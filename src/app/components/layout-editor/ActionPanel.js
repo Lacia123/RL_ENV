@@ -21,9 +21,38 @@ const ActionPanel = ({
   onUpdateElementContent, // 更新元素内容的函数
   onMoveElement, // 移动元素到容器的函数
   onMoveElementToSibling, // 移动元素到同级位置的函数
+  usedElementIds = [], // 已使用的元素ID列表
+  onAddContainer, // 添加容器的函数
 }) => {
   // 设置当前活动的标签页
   const [activeTab, setActiveTab] = useState('components');
+  // 添加容器时选中的元素
+  const [selectedElements, setSelectedElements] = useState([]);
+  
+  // 获取未使用的元素
+  const unusedElements = markdownElements.filter(element => !usedElementIds.includes(element.id));
+
+
+  console.log('..... unusedElements')
+  console.log(unusedElements)
+  
+  // 处理容器添加
+  const handleAddContainer = () => {
+    // 添加一个容器，包含选中的元素
+    onAddContainer(selectedElements);
+    setSelectedElements([]); // 清空选择
+  };
+
+  // 处理元素选择
+  const handleElementSelect = (element) => {
+    setSelectedElements(prev => {
+      const index = prev.findIndex(e => e.id === element.id);
+      if (index === -1) {
+        return [...prev, element];
+      }
+      return prev.filter(e => e.id !== element.id);
+    });
+  };
 
   // 查找所有容器元素，用于移动功能
   const findAllContainers = (rootElement) => {
@@ -39,7 +68,10 @@ const ActionPanel = ({
       }
     };
     
-    traverse(rootElement);
+    // 只有当根元素存在时才遍历
+    if (rootElement) {
+      traverse(rootElement);
+    }
     return containers;
   };
 
@@ -47,6 +79,11 @@ const ActionPanel = ({
   const findSiblings = (rootElement, elementId) => {
     const siblings = [];
     let parentElement = null;
+    
+    // 如果根元素不存在，直接返回空数组
+    if (!rootElement) {
+      return siblings;
+    }
     
     // 辅助函数：查找元素的父元素
     const findParent = (element, targetId, parent = null) => {
@@ -85,6 +122,9 @@ const ActionPanel = ({
 
   // 使用通过导入的getAvailablePresets获取元素的可用预设
   const getElementPresets = (elementId) => {
+    // 如果没有布局或元素ID，返回空对象
+    if (!layout || !elementId) return {};
+    
     // 查找元素
     const element = findElement(layout, elementId);
     if (!element || !element.type) return {};
@@ -125,60 +165,193 @@ const ActionPanel = ({
     return presetMap[presetKey] || presetKey.replace('Preset', '');
   };
 
-  // 核心属性列表
-  const coreProperties = [
-    { 
-      name: 'width', 
-      label: '宽度',
-      type: 'text',
-      placeholder: '例如: 100px, 50%, auto'
-    },
-    { 
-      name: 'height', 
-      label: '高度',
-      type: 'text',
-      placeholder: '例如: 100px, 50%, auto'
-    },
-    { 
-      name: 'margin', 
-      label: '外边距',
-      type: 'text',
-      placeholder: '例如: 10px, 10px 20px'
-    },
-    { 
-      name: 'padding', 
-      label: '内边距',
-      type: 'text',
-      placeholder: '例如: 10px, 10px 20px'
-    },
-    { 
-      name: 'background', 
-      label: '背景',
-      type: 'text',
-      placeholder: '例如: #ffffff, rgba(255,255,255,0.5)'
-    },
-    { 
-      name: 'color', 
-      label: '文字颜色',
-      type: 'text',
-      placeholder: '例如: #000000, rgb(0,0,0)'
-    },
-    { 
-      name: 'fontSize', 
-      label: '字体大小',
-      type: 'text',
-      placeholder: '例如: 16px, 1.2rem'
-    },
-    { 
-      name: 'fontWeight', 
-      label: '字体粗细',
-      type: 'text',
-      placeholder: '例如: normal, bold, 600'
-    }
-  ];
+  // 根据元素类型渲染不同的核心属性配置
+  const renderCoreProperties = () => {
+    if (!selectedElementId || !layout) return null;
+    
+    const selectedElement = findElement(layout, selectedElementId);
+    if (!selectedElement) return null;
 
-  // 仅在有元素选中时才启用动作
-  const isActionDisabled = !selectedElementId;
+    const { type, content } = selectedElement;
+    
+    switch (type) {
+      case 'text':
+        // 文本元素的核心属性是文本内容
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <label className="w-1/3 text-sm">文本内容:</label>
+              <textarea
+                className="flex-1 px-3 py-2 border rounded text-sm"
+                rows="3"
+                value={typeof content === 'string' ? content : (content?.value || '')}
+                onChange={(e) => {
+                  if (typeof content === 'string') {
+                    onUpdateElementContent(selectedElementId, 'content', e.target.value);
+                  } else {
+                    onUpdateElementContent(selectedElementId, 'value', e.target.value);
+                  }
+                }}
+                placeholder="输入文本内容"
+              />
+            </div>
+          </div>
+        );
+        
+      case 'button':
+        // 按钮元素的核心属性包括文本、图标和图标位置
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <label className="w-1/3 text-sm">按钮文本:</label>
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 border rounded text-sm"
+                value={content?.text || ''}
+                onChange={(e) => onUpdateElementContent(selectedElementId, 'text', e.target.value)}
+                placeholder="输入按钮文本"
+              />
+            </div>
+            <div className="flex items-center">
+              <label className="w-1/3 text-sm">图标:</label>
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 border rounded text-sm"
+                value={content?.icon || ''}
+                onChange={(e) => onUpdateElementContent(selectedElementId, 'icon', e.target.value)}
+                placeholder="选择图标"
+              />
+            </div>
+            {content?.icon && (
+              <div className="flex items-center">
+                <label className="w-1/3 text-sm">图标位置:</label>
+                <select
+                  className="flex-1 px-3 py-2 border rounded text-sm"
+                  value={content?.iconPosition || 'left'}
+                  onChange={(e) => onUpdateElementContent(selectedElementId, 'iconPosition', e.target.value)}
+                >
+                  <option value="left">左侧</option>
+                  <option value="right">右侧</option>
+                </select>
+              </div>
+            )}
+          </div>
+        );
+        
+      case 'image':
+        // 图片元素的核心属性包括图片源和替代文本
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <label className="w-1/3 text-sm">图片链接:</label>
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 border rounded text-sm"
+                value={content?.src || ''}
+                onChange={(e) => onUpdateElementContent(selectedElementId, 'src', e.target.value)}
+                placeholder="输入图片URL"
+              />
+            </div>
+            <div className="flex items-center">
+              <label className="w-1/3 text-sm">替代文本:</label>
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 border rounded text-sm"
+                value={content?.alt || ''}
+                onChange={(e) => onUpdateElementContent(selectedElementId, 'alt', e.target.value)}
+                placeholder="输入替代文本"
+              />
+            </div>
+          </div>
+        );
+        
+      case 'icon':
+        // 图标元素的核心属性是图标名称和大小
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <label className="w-1/3 text-sm">图标:</label>
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 border rounded text-sm"
+                value={content?.icon || ''}
+                onChange={(e) => onUpdateElementContent(selectedElementId, 'icon', e.target.value)}
+                placeholder="选择图标"
+              />
+            </div>
+            {content?.icon && (
+              <div className="flex items-center">
+                <label className="w-1/3 text-sm">图标大小:</label>
+                <input
+                  type="text"
+                  className="flex-1 px-3 py-2 border rounded text-sm"
+                  value={selectedElement.style?.fontSize || '24px'}
+                  onChange={(e) => onUpdateElementStyle(selectedElementId, 'fontSize', e.target.value)}
+                  placeholder="输入图标大小"
+                />
+              </div>
+            )}
+          </div>
+        );
+        
+      case 'input':
+        // 输入框元素的核心属性包括占位符、字段名和类型
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <label className="w-1/3 text-sm">占位符:</label>
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 border rounded text-sm"
+                value={content?.placeholder || ''}
+                onChange={(e) => onUpdateElementContent(selectedElementId, 'placeholder', e.target.value)}
+                placeholder="输入占位符文本"
+              />
+            </div>
+            <div className="flex items-center">
+              <label className="w-1/3 text-sm">字段名:</label>
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 border rounded text-sm"
+                value={content?.field || ''}
+                onChange={(e) => onUpdateElementContent(selectedElementId, 'field', e.target.value)}
+                placeholder="输入字段名"
+              />
+            </div>
+            <div className="flex items-center">
+              <label className="w-1/3 text-sm">输入类型:</label>
+              <select
+                className="flex-1 px-3 py-2 border rounded text-sm"
+                value={content?.type || 'text'}
+                onChange={(e) => onUpdateElementContent(selectedElementId, 'type', e.target.value)}
+              >
+                <option value="text">文本</option>
+                <option value="password">密码</option>
+                <option value="number">数字</option>
+                <option value="email">邮箱</option>
+                <option value="tel">电话</option>
+                <option value="url">网址</option>
+              </select>
+            </div>
+          </div>
+        );
+        
+      case 'container':
+      case 'divider':
+      default:
+        return (
+          <p className="text-sm text-gray-500 py-2">
+            {type === 'container' || type === 'divider' 
+              ? `${type === 'container' ? '容器' : '分割线'}元素没有核心内容属性，请使用布局和样式配置。`
+              : '该元素类型没有可配置的核心属性。'
+            }
+          </p>
+        );
+    }
+  };
+
+  // 检查是否可以执行动作
+  const isActionDisabled = !layout || !selectedElementId;
   const selectedElement = selectedElementId ? findElement(layout, selectedElementId) : null;
   const containers = findAllContainers(layout);
   const siblings = selectedElementId ? findSiblings(layout, selectedElementId) : [];
@@ -186,6 +359,7 @@ const ActionPanel = ({
 
   // 查找元素
   function findElement(layout, id) {
+    if (!layout || !id) return null;
     if (layout.id === id) return layout;
     if (layout.children) {
       for (const child of layout.children) {
@@ -208,46 +382,118 @@ const ActionPanel = ({
 
       {/* 标签栏 */}
       <div className="flex border-b">
-        <button
-          className={`flex-1 py-2 px-4 font-medium ${activeTab === 'components' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}
-          onClick={() => setActiveTab('components')}
-        >
-          组件
-        </button>
-        <button
-          className={`flex-1 py-2 px-4 font-medium ${activeTab === 'presets' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}
-          onClick={() => setActiveTab('presets')}
-        >
-          预设
-        </button>
-        <button
-          className={`flex-1 py-2 px-4 font-medium ${activeTab === 'properties' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}
-          onClick={() => setActiveTab('properties')}
-        >
-          属性
-        </button>
-        <button
-          className={`flex-1 py-2 px-4 font-medium ${activeTab === 'movement' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}
-          onClick={() => setActiveTab('movement')}
-        >
-          移动
-        </button>
+        {[
+          { id: 'container', label: '容器' },
+          { id: 'components', label: '组件' },
+          { id: 'presets', label: '预设' },
+          { id: 'properties', label: '属性' },
+          { id: 'movement', label: '移动' }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            className={`flex-1 py-2 px-4 font-medium ${activeTab === tab.id ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* 内容区域 */}
       <div className="p-4 max-h-96 overflow-y-auto">
-        {/* 组件标签内容 - 从Markdown生成的组件 */}
+        {/* 容器标签内容 */}
+        {activeTab === 'container' && (
+          <div>
+            <h4 className="font-medium mb-3">添加新容器</h4>
+            {!layout && (
+              <div className="mb-4">
+                <p className="text-sm text-yellow-600 mb-2">
+                  ⚠️ 将创建一个根容器来开始布局
+                </p>
+              </div>
+            )}
+            
+            <div className="space-y-4">
+              {/* 可选元素列表 */}
+              <div>
+                <h5 className="text-sm font-medium mb-2">选择要包含的元素：</h5>
+                {unusedElements.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    {unusedElements.map((element) => (
+                      <button
+                        key={element.id}
+                        className={`p-2 border rounded flex items-center ${
+                          selectedElements.some(e => e.id === element.id)
+                            ? 'bg-blue-50 border-blue-300'
+                            : 'hover:bg-gray-50'
+                        }`}
+                        onClick={() => handleElementSelect(element)}
+                      >
+                        <span className="mr-2">{getElementIcon(element.type)}</span>
+                        <div className="text-left">
+                          <div className="text-sm font-medium">{element.content?.value || element.content?.text || element.type}</div>
+                          <div className="text-xs text-gray-500">{element.type}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-gray-500 text-center py-2">
+                    <p>没有可用的未使用元素</p>
+                  </div>
+                )}
+              </div>
+
+              {/* 容器说明 */}
+              <div className="p-4 border rounded-lg bg-gray-50">
+                <h5 className="text-sm font-medium mb-2">容器说明：</h5>
+                <p className="text-sm text-gray-600 mb-2">
+                  容器是用来组织和布局其他元素的基本单位。您可以：
+                </p>
+                <ul className="text-sm text-gray-600 list-disc pl-5 space-y-1">
+                  {[
+                    { id: 'add', text: '添加一个新的容器，可选择包含未使用的元素' },
+                    { id: 'nest', text: '在"移动"标签页中调整容器的嵌套关系' }
+                  ].map(item => (
+                    <li key={item.id}>{item.text}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* 添加容器按钮 */}
+              <button
+                className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                onClick={handleAddContainer}
+              >
+                {!layout 
+                  ? '创建根容器'
+                  : `添加新容器${selectedElements.length > 0 ? `(包含 ${selectedElements.length} 个元素)` : ''}`
+                }
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 组件标签内容 */}
         {activeTab === 'components' && (
           <div>
             <h4 className="font-medium mb-3">可用组件</h4>
-            {markdownElements.length > 0 ? (
+            {unusedElements.length > 0 ? (
               <div className="grid grid-cols-2 gap-2">
-                {markdownElements.map((element, index) => (
+                {unusedElements.map((element, index) => (
                   <button
-                    key={index}
-                    className="p-3 border rounded flex items-center hover:bg-blue-50 hover:border-blue-300 transition-colors"
-                    onClick={() => onAddComponent(selectedElementId || layout.id, element.type, element)}
-                    disabled={isActionDisabled}
+                    key={element.id}
+                    className={`p-3 border rounded flex items-center ${
+                      !layout || layout.type !== 'container'
+                        ? 'bg-gray-100 cursor-not-allowed'
+                        : 'hover:bg-blue-50 hover:border-blue-300'
+                    } transition-colors`}
+                    onClick={() => {
+                      if (layout && layout.type === 'container') {
+                        onAddComponent(selectedElementId || layout.id, element.type, element);
+                      }
+                    }}
+                    disabled={!layout || layout.type !== 'container'}
                   >
                     <span className="mr-2 text-xl">{getElementIcon(element.type)}</span>
                     <div className="text-left">
@@ -266,7 +512,32 @@ const ActionPanel = ({
             ) : (
               <div className="text-gray-500 text-center py-4">
                 <p>没有可用的组件</p>
-                <p className="text-sm">请先输入Markdown内容</p>
+                <p className="text-sm">所有组件已添加到布局中</p>
+              </div>
+            )}
+
+            {/* 添加已使用组件的提示信息 */}
+            {markdownElements.length > unusedElements.length && (
+              <div className="mt-4 p-3 bg-gray-50 border rounded-lg">
+                <h5 className="text-sm font-medium mb-2">已使用的组件</h5>
+                <div className="text-sm text-gray-600">
+                  <p>已添加 {markdownElements.length - unusedElements.length} 个组件到布局中</p>
+                  <p className="mt-1">提示：已使用的组件可以在"移动"标签页中调整位置</p>
+                </div>
+                <div className="mt-2 space-y-2">
+                  {markdownElements
+                    .filter(element => usedElementIds.includes(element.id))
+                    .map(element => (
+                      <div key={element.id} className="flex items-center p-2 bg-white border rounded">
+                        <span className="mr-2 text-xl opacity-50">{getElementIcon(element.type)}</span>
+                        <div className="text-left">
+                          <div className="font-medium text-gray-400">{element.content?.value || element.content?.text || element.type}</div>
+                          <div className="text-xs text-gray-400">{element.type}</div>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
               </div>
             )}
           </div>
@@ -315,20 +586,7 @@ const ActionPanel = ({
           <div>
             <h4 className="font-medium mb-3">核心属性</h4>
             {!isActionDisabled ? (
-              <div className="space-y-3">
-                {coreProperties.map(property => (
-                  <div key={property.name} className="flex items-center">
-                    <label className="w-1/3 text-sm">{property.label}:</label>
-                    <input
-                      type={property.type}
-                      className="flex-1 px-3 py-2 border rounded text-sm"
-                      placeholder={property.placeholder}
-                      value={selectedElement?.style?.[property.name] || ''}
-                      onChange={(e) => onUpdateElementStyle(selectedElementId, property.name, e.target.value)}
-                    />
-                  </div>
-                ))}
-              </div>
+              renderCoreProperties()
             ) : (
               <div className="text-gray-500 text-center py-4">
                 <p>请先选择一个元素</p>
@@ -337,7 +595,7 @@ const ActionPanel = ({
           </div>
         )}
 
-        {/* 移动标签内容 */}
+        {/* 移动标签内容 - 增强容器嵌套功能 */}
         {activeTab === 'movement' && (
           <div>
             <h4 className="font-medium mb-3">移动元素</h4>
@@ -347,8 +605,9 @@ const ActionPanel = ({
                   <h5 className="font-medium mb-2">移动到容器</h5>
                   {containers.length > 0 ? (
                     <div className="space-y-2 max-h-32 overflow-y-auto">
-                      {containers.map(container => (
-                        container.id !== selectedElementId && (
+                      {containers
+                        .filter(container => container.id !== selectedElementId)
+                        .map(container => (
                           <button
                             key={container.id}
                             className="w-full p-2 border rounded flex items-center hover:bg-blue-50 hover:border-blue-300"
@@ -357,8 +616,7 @@ const ActionPanel = ({
                             <span className="mr-2">🔲</span>
                             <span>{container.name || `容器 - ${container.id}`}</span>
                           </button>
-                        )
-                      ))}
+                        ))}
                     </div>
                   ) : (
                     <div className="text-gray-500 text-center py-2">
