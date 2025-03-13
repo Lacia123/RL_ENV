@@ -287,8 +287,9 @@ const TreeNodeActions = ({
               <>
                 {containerElements.length > 0 ? (
                   <div className="max-h-60 overflow-y-auto mb-4">
-                    {containerElements.map((container) => (
-                      container.id !== element.id && (
+                    {containerElements
+                      .filter(container => container.id !== element.id)
+                      .map((container) => (
                         <div
                           key={container.id}
                           className="p-2 hover:bg-gray-100 cursor-pointer rounded"
@@ -302,8 +303,7 @@ const TreeNodeActions = ({
                             </div>
                           </div>
                         </div>
-                      )
-                    ))}
+                      ))}
                   </div>
                 ) : (
                   <div className="text-gray-500 mb-4">没有可用的容器元素</div>
