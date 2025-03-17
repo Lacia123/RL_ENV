@@ -12,18 +12,89 @@ const LayoutPreview = ({
   selectedElementId,
   onElementClick
 }) => {
+  // 生成基于内容的元素ID
+  const generateElementId = (element) => {
+    if (!element) return `element_unknown`;
+    
+    let idComponents = ['element', element.type];
+    
+    // 创建一个简单的哈希函数
+    const simpleHash = (str) => {
+      if (!str) return '';
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // 转换为 32bit 整数
+      }
+      return Math.abs(hash).toString(16).substring(0, 8); // 转为16进制字符串并取前8位
+    };
+    
+    // 获取内容字符串
+    let contentString = '';
+    if (element.content) {
+      if (typeof element.content === 'string') {
+        contentString = element.content;
+      } else if (element.content.text) {
+        contentString = element.content.text;
+      } else if (element.content.value) {
+        contentString = element.content.value.toString();
+      }
+    }
+    
+    // 添加额外特征字符串
+    let featureString = '';
+    if (element.name) {
+      featureString += element.name;
+    }
+    
+    // 添加预设特征
+    const presetKeys = Object.keys(element).filter(key => key.endsWith('Preset'));
+    presetKeys.forEach(key => {
+      if (element[key]) {
+        featureString += `${key}:${element[key]};`;
+      }
+    });
+    
+    // 创建唯一内容哈希
+    const contentHash = contentString ? simpleHash(contentString) : '';
+    const featureHash = featureString ? simpleHash(featureString) : '';
+    
+    // 添加哈希到ID组件
+    if (contentHash) {
+      idComponents.push(contentHash);
+    }
+    
+    if (featureHash) {
+      idComponents.push(featureHash);
+    }
+    
+    // 只有在必要时才添加一个确定性的序号（而不是随机数或时间戳）
+    if (idComponents.length < 3) {
+      idComponents.push('0');
+    }
+    
+    return idComponents.join('_');
+  };
+
   // 元素渲染函数
   const renderElement = (element) => {
     if (!element || !element.type) return null;
 
-    const { style = {}, type } = element;
-    const isSelected = element.id === selectedElementId;
+    // 确保元素有ID
+    const elementWithId = element.id ? element : {
+      ...element,
+      id: generateElementId(element)
+    };
+
+    const { style = {}, type } = elementWithId;
+    const isSelected = elementWithId.id === selectedElementId;
 
     // 判断元素是否支持布局属性
     const supportsLayout = ['container'].includes(type);
 
     // 从新预设系统中获取预设样式并处理令牌引用
-    let presetStyle = mergeElementPresets(element) || {};
+    let presetStyle = mergeElementPresets(elementWithId) || {};
 
     // 处理预设样式中的所有令牌引用
     for (const [key, value] of Object.entries(presetStyle)) {
@@ -36,8 +107,8 @@ const LayoutPreview = ({
     }
 
     // 调试输出预设信息
-    if (element.spacingPreset) {
-      console.log(`元素 ${element.id || element.type} 的间距预设:`, element.spacingPreset);
+    if (elementWithId.spacingPreset) {
+      console.log(`元素 ${elementWithId.id || elementWithId.type} 的间距预设:`, elementWithId.spacingPreset);
       console.log('解析后的预设样式:', presetStyle);
     }
 
@@ -164,16 +235,16 @@ const LayoutPreview = ({
 
 
     // 根据类型渲染特定元素
-    switch (element.type) {
+    switch (elementWithId.type) {
       case 'container':
         return (
           <div
             style={computedStyle}
-            onClick={(e) => onElementClick(element, e)}
+            onClick={(e) => onElementClick(elementWithId, e)}
             className={isSelected ? 'selected-element' : ''}
-            data-element-id={element.id}
+            data-element-id={elementWithId.id}
           >
-            {element.children?.map((child) => (
+            {elementWithId.children?.map((child) => (
               <React.Fragment key={child.id}>
                 {renderElement(child)}
               </React.Fragment>
@@ -201,11 +272,11 @@ const LayoutPreview = ({
         return (
           <div
             style={textStyle}
-            onClick={(e) => onElementClick(element, e)}
+            onClick={(e) => onElementClick(elementWithId, e)}
             className={isSelected ? 'selected-element' : ''}
-            data-element-id={element.id}
+            data-element-id={elementWithId.id}
           >
-            {element.content?.value || 'Text Element'}
+            {elementWithId.content?.value || 'Text Element'}
           </div>
         );
 
@@ -223,9 +294,9 @@ const LayoutPreview = ({
         };
 
         // 处理按钮图标
-        const buttonText = element.content?.text || 'Button';
-        const buttonIcon = element.content?.icon;
-        const iconPosition = element.content?.iconPosition || 'left';
+        const buttonText = elementWithId.content?.text || 'Button';
+        const buttonIcon = elementWithId.content?.icon;
+        const iconPosition = elementWithId.content?.iconPosition || 'left';
 
         // 渲染按钮内容，包括可选的图标
         const renderButtonContent = () => {
@@ -259,9 +330,9 @@ const LayoutPreview = ({
         return (
           <div
             style={buttonStyle}
-            onClick={(e) => onElementClick(element, e)}
+            onClick={(e) => onElementClick(elementWithId, e)}
             className={isSelected ? 'selected-element' : ''}
-            data-element-id={element.id}
+            data-element-id={elementWithId.id}
           >
             {renderButtonContent()}
           </div>
@@ -281,14 +352,14 @@ const LayoutPreview = ({
         return (
           <div
             style={imageStyle}
-            onClick={(e) => onElementClick(element, e)}
+            onClick={(e) => onElementClick(elementWithId, e)}
             className={isSelected ? 'selected-element' : ''}
-            data-element-id={element.id}
+            data-element-id={elementWithId.id}
           >
-            {element.content?.src ? (
+            {elementWithId.content?.src ? (
               <img
-                src={element.content.src}
-                alt={element.content.alt || ''}
+                src={elementWithId.content.src}
+                alt={elementWithId.content.alt || ''}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -316,11 +387,11 @@ const LayoutPreview = ({
         return (
           <div
             style={{ ...computedStyle, padding: '12px', textAlign: 'center' }}
-            onClick={(e) => onElementClick(element, e)}
+            onClick={(e) => onElementClick(elementWithId, e)}
             className={isSelected ? 'selected-element' : ''}
-            data-element-id={element.id}
+            data-element-id={elementWithId.id}
           >
-            {element.type.charAt(0).toUpperCase() + element.type.slice(1)} Element
+            {elementWithId.type.charAt(0).toUpperCase() + elementWithId.type.slice(1)} Element
           </div>
         );
     }

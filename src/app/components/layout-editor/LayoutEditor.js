@@ -10,6 +10,8 @@ import JsonInputPanel from './JsonInputPanel';
 import elementPresets, { applyPresetToElement, mergeElementPresets } from '../../utils/presetSystem';
 import { elementDefinitions } from '../../utils/elementDefinitions';
 import exampleLayout from './exampleLayout';
+import ActionExecutor from '../../utils/actionExecutor'; // 导入ActionExecutor
+import globalLayoutState from '../../utils/globalLayoutState'; // 导入全局布局状态
 
 /**
  * 布局编辑器组件 - 整合预览、控制面板和评分功能
@@ -23,6 +25,8 @@ const LayoutEditor = ({ initialLayout }) => {
   const idCounterRef = useRef(0);
   // 用于跟踪 Markdown 元素变化
   const lastElementsRef = useRef([]);
+  // 创建ActionExecutor实例
+  const [actionExecutor, setActionExecutor] = useState(null);
 
   // 使用初始化函数确保一致的ID
   const [state, setState] = useState(() => {
@@ -45,6 +49,94 @@ const LayoutEditor = ({ initialLayout }) => {
   });
 
   const panelRef = useRef(null);
+
+  // 将state.layout的更改同步到全局状态
+  useEffect(() => {
+    console.log('组件挂载，初始化全局状态同步...');
+    
+    // 添加布局变化监听函数
+    const syncStateToGlobal = () => {
+      if (state.layout) {
+        console.log('更新全局布局状态...');
+        globalLayoutState.updateLayout(state.layout);
+      }
+      
+      if (state.selectedElementId) {
+        console.log('更新全局选中元素ID...');
+        globalLayoutState.updateSelectedElementId(state.selectedElementId);
+      }
+    };
+    
+    // 同步当前状态到全局
+    syncStateToGlobal();
+    
+    // 添加状态变化监听器
+    const unsubscribe = globalLayoutState.registerListener((globalState) => {
+      console.log('全局状态变化，检查是否需要更新本地状态');
+      
+      // 如果local state没有布局但全局状态有，则同步到本地
+      if (!state.layout && globalState.layout) {
+        console.log('全局布局存在但本地布局为空，同步到本地状态');
+        setState(prev => ({
+          ...prev,
+          layout: globalState.layout,
+          jsonInput: JSON.stringify(globalState.layout, null, 2)
+        }));
+      }
+    });
+    
+    // 清理函数
+    return () => {
+      unsubscribe();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
+  // 同步state变化到全局状态
+  useEffect(() => {
+    if (state.layout) {
+      console.log('布局状态变化，更新全局状态...');
+      globalLayoutState.updateLayout(state.layout);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.layout]);
+  
+  // 同步选中元素到全局状态
+  useEffect(() => {
+    if (state.selectedElementId) {
+      console.log('选中元素变化，更新全局状态...');
+      globalLayoutState.updateSelectedElementId(state.selectedElementId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.selectedElementId]);
+
+  // 在所有方法定义完成后，确保ActionExecutor在组件挂载时初始化
+  useEffect(() => {
+    console.log('组件挂载，初始化ActionExecutor实例...');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const executor = new ActionExecutor({
+      onAddComponent: addChildComponent,
+      onAddContainer: handleAddContainer,
+      onApplyPreset: applyCategoryPreset, 
+      onUpdateElementStyle: updateElementStyle,
+      onUpdateElementContent: updateElementContent,
+      onMoveElement: moveElement,
+      onMoveElementToSibling: moveElementToSibling,
+      onClearLayout: clearLayout,
+      onSetMarkdownData: setMarkdownData,
+      onResetUsedElements: resetUsedElements,
+      onActionExecuted: (actionData) => {
+        console.log('Action executed:', actionData);
+      },
+      onError: (error) => {
+        console.error('Action error:', error);
+      }
+    });
+    
+    setActionExecutor(executor);
+    console.log('ActionExecutor实例创建完成!');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 处理面板外部点击
   useEffect(() => {
@@ -148,11 +240,16 @@ const LayoutEditor = ({ initialLayout }) => {
   const handleElementClick = (element, event) => {
     if (!element) return;
     event.stopPropagation();
+    
+    // 更新本地状态
     setState(prev => ({
       ...prev,
       selectedElementId: element.id,
       showPanel: true
     }));
+    
+    // 同时更新全局状态
+    globalLayoutState.updateSelectedElementId(element.id);
   };
 
   // 处理元素选择 - 仅选中元素不显示面板
@@ -276,129 +373,164 @@ const LayoutEditor = ({ initialLayout }) => {
       }
     }
 
-    // 根据类型创建新元素
-    let newElement = {};
+    // 创建新元素
+    const newElement = markdownElement || {
+      type,
+      id: generateStandardId({ type, content: { value: type } }),
+      content: { value: type }
+    };
 
-    // 处理传入的参数：当markdownElement是元素对象时直接使用它，当是字符串(preset)时查找
-    if (markdownElement && typeof markdownElement === 'object') {
-      // 直接使用传入的元素（完整的Markdown生成元素）
-      newElement = JSON.parse(JSON.stringify(markdownElement));
-    } else {
-      // 按旧逻辑处理，查找匹配的markdown元素或使用默认元素
-      const preset = markdownElement;
-      const matchedElement = state.markdownElements.find(element =>
-        element.type === type && (!preset || element.preset === preset)
-      );
-
-      if (matchedElement) {
-        // 使用找到的markdown元素
-        newElement = JSON.parse(JSON.stringify(matchedElement));
-      } else if (elementDefinitions[type]) {
-        // 使用元素定义
-        newElement = {
-          ...elementDefinitions[type],
-          preset
-        };
-      } else {
-        // 使用默认元素
-        newElement = {
-          type,
-          style: { ...elementDefinitions.commonStyleProps },
-          preset
-        };
-      }
+    // 确保元素具有唯一ID
+    if (!newElement.id || (markdownElement && !markdownElement.id)) {
+      newElement.id = generateStandardId(newElement);
     }
 
-    // 如果没有从markdown元素获取预设，则添加默认预设值
-    if (!markdownElement) {
-      switch (type) {
-        case 'button':
-          // 为按钮设置默认的按钮尺寸和自对齐方式
-          newElement.buttonSizePreset = 'btn-medium';
-          newElement.selfAlignPreset = 'self-center';
-          break;
-        case 'text':
-          // 为文本设置默认的文本对齐和自对齐方式
-          newElement.textAlignPreset = 'left';
-          newElement.selfAlignPreset = 'self-start';
-          newElement.sizePreset = 'auto';
-          break;
-        case 'image':
-          // 为图片设置默认的图片比例和自对齐方式
-          newElement.imageProportionPreset = 'original';
-          newElement.selfAlignPreset = 'self-center';
-          newElement.sizePreset = 'responsive-medium';
-          break;
-        case 'container':
-          // 为容器设置默认的布局和尺寸
-          newElement.layoutPreset = 'vertical-centered';
-          newElement.sizePreset = 'fill-width';
-          newElement.flexRatioPreset = 'grow-1';
-          break;
-        default:
-          // 为其他元素类型设置默认的自对齐方式
-          newElement.selfAlignPreset = 'self-start';
-          newElement.sizePreset = 'auto';
-      }
+    // 为了确保在导入情况下也有唯一ID，再次检查
+    const existingElement = findElement(state.layout, newElement.id);
+    if (existingElement) {
+      // 如果ID已存在，添加随机后缀确保唯一性
+      newElement.id = `${newElement.id}_${Math.random().toString(36).substring(2, 7)}`;
     }
 
-    // 添加唯一ID
-    newElement = addIds(newElement);
-
-    // 添加到父元素
+    // 更新布局结构
     const updateElement = (layout) => {
       if (layout.id === parentId) {
-        const newLayout = { ...layout };
-        if (!newLayout.children) newLayout.children = [];
-
-        newLayout.children = [...newLayout.children, newElement];
-
-        // 选中新添加的元素
-        setState(prev => ({
-          ...prev,
-          selectedElementId: newElement.id
-        }));
-
-        return newLayout;
+        if (!layout.children) {
+          layout.children = [];
+        }
+        layout.children.push(newElement);
+        return layout;
       }
 
       if (layout.children) {
-        return {
-          ...layout,
-          children: layout.children.map(child => updateElement(child))
-        };
+        layout.children = layout.children.map(child => updateElement(child));
       }
-
       return layout;
     };
 
     const newLayout = updateElement(state.layout);
-    setState(prev => ({
-      ...prev,
-      layout: newLayout,
-      jsonInput: JSON.stringify(newLayout, null, 2)
-    }));
 
-    // 更新已使用元素集合
-    if (markdownElement && markdownElement.id) {
-      setState(prev => ({
+    // 更新状态
+    setState(prev => {
+      const updatedUsedElementIds = new Set(prev.usedElementIds);
+      if (markdownElement && markdownElement.id) {
+        updatedUsedElementIds.add(markdownElement.id);
+      }
+      
+      return {
         ...prev,
-        usedElementIds: new Set([...prev.usedElementIds, markdownElement.id])
-      }));
-    }
+        layout: newLayout,
+        jsonInput: JSON.stringify(newLayout, null, 2),
+        usedElementIds: updatedUsedElementIds
+      };
+    });
 
-    // 返回新创建的元素ID，以便外部使用
     return newElement.id;
   };
 
-  // 旧版预设选择方法已移除，统一使用分类预设系统
-
   // 应用分类预设样式
-  const applyCategoryPreset = (category, presetKey, asArray = false) => {
-    const elementId = state.selectedElementId || state.layout.id;
-    console.log(`应用预设: ${category} - ${presetKey} 到元素: ${elementId}`);
+  const applyCategoryPreset = (elementIdOrCategory, categoryOrPresetKey, presetKeyOrAsArray = false, asArray = false) => {
+    // 支持两种调用方式:
+    // 1. applyCategoryPreset(elementId, category, presetKey, asArray) - 新版本，用于 actionExecutor
+    // 2. applyCategoryPreset(category, presetKey, asArray) - 旧版本，向后兼容
+    
+    let elementId, category, presetKey;
+    
+    // 检查第一个参数是否为元素ID
+    if (typeof categoryOrPresetKey === 'string' && typeof presetKeyOrAsArray === 'string') {
+      // 新版本调用方式
+      elementId = elementIdOrCategory;
+      category = categoryOrPresetKey;
+      presetKey = presetKeyOrAsArray;
+      // asArray 保持不变
+      console.log(`新版本调用: elementId=${elementId}, category=${category}, presetKey=${presetKey}`);
+    } else {
+      // 旧版本调用方式
+      elementId = state.selectedElementId || (state.layout ? state.layout.id : null);
+      category = elementIdOrCategory;
+      presetKey = categoryOrPresetKey;
+      asArray = presetKeyOrAsArray;
+      console.log(`旧版本调用: elementId=${elementId}, category=${category}, presetKey=${presetKey}`);
+    }
+    
+    // 先尝试从本地状态获取布局，如果为空则尝试从全局状态获取
+    const currentLayout = state.layout || globalLayoutState.getLayout();
+    
+    // 检查布局状态
+    if (!currentLayout) {
+      console.log(`本地和全局布局都为空，将在500ms后重试应用预设... elementId=${elementId}`);
+      // 使用延迟重试机制
+      setTimeout(() => {
+        console.log('重试应用预设:', elementId, category, presetKey);
+        
+        // 重试时再次检查本地和全局布局
+        const retryLayout = state.layout || globalLayoutState.getLayout();
+        console.log('重试时布局状态:', retryLayout ? '布局存在' : '布局仍为空');
+        
+        if (!retryLayout) {
+          console.error('重试失败：本地和全局布局仍为空');
+          return;
+        }
+        
+        if (!elementId) {
+          console.error('重试失败：元素ID为空');
+          return;
+        }
+        
+        // 重新执行预设应用逻辑
+        const updateElement = (layout) => {
+          if (!layout) return null;
+          if (layout.id === elementId) {
+            try {
+              console.log(`找到元素，重试应用预设: ${layout.id}`);
+              let newLayout = applyPresetToElement(layout, category, presetKey, asArray);
+              console.log('预设应用成功');
+              return newLayout;
+            } catch (error) {
+              console.error('预设应用失败:', error);
+              return layout;
+            }
+          }
+          
+          if (layout.children) {
+            return {
+              ...layout,
+              children: layout.children.map(child => updateElement(child))
+            };
+          }
+          
+          return layout;
+        };
+        
+        // 应用预设
+        const newLayout = updateElement(retryLayout);
+        setState(prev => ({
+          ...prev,
+          layout: newLayout,
+          jsonInput: JSON.stringify(newLayout, null, 2)
+        }));
+        
+        // 同时更新全局状态
+        globalLayoutState.updateLayout(newLayout);
+      }, 500);
+      
+      return;
+    }
+    
+    // 布局存在，继续正常逻辑
+    if (!elementId) {
+      console.error(`无法应用预设: 元素ID为空, category=${category}, presetKey=${presetKey}`);
+      return;
+    }
+    
+    console.log(`应用预设: ${category} - ${presetKey} 到元素: ${elementId}, 布局存在:`, true);
 
     const updateElement = (layout) => {
+      if (!layout) {
+        console.error("updateElement: 布局为null");
+        return null;
+      }
+      
       if (layout.id === elementId) {
         // 使用预设系统的applyPresetToElement函数应用预设
         console.log(`找到元素: ${layout.type} - ${layout.id}`);
@@ -422,12 +554,22 @@ const LayoutEditor = ({ initialLayout }) => {
       return layout;
     };
 
-    const newLayout = updateElement(state.layout);
+    const newLayout = updateElement(currentLayout);
+    
+    // 检查是否找到并更新了元素
+    const elementWasFound = JSON.stringify(newLayout) !== JSON.stringify(currentLayout);
+    if (!elementWasFound) {
+      console.warn(`未找到ID为 ${elementId} 的元素，无法应用预设`);
+    }
+    
     setState(prev => ({
       ...prev,
       layout: newLayout,
       jsonInput: JSON.stringify(newLayout, null, 2)
     }));
+    
+    // 同时更新全局状态
+    globalLayoutState.updateLayout(newLayout);
   };
 
   // 删除元素
@@ -661,36 +803,34 @@ const LayoutEditor = ({ initialLayout }) => {
 
   // 处理Markdown元素生成
   const handleMarkdownElementsGenerated = (elements) => {
-    // 使用ref来避免不必要的状态更新
-    if (JSON.stringify(lastElementsRef.current) !== JSON.stringify(elements)) {
-      lastElementsRef.current = elements;
-
-      // 创建一个空的根容器
-      const emptyLayout = {
-        type: 'container',
-        layoutPreset: 'vertical-centered',
-        flexRatioPreset: 'grow-1',
-        sizePreset: 'fill-width',
-        appearancePreset: 'card',
-        spacingPreset: 'spacious',
-        children: []
-      };
-
-      // 添加ID并更新布局
-      const emptyLayoutWithIds = addIds(emptyLayout);
-
-      // 添加ID给每个Markdown元素
-      const elementsWithIds = elements.map(element => addIds({ ...element }));
-
-      // 更新状态：清空预览区域，更新解析出的元素
-      setState(prev => ({
-        ...prev,
-        layout: emptyLayoutWithIds,
-        jsonInput: JSON.stringify(emptyLayoutWithIds, null, 2),
-        selectedElementId: emptyLayoutWithIds.id,
-        markdownElements: elementsWithIds
-      }));
-    }
+    // 为元素添加标准化ID
+    const elementsWithIds = elements.map(element => {
+      if (!element.id) {
+        return {
+          ...element,
+          id: generateStandardId(element)
+        };
+      }
+      return element;
+    });
+    
+    // 确保没有重复ID
+    const idMap = new Map();
+    const uniqueElements = elementsWithIds.map(element => {
+      if (idMap.has(element.id)) {
+        // 如果ID已存在，添加随机后缀
+        const newId = `${element.id}_${Math.random().toString(36).substring(2, 7)}`;
+        return { ...element, id: newId };
+      }
+      
+      idMap.set(element.id, true);
+      return element;
+    });
+    
+    setState(prev => ({
+      ...prev,
+      markdownElements: uniqueElements,
+    }));
   };
 
   // 处理Markdown文本变化
@@ -783,6 +923,8 @@ const LayoutEditor = ({ initialLayout }) => {
 
   // 添加容器
   const handleAddContainer = (selectedElements = []) => {
+    console.log('handleAddContainer 被调用，添加元素数量:', selectedElements ? selectedElements.length : 0);
+    
     // 创建新容器
     const newContainer = {
       type: 'container',
@@ -794,17 +936,81 @@ const LayoutEditor = ({ initialLayout }) => {
       children: []
     };
 
-    // 添加ID
+    // 检查是否已有相同内容的容器
+    const checkDuplicateContainer = (container, elements) => {
+      if (!container || !container.children || !elements || elements.length === 0) {
+        return false;
+      }
+      
+      // 检查是否有相同数量的子元素
+      if (container.children.length !== elements.length) {
+        return false;
+      }
+      
+      // 检查每个子元素是否匹配
+      const allElementsMatch = elements.every(element => {
+        // 使用ID匹配，因为ID是基于内容生成的，相同内容会有相同ID
+        return container.children.some(child => 
+          child.id === element.id || 
+          (child.content && element.content && 
+           JSON.stringify(child.content) === JSON.stringify(element.content))
+        );
+      });
+      
+      return allElementsMatch;
+    };
+    
+    // 检查布局中是否已存在相同内容的容器
+    if (state.layout && selectedElements && selectedElements.length > 0) {
+      // 检查根容器
+      if (checkDuplicateContainer(state.layout, selectedElements)) {
+        console.log('检测到重复的根容器内容，不重复添加');
+        return state.layout.id;
+      }
+      
+      // 检查子容器
+      if (state.layout.children) {
+        for (const child of state.layout.children) {
+          if (child.type === 'container' && checkDuplicateContainer(child, selectedElements)) {
+            console.log('检测到重复的子容器内容，不重复添加');
+            return child.id;
+          }
+        }
+      }
+    }
+
+    // 将选中的元素添加到容器中
+    if (selectedElements && selectedElements.length > 0) {
+      console.log('将选中的元素添加到容器中:', selectedElements.map(el => el.id || '无ID'));
+      // 确保每个元素都有ID
+      newContainer.children = selectedElements.map(element => {
+        if (!element.id) {
+          const elementWithId = {
+            ...element,
+            id: generateStandardId(element)
+          };
+          console.log(`为元素生成ID: ${elementWithId.id}`);
+          return elementWithId;
+        }
+        return element;
+      });
+    }
+
+    // 记录生成容器前的状态
+    console.log('生成容器前的状态:', 
+      state.layout ? `已有根容器 ID: ${state.layout.id}` : '无根容器',
+      '已使用ID数量:', state.usedElementIds.size
+    );
+
+    // 添加ID，基于容器内容生成
     const containerWithId = addIds(newContainer);
+    console.log('生成的容器ID:', containerWithId.id);
 
     if (!state.layout) {
+      console.log('没有根容器，将创建新的根容器');
       // 如果没有根容器，这个容器将成为根容器
       const newLayout = {
-        ...containerWithId,
-        children: selectedElements.map(element => {
-          const elementWithId = addIds(element);
-          return elementWithId;
-        })
+        ...containerWithId
       };
 
       // 更新已使用元素集合
@@ -812,9 +1018,11 @@ const LayoutEditor = ({ initialLayout }) => {
       selectedElements.forEach(element => {
         if (element.id) {
           newUsedElementIds.add(element.id);
+          console.log(`标记元素ID为已使用: ${element.id}`);
         }
       });
 
+      console.log('更新状态，设置根容器...');
       setState(prev => ({
         ...prev,
         layout: newLayout,
@@ -822,19 +1030,27 @@ const LayoutEditor = ({ initialLayout }) => {
         selectedElementId: newLayout.id,
         usedElementIds: newUsedElementIds
       }));
+      
+      // 返回根容器ID
+      return newLayout.id;
     } else {
+      console.log('已有根容器，将添加子容器');
       // 如果已有根容器，将新容器添加为子元素
       const parentId = state.selectedElementId || state.layout.id;
+      console.log(`将容器添加到父元素: ${parentId}`);
 
-      // 将选中的元素添加到新容器中
+      // 确保将选中的元素添加到新容器中并且有唯一ID
       containerWithId.children = selectedElements.map(element => {
         // 如果是新元素，添加ID
-        return addIds({ ...element });
+        const elementWithId = addIds({ ...element });
+        console.log(`将元素添加到容器中: ${elementWithId.id}`);
+        return elementWithId;
       });
 
       // 更新布局
       const updateLayout = (layout) => {
         if (layout.id === parentId) {
+          console.log(`找到父元素 ${parentId}，添加新容器`);
           // 将新容器添加到父元素
           const newLayout = {
             ...layout,
@@ -861,9 +1077,11 @@ const LayoutEditor = ({ initialLayout }) => {
       selectedElements.forEach(element => {
         if (element.id) {
           newUsedElementIds.add(element.id);
+          console.log(`标记元素ID为已使用: ${element.id}`);
         }
       });
 
+      console.log('更新状态，添加新容器...');
       setState(prev => ({
         ...prev,
         layout: newLayout,
@@ -871,7 +1089,81 @@ const LayoutEditor = ({ initialLayout }) => {
         selectedElementId: containerWithId.id,
         usedElementIds: newUsedElementIds
       }));
+      
+      return containerWithId.id;
     }
+  };
+
+  // 添加清除布局的方法（在 handleAddContainer 方法后）
+  const clearLayout = () => {
+    setState(prev => ({
+      ...prev,
+      layout: null,
+      jsonInput: '',
+      selectedElementId: null,
+      usedElementIds: new Set()
+    }));
+    return true;
+  };
+
+  // 添加设置 Markdown 数据的方法
+  const setMarkdownData = (markdownData) => {
+    if (!markdownData) return false;
+    
+    // 设置 Markdown 文本
+    const newMarkdownText = markdownData.markdownText || '';
+    
+    // 如果提供了 Markdown 元素，使用它们，否则重新解析
+    if (markdownData.markdownElements && markdownData.markdownElements.length > 0) {
+      // 为每个元素应用标准化 ID
+      const standardizedElements = markdownData.markdownElements.map(element => {
+        // 返回带有标准化ID的元素
+        return {
+          ...element,
+          id: generateStandardId(element)
+        };
+      });
+      
+      // 确保没有重复ID
+      const idMap = new Map();
+      const uniqueElements = standardizedElements.map(element => {
+        if (idMap.has(element.id)) {
+          // 如果ID已存在，添加随机后缀
+          const newId = `${element.id}_${Math.random().toString(36).substring(2, 7)}`;
+          return { ...element, id: newId };
+        }
+        
+        idMap.set(element.id, true);
+        return element;
+      });
+      
+      // 注意：此处不将元素添加到 usedElementIds 中
+      // 这样可以避免导入时就将元素标记为已使用
+      
+      // 更新状态
+      setState(prev => ({
+        ...prev,
+        markdownText: newMarkdownText,
+        markdownElements: uniqueElements
+      }));
+    } else {
+      // 只设置 Markdown 文本，让 MarkdownParser 组件解析它
+      setState(prev => ({
+        ...prev,
+        markdownText: newMarkdownText
+      }));
+    }
+    
+    return true;
+  };
+  
+  // 重置已使用元素 IDs
+  const resetUsedElements = () => {
+    setState(prev => ({
+      ...prev,
+      usedElementIds: new Set()
+    }));
+    return true;
   };
 
   // 生成顺序ID
@@ -886,11 +1178,79 @@ const LayoutEditor = ({ initialLayout }) => {
     if (element.id) return element; // 如果已有ID则跳过
 
     const newElement = { ...element };
-    newElement.id = generateId();
+    
+    // 使用内容和特征生成ID
+    newElement.id = generateStandardId(newElement);
+    
     if (newElement.children) {
       newElement.children = newElement.children.map(child => addIds(child));
     }
     return newElement;
+  };
+
+  // 生成标准化ID
+  const generateStandardId = (element) => {
+    if (!element) return `element_unknown`;
+    
+    let idComponents = ['element', element.type];
+    
+    // 创建一个简单的哈希函数
+    const simpleHash = (str) => {
+      if (!str) return '';
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return Math.abs(hash).toString(16).substring(0, 8);
+    };
+    
+    // 获取内容字符串
+    let contentString = '';
+    if (element.content) {
+      if (typeof element.content === 'string') {
+        contentString = element.content;
+      } else if (element.content.text) {
+        contentString = element.content.text;
+      } else if (element.content.value) {
+        contentString = element.content.value.toString();
+      }
+    }
+    
+    // 添加额外特征字符串
+    let featureString = '';
+    if (element.name) {
+      featureString += element.name;
+    }
+    
+    // 添加预设特征
+    const presetKeys = Object.keys(element).filter(key => key.endsWith('Preset'));
+    presetKeys.forEach(key => {
+      if (element[key]) {
+        featureString += `${key}:${element[key]};`;
+      }
+    });
+    
+    // 创建唯一内容哈希
+    const contentHash = contentString ? simpleHash(contentString) : '';
+    const featureHash = featureString ? simpleHash(featureString) : '';
+    
+    // 添加哈希到ID组件
+    if (contentHash) {
+      idComponents.push(contentHash);
+    }
+    
+    if (featureHash) {
+      idComponents.push(featureHash);
+    }
+    
+    // 如果没有足够的唯一性，添加一个确定性标识符
+    if (idComponents.length < 3) {
+      idComponents.push('0');
+    }
+    
+    return idComponents.join('_');
   };
 
   return (
@@ -992,6 +1352,11 @@ const LayoutEditor = ({ initialLayout }) => {
                   onMoveElementToSibling={moveElementToSibling}
                   usedElementIds={Array.from(state.usedElementIds)}
                   onAddContainer={handleAddContainer}
+                  onClearLayout={clearLayout}
+                  onSetMarkdownData={setMarkdownData}
+                  onResetUsedElements={resetUsedElements}
+                  markdownText={state.markdownText}
+                  actionExecutor={actionExecutor}
                 />
               </div>
             </div>
@@ -1023,6 +1388,11 @@ const LayoutEditor = ({ initialLayout }) => {
                 onMoveElementToSibling={moveElementToSibling}
                 usedElementIds={Array.from(state.usedElementIds)}
                 onAddContainer={handleAddContainer}
+                onClearLayout={clearLayout}
+                onSetMarkdownData={setMarkdownData}
+                onResetUsedElements={resetUsedElements}
+                markdownText={state.markdownText}
+                actionExecutor={actionExecutor}
               />
             </div>
           )}

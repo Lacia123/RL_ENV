@@ -118,15 +118,74 @@ const ComponentStatusPanel = ({
     return siblings;
   }, []);
   
+  // 确保元素有ID
+  const ensureElementId = (element) => {
+    if (!element) return element;
+    
+    // 如果元素已有ID，直接返回
+    if (element.id) return element;
+    
+    // 创建简单哈希
+    const simpleHash = (str) => {
+      if (!str) return '';
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return Math.abs(hash).toString(16).substring(0, 8);
+    };
+    
+    // 获取内容哈希
+    let contentString = '';
+    if (element.content) {
+      if (typeof element.content === 'string') {
+        contentString = element.content;
+      } else if (element.content.text) {
+        contentString = element.content.text;
+      } else if (element.content.value) {
+        contentString = element.content.value.toString();
+      }
+    }
+    
+    // 添加额外特征字符串
+    let featureString = '';
+    if (element.name) {
+      featureString += element.name;
+    }
+    
+    // 添加预设特征
+    const presetKeys = Object.keys(element).filter(key => key.endsWith('Preset'));
+    presetKeys.forEach(key => {
+      if (element[key]) {
+        featureString += `${key}:${element[key]};`;
+      }
+    });
+    
+    // 生成ID组件
+    const idBase = `element_${element.type}`;
+    const contentHash = contentString ? `_${simpleHash(contentString)}` : '';
+    const featureHash = featureString ? `_${simpleHash(featureString)}` : '';
+    const finalId = `${idBase}${contentHash}${featureHash}${!contentHash && !featureHash ? '_0' : ''}`;
+    
+    return {
+      ...element,
+      id: finalId
+    };
+  };
+  
   // 生成元素的树状视图
   const renderElementTree = (element, depth = 0) => {
     if (!element) return null;
 
-    const isSelected = element.id === selectedElementId;
-    const hasChildren = element.children && element.children.length > 0;
+    // 确保元素有ID
+    const elementWithId = ensureElementId(element);
+    const isSelected = elementWithId.id === selectedElementId;
+    const hasChildren = elementWithId.children && elementWithId.children.length > 0;
     
     return (
-      <div key={element.id} className="element-tree-item">
+      <div key={elementWithId.id} className="element-tree-item">
         <div
           className={`flex items-center py-1 px-2 cursor-pointer hover:bg-gray-100 rounded group ${
             isSelected ? 'bg-blue-100 border-blue-300 border' : ''
@@ -135,29 +194,29 @@ const ComponentStatusPanel = ({
           onClick={(e) => {
             e.stopPropagation();
             // 只选中元素，不显示配置面板
-            onElementSelect(element, e);
+            onElementSelect(elementWithId, e);
           }}
           onDoubleClick={(e) => {
             e.stopPropagation();
             // 双击选中元素并显示配置面板
-            onElementClick(element, e);
+            onElementClick(elementWithId, e);
           }}
           onContextMenu={(e) => {
             e.preventDefault();
             e.stopPropagation();
             // 右键菜单
-            openActionMenu(e, element);
+            openActionMenu(e, elementWithId);
           }}
         >
           {/* 元素类型图标 */}
           <span className="mr-2">
-            {getElementIcon(element.type)}
+            {getElementIcon(elementWithId.type)}
           </span>
           
           {/* 元素类型和ID */}
           <div className="flex-1 truncate">
-            <span className="font-medium">{getElementName(element)}</span>
-            <span className="text-xs text-gray-500 ml-2">{element.id}</span>
+            <span className="font-medium">{getElementName(elementWithId)}</span>
+            <span className="text-xs text-gray-500 ml-2">{elementWithId.id}</span>
           </div>
           
           {/* 操作按钮 - 鼠标悬停时显示 */}
@@ -166,7 +225,7 @@ const ComponentStatusPanel = ({
               className="p-1 text-gray-500 hover:text-blue-500 hover:bg-blue-50 rounded"
               onClick={(e) => {
                 e.stopPropagation();
-                openActionMenu(e, element);
+                openActionMenu(e, elementWithId);
               }}
               title="元件操作"
             >
@@ -177,13 +236,13 @@ const ComponentStatusPanel = ({
           {/* 展示是否有子元素 */}
           {hasChildren && (
             <span className="text-gray-400 text-xs">
-              {element.children.length}
+              {elementWithId.children.length}
             </span>
           )}
         </div>
         
         {/* 递归渲染子元素 */}
-        {element.children?.map((child) => renderElementTree(child, depth + 1))}
+        {elementWithId.children?.map((child) => renderElementTree(child, depth + 1))}
       </div>
     );
   };
