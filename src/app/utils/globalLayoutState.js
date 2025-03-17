@@ -9,6 +9,8 @@
 let globalLayoutState = {
   layout: null,
   selectedElementId: null,
+  canvasWidth: 1024,  // 默认画布宽度
+  canvasHeight: 768,  // 默认画布高度
   listeners: [],
 };
 
@@ -32,11 +34,24 @@ const updateSelectedElementId = (elementId) => {
   notifyListeners();
 };
 
+// 更新画布尺寸
+const updateCanvasSize = (width, height) => {
+  globalLayoutState.canvasWidth = width;
+  globalLayoutState.canvasHeight = height;
+  notifyListeners();
+};
+
 // 获取当前布局
 const getLayout = () => globalLayoutState.layout;
 
 // 获取当前选中元素ID
 const getSelectedElementId = () => globalLayoutState.selectedElementId;
+
+// 获取画布尺寸
+const getCanvasSize = () => ({
+  width: globalLayoutState.canvasWidth,
+  height: globalLayoutState.canvasHeight
+});
 
 // 通知所有监听器
 const notifyListeners = () => {
@@ -47,7 +62,9 @@ const notifyListeners = () => {
 export default {
   updateLayout,
   updateSelectedElementId,
+  updateCanvasSize,
   getLayout,
   getSelectedElementId,
+  getCanvasSize,
   registerListener,
 }; 

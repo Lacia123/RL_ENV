@@ -610,9 +610,9 @@ class ActionExecutor {
   
   /**
    * 导出动作序列到文件
-   * @param {string} sequenceName - 序列名称
-   * @param {Object} markdownData - Markdown 数据和生成的元素（可选）
-   * @returns {Object} - 包含文件名和 blob 的对象，用于下载
+   * @param {string} sequenceName - 要导出的序列名称
+   * @param {Object} markdownData - 可选的Markdown数据
+   * @returns {Object} 导出的序列数据
    */
   exportSequenceToFile(sequenceName, markdownData = null) {
     if (!savedSequences[sequenceName]) {
@@ -621,13 +621,19 @@ class ActionExecutor {
     }
     
     const sequence = savedSequences[sequenceName];
+    
+    // 获取画布尺寸
+    const canvasSize = globalLayoutState.getCanvasSize();
+    
     const metadata = {
       name: sequenceName,
       version: "1.0.0",
       exportDate: new Date().toISOString(),
       source: "aigui-environment-emulator",
       actionsCount: sequence.length,
-      hasMarkdownData: !!markdownData
+      hasMarkdownData: !!markdownData,
+      canvasWidth: canvasSize.width,
+      canvasHeight: canvasSize.height
     };
     
     // 创建导出数据的副本
@@ -898,6 +904,21 @@ class ActionExecutor {
       }
       
       console.log('成功导入序列，包含动作数量:', importResult.actions.length);
+      
+      // 如果序列包含画布尺寸信息，应用它
+      if (importResult.metadata && 
+          importResult.metadata.canvasWidth && 
+          importResult.metadata.canvasHeight) {
+        
+        console.log('应用导入序列中的画布尺寸设置:', 
+          importResult.metadata.canvasWidth, 'x', importResult.metadata.canvasHeight);
+          
+        // 更新全局状态中的画布尺寸
+        globalLayoutState.updateCanvasSize(
+          importResult.metadata.canvasWidth,
+          importResult.metadata.canvasHeight
+        );
+      }
       
       // 清除当前布局
       const clearResult = await this.clearCurrentLayout();

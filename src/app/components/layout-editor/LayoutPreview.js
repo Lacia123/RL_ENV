@@ -6,11 +6,18 @@ import { iconMap } from '../layout-panel/inputs/IconSelector';
 
 /**
  * 布局预览组件 - 负责渲染预览区域中的各种元素
+ * @param {Object} layout - 要渲染的布局对象
+ * @param {string} selectedElementId - 当前选中的元素ID
+ * @param {Function} onElementClick - 元素点击回调
+ * @param {number} canvasWidth - 画布宽度
+ * @param {number} canvasHeight - 画布高度
  */
 const LayoutPreview = ({
   layout,
   selectedElementId,
-  onElementClick
+  onElementClick,
+  canvasWidth = 1024,
+  canvasHeight = 768
 }) => {
   // 生成基于内容的元素ID
   const generateElementId = (element) => {
@@ -402,10 +409,25 @@ const LayoutPreview = ({
       <div className="max-w-7xl mx-auto w-full flex flex-col flex-grow">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">布局预览</h3>
-          <p className="text-sm">当前选中: {selectedElementId || 'root'}</p>
+          <div className="flex items-center text-sm">
+            <p className="mr-4">当前选中: {selectedElementId || 'root'}</p>
+            <span className="px-2 py-1 bg-gray-100 rounded-md">
+              画布尺寸: {canvasWidth} × {canvasHeight}
+            </span>
+          </div>
         </div>
-        <div className="flex justify-center items-center flex-grow">
-          <div className="border rounded bg-white w-full h-full layout-preview-container overflow-auto flex">
+        <div className="flex justify-center items-center flex-grow overflow-auto">
+          <div 
+            className="border rounded bg-white layout-preview-container overflow-auto flex"
+            style={{
+              width: `${canvasWidth}px`,
+              height: `${canvasHeight}px`,
+              maxWidth: '100%',
+              maxHeight: '65vh',
+              boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+              position: 'relative'
+            }}
+          >
             {renderElement(layout)}
           </div>
         </div>

@@ -7,6 +7,7 @@ import ComponentStatusPanel from './ComponentStatusPanel';
 import ActionPanel from './ActionPanel';
 import MarkdownParser from './MarkdownParser';
 import JsonInputPanel from './JsonInputPanel';
+import CanvasSettingsPanel from './CanvasSettingsPanel'; // 新增：导入画布设置面板
 import elementPresets, { applyPresetToElement, mergeElementPresets } from '../../utils/presetSystem';
 import { elementDefinitions } from '../../utils/elementDefinitions';
 import exampleLayout from './exampleLayout';
@@ -41,6 +42,9 @@ const LayoutEditor = ({ initialLayout }) => {
       showJsonPanel: false,
       showComponentPanel: false,
       showScorePanel: false,
+      showCanvasSettingsPanel: false, // 新增：画布设置面板显示状态
+      canvasWidth: 1024, // 新增：画布宽度默认值
+      canvasHeight: 768, // 新增：画布高度默认值
       selectedElementId: null,
       markdownText: '',
       markdownElements: [],
@@ -1253,6 +1257,20 @@ const LayoutEditor = ({ initialLayout }) => {
     return idComponents.join('_');
   };
 
+  // 处理画布大小变更
+  const handleCanvasSizeChange = (width, height) => {
+    setState(prev => ({
+      ...prev,
+      canvasWidth: width,
+      canvasHeight: height
+    }));
+    
+    // 同时记录到全局状态中
+    if (globalLayoutState) {
+      globalLayoutState.updateCanvasSize(width, height);
+    }
+  };
+
   return (
     <div className="w-full min-h-screen bg-gray-50">
       <div className="w-full">
@@ -1274,6 +1292,7 @@ const LayoutEditor = ({ initialLayout }) => {
                     showMarkdownPanel: true,
                     showJsonPanel: false,
                     showActionPanel: false,
+                    showCanvasSettingsPanel: false,
                     // 如果 JSON 面板之前是打开的，则清空 JSON 输入
                     jsonInput: prev.showJsonPanel ? '' : prev.jsonInput
                   };
@@ -1293,12 +1312,33 @@ const LayoutEditor = ({ initialLayout }) => {
                   return {
                     ...prev,
                     showActionPanel: true,
-                    showJsonPanel: false
+                    showJsonPanel: false,
+                    showCanvasSettingsPanel: false
                   };
                 })}
               >
                 <span className="mr-2">{state.showActionPanel ? '🎮' : '🕹️'}</span>
                 动作面板
+              </button>
+              <button
+                className={`px-4 py-1 rounded-md flex items-center ${state.showCanvasSettingsPanel ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}
+                onClick={() => setState(prev => {
+                  // 如果当前画布设置面板已显示，则关闭它
+                  if (prev.showCanvasSettingsPanel) {
+                    return { ...prev, showCanvasSettingsPanel: false };
+                  }
+                  // 否则，打开画布设置面板，关闭其他面板
+                  return {
+                    ...prev,
+                    showCanvasSettingsPanel: true,
+                    showMarkdownPanel: false,
+                    showJsonPanel: false, 
+                    showActionPanel: false
+                  };
+                })}
+              >
+                <span className="mr-2">{state.showCanvasSettingsPanel ? '📏' : '📐'}</span>
+                画布设置
               </button>
               <button
                 className={`px-4 py-1 rounded-md flex items-center ${state.showJsonPanel ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}
@@ -1313,6 +1353,7 @@ const LayoutEditor = ({ initialLayout }) => {
                     showJsonPanel: true,
                     showMarkdownPanel: false,
                     showActionPanel: false,
+                    showCanvasSettingsPanel: false,
                     // 如果 Markdown 面板之前是打开的，则清空 Markdown 文本
                     markdownText: prev.showMarkdownPanel ? '' : prev.markdownText,
                     // 如果 JSON 输入为空，则使用当前布局的 JSON 表示
@@ -1407,6 +1448,17 @@ const LayoutEditor = ({ initialLayout }) => {
               />
             </div>
           )}
+
+          {/* 画布设置面板 */}
+          {state.showCanvasSettingsPanel && (
+            <div className="pb-4">
+              <CanvasSettingsPanel 
+                initialWidth={state.canvasWidth}
+                initialHeight={state.canvasHeight}
+                onSizeChange={handleCanvasSizeChange}
+              />
+            </div>
+          )}
         </div>
 
         {/* 布局预览区 - 主要区域 */}
@@ -1431,6 +1483,8 @@ const LayoutEditor = ({ initialLayout }) => {
                     layout={state.layout}
                     selectedElementId={state.selectedElementId}
                     onElementClick={handleElementClick}
+                    canvasWidth={state.canvasWidth}
+                    canvasHeight={state.canvasHeight}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
