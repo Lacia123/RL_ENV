@@ -149,7 +149,7 @@ export const mergeElementPresets = (element, presets) => {
       const presetStyle = elementPresetCategories[category][presetKeys].defaultStyle;
       // 合并样式
       mergedStyle = { ...mergedStyle, ...presetStyle };
-      console.log(`应用${category}预设: ${presetKeys}`);
+      // console.log(`应用${category}预设: ${presetKeys}`);
     }
     // 如果是预设数组
     else if (Array.isArray(presetKeys)) {
@@ -158,7 +158,7 @@ export const mergeElementPresets = (element, presets) => {
           const presetStyle = elementPresetCategories[category][key].defaultStyle;
           // 合并样式，数组中后面的预设会覆盖前面预设的相同属性
           mergedStyle = { ...mergedStyle, ...presetStyle };
-          console.log(`应用${category}预设数组: ${key}`);
+          // console.log(`应用${category}预设数组: ${key}`);
         }
       }
     }
@@ -211,11 +211,11 @@ export const applyPresetToElement = (element, category, presetKey, asArray = fal
     }
     
     newElement[`${category}Preset`] = currentPresets;
-    console.log(`向${category}预设数组添加: ${presetKey}, 当前预设: ${currentPresets.join(', ')}`);
+    // console.log(`向${category}预设数组添加: ${presetKey}, 当前预设: ${currentPresets.join(', ')}`);
   } else {
     // 单个预设模式 - 直接替换
     newElement[`${category}Preset`] = presetKey;
-    console.log(`设置${category}预设: ${presetKey}`);
+    // console.log(`设置${category}预设: ${presetKey}`);
   }
   
   // 获取预设样式
@@ -233,7 +233,7 @@ export const applyPresetToElement = (element, category, presetKey, asArray = fal
       newElement.style.paddingRight = value;
       newElement.style.paddingBottom = value;
       newElement.style.paddingLeft = value;
-      console.log(`应用预设 ${category}:${presetKey} - 将padding=${value}拆分为独立属性`);
+      // console.log(`应用预设 ${category}:${presetKey} - 将padding=${value}拆分为独立属性`);
     }
     else if (key === 'margin') {
       // 使用单独属性而不是简写方式
@@ -241,12 +241,12 @@ export const applyPresetToElement = (element, category, presetKey, asArray = fal
       newElement.style.marginRight = value;
       newElement.style.marginBottom = value;
       newElement.style.marginLeft = value;
-      console.log(`应用预设 ${category}:${presetKey} - 将margin=${value}拆分为独立属性`);
+      // console.log(`应用预设 ${category}:${presetKey} - 将margin=${value}拆分为独立属性`);
     }
     else {
       // 其他属性正常应用
       newElement.style[key] = value;
-      console.log(`应用预设 ${category}:${presetKey} - 设置 ${key}=${value}`);
+      // console.log(`应用预设 ${category}:${presetKey} - 设置 ${key}=${value}`);
     }
   }
   

@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import LayoutEditor from './components/layout-editor/LayoutEditor';
 import ElementsDemo from './components/ElementsDemo';
-import { exampleLayout } from './components/layout-editor/exampleLayout';
-
+import { Provider } from 'react-redux';
+import { store } from './utils/reduxStore';
 /**
  * 主页面组件 - 整合布局编辑器和元素演示
  */
@@ -43,7 +43,9 @@ const HomePage = () => {
       {/* 内容区域 */}
       <div className="w-full">
         {activeTab === 'layoutEditor' ? (
-          <LayoutEditor initialLayout={exampleLayout} />
+          <Provider store={store}>
+            <LayoutEditor/>
+          </Provider>
         ) : (
           <ElementsDemo />
         )}

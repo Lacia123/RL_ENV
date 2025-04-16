@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getAvailablePresets } from "../../utils/presetSystem";
 import ReduxActionExecutor from "../../utils/reduxActionExecutor"; // 使用 Redux 版本的执行器
-import { store, actions, layoutState } from "../../utils/reduxStore"; // 引入 Redux 存储
+import { store, actions } from "../../utils/reduxStore"; // 引入 Redux 存储
 import { getAllActions, getCategoryActions } from "../../utils/actionConfig";
 
 /**
@@ -67,7 +67,6 @@ const NewActionPanel = ({
   
   // 初始化动作执行器
   useEffect(() => {
-    console.log("初始化 Redux 动作执行器");
     // 使用 Redux 版本的执行器，而不是查找 window.ActionExecutor
     if (!actionExecutorInstance) {
       console.log('初始化 Redux 动作执行器');

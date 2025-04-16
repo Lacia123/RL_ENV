@@ -5,7 +5,7 @@
  * 这个版本使用 Redux 进行状态管理，以确保全局状态的一致性
  */
 import { getActionDefinition } from './actionConfig';
-import { store, actions, layoutState } from './reduxStore'; // 导入 Redux store
+import { store, actions } from './reduxStore'; // 导入 Redux store
 
 // 记录当前录制状态
 const recordingState = {
@@ -246,6 +246,9 @@ class ReduxActionExecutor {
         // 检查父容器的有效性
         let parentId = params.parentId;
         const containerLayout = this._getReduxLayout();
+
+
+        console.log('..... containerLayout',containerLayout)
         
         // 如果没有指定父容器ID，检查是否有选中容器
         if (!parentId) {

@@ -10,8 +10,6 @@ import MarkdownParser from './MarkdownParser';
 import JsonInputPanel from './JsonInputPanel';
 import CanvasSettingsPanel from './CanvasSettingsPanel'; // 新增：导入画布设置面板
 import elementPresets, { applyPresetToElement, mergeElementPresets } from '../../utils/presetSystem';
-import { elementDefinitions } from '../../utils/elementDefinitions';
-import exampleLayout from './exampleLayout';
 import ReduxActionExecutor from '../../utils/reduxActionExecutor'; // 导入 Redux 版本的 ActionExecutor
 import { store, actions } from '../../utils/reduxStore'; // 导入 Redux store及actions
 
@@ -74,31 +72,35 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
 
   // 添加子组件到指定父元素
   const addChildComponent = (parentId, type, markdownElement) => {
+    // 直接从store获取最新布局状态，避免使用可能为null的layout
+    const currentLayout = store.getState().layout;
+    const storeUsedElementIds = store.getState().usedElementIds;
+    
     // 如果没有布局，需要先创建容器
-    if (!layout) {
+    if (!currentLayout) {
       console.error('无法添加组件：布局不存在');
       alert('请先添加一个容器');
       return;
     }
 
     // 如果元素已被使用，不允许重复添加
-    if (markdownElement && markdownElement.id && usedElementIds.has(markdownElement.id)) {
+    if (markdownElement && markdownElement.id && storeUsedElementIds && storeUsedElementIds.has(markdownElement.id)) {
       console.error('无法添加组件：元素已被使用', markdownElement.id);
       alert('此元素已被添加到布局中');
       return;
     }
 
     // 查找父元素
-    const parentElement = findElement(layout, parentId);
+    const parentElement = findElement(currentLayout, parentId);
     if (!parentElement) {
       console.error('找不到父元素:', parentId);
       return;
     }
 
     // 检查：如果父元素是文本元素，则将新元素添加为兄弟元素而不是子元素
-    if (parentElement.type === 'text' && parentElement.id !== layout.id) {
+    if (parentElement.type === 'text' && parentElement.id !== currentLayout.id) {
       // 查找父元素的父元素
-      const grandParent = findParentElement(layout, parentId);
+      const grandParent = findParentElement(currentLayout, parentId);
       if (grandParent) {
         return addChildComponent(grandParent.id, type, markdownElement);
       }
@@ -117,7 +119,7 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
     }
 
     // 为了确保在导入情况下也有唯一ID，再次检查
-    const existingElement = findElement(layout, newElement.id);
+    const existingElement = findElement(currentLayout, newElement.id);
     if (existingElement) {
       // 如果ID已存在，添加随机后缀确保唯一性
       newElement.id = `${newElement.id}_${Math.random().toString(36).substring(2, 7)}`;
@@ -139,12 +141,10 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
       return layout;
     };
 
-    const newLayout = updateElement({ ...layout });
+    const newLayout = updateElement({ ...currentLayout });
 
     // 更新已使用元素集合
     if (markdownElement && markdownElement.id) {
-      const newUsedElementIds = new Set(usedElementIds);
-      newUsedElementIds.add(markdownElement.id);
       dispatch(actions.updateUsedElementIds([markdownElement.id]));
     }
 
@@ -157,6 +157,10 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
   // 添加容器
   const handleAddContainer = (selectedElements = []) => {
     console.log('handleAddContainer 被调用，添加元素数量:', selectedElements ? selectedElements.length : 0);
+    
+    // 直接从store获取最新布局状态，避免使用可能为null的layout
+    const currentLayout = store.getState().layout;
+    console.log('从Redux获取的当前布局状态：', currentLayout ? '存在' : '不存在');
 
     // 创建新容器
     const newContainer = {
@@ -194,16 +198,16 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
     };
 
     // 检查布局中是否已存在相同内容的容器
-    if (layout && selectedElements && selectedElements.length > 0) {
+    if (currentLayout && selectedElements && selectedElements.length > 0) {
       // 检查根容器
-      if (checkDuplicateContainer(layout, selectedElements)) {
+      if (checkDuplicateContainer(currentLayout, selectedElements)) {
         console.log('检测到重复的根容器内容，不重复添加');
-        return layout.id;
+        return currentLayout.id;
       }
 
       // 检查子容器
-      if (layout.children) {
-        for (const child of layout.children) {
+      if (currentLayout.children) {
+        for (const child of currentLayout.children) {
           if (child.type === 'container' && checkDuplicateContainer(child, selectedElements)) {
             console.log('检测到重复的子容器内容，不重复添加');
             return child.id;
@@ -230,51 +234,51 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
     }
 
     // 记录生成容器前的状态
+    const storeUsedElementIds = store.getState().usedElementIds;
     console.log('生成容器前的状态:',
-      layout ? `已有根容器 ID: ${layout.id}` : '无根容器',
-      '已使用ID数量:', uiState.usedElementIds.size
+      currentLayout ? `已有根容器 ID: ${currentLayout.id}` : '无根容器',
+      '已使用ID数量:', storeUsedElementIds ? storeUsedElementIds.size : 0
     );
 
     // 添加ID，基于容器内容生成
     const containerWithId = addIds(newContainer);
     console.log('生成的容器ID:', containerWithId.id);
 
-    if (!layout) {
+    if (!currentLayout) {
       console.log('没有根容器，将创建新的根容器');
       // 如果没有根容器，这个容器将成为根容器
       const newLayout = {
         ...containerWithId
       };
 
-      // 更新已使用元素集合
-      const updatedUsedElementIds = new Set(uiState.usedElementIds);
+      // 收集要更新的元素ID
+      const newUsedElementIds = [];
       selectedElements.forEach(element => {
         if (element.id) {
-          updatedUsedElementIds.add(element.id);
+          newUsedElementIds.push(element.id);
           console.log(`标记元素ID为已使用: ${element.id}`);
         }
       });
 
       console.log('更新状态，设置根容器...');
-      // 更新本地UI状态，不设置jsonInput
-      setUiState(prev => ({
-        ...prev,
-        usedElementIds: updatedUsedElementIds
-      }));
-
+      
       // 更新Redux状态
+      if (newUsedElementIds.length > 0) {
+        dispatch(actions.updateUsedElementIds(newUsedElementIds));
+      }
       dispatch(actions.updateLayout(newLayout));
       dispatch(actions.updateSelectedElementId(newLayout.id));
-
+      
       // 更新jsonRef而不是直接设置jsonInput
       jsonRef.current = JSON.stringify(newLayout, null, 2);
-
+      
       // 返回根容器ID
       return newLayout.id;
     } else {
       console.log('已有根容器，将添加子容器');
       // 如果已有根容器，将新容器添加为子元素
-      const parentId = selectedElementId || layout.id;
+      const storeSelectedElementId = store.getState().selectedElementId;
+      const parentId = storeSelectedElementId || currentLayout.id;
       console.log(`将容器添加到父元素: ${parentId}`);
 
       // 确保将选中的元素添加到新容器中并且有唯一ID
@@ -286,8 +290,8 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
       });
 
       // 创建一个深拷贝的布局
-      const layoutCopy = JSON.parse(JSON.stringify(layout));
-
+      const layoutCopy = JSON.parse(JSON.stringify(currentLayout));
+      
       // 更新布局
       const updateElement = (layout) => {
         if (layout.id === parentId) {
@@ -313,29 +317,27 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
 
       const newLayout = updateElement(layoutCopy);
 
-      // 更新已使用元素集合
-      const updatedUsedElementIds = new Set(uiState.usedElementIds);
+      // 收集要更新的元素ID
+      const newUsedElementIds = [];
       selectedElements.forEach(element => {
         if (element.id) {
-          updatedUsedElementIds.add(element.id);
+          newUsedElementIds.push(element.id);
           console.log(`标记元素ID为已使用: ${element.id}`);
         }
       });
 
       console.log('更新状态，添加新容器...');
-      // 更新本地UI状态，不设置jsonInput
-      setUiState(prev => ({
-        ...prev,
-        usedElementIds: updatedUsedElementIds
-      }));
-
+      
       // 更新Redux状态
+      if (newUsedElementIds.length > 0) {
+        dispatch(actions.updateUsedElementIds(newUsedElementIds));
+      }
       dispatch(actions.updateLayout(newLayout));
       dispatch(actions.updateSelectedElementId(containerWithId.id));
-
+      
       // 更新jsonRef而不是直接设置jsonInput
       jsonRef.current = JSON.stringify(newLayout, null, 2);
-
+      
       return containerWithId.id;
     }
   };
