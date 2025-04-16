@@ -155,7 +155,7 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
   };
 
   // 添加容器
-  const handleAddContainer = (selectedElements = []) => {
+  const handleAddContainer = (selectedElements = [], parentId = null, predefinedContainerId = null) => {
     console.log('handleAddContainer 被调用，添加元素数量:', selectedElements ? selectedElements.length : 0);
     
     // 直接从store获取最新布局状态，避免使用可能为null的layout
@@ -172,6 +172,19 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
       spacingPreset: 'spacious',
       children: []
     };
+
+    // 如果提供了预定义ID，则使用它
+    if (predefinedContainerId) {
+      console.log(`使用预定义容器ID: ${predefinedContainerId}`);
+      // 从预定义ID中提取标准部分，确保符合标准格式
+      if (!predefinedContainerId.startsWith('element_')) {
+        // 将其转换为符合标准格式的ID
+        newContainer.id = `element_${predefinedContainerId}`;
+        console.log(`标准化预定义ID: ${newContainer.id}`);
+      } else {
+        newContainer.id = predefinedContainerId;
+      }
+    }
 
     // 检查是否已有相同内容的容器
     const checkDuplicateContainer = (container, elements) => {
@@ -240,8 +253,8 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
       '已使用ID数量:', storeUsedElementIds ? storeUsedElementIds.size : 0
     );
 
-    // 添加ID，基于容器内容生成
-    const containerWithId = addIds(newContainer);
+    // 添加ID，基于容器内容生成（如果没有预定义ID）
+    const containerWithId = newContainer.id ? newContainer : addIds(newContainer);
     console.log('生成的容器ID:', containerWithId.id);
 
     if (!currentLayout) {
@@ -278,8 +291,8 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
       console.log('已有根容器，将添加子容器');
       // 如果已有根容器，将新容器添加为子元素
       const storeSelectedElementId = store.getState().selectedElementId;
-      const parentId = storeSelectedElementId || currentLayout.id;
-      console.log(`将容器添加到父元素: ${parentId}`);
+      const parentElementId = parentId || storeSelectedElementId || currentLayout.id;
+      console.log(`将容器添加到父元素: ${parentElementId}`);
 
       // 确保将选中的元素添加到新容器中并且有唯一ID
       containerWithId.children = selectedElements.map(element => {
@@ -294,8 +307,8 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
       
       // 更新布局
       const updateElement = (layout) => {
-        if (layout.id === parentId) {
-          console.log(`找到父元素 ${parentId}，添加新容器`);
+        if (layout.id === parentElementId) {
+          console.log(`找到父元素 ${parentElementId}，添加新容器`);
           // 将新容器添加到父元素
           const newLayout = {
             ...layout,

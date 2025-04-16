@@ -101,7 +101,7 @@ class ReduxActionExecutor {
    * @param {Object} params - 动作参数
    * @returns {Promise<any>} - 动作执行结果
    */
-  async executeAction(category, actionId, params = {}) {
+  async executeAction(category, actionId, params = {}, res = null) {
     try {
       // 获取动作定义
       const actionDef = getActionDefinition(category, actionId);
@@ -121,7 +121,7 @@ class ReduxActionExecutor {
       console.log(`执行动作: ${category}.${actionId}，参数:`, JSON.stringify(params));
       
       // 执行动作
-      const result = await this.executeActionByType(category, actionId, params);
+      const result = await this.executeActionByType(category, actionId, params, res);
       
       // 记录动作（如果正在录制）
       if (recordingState.isRecording) {
@@ -150,10 +150,10 @@ class ReduxActionExecutor {
    * @param {Object} params - 动作参数
    * @returns {Promise<any>} - 动作执行结果
    */
-  async executeActionByType(category, actionId, params) {
+  async executeActionByType(category, actionId, params, res) {
     switch (category) {
       case 'componentActions':
-        return this._executeComponentAction(actionId, params);
+        return this._executeComponentAction(actionId, params, res);
       
       case 'presetActions':
         return this._executePresetAction(actionId, params);
@@ -176,7 +176,7 @@ class ReduxActionExecutor {
    * 执行组件相关动作
    * @private
    */
-  async _executeComponentAction(actionId, params) {
+  async _executeComponentAction(actionId, params, res) {
     switch (actionId) {
       case 'addComponent':
         console.log('执行addComponent动作, 参数:', params);
@@ -216,7 +216,7 @@ class ReduxActionExecutor {
       case 'addContainer':
         // 执行添加容器的动作
         console.log('执行addContainer动作');
-        
+        console.log('res.....', res)
         // 确保每次添加相同内容的容器时生成一致的ID
         let elements = params.elements || [];
         
@@ -246,9 +246,15 @@ class ReduxActionExecutor {
         // 检查父容器的有效性
         let parentId = params.parentId;
         const containerLayout = this._getReduxLayout();
-
-
-        console.log('..... containerLayout',containerLayout)
+        
+        // 提前处理特殊情况：当有指定result且parentId为null时，说明这是一个要作为root的container
+        // 这个逻辑优先级更高，应该在检查parentId之前执行
+        let predefinedContainerId = null;
+        if (res) {
+          // 如果有result字段，我们应该使用它作为容器ID
+          predefinedContainerId = res;
+          console.log(`检测到指定的容器ID: ${predefinedContainerId}，${parentId ? '子容器' : '根容器'}`);
+        }
         
         // 如果没有指定父容器ID，检查是否有选中容器
         if (!parentId) {
@@ -274,7 +280,13 @@ class ReduxActionExecutor {
         }
         
         // 调用添加容器回调
-        const containerId = await this.callbacks.onAddContainer(elements, parentId);
+        let containerId;
+        if (predefinedContainerId) {
+          // 如果有预定义ID，传递给回调以确保使用指定的ID
+          containerId = await this.callbacks.onAddContainer(elements, parentId, predefinedContainerId);
+        } else {
+          containerId = await this.callbacks.onAddContainer(elements, parentId);
+        }
         console.log('容器添加完成，ID:', containerId);
         
         // 添加元素ID到已使用列表
@@ -581,7 +593,7 @@ class ReduxActionExecutor {
         
         // 执行动作
         try {
-          await this.executeAction(action.category, action.actionId, action.params);
+          await this.executeAction(action.category, action.actionId, action.params, action.result);
         } catch (error) {
           console.error(`回放动作 ${action.category}.${action.actionId} 失败:`, error);
           // 继续执行其余动作
@@ -608,15 +620,28 @@ class ReduxActionExecutor {
       return null;
     }
     
-    // 准备要导出的数据
+    // 获取画布尺寸
+    const { canvasWidth, canvasHeight } = store.getState();
+    
+    // 准备要导出的数据 - 使用旧格式
     const exportData = {
-      version: '1.0',
-      name: sequenceName,
-      timestamp: Date.now(),
-      actions: sequence.actions,
       metadata: {
-        originalTimestamp: sequence.timestamp
-      }
+        name: sequenceName,
+        version: "1.0.0",
+        exportDate: new Date().toISOString(),
+        source: "aigui-environment-emulator",
+        actionsCount: sequence.actions.length,
+        hasMarkdownData: !!markdownData,
+        canvasWidth: canvasWidth || 1024,
+        canvasHeight: canvasHeight || 768
+      },
+      actions: sequence.actions.map(action => ({
+        timestamp: action.timeSinceStart,
+        category: action.category,
+        actionId: action.actionId,
+        params: action.params,
+        result: action.result
+      }))
     };
     
     // 如果提供了Markdown数据，也包含它
@@ -646,20 +671,41 @@ class ReduxActionExecutor {
         try {
           const data = JSON.parse(e.target.result);
           
-          // 验证数据格式
-          if (!data.name || !data.actions || !Array.isArray(data.actions)) {
+          // 检查是否为新格式或旧格式
+          let actions = [];
+          let name = '';
+          let markdownData = null;
+          
+          if (data.actions && Array.isArray(data.actions)) {
+            // 旧格式 - actions 是顶级属性
+            actions = data.actions.map(action => ({
+              category: action.category,
+              actionId: action.actionId,
+              params: action.params,
+              result: action.result,
+              timestamp: Date.now(),
+              timeSinceStart: action.timestamp || 0
+            }));
+            name = data.metadata?.name || 'imported_sequence';
+            markdownData = data.markdownData || null;
+          } else if (data.name && data.actions && Array.isArray(data.actions)) {
+            // 新格式 - actions 是嵌套的
+            actions = data.actions;
+            name = data.name;
+            markdownData = data.markdownData || null;
+          } else {
             reject(new Error('无效的序列文件格式'));
             return;
           }
           
           // 导入序列
-          this.saveRecordedSequence(data.name, data.actions);
+          this.saveRecordedSequence(name, actions);
           
           resolve({
             success: true,
-            sequenceName: data.name,
-            actions: data.actions,
-            markdownData: data.markdownData || null
+            sequenceName: name,
+            actions: actions,
+            markdownData: markdownData
           });
         } catch (error) {
           reject(new Error(`解析序列文件失败: ${error.message}`));
@@ -672,58 +718,6 @@ class ReduxActionExecutor {
       
       reader.readAsText(file);
     });
-  }
-  
-  /**
-   * 导入并执行序列
-   * @param {File} file - 序列文件
-   * @param {number} speed - 执行速度
-   * @returns {Promise<Object>} - 执行结果
-   */
-  async importAndExecuteSequence(file, speed = 1.0) {
-    try {
-      // 导入序列
-      const importResult = await this.importSequenceFromFile(file);
-      
-      if (!importResult.success) {
-        return { success: false, error: '导入序列失败' };
-      }
-      
-      // 设置Markdown数据（如果有）
-      if (importResult.markdownData && this.callbacks.onSetMarkdownData) {
-        await this.callbacks.onSetMarkdownData(importResult.markdownData);
-      }
-      
-      // 重置已使用元素
-      if (this.callbacks.onResetUsedElements) {
-        await this.callbacks.onResetUsedElements();
-      }
-      
-      // 清除现有布局
-      if (this.callbacks.onClearLayout) {
-        await this.callbacks.onClearLayout();
-      }
-      
-      // 执行动作序列
-      await this.playRecordedSequence(importResult.actions, speed);
-      
-      // 获取结果布局
-      const resultLayout = store.getState().layout;
-      
-      return {
-        success: true,
-        sequenceName: importResult.sequenceName,
-        actionsCount: importResult.actions.length,
-        hasMarkdownData: !!importResult.markdownData,
-        rootContainerId: resultLayout?.id
-      };
-    } catch (error) {
-      console.error('导入并执行序列失败:', error);
-      return {
-        success: false,
-        error: error.message
-      };
-    }
   }
   
   /**
@@ -835,6 +829,58 @@ class ReduxActionExecutor {
     }
     
     return idComponents.join('_');
+  }
+  
+  /**
+   * 导入并执行序列
+   * @param {File} file - 序列文件
+   * @param {number} speed - 执行速度
+   * @returns {Promise<Object>} - 执行结果
+   */
+  async importAndExecuteSequence(file, speed = 1.0) {
+    try {
+      // 导入序列
+      const importResult = await this.importSequenceFromFile(file);
+      
+      if (!importResult.success) {
+        return { success: false, error: '导入序列失败' };
+      }
+      
+      // 设置Markdown数据（如果有）
+      if (importResult.markdownData && this.callbacks.onSetMarkdownData) {
+        await this.callbacks.onSetMarkdownData(importResult.markdownData);
+      }
+      
+      // 重置已使用元素
+      if (this.callbacks.onResetUsedElements) {
+        await this.callbacks.onResetUsedElements();
+      }
+      
+      // 清除现有布局
+      if (this.callbacks.onClearLayout) {
+        await this.callbacks.onClearLayout();
+      }
+      
+      // 执行动作序列
+      await this.playRecordedSequence(importResult.actions, speed);
+      
+      // 获取结果布局
+      const resultLayout = store.getState().layout;
+      
+      return {
+        success: true,
+        sequenceName: importResult.sequenceName,
+        actionsCount: importResult.actions.length,
+        hasMarkdownData: !!importResult.markdownData,
+        rootContainerId: resultLayout?.id
+      };
+    } catch (error) {
+      console.error('导入并执行序列失败:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
   }
 }
 
