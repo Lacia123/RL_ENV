@@ -1,0 +1,18 @@
+{
+  "default": {
+    "name": "默认输入文本",
+    "description": "标准输入框文字样式",
+    "defaultStyle": {
+      "fontSize": "{font.size.medium}",
+      "fontWeight": "{font.weight.medium}"
+    }
+  },
+  "small": {
+    "name": "小型输入文本",
+    "description": "小型输入框文字样式",
+    "defaultStyle": {
+      "fontSize": "{font.size.small}",
+      "fontWeight": "{font.weight.medium}"
+    }
+  }
+} 

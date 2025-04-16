@@ -4,7 +4,7 @@ import NewActionPanel from "./newActionPanel";
 
 /**
  * 动作操作面板 - 用于强化学习环境的动作选择
- *
+ * 
  * 此组件已被重构为基于抽象化的动作配置系统的新版本。
  * 为了保持向后兼容性，我们导出新版本但保持相同的接口。
  */
@@ -104,30 +104,30 @@ const ActionPanel = (props) => {
           <p className="text-red-600">错误：无法加载NewActionPanel组件</p>
           <p className="text-sm text-red-500">
             请检查组件导入路径和文件名是否正确
-          </p>
-        </div>
-      )}
-
+                </p>
+              </div>
+            )}
+            
       {/* 显示加载状态和消息 */}
       {loading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg shadow-lg">
             <p>正在处理导入操作，请稍候...</p>
           </div>
-        </div>
-      )}
+              </div>
+            )}
 
       {message && (
         <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
           {message}
-        </div>
-      )}
+          </div>
+        )}
 
       {error && (
         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
           {error}
-        </div>
-      )}
+          </div>
+        )}
     </div>
   );
 };

@@ -1,0 +1,22 @@
+{
+  "default": {
+    "name": "标准输入框间距",
+    "description": "标准输入框内边距",
+    "defaultStyle": {
+      "paddingTop": "{padding.semitight}",
+      "paddingRight": "{padding.base}",
+      "paddingBottom": "{padding.semitight}",
+      "paddingLeft": "{padding.base}"
+    }
+  },
+  "compact": {
+    "name": "紧凑输入框间距",
+    "description": "紧凑的输入框内边距",
+    "defaultStyle": {
+      "paddingTop": "{padding.tight}",
+      "paddingRight": "{padding.semitight}",
+      "paddingBottom": "{padding.tight}",
+      "paddingLeft": "{padding.semitight}"
+    }
+  }
+} 

@@ -4,7 +4,7 @@
  * 负责执行动作配置中定义的各种动作，并提供录制和回放功能
  */
 import { getActionDefinition } from './actionConfig';
-import globalLayoutState from './globalLayoutState'; // 导入全局布局状态
+import { store, actions, layoutState } from './reduxStore'; // 导入 Redux store
 
 // 记录当前录制状态
 const recordingState = {
@@ -47,7 +47,10 @@ class ActionExecutor {
       onActionExecuted: callbacks.onActionExecuted || (() => {}),
       onError: callbacks.onError || (console.error),
       onSetMarkdownData: callbacks.onSetMarkdownData || (() => {}),
-      onResetUsedElements: callbacks.onResetUsedElements || (() => {})
+      onResetUsedElements: callbacks.onResetUsedElements || (() => {}),
+      
+      // 状态同步回调
+      onStateUpdated: callbacks.onStateUpdated || (() => {})
     };
     
     // 绑定方法
@@ -58,6 +61,38 @@ class ActionExecutor {
     this.saveRecordedSequence = this.saveRecordedSequence.bind(this);
     this.loadRecordedSequence = this.loadRecordedSequence.bind(this);
     this.playRecordedSequence = this.playRecordedSequence.bind(this);
+    
+    // 注册全局状态监听器
+    this._setupGlobalStateListeners();
+  }
+  
+  /**
+   * 设置全局状态监听器
+   * @private
+   */
+  _setupGlobalStateListeners() {
+    // 使用Redux状态的监听机制，当全局状态更新时通知组件
+    if (layoutState.registerListener) {
+      this._unregisterListener = layoutState.registerListener((state) => {
+        // 当Redux布局状态改变时，通知组件更新本地状态
+        console.log('Redux布局状态已更新，通知组件同步状态');
+        this._notifyStateUpdate(state);
+      });
+    }
+  }
+  
+  /**
+   * 通知状态更新
+   * @private
+   */
+  _notifyStateUpdate(state) {
+    if (this.callbacks.onStateUpdated) {
+      try {
+        this.callbacks.onStateUpdated(state);
+      } catch (error) {
+        console.error('通知状态更新失败:', error);
+      }
+    }
   }
   
   /**
@@ -145,11 +180,78 @@ class ActionExecutor {
   async _executeComponentAction(actionId, params) {
     switch (actionId) {
       case 'addComponent':
-        return this.callbacks.onAddComponent(
+        console.log('执行addComponent动作, 参数:', params);
+        
+        // 确保有父容器ID
+        if (!params.parentId) {
+          const selectedElementId = layoutState.getSelectedElementId();
+          const currentLayout = this._getGlobalLayout();
+          
+          if (!currentLayout) {
+            console.error('添加组件失败：找不到有效的布局');
+            throw new Error('请先添加一个容器');
+          }
+          
+          // 使用全局选中的元素ID或根布局ID
+          params.parentId = selectedElementId || currentLayout.id;
+          console.log(`没有提供父容器ID，使用全局状态：${params.parentId}`);
+        }
+        
+        // 检查父容器是否存在且是有效的容器类型
+        const currentLayout = this._getGlobalLayout();
+        if (currentLayout) {
+          const parentContainer = this._findContainer(currentLayout, params.parentId);
+          if (!parentContainer) {
+            console.error(`找不到ID为 ${params.parentId} 的父容器`);
+            throw new Error('找不到指定的父容器');
+          }
+          
+          if (parentContainer.type !== 'container') {
+            console.error(`ID为 ${params.parentId} 的元素不是容器类型: ${parentContainer.type}`);
+            throw new Error('选中的元素不是容器，无法添加子组件');
+          }
+          
+          console.log(`找到父容器: ${parentContainer.type} - ${parentContainer.id}`);
+        }
+        
+        // 获取组件类型:
+        // 1. 优先使用elementData.type
+        // 2. 如果没有，则使用componentType
+        // 这样统一了参数格式
+        let componentType;
+        
+        if (params.elementData && params.elementData.type) {
+          componentType = params.elementData.type;
+        } else {
+          componentType = params.componentType;
+        }
+        
+        if (!componentType) {
+          console.error('添加组件失败：未指定组件类型');
+          throw new Error('未指定组件类型');
+        }
+        
+        // 调用回调函数添加组件
+        const componentId = await this.callbacks.onAddComponent(
           params.parentId,
-          params.componentType,
+          componentType,
           params.elementData
         );
+        
+        // 确保状态已更新
+        setTimeout(() => {
+          const updatedLayout = this._getGlobalLayout();
+          if (updatedLayout) {
+            // 确保全局状态已更新
+            console.log('组件添加完成后确认全局状态已更新');
+            this._notifyStateUpdate({
+              layout: updatedLayout,
+              selectedElementId: componentId || layoutState.getSelectedElementId()
+            });
+          }
+        }, 50);
+        
+        return componentId;
       
       case 'addContainer':
         // 执行添加容器的动作
@@ -181,14 +283,66 @@ class ActionExecutor {
           });
         }
         
+        // 检查父容器的有效性
+        let parentId = params.parentId;
+        const containerLayout = this._getGlobalLayout();
+        
+        // 验证父容器存在且是有效的容器
+        if (parentId && containerLayout) {
+          const parentContainer = this._findContainer(containerLayout, parentId);
+          if (!parentContainer) {
+            console.warn(`找不到ID为 ${parentId} 的父容器，将使用根容器作为父容器`);
+            parentId = containerLayout.id; // 如果找不到指定的父容器，回退到根容器
+          } else if (parentContainer.type !== 'container') {
+            console.warn(`ID为 ${parentId} 的元素不是容器类型: ${parentContainer.type}，将使用根容器作为父容器`);
+            parentId = containerLayout.id; // 如果找到的元素不是容器，回退到根容器
+          } else {
+            console.log(`找到有效的父容器: ${parentContainer.type} - ${parentContainer.id}`);
+          }
+        } else if (!parentId && containerLayout) {
+          // 如果没有指定父容器，使用根容器
+          parentId = containerLayout.id;
+          console.log(`没有指定父容器，使用根容器: ${parentId}`);
+        }
+        
         // 调用回调函数添加容器
-        console.log(`调用onAddContainer，父容器ID: ${params.parentId || '无(根容器)'}`);
-        const containerId = await this.callbacks.onAddContainer(
-          elements,
-          params.parentId
-        );
+        console.log(`调用onAddContainer，父容器ID: ${parentId || '无(根容器)'}`);
+        let containerId;
+        
+        // 如果是来自行为序列且有预定义的result ID，优先使用它
+        if (params._predefinedId) {
+          console.log(`使用预定义的容器ID: ${params._predefinedId}`);
+          containerId = params._predefinedId;
+          
+          // 调用回调函数时传入预定义ID
+          await this.callbacks.onAddContainer(
+            elements,
+            parentId,
+            containerId
+          );
+        } else {
+          // 否则正常调用回调函数
+          containerId = await this.callbacks.onAddContainer(
+            elements,
+            parentId
+          );
+        }
         
         console.log(`容器添加结果，返回ID: ${containerId}`);
+        
+        // 确保状态已更新
+        setTimeout(() => {
+          const updatedLayout = this._getGlobalLayout();
+          if (updatedLayout) {
+            // 确保全局状态已更新
+            console.log('容器添加完成后确认全局状态已更新');
+            this._notifyStateUpdate({
+              layout: updatedLayout,
+              selectedElementId: containerId || layoutState.getSelectedElementId()
+            });
+          }
+        }, 50);
+        
         return containerId;
       
       case 'removeComponent':
@@ -226,11 +380,11 @@ class ActionExecutor {
         }
         
         // 获取全局布局和检查元素是否存在
-        const globalLayout = globalLayoutState.getLayout();
-        console.log(`_executePresetAction: 全局布局状态:`, globalLayout ? '存在' : '不存在');
+        const presetLayout = this._getGlobalLayout();
+        console.log(`_executePresetAction: 全局布局状态:`, presetLayout ? '存在' : '不存在');
         
         // 如果全局布局存在，验证元素是否存在
-        if (globalLayout) {
+        if (presetLayout) {
           let elementExists = false;
           
           // 递归查找元素
@@ -244,7 +398,7 @@ class ActionExecutor {
             return false;
           };
           
-          elementExists = findElement(globalLayout, params.elementId);
+          elementExists = findElement(presetLayout, params.elementId);
           console.log(`_executePresetAction: 元素 ${params.elementId} 在全局布局中${elementExists ? '存在' : '不存在'}`);
         }
         
@@ -256,7 +410,7 @@ class ActionExecutor {
         const applyPresetWithRetry = async () => {
           try {
             // 检查全局布局状态 
-            const globalLayout = globalLayoutState.getLayout();
+            const globalLayout = this._getGlobalLayout();
             if (!globalLayout && retryCount < maxRetries) {
               console.log(`全局布局状态为空，将在 ${retryDelay}ms 后重试... (${retryCount + 1}/${maxRetries})`);
               retryCount++;
@@ -395,6 +549,14 @@ class ActionExecutor {
    */
   _validateParams(actionDef, params) {
     if (!actionDef.parameters) return;
+    
+    // 特殊处理addComponent动作的兼容性
+    if (actionDef.parameters.some(p => p.name === 'componentType') && 
+        params.elementData && params.elementData.type && !params.componentType) {
+      // 如果有elementData.type但没有componentType，自动设置componentType
+      console.log('从elementData.type自动设置componentType:', params.elementData.type);
+      params.componentType = params.elementData.type;
+    }
     
     actionDef.parameters.forEach(paramDef => {
       if (paramDef.required && (params[paramDef.name] === undefined)) {
@@ -549,7 +711,7 @@ class ActionExecutor {
       
       for (let i = 0; i < actionSequence.length; i++) {
         const actionRecord = actionSequence[i];
-        const { timestamp, category, actionId, params } = actionRecord;
+        const { timestamp, category, actionId, params, result } = actionRecord;
         
         console.log(`执行动作 ${i+1}/${actionSequence.length}: ${category}.${actionId}`);
         console.log('参数:', JSON.stringify(params, null, 2));
@@ -568,12 +730,21 @@ class ActionExecutor {
         }
         
         try {
-          const result = await this.executeAction(category, actionId, params);
-          console.log(`动作 ${i+1} 执行结果:`, result);
-          results.push(result);
+          // 如果动作有预定义的结果ID，添加到参数中
+          const executeParams = { ...params };
+          
+          // 为addContainer添加预定义ID
+          if (category === 'componentActions' && actionId === 'addContainer' && result) {
+            executeParams._predefinedId = result;
+            console.log(`为addContainer动作添加预定义ID: ${result}`);
+          }
+          
+          const actionResult = await this.executeAction(category, actionId, executeParams);
+          console.log(`动作 ${i+1} 执行结果:`, actionResult);
+          results.push(actionResult);
           
           // 检查是否成功执行
-          if (result === undefined || result === null) {
+          if (actionResult === undefined || actionResult === null) {
             console.warn(`警告: 动作 ${i+1} 没有返回结果`);
           }
         } catch (error) {
@@ -623,7 +794,7 @@ class ActionExecutor {
     const sequence = savedSequences[sequenceName];
     
     // 获取画布尺寸
-    const canvasSize = globalLayoutState.getCanvasSize();
+    const canvasSize = layoutState.getCanvasSize();
     
     const metadata = {
       name: sequenceName,
@@ -639,8 +810,26 @@ class ActionExecutor {
     // 创建导出数据的副本
     let exportData = {
       metadata,
-      actions: [...sequence]
+      actions: []
     };
+    
+    // 清理序列数据中的冗余字段
+    exportData.actions = sequence.map(action => {
+      const cleanedAction = { ...action };
+      
+      // 处理addComponent动作中的参数
+      if (action.category === 'componentActions' && action.actionId === 'addComponent' && action.params) {
+        const cleanedParams = { ...action.params };
+        
+        // 如果存在elementData.type，则移除冗余的componentType字段
+        if (cleanedParams.elementData && cleanedParams.elementData.type && cleanedParams.componentType) {
+          const { componentType, ...restParams } = cleanedParams;
+          cleanedAction.params = restParams;
+        }
+      }
+      
+      return cleanedAction;
+    });
     
     // 如果提供了 Markdown 数据，添加到导出内容中
     if (markdownData) {
@@ -798,6 +987,13 @@ class ActionExecutor {
       idComponents.push('0');
     }
     
+    // 为容器类型添加时间戳，确保唯一性
+    if (element.type === 'container') {
+      // 添加时间戳部分（最后4位）以确保唯一性
+      const timestamp = Date.now().toString().slice(-4);
+      idComponents.push(timestamp);
+    }
+    
     return idComponents.join('_');
   }
   
@@ -844,7 +1040,7 @@ class ActionExecutor {
       const newAction = { ...action };
       
       if (newAction.params) {
-        const newParams = { ...newAction.params };
+        let newParams = { ...newAction.params };
         
         // 更新常见ID参数
         const idParams = ['elementId', 'parentId', 'targetContainerId', 'siblingId'];
@@ -860,6 +1056,14 @@ class ActionExecutor {
             ...newParams.elementData,
             id: idMapping[newParams.elementData.id]
           };
+        }
+        
+        // 移除冗余的componentType字段，如果elementData.type已存在
+        if (action.category === 'componentActions' && action.actionId === 'addComponent') {
+          if (newParams.elementData && newParams.elementData.type && newParams.componentType) {
+            const { componentType, ...restParams } = newParams;
+            newParams = restParams;
+          }
         }
         
         newAction.params = newParams;
@@ -905,6 +1109,32 @@ class ActionExecutor {
       
       console.log('成功导入序列，包含动作数量:', importResult.actions.length);
       
+      // 预处理导入的动作序列，确保兼容性
+      importResult.actions = importResult.actions.map(action => {
+        // 深拷贝动作对象
+        const processedAction = JSON.parse(JSON.stringify(action));
+        
+        // 特别处理addComponent动作
+        if (processedAction.category === 'componentActions' && 
+            processedAction.actionId === 'addComponent' && 
+            processedAction.params) {
+          
+          // 检查是否缺少必需的componentType参数
+          if (!processedAction.params.componentType && 
+              processedAction.params.elementData && 
+              processedAction.params.elementData.type) {
+            
+            // 从elementData.type自动设置componentType
+            console.log(`为动作添加缺少的componentType参数: ${processedAction.params.elementData.type}`);
+            processedAction.params.componentType = processedAction.params.elementData.type;
+          }
+        }
+        
+        return processedAction;
+      });
+      
+      console.log('预处理动作序列完成，确保参数兼容性');
+      
       // 如果序列包含画布尺寸信息，应用它
       if (importResult.metadata && 
           importResult.metadata.canvasWidth && 
@@ -914,7 +1144,7 @@ class ActionExecutor {
           importResult.metadata.canvasWidth, 'x', importResult.metadata.canvasHeight);
           
         // 更新全局状态中的画布尺寸
-        globalLayoutState.updateCanvasSize(
+        layoutState.updateCanvasSize(
           importResult.metadata.canvasWidth,
           importResult.metadata.canvasHeight
         );
@@ -937,79 +1167,82 @@ class ActionExecutor {
       
       // 创建ID映射（旧ID到新ID）
       const idMapping = {};
+      let keepOriginalIds = true; // 增加一个标志，表示是否保留原始ID，当从Python模型导入时需要保留原始ID
       
-      // 如果有 Markdown 数据，先应用 Markdown 数据，并更新ID
+      // 检查数据源是否为模型服务导出的
+      if (importResult.metadata && importResult.metadata.source === 'aigui-model-service') {
+        console.log('检测到从模型服务导入的序列，将保留原始ID');
+        keepOriginalIds = true;
+      }
+      
+      // 如果有 Markdown 数据，先应用 Markdown 数据，并根据设置决定是否更新ID
       if (importResult.markdownData && this.callbacks.onSetMarkdownData) {
         console.log('检测到Markdown数据，准备应用...');
-        // 更新Markdown元素中的ID
+        
+        // 更新或保留Markdown元素中的ID
         if (importResult.markdownData.markdownElements) {
-          const updatedElements = [];
-          
-          // 为每个元素生成新的标准ID
-          for (const element of importResult.markdownData.markdownElements) {
-            const oldId = element.id;
-            const newElement = { ...element };
-            newElement.id = this.generateStandardElementId(newElement);
-            idMapping[oldId] = newElement.id;
-            updatedElements.push(newElement);
+          // 如果需要保留原始ID
+          if (keepOriginalIds) {
+            console.log('将保留原始Markdown元素ID');
+            // 不重新生成ID，但仍然创建ID映射（相同的ID映射到自身）
+            for (const element of importResult.markdownData.markdownElements) {
+              idMapping[element.id] = element.id;
+            }
+            console.log('.... idMapping')
+            console.log(idMapping)
+          } else {
+            // 原始逻辑：生成新ID
+            const updatedElements = [];
+            
+            for (const element of importResult.markdownData.markdownElements) {
+              const oldId = element.id;
+              const newElement = { ...element };
+              newElement.id = this.generateStandardElementId(newElement);
+              idMapping[oldId] = newElement.id;
+              updatedElements.push(newElement);
+            }
+            
+            importResult.markdownData.markdownElements = updatedElements;
+            console.log('已更新Markdown元素ID');
           }
-          
-          // 使用更新后的元素
-          importResult.markdownData.markdownElements = updatedElements;
-          console.log('已更新Markdown元素ID');
         }
         
-        // 设置更新后的Markdown数据
+        // 设置Markdown数据
         await this.callbacks.onSetMarkdownData(importResult.markdownData);
         console.log('已成功设置Markdown数据');
       }
       
       // 更新动作序列中的ID引用
-      console.log('更新动作序列中的ID引用...');
-      const updatedActions = this.updateActionIds(importResult.actions, idMapping);
-      console.log('ID更新完成，准备执行动作序列');
+      let updatedActions = importResult.actions;
       
-      // 防止创建重复嵌套容器
-      let rootContainerCreated = false;
-      const processedActions = updatedActions.map(action => {
-        // 只处理添加容器的动作
-        if (action.category === 'componentActions' && action.actionId === 'addContainer') {
-          // 第一个容器是根容器
-          if (!rootContainerCreated) {
-            rootContainerCreated = true;
-            return action;
-          } else {
-            // 如果不是第一个容器，确保它的parentId不为null（避免创建另一个根容器）
-            if (!action.params.parentId) {
-              console.log('检测到尝试创建重复的根容器，已阻止此操作');
-              // 修改动作，将其parentId设置为已存在的根容器的ID
-              // 这里假设第一个动作返回的结果是根容器的ID
-              const rootContainerId = updatedActions.find(a => 
-                a.category === 'componentActions' && a.actionId === 'addContainer' && !a.params.parentId
-              )?.result;
-              
-              if (rootContainerId) {
-                return {
-                  ...action,
-                  params: {
-                    ...action.params,
-                    parentId: rootContainerId
-                  }
-                };
-              }
-            }
-          }
-        }
-        return action;
-      });
+      // 只有在不保留原始ID的情况下才更新ID引用
+      if (!keepOriginalIds) {
+        console.log('更新动作序列中的ID引用...');
+        updatedActions = this.updateActionIds(importResult.actions, idMapping);
+        console.log('ID更新完成');
+      } else {
+        console.log('保留原始ID，不更新ID引用');
+      }
+      
+      console.log('准备执行动作序列');
       
       // 强制执行第一个根容器动作，确保后续动作有正确的父容器
-      if (processedActions.length > 0 && 
-          processedActions[0].category === 'componentActions' && 
-          processedActions[0].actionId === 'addContainer') {
+      if (updatedActions.length > 0 && 
+          updatedActions[0].category === 'componentActions' && 
+          updatedActions[0].actionId === 'addContainer') {
         
         console.log('开始执行根容器创建动作');
-        const firstAction = processedActions[0];
+        const firstAction = updatedActions[0];
+        
+        // 确保_predefinedId已设置为原始的result值
+        if (firstAction.result && !firstAction.params._predefinedId) {
+          firstAction.params._predefinedId = firstAction.result;
+          console.log(`设置根容器预定义ID: ${firstAction.result}`);
+        }
+        
+        // 创建ID到索引的映射，用于跟踪已执行的容器
+        const containerIdMapping = {};
+        
         const rootContainerId = await this.executeAction(
           firstAction.category, 
           firstAction.actionId, 
@@ -1017,15 +1250,86 @@ class ActionExecutor {
         );
         
         console.log('根容器创建结果:', rootContainerId);
+        containerIdMapping[firstAction.result] = rootContainerId;
         
         // 给布局状态更新一些时间
         await new Promise(resolve => setTimeout(resolve, 100));
         
         // 执行其余动作
-        if (processedActions.length > 1) {
-          console.log(`开始执行剩余的 ${processedActions.length - 1} 个动作`);
-          const remainingActions = processedActions.slice(1);
-          const playResult = await this.playRecordedSequence(remainingActions, speed);
+        if (updatedActions.length > 1) {
+          console.log(`开始执行剩余的 ${updatedActions.length - 1} 个动作`);
+          
+          // 将剩余的动作按照容器嵌套顺序重新排序
+          // 确保父容器在子容器之前创建
+          const remainingActions = updatedActions.slice(1).map(action => {
+            // 为addContainer操作添加预定义ID
+            if (action.category === 'componentActions' && 
+                action.actionId === 'addContainer' && 
+                action.result && 
+                !action.params._predefinedId) {
+              return {
+                ...action,
+                params: {
+                  ...action.params,
+                  _predefinedId: action.result
+                }
+              };
+            }
+            return action;
+          });
+          
+          // 确保按照正确的父子关系顺序执行容器创建操作
+          const reorderedActions = [];
+          const containersToProcess = remainingActions.filter(a => 
+            a.category === 'componentActions' && a.actionId === 'addContainer'
+          );
+          const otherActions = remainingActions.filter(a => 
+            !(a.category === 'componentActions' && a.actionId === 'addContainer')
+          );
+          
+          // 创建容器ID到其动作的映射
+          const containerActions = {};
+          containersToProcess.forEach(action => {
+            if (action.result) {
+              containerActions[action.result] = action;
+            }
+          });
+          
+          // 处理顺序：首先添加直接子容器，然后添加子容器的子容器，以此类推
+          // 找出所有父容器ID为第一个容器的动作
+          const processChildren = (parentId) => {
+            const children = containersToProcess.filter(a => 
+              a.params.parentId === parentId && !reorderedActions.includes(a)
+            );
+            
+            for (const child of children) {
+              if (!reorderedActions.includes(child)) {
+                reorderedActions.push(child);
+                // 递归处理这个子容器的子容器
+                if (child.result) {
+                  processChildren(child.result);
+                }
+              }
+            }
+          };
+          
+          // 从根容器开始处理
+          processChildren(firstAction.result);
+          
+          // 添加任何其他未处理的容器动作（可能是因为parentId不存在等原因）
+          containersToProcess.forEach(action => {
+            if (!reorderedActions.includes(action)) {
+              console.warn(`容器动作未在层级处理中包含，parentId: ${action.params.parentId}`);
+              reorderedActions.push(action);
+            }
+          });
+          
+          // 最后添加其他非容器动作
+          reorderedActions.push(...otherActions);
+          
+          console.log(`动作已重新排序，先处理容器层次结构`);
+          
+          const playResult = await this.playRecordedSequence(reorderedActions, speed);
           
           // 最终验证
           await new Promise(resolve => setTimeout(resolve, 300));
@@ -1045,7 +1349,7 @@ class ActionExecutor {
       } else {
         // 如果没有根容器动作，正常执行整个序列
         console.log('未检测到根容器动作，执行完整序列');
-        const playResult = await this.playRecordedSequence(processedActions, speed);
+        const playResult = await this.playRecordedSequence(updatedActions, speed);
         
         return {
           success: playResult,
@@ -1058,6 +1362,41 @@ class ActionExecutor {
       this.callbacks.onError(`导入并执行序列失败: ${error.message}`);
       console.error('导入并执行序列失败:', error);
       return { success: false, error: error.message };
+    }
+  }
+  
+  /**
+   * 递归查找容器的辅助函数
+   * @private
+   */
+  _findContainer(layout, id) {
+    if (!layout) return null;
+    if (layout.id === id) return layout;
+    if (layout.children) {
+      for (const child of layout.children) {
+        const found = this._findContainer(child, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+  
+  /**
+   * 获取全局布局状态
+   * @private
+   */
+  _getGlobalLayout() {
+    return layoutState.getLayout();
+  }
+  
+  /**
+   * 清理资源
+   */
+  dispose() {
+    // 清理全局状态监听器
+    if (this._unregisterListener) {
+      this._unregisterListener();
+      this._unregisterListener = null;
     }
   }
 }

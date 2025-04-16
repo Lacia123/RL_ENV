@@ -1,0 +1,26 @@
+{
+  "default": {
+    "name": "默认分割线",
+    "description": "标准分割线样式",
+    "defaultStyle": {
+      "backgroundColor": "{color.neutral.light}",
+      "height": "{borderWidth.narrow}"
+    }
+  },
+  "subtle": {
+    "name": "淡色分割线",
+    "description": "更淡的分割线样式",
+    "defaultStyle": {
+      "backgroundColor": "{color.neutral.lighter}",
+      "height": "{borderWidth.narrow}"
+    }
+  },
+  "bold": {
+    "name": "粗分割线",
+    "description": "更粗的分割线样式",
+    "defaultStyle": {
+      "backgroundColor": "{color.neutral.base}",
+      "height": "{borderWidth.base}"
+    }
+  }
+} 

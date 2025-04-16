@@ -81,6 +81,13 @@ const LayoutPreview = ({
       idComponents.push('0');
     }
     
+    // 为容器类型添加时间戳，确保唯一性
+    if (element.type === 'container') {
+      // 添加时间戳部分（最后4位）以确保唯一性
+      const timestamp = Date.now().toString().slice(-4);
+      idComponents.push(timestamp);
+    }
+    
     return idComponents.join('_');
   };
 
@@ -229,7 +236,9 @@ const LayoutPreview = ({
       outline: '2px solid #1890FF',
       boxShadow: '0 0 0 1px #1890FF',
       position: 'relative',
-      zIndex: 1
+      zIndex: 1,
+      // 确保选中状态下有足够空间显示边框
+      margin: elementWithId.id === layout?.id ? 0 : undefined
     } : {};
 
     // 合并样式，确保预设样式优先级高于基础样式
@@ -244,18 +253,44 @@ const LayoutPreview = ({
     // 根据类型渲染特定元素
     switch (elementWithId.type) {
       case 'container':
+        // 为容器添加特殊处理，确保子元素即使有margin也不会超出容器
+        const containerStyle = {
+          ...computedStyle,
+          position: 'relative',
+          // 确保可以显示子元素的外边距
+          paddingTop: computedStyle.paddingTop || '4px',
+          paddingRight: computedStyle.paddingRight || '4px',
+          paddingBottom: computedStyle.paddingBottom || '4px',
+          paddingLeft: computedStyle.paddingLeft || '4px',
+          // 防止边距重叠
+          borderTop: computedStyle.borderTop || '1px solid transparent',
+          borderBottom: computedStyle.borderBottom || '1px solid transparent',
+          // 关键修改：对根容器禁用margin，避免影响边框显示
+          ...(elementWithId.id === layout?.id ? {
+            marginTop: 0,
+            marginRight: 0,
+            marginBottom: 0,
+            marginLeft: 0
+          } : {})
+        };
+        
         return (
           <div
-            style={computedStyle}
+            style={containerStyle}
             onClick={(e) => onElementClick(elementWithId, e)}
             className={isSelected ? 'selected-element' : ''}
             data-element-id={elementWithId.id}
           >
-            {elementWithId.children?.map((child) => (
-              <React.Fragment key={child.id}>
-                {renderElement(child)}
-              </React.Fragment>
-            ))}
+            {elementWithId.children?.map((child, index) => {
+              // 确保每个子元素都有一个唯一的key
+              // 如果child没有id，使用index作为备选
+              const key = child.id || `${elementWithId.id}_child_${index}`;
+              return (
+                <React.Fragment key={key}>
+                  {renderElement(child)}
+                </React.Fragment>
+              );
+            })}
           </div>
         );
 
@@ -418,17 +453,30 @@ const LayoutPreview = ({
         </div>
         <div className="flex justify-center items-center flex-grow overflow-auto">
           <div 
-            className="border rounded bg-white layout-preview-container overflow-auto flex"
+            className="border rounded bg-white"
             style={{
               width: `${canvasWidth}px`,
               height: `${canvasHeight}px`,
               maxWidth: '100%',
               maxHeight: '65vh',
               boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-              position: 'relative'
+              position: 'relative',
+              // 避免影响滚动区域大小 
+              boxSizing: 'border-box'
             }}
           >
-            {renderElement(layout)}
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                overflow: 'auto',
+                // 增加内边距，确保有足够空间显示边框
+                padding: '6px',
+                boxSizing: 'border-box'
+              }}
+            >
+              {renderElement(layout)}
+            </div>
           </div>
         </div>
       </div>

@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { getAvailablePresets } from "../../utils/presetSystem";
-import ActionExecutor from "../../utils/actionExecutor";
+import ReduxActionExecutor from "../../utils/reduxActionExecutor"; // 使用 Redux 版本的执行器
+import { store, actions, layoutState } from "../../utils/reduxStore"; // 引入 Redux 存储
 import { getAllActions, getCategoryActions } from "../../utils/actionConfig";
-import globalLayoutState from "../../utils/globalLayoutState"; // 导入全局布局状态
 
 /**
  * 新版动作操作面板 - 用于强化学习环境的动作选择
@@ -40,84 +40,86 @@ const NewActionPanel = ({
   setError = () => {},
   onImportSequence = null,
   actionExecutor = null,
+  selectedPresetTab = false, // 新增：控制是否显示预设标签页
 }) => {
-  // 设置当前活动的标签页
-  const [activeTab, setActiveTab] = useState("components");
-  // 添加容器时选中的元素
+  // 局部状态
   const [selectedElements, setSelectedElements] = useState([]);
-  // 录制状态
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingName, setRecordingName] = useState("");
-  // 动作执行器实例
+  const [activeTab, setActiveTab] = useState("container");
   const [actionExecutorInstance, setActionExecutorInstance] = useState(null);
-
-  // 内部状态 - 如果外部未提供，则使用内部状态
-  const [internalLoading, setInternalLoading] = useState(false);
-  const [internalMessage, setInternalMessage] = useState("");
-  const [internalError, setInternalError] = useState("");
-
-  // 使用传入的状态或内部状态
-  const actualLoading = loading !== undefined ? loading : internalLoading;
-  const actualSetLoading =
-    typeof setLoading === "function" ? setLoading : setInternalLoading;
-  const actualMessage = message !== undefined ? message : internalMessage;
-  const actualSetMessage =
-    typeof setMessage === "function" ? setMessage : setInternalMessage;
-  const actualError = error !== undefined ? error : internalError;
-  const actualSetError =
-    typeof setError === "function" ? setError : setInternalError;
-
-  // 录制相关状态 - 移到组件顶层
+  const [recordingName, setRecordingName] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
   const [recordedSequences, setRecordedSequences] = useState({});
   const [currentRecording, setCurrentRecording] = useState(null);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+  const [recordingStatus, setRecordingStatus] = useState("");
+  const [importFile, setImportFile] = useState(null);
+  const [importSpeed, setImportSpeed] = useState(1);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [sequenceName, setSequenceName] = useState("");
-
-  // 添加文件输入引用
+  
+  // 将props中的值赋给本地变量，以便在组件内部使用
+  const actualLoading = loading;
+  const actualSetLoading = setLoading;
+  const actualMessage = message;
+  const actualError = error;
+  
+  // 引用
   const fileInputRef = useRef(null);
-
+  
   // 初始化动作执行器
   useEffect(() => {
-    // 如果已经从props传入了actionExecutor，直接使用
-    if (actionExecutor) {
-      setActionExecutorInstance(actionExecutor);
-      return;
+    console.log("初始化 Redux 动作执行器");
+    // 使用 Redux 版本的执行器，而不是查找 window.ActionExecutor
+    if (!actionExecutorInstance) {
+      console.log('初始化 Redux 动作执行器');
+      const executor = new ReduxActionExecutor({
+        onAddComponent,
+        onAddContainer,
+        onApplyPreset: onApplyCategoryPreset,
+        onUpdateElementStyle,
+        onUpdateElementContent,
+        onMoveElement,
+        onMoveElementToSibling,
+        onClearLayout,
+        onSetMarkdownData,
+        onResetUsedElements,
+        onError: (error) => setError(error),
+        // 添加状态同步回调
+        onStateUpdated: (globalState) => {
+          // 当全局状态变化时，使用传递的props来更新本地组件
+          console.log('收到 Redux 状态更新通知:', globalState);
+          // 注意：我们不能直接修改props，这个回调主要用于通知父组件（LayoutEditor）
+          // 在实际集成时，需要在LayoutEditor组件中处理onStateUpdated回调
+        }
+      });
+      
+      setActionExecutorInstance(executor);
+      
+      // 使用外部传入的actionExecutor（如果有）
+      if (actionExecutor) {
+        console.log('使用外部传入的actionExecutor');
+        window.actionExecutor = actionExecutor;
+      } else {
+        window.actionExecutor = executor;
+      }
+      
+      // 清理函数
+      return () => {
+        console.log('清理动作执行器');
+        if (executor && executor.dispose) {
+          executor.dispose();
+        }
+      };
     }
+  }, [onAddComponent, onAddContainer, onApplyCategoryPreset, onUpdateElementStyle, 
+      onUpdateElementContent, onMoveElement, onMoveElementToSibling, onClearLayout,
+      onSetMarkdownData, onResetUsedElements, actionExecutor]);
 
-    // 否则创建新的实例
-    const executor = new ActionExecutor({
-      onAddComponent,
-      onAddContainer,
-      onApplyPreset: onApplyCategoryPreset,
-      onUpdateElementStyle,
-      onUpdateElementContent,
-      onMoveElement,
-      onMoveElementToSibling,
-      onClearLayout,
-      onSetMarkdownData,
-      onResetUsedElements,
-      onActionExecuted: (actionData) => {
-        console.log("Action executed:", actionData);
-      },
-      onError: (error) => {
-        console.error("Action error:", error);
-      },
-    });
-
-    setActionExecutorInstance(executor);
-  }, [
-    actionExecutor,
-    onAddComponent,
-    onAddContainer,
-    onApplyCategoryPreset,
-    onUpdateElementStyle,
-    onUpdateElementContent,
-    onMoveElement,
-    onMoveElementToSibling,
-    onClearLayout,
-    onSetMarkdownData,
-    onResetUsedElements,
-  ]);
+  // 当selectedPresetTab变为true时，自动切换到presets标签页
+  useEffect(() => {
+    if (selectedPresetTab) {
+      setActiveTab("presets");
+    }
+  }, [selectedPresetTab, selectedElementId]);
 
   // 获取未使用的元素
   const unusedElements = markdownElements.filter(
@@ -126,15 +128,120 @@ const NewActionPanel = ({
 
   // 处理容器添加
   const handleAddContainer = () => {
+    // 检查当前选中的元素是否为容器
+    const selectedElement = selectedElementId ? findElement(layout, selectedElementId) : null;
+    const isSelectedElementContainer = selectedElement && selectedElement.type === "container";
+    
+    // 如果当前选中的是容器，则将新容器添加到该容器内
+    // 否则添加到布局的根容器中
+    const parentId = isSelectedElementContainer ? selectedElementId : (layout ? layout.id : null);
+    
+    console.log(`添加容器，父容器ID: ${parentId || '根布局'}，选中元素: ${selectedElementId || '无'}`);
+    
+    // 检查是否已有相同内容的容器
+    const checkDuplicateContainer = (container, elements) => {
+      if (!container || !container.children || !elements || elements.length === 0) {
+        return false;
+      }
+
+      // 检查是否有相同数量的子元素
+      if (container.children.length !== elements.length) {
+        return false;
+      }
+
+      // 检查每个子元素是否匹配
+      const allElementsMatch = elements.every(element => {
+        // 使用ID匹配，因为ID是基于内容生成的，相同内容会有相同ID
+        return container.children.some(child =>
+          child.id === element.id ||
+          (child.content && element.content &&
+            JSON.stringify(child.content) === JSON.stringify(element.content))
+        );
+      });
+
+      return allElementsMatch;
+    };
+
+    // 检查布局中是否已存在相同内容的容器
+    let duplicateContainerId = null;
+    if (layout && selectedElements && selectedElements.length > 0) {
+      // 检查根容器
+      if (checkDuplicateContainer(layout, selectedElements)) {
+        console.log('检测到重复的根容器内容，不重复添加');
+        duplicateContainerId = layout.id;
+      } else if (layout.children) {
+        // 递归检查子容器
+        const findDuplicateContainer = (container) => {
+          if (container.type === 'container' && checkDuplicateContainer(container, selectedElements)) {
+            return container.id;
+          }
+          
+          if (container.children) {
+            for (const child of container.children) {
+              const duplicateId = findDuplicateContainer(child);
+              if (duplicateId) return duplicateId;
+            }
+          }
+          
+          return null;
+        };
+        
+        duplicateContainerId = findDuplicateContainer(layout);
+        if (duplicateContainerId) {
+          console.log('检测到重复的子容器内容，不重复添加，使用已有容器ID:', duplicateContainerId);
+        }
+      }
+    }
+    
+    if (duplicateContainerId) {
+      // 如果发现重复容器，直接选中它而不是创建新容器
+      if (actionExecutorInstance) {
+        // 使用 Redux 调度选中元素动作
+        console.log('使用已有容器:', duplicateContainerId);
+        store.dispatch(actions.updateSelectedElementId(duplicateContainerId));
+      }
+      setSelectedElements([]); // 清空选择
+      return;
+    }
+    
     if (actionExecutorInstance) {
+      // 在执行前再次检查全局状态，避免时序问题导致的重复创建根容器
+      const currentGlobalLayout = store.getState().layout;
+      
+      // 检查是否需要创建根容器
+      if (!layout && currentGlobalLayout) {
+        console.log('检测到已有全局根容器，但本地状态中没有。使用全局根容器:', currentGlobalLayout.id);
+        // 更新本地状态以匹配全局状态
+        setTimeout(() => {
+          store.dispatch(actions.updateSelectedElementId(currentGlobalLayout.id));
+        }, 0);
+        setSelectedElements([]); // 清空选择
+        return;
+      }
+
+      console.log('执行添加容器动作');
       actionExecutorInstance.executeAction("componentActions", "addContainer", {
         elements: selectedElements,
-        parentId: layout ? layout.id : null,
+        parentId: parentId,
+      })
+      .then(containerId => {
+        console.log('容器添加完成，ID:', containerId);
+        // 确保选中新添加的容器
+        setTimeout(() => {
+          const updatedReduxLayout = store.getState().layout;
+          if (updatedReduxLayout) {
+            console.log('添加容器后更新 Redux 状态，新布局ID:', updatedReduxLayout.id);
+          }
+        }, 100); // 延迟检查，确保状态已更新
+      })
+      .catch(error => {
+        console.error('添加容器失败:', error);
       });
+      
       setSelectedElements([]); // 清空选择
     } else {
       // 兼容旧版接口
-      onAddContainer(selectedElements);
+      onAddContainer(selectedElements, parentId);
       setSelectedElements([]);
     }
   };
@@ -351,13 +458,50 @@ const NewActionPanel = ({
 
   // 渲染组件标签页内容
   const renderComponentsTab = () => {
+    // 检查当前选中的元素是否为容器
+    const selectedElement = selectedElementId ? findElement(layout, selectedElementId) : null;
+    const isSelectedElementContainer = selectedElement && selectedElement.type === "container";
+    
+    // 检查根布局是否为容器
+    const isRootContainer = layout && layout.type === "container";
+    
+    // 选择要使用的父容器ID
+    const parentId = isSelectedElementContainer ? selectedElementId : (isRootContainer ? layout.id : null);
+    
+    // 获取父容器元素
+    const parentElement = parentId ? findElement(layout, parentId) : null;
+    
+    // 只有当父元素存在且是容器类型时才能添加组件
+    const canAddComponent = parentElement && parentElement.type === "container";
+    
+    // 获取容器名称用于显示
+    const containerName = parentElement ? (parentElement.name || parentElement.id) : "无有效容器";
+    
     const handleAddComponent = (element) => {
+      if (!canAddComponent) {
+        console.error("添加组件失败：父元素不是有效的容器", {
+          parentId,
+          parentElement: parentElement ? parentElement.type : "未找到",
+          selectedElementId,
+          layoutExists: !!layout
+        });
+        alert("请先选择一个容器，或者使用容器标签页创建一个新容器");
+        return;
+      }
+      
+      console.log("添加组件到容器:", {
+        containerId: parentId,
+        containerType: parentElement.type,
+        elementType: element.type,
+        elementId: element.id
+      });
+
       if (actionExecutorInstance) {
         actionExecutorInstance.executeAction(
           "componentActions",
           "addComponent",
           {
-            parentId: selectedElementId || (layout ? layout.id : null),
+            parentId,
             componentType: element.type,
             elementData: element,
           },
@@ -365,7 +509,7 @@ const NewActionPanel = ({
       } else {
         // 兼容旧版接口
         onAddComponent(
-          selectedElementId || (layout ? layout.id : null),
+          parentId,
           element.type,
           element,
         );
@@ -375,22 +519,34 @@ const NewActionPanel = ({
     return (
       <div>
         <h4 className="font-medium mb-3">可用组件</h4>
+        {canAddComponent && (
+          <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded text-sm">
+            <p>添加的组件将放置到: <strong>
+              {containerName}
+            </strong></p>
+          </div>
+        )}
+        {!canAddComponent && (
+          <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
+            <p>请先选择一个容器，或者使用容器标签页创建一个新容器</p>
+          </div>
+        )}
         {unusedElements.length > 0 ? (
           <div className="grid grid-cols-2 gap-2">
             {unusedElements.map((element) => (
               <button
                 key={element.id}
                 className={`p-3 border rounded flex items-center ${
-                  !layout || layout.type !== "container"
+                  !canAddComponent
                     ? "bg-gray-100 cursor-not-allowed"
                     : "hover:bg-blue-50 hover:border-blue-300"
                 } transition-colors`}
                 onClick={() => {
-                  if (layout && layout.type === "container") {
+                  if (canAddComponent) {
                     handleAddComponent(element);
                   }
                 }}
-                disabled={!layout || layout.type !== "container"}
+                disabled={!canAddComponent}
               >
                 <span className="mr-2 text-xl">
                   {getElementIcon(element.type)}
@@ -488,7 +644,7 @@ const NewActionPanel = ({
       }
 
       // 优先使用当前组件接收的布局，其次使用全局布局状态
-      const currentLayout = layout || globalLayoutState.getLayout();
+      const currentLayout = layout || store.getState().layout;
       
       // 添加对布局状态的检查
       if (!currentLayout) {
@@ -521,13 +677,13 @@ const NewActionPanel = ({
       // 确保全局布局状态已更新
       if (currentLayout && !layout) {
         console.log("当前使用的是全局布局状态，确保全局状态已同步...");
-        globalLayoutState.updateLayout(currentLayout);
+        store.dispatch(actions.updateSelectedElementId(currentLayout.id));
       }
 
       // 确保布局在 UI 中已更新
       setTimeout(() => {
         // 再次检查布局状态，确保UI线程中布局仍然可用
-        const uiThreadLayout = layout || globalLayoutState.getLayout();
+        const uiThreadLayout = layout || store.getState().layout;
         if (!uiThreadLayout) {
           console.error("应用预设失败：UI线程中布局状态丢失");
           setError("布局状态异常，请尝试重新创建容器");
@@ -990,7 +1146,7 @@ const NewActionPanel = ({
         alert("请输入录制名称");
         return;
       }
-
+      console.log("actionExecutorInstance", actionExecutorInstance);
       if (actionExecutorInstance) {
         const success = actionExecutorInstance.startRecording(recordingName);
         if (success) {

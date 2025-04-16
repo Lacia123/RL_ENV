@@ -167,7 +167,15 @@ const ComponentStatusPanel = ({
     const idBase = `element_${element.type}`;
     const contentHash = contentString ? `_${simpleHash(contentString)}` : '';
     const featureHash = featureString ? `_${simpleHash(featureString)}` : '';
-    const finalId = `${idBase}${contentHash}${featureHash}${!contentHash && !featureHash ? '_0' : ''}`;
+    let uniqueSuffix = (!contentHash && !featureHash) ? '_0' : '';
+    
+    // 为容器添加时间戳，确保唯一性
+    if (element.type === 'container') {
+      const timestamp = Date.now().toString().slice(-4);
+      uniqueSuffix = `${uniqueSuffix}_${timestamp}`;
+    }
+    
+    const finalId = `${idBase}${contentHash}${featureHash}${uniqueSuffix}`;
     
     return {
       ...element,

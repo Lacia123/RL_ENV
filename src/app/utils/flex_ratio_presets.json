@@ -1,0 +1,47 @@
+{
+  "no-grow": {
+    "name": "不伸展",
+    "description": "元素不会伸展占据额外空间",
+    "defaultStyle": {
+      "flexGrow": 0,
+      "flexShrink": 1,
+      "flexBasis": "auto"
+    }
+  },
+  "grow-1": {
+    "name": "等比伸展",
+    "description": "元素将平均分配额外空间",
+    "defaultStyle": {
+      "flexGrow": 1,
+      "flexShrink": 1,
+      "flexBasis": "0%"
+    }
+  },
+  "grow-2": {
+    "name": "双倍伸展",
+    "description": "元素将获得2倍的额外空间",
+    "defaultStyle": {
+      "flexGrow": 2,
+      "flexShrink": 1,
+      "flexBasis": "0%"
+    }
+  },
+  "grow-3": {
+    "name": "三倍伸展",
+    "description": "元素将获得3倍的额外空间",
+    "defaultStyle": {
+      "flexGrow": 3,
+      "flexShrink": 1,
+      "flexBasis": "0%"
+    }
+  },
+  "no-shrink": {
+    "name": "不收缩",
+    "description": "元素不会收缩",
+    "defaultStyle": {
+      "flexGrow": 0,
+      "flexShrink": 0,
+      "flexBasis": "auto"
+    }
+  }
+} 
