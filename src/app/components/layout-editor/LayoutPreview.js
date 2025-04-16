@@ -237,8 +237,14 @@ const LayoutPreview = ({
       boxShadow: '0 0 0 1px #1890FF',
       position: 'relative',
       zIndex: 1,
-      // 确保选中状态下有足够空间显示边框
-      margin: elementWithId.id === layout?.id ? 0 : undefined
+      // 修复：不要同时使用margin简写和具体的margin方向属性
+      // 使用具体方向的margin属性代替
+      ...(elementWithId.id === layout?.id ? {
+        marginTop: 0,
+        marginRight: 0,
+        marginBottom: 0,
+        marginLeft: 0
+      } : {})
     } : {};
 
     // 合并样式，确保预设样式优先级高于基础样式
@@ -265,7 +271,7 @@ const LayoutPreview = ({
           // 防止边距重叠
           borderTop: computedStyle.borderTop || '1px solid transparent',
           borderBottom: computedStyle.borderBottom || '1px solid transparent',
-          // 关键修改：对根容器禁用margin，避免影响边框显示
+          // 修复：使用更明确的方式设置根容器边距为0
           ...(elementWithId.id === layout?.id ? {
             marginTop: 0,
             marginRight: 0,
