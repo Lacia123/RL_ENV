@@ -1,0 +1,61 @@
+export default {
+  "compact": {
+    "name": "紧凑",
+    "description": "适用于空间有限的区域",
+    "defaultStyle": {
+      "gap": "{gap.tight}",
+      "paddingTop": "{padding.tight}",
+      "paddingRight": "{padding.tight}",
+      "paddingBottom": "{padding.tight}",
+      "paddingLeft": "{padding.tight}",
+      "marginTop": "{margin.tight}",
+      "marginRight": "{margin.tight}",
+      "marginBottom": "{margin.tight}",
+      "marginLeft": "{margin.tight}"
+    }
+  },
+  "comfortable": {
+    "name": "舒适",
+    "description": "标准间距，提供良好的可读性",
+    "defaultStyle": {
+      "gap": "{gap.base}",
+      "paddingTop": "{padding.base}",
+      "paddingRight": "{padding.base}",
+      "paddingBottom": "{padding.base}",
+      "paddingLeft": "{padding.base}",
+      "marginTop": "{margin.base}",
+      "marginRight": "{margin.base}",
+      "marginBottom": "{margin.base}",
+      "marginLeft": "{margin.base}"
+    }
+  },
+  "spacious": {
+    "name": "宽敞",
+    "description": "更大的间距，提供丰富的留白",
+    "defaultStyle": {
+      "gap": "{gap.loose}",
+      "paddingTop": "{padding.loose}",
+      "paddingRight": "{padding.loose}",
+      "paddingBottom": "{padding.loose}",
+      "paddingLeft": "{padding.loose}",
+      "marginTop": "{margin.loose}",
+      "marginRight": "{margin.loose}",
+      "marginBottom": "{margin.loose}",
+      "marginLeft": "{margin.loose}"
+    }
+  },
+  "asymmetric": {
+    "name": "非对称",
+    "description": "上下紧凑，左右宽敞",
+    "defaultStyle": {
+      "paddingTop": "{padding.tight}",
+      "paddingRight": "{padding.loose}",
+      "paddingBottom": "{padding.tight}",
+      "paddingLeft": "{padding.loose}",
+      "marginTop": "{margin.tight}",
+      "marginRight": "{margin.loose}",
+      "marginBottom": "{margin.tight}",
+      "marginLeft": "{margin.loose}"
+    }
+  }
+} 

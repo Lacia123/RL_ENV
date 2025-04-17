@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 布局分析系统
 
-## Getting Started
+一个基于 Next.js 和 Express 的布局分析应用，支持服务器端渲染 (SSR) 和直接 API 集成。
 
-First, run the development server:
+## 功能特点
+
+- 布局评估与分析
+- 多维度设计评分
+- 服务器端渲染 (SSR)
+- Express API 集成
+- 客户端和服务器组件分离
+
+## 快速开始
+
+### 安装依赖
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3002](http://localhost:3002) with your browser to see the result.
+### 启动开发环境
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+# 使用 Express + Next.js SSR (推荐)
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Windows用户
+npm run dev:win
 
-## Learn More
+# 仅使用 Next.js 开发服务器
+npm run dev:next
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 构建生产版本
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 启动生产环境
 
-## Deploy on Vercel
+```bash
+# 使用 Express + Next.js SSR
+npm start
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Windows用户
+npm run start:win
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 服务器架构
+
+该应用使用双重架构实现了高性能和灵活性：
+
+1. **Express 服务器** - 作为主要入口点，处理以下内容：
+   - 提供静态文件服务
+   - API 端点实现
+   - 性能监控
+   - 路由代理到 Next.js
+
+2. **Next.js SSR** - 处理：
+   - 页面渲染
+   - 服务器组件
+   - 布局分析
+   - 动态路由
+
+## 布局分析 API
+
+布局分析可以通过以下方式进行：
+
+1. **直接在服务器组件中**：
+   ```javascript
+   import { evaluateLayoutOnServer } from '../api/layout-analysis/server-utils';
+   const result = await evaluateLayoutOnServer(layoutData);
+   ```
+
+2. **通过 API 调用**：
+   ```javascript
+   const response = await fetch('/api/layout-analysis', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify(layoutData)
+   });
+   ```
+
+## 开发模式
+
+开发时可以选择以下两种模式：
+
+1. **完整的 SSR 模式**：使用 `npm run dev` 启动 Express + Next.js
+2. **单独的 Next.js 模式**：使用 `npm run dev:next` 只启动 Next.js
+
+## 许可证
+
+MIT

@@ -1,0 +1,44 @@
+export default {
+  "default": {
+    "name": "默认文本",
+    "description": "标准文本样式",
+    "defaultStyle": {
+      "color": "{color.neutral.dark}"
+    }
+  },
+  "primary": {
+    "name": "主要文本",
+    "description": "突出显示的文本",
+    "defaultStyle": {
+      "color": "{color.primary.base}"
+    }
+  },
+  "secondary": {
+    "name": "次要文本",
+    "description": "辅助文本样式",
+    "defaultStyle": {
+      "color": "{color.secondary.base}"
+    }
+  },
+  "success": {
+    "name": "成功文本",
+    "description": "表示成功状态的文本",
+    "defaultStyle": {
+      "color": "{color.success.base}"
+    }
+  },
+  "warning": {
+    "name": "警告文本",
+    "description": "表示警告状态的文本",
+    "defaultStyle": {
+      "color": "{color.warning.base}"
+    }
+  },
+  "error": {
+    "name": "错误文本",
+    "description": "表示错误状态的文本",
+    "defaultStyle": {
+      "color": "{color.error.base}"
+    }
+  }
+} 

@@ -1,0 +1,35 @@
+export default {
+  "default": {
+    "name": "默认输入框",
+    "description": "标准输入框样式",
+    "defaultStyle": {
+      "backgroundColor": "{color.neutral.white}",
+      "borderWidth": "{borderWidth.narrow}",
+      "borderColor": "{color.neutral.base}",
+      "borderRadius": "{borderRadius.medium}",
+      "color": "{color.neutral.darkest}"
+    }
+  },
+  "filled": {
+    "name": "填充输入框",
+    "description": "带背景色的输入框",
+    "defaultStyle": {
+      "backgroundColor": "{color.neutral.lighter}",
+      "borderWidth": "{borderWidth.none}",
+      "borderRadius": "{borderRadius.medium}",
+      "color": "{color.neutral.darkest}"
+    }
+  },
+  "underlined": {
+    "name": "下划线输入框",
+    "description": "仅有下边框的输入框",
+    "defaultStyle": {
+      "backgroundColor": "transparent",
+      "borderWidth": "{borderWidth.none}",
+      "borderBottomWidth": "{borderWidth.narrow}",
+      "borderColor": "{color.neutral.base}",
+      "borderRadius": "{borderRadius.none}",
+      "color": "{color.neutral.darkest}"
+    }
+  }
+} 

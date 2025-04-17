@@ -1,5 +1,5 @@
 'use client';
-import { findElementById } from '../tools'
+import { findElementById } from '../tools.js'
 
 /**
  * 分析布局中的内容密度

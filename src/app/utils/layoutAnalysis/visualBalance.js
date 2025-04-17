@@ -1,6 +1,6 @@
 'use client';
 
-import { calculateVisualWeight } from './index';
+import { calculateVisualWeight } from './index.js';
 
 /**
  * 计算布局的视觉平衡度

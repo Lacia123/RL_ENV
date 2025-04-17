@@ -13,45 +13,45 @@
  */
 
 // 从JSON文件引入通用预设
-import sizePresets from './size_presets.json';
-import layoutPresets from './layout_presets.json';
-import selfAlignPresets from './self_align_presets.json';
-import flexRatioPresets from './flex_ratio_presets.json';
-import imageProportionPresets from './image_proportion_presets.json';
-import textAlignPresets from './text_align_presets.json';
+import sizePresets from './size_presets.js'
+import layoutPresets from './layout_presets.js';
+import selfAlignPresets from './self_align_presets.js';
+import flexRatioPresets from './flex_ratio_presets.js';
+import imageProportionPresets from './image_proportion_presets.js';
+import textAlignPresets from './text_align_presets.js';
 
 // 从JSON文件引入元素专用预设
-import appearancePresets from './appearance_presets.json';
-import typographyPresets from './typography_presets.json';
-import spacingPresets from './spacing_presets.json';
+import appearancePresets from './appearance_presets.js';
+import typographyPresets from './typography_presets.js';
+import spacingPresets from './spacing_presets.js';
 
 // 文本元素专用预设
-import textAppearancePresets from './text_appearance_presets.json';
+import textAppearancePresets from './text_appearance_presets.js';
 
 // 按钮元素专用预设
-import buttonAppearancePresets from './button_appearance_presets.json';
-import buttonSizePresets from './button_size_presets.json';
-import buttonTypographyPresets from './button_typography_presets.json';
-import buttonSpacingPresets from './button_spacing_presets.json';
+import buttonAppearancePresets from './button_appearance_presets.js';
+import buttonSizePresets from './button_size_presets.js';
+import buttonTypographyPresets from './button_typography_presets.js';
+import buttonSpacingPresets from './button_spacing_presets.js';
 
 // 容器元素专用预设
-import containerAppearancePresets from './container_appearance_presets.json';
+import containerAppearancePresets from './container_appearance_presets.js';
 
 // 输入框元素专用预设
-import inputAppearancePresets from './input_appearance_presets.json';
-import inputTypographyPresets from './input_typography_presets.json';
-import inputSpacingPresets from './input_spacing_presets.json';
+import inputAppearancePresets from './input_appearance_presets.js';
+import inputTypographyPresets from './input_typography_presets.js';
+import inputSpacingPresets from './input_spacing_presets.js';
 
 // 图标元素专用预设
-import iconAppearancePresets from './icon_appearance_presets.json';
-import iconSpacingPresets from './icon_spacing_presets.json';
+import iconAppearancePresets from './icon_appearance_presets.js';
+import iconSpacingPresets from './icon_spacing_presets.js';
 
 // 图片元素专用预设
-import imageAppearancePresets from './image_appearance_presets.json';
+import imageAppearancePresets from './image_appearance_presets.js';
 
 // 分割线元素专用预设
-import dividerAppearancePresets from './divider_appearance_presets.json';
-import dividerSpacingPresets from './divider_spacing_presets.json';
+import dividerAppearancePresets from './divider_appearance_presets.js';
+import dividerSpacingPresets from './divider_spacing_presets.js';
 
 // 各元素类型的默认组合预设 - 使用元素专用的预设文件
 const elementPresets = {

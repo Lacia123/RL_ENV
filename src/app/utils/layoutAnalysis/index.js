@@ -1,21 +1,21 @@
 'use client';
 
 // 导入各个维度的分析模块
-import { analyzeContentDensity } from './contentDensity';
-import { analyzeAlignment } from './alignment';
-import { analyzeHierarchy } from './hierarchy';
-import { analyzeVisualBalance } from './visualBalance';
-import { analyzeResponsiveDesign } from './responsiveDesign';
-import { analyzeAccessibility } from './accessibility';
-import { analyzeColorTypography } from './colorTypography';
-import { analyzePerformance } from './performance';
+import { analyzeContentDensity } from './contentDensity.js';
+import { analyzeAlignment } from './alignment.js';
+import { analyzeHierarchy } from './hierarchy.js';
+import { analyzeVisualBalance } from './visualBalance.js';
+import { analyzeResponsiveDesign } from './responsiveDesign.js';
+import { analyzeAccessibility } from './accessibility.js';
+import { analyzeColorTypography } from './colorTypography.js';
+import { analyzePerformance } from './performance.js';
 
 /**
  * 计算元素的视觉权重
  * @param {Object} element - 布局元素
  * @returns {number} 视觉权重值
  */
-export function calculateVisualWeight(element) {
+function calculateVisualWeight(element) {
   if (!element) return 0;
   
   // 基础权重值

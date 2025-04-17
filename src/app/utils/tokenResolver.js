@@ -1,5 +1,5 @@
 'use client';
-import designTokens from './token';
+import designTokens from './token.js';
 
 /**
  * 解析设计令牌值
