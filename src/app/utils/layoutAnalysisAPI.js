@@ -3,6 +3,11 @@
 import { analyzeLayout } from './layoutAnalysis/index.js';
 import { generateVirtualDomMeasurements } from './layoutAnalysis/virtualDom.js';
 import { generateJSDOMmeasurements } from './layoutAnalysis/domMeasure.js';
+import ReduxActionExecutor from './reduxActionExecutor.js';
+import { addContainerImpl, addChildComponentImpl, applyCategoryPresetImpl, 
+  updateElementStyleImpl, updateElementContentImpl, moveElementImpl } from './layoutOperations.js';
+import { applyPresetToElement } from './presetSystem.js'
+import { store, actions as reduxActions } from './reduxStore.js';
 
 /**
  * 布局分析API类
@@ -93,7 +98,10 @@ class LayoutAnalysisAPI {
 
       return {
         success: true,
-        result: analysisResult
+        result: {
+          analysisResult,
+          layout: this.layout
+        } 
       };
     } catch (error) {
       console.error('布局评估失败:', error);
@@ -112,7 +120,6 @@ class LayoutAnalysisAPI {
     if (!actions || !Array.isArray(actions)) {
       throw new Error('无效的动作数组');
     }
-
     // 初始化根容器
     this.layout = {
       id: 'root',
@@ -131,40 +138,218 @@ class LayoutAnalysisAPI {
       children: []
     };
 
-    // 处理每个动作
-    for (const action of actions) {
-      this.processAction(action);
-    }
+    // 创建临时的动作执行器，用于布局分析
+    const tempExecutor = new ReduxActionExecutor({
+      onAddContainer: async (elements, parentId, predefinedContainerId) => {
+        try {
+          // 使用共享函数实现添加容器
+          const result = addContainerImpl(store.getState().layout, elements, parentId, predefinedContainerId);
+          if (result.error) {
+            console.error("添加容器错误:", result.error);
+            return predefinedContainerId || `container_${Date.now()}`;
+          }
+          
+          // 更新Redux状态
+          store.dispatch(reduxActions.updateLayout(result.newLayout));
+          if (result.usedElementIds && result.usedElementIds.length > 0) {
+            store.dispatch(reduxActions.updateUsedElementIds(result.usedElementIds));
+          }
+          
+          return result.containerId;
+        } catch (error) {
+          console.error("添加容器异常:", error);
+          return predefinedContainerId || `container_${Date.now()}`;
+        }
+      },
+      
+      onAddChildComponent: async (parentId, componentType, elementData) => {
+        try {
+          // 使用共享函数实现添加组件
+          const result = addChildComponentImpl(
+            store.getState().layout, 
+            parentId, 
+            componentType, 
+            elementData, 
+            store.getState().usedElementIds
+          );
+          
+          if (result.error) {
+            console.error("添加组件错误:", result.error);
+            return `component_${Date.now()}`;
+          }
+          
+          // 更新Redux状态
+          store.dispatch(reduxActions.updateLayout(result.newLayout));
+          if (result.usedElementIds && result.usedElementIds.length > 0) {
+            store.dispatch(reduxActions.updateUsedElementIds(result.usedElementIds));
+          }
+          
+          return result.elementId;
+        } catch (error) {
+          console.error("添加组件异常:", error);
+          return `component_${Date.now()}`;
+        }
+      },
+      
+      onApplyCategoryPreset: async (elementId, presetCategory, presetKey) => {
+        try {
+          // 使用共享函数实现应用预设
+          const result = applyCategoryPresetImpl(
+            store.getState().layout,
+            elementId,
+            presetCategory,
+            presetKey,
+            false,
+            applyPresetToElement
+          );
+          
+          if (result.error) {
+            console.error("应用预设错误:", result.error);
+            return elementId;
+          }
+          
+          // 更新Redux状态
+          store.dispatch(reduxActions.updateLayout(result.newLayout));
+          return elementId;
+        } catch (error) {
+          console.error("应用预设异常:", error);
+          return elementId;
+        }
+      },
+      
+      onUpdateElementStyle: async (elementId, property, value) => {
+        try {
+          // 使用共享函数实现更新样式
+          const result = updateElementStyleImpl(
+            store.getState().layout,
+            elementId,
+            property,
+            value
+          );
+          
+          if (result.error) {
+            console.error("更新样式错误:", result.error);
+            return { elementId, property, value };
+          }
+          
+          // 更新Redux状态
+          store.dispatch(reduxActions.updateLayout(result.newLayout));
+          return { elementId, property, value };
+        } catch (error) {
+          console.error("更新样式异常:", error);
+          return { elementId, property, value };
+        }
+      },
+      
+      onUpdateElementContent: async (elementId, contentProperty, value) => {
+        try {
+          // 使用共享函数实现更新内容
+          const result = updateElementContentImpl(
+            store.getState().layout,
+            elementId,
+            contentProperty,
+            value
+          );
+          
+          if (result.error) {
+            console.error("更新内容错误:", result.error);
+            return { elementId, contentProperty, value };
+          }
+          
+          // 更新Redux状态
+          store.dispatch(reduxActions.updateLayout(result.newLayout));
+          return { elementId, contentProperty, value };
+        } catch (error) {
+          console.error("更新内容异常:", error);
+          return { elementId, contentProperty, value };
+        }
+      },
+      
+      onMoveElement: async (elementId, targetContainerId) => {
+        try {
+          // 使用共享函数实现移动元素
+          const result = moveElementImpl(
+            store.getState().layout,
+            elementId,
+            targetContainerId
+          );
+          
+          if (result.error) {
+            console.error("移动元素错误:", result.error);
+            return { elementId, targetContainerId };
+          }
+          
+          // 更新Redux状态
+          store.dispatch(reduxActions.updateLayout(result.newLayout));
+          return { elementId, targetContainerId };
+        } catch (error) {
+          console.error("移动元素异常:", error);
+          return { elementId, targetContainerId };
+        }
+      },
+      
+      onClearLayout: () => {
+        // 清除布局状态
+        store.dispatch(reduxActions.clearLayout());
+        store.dispatch(reduxActions.resetUsedElementIds());
+        return true;
+      }
+    });
+
+    // 清除现有状态
+    tempExecutor.callbacks.onClearLayout();
+
+    // 执行动作序列
+    this._executeActionsSequentially(actions, tempExecutor);
+    
+    // 确保清理资源
+    tempExecutor.dispose();
+
+    // 从Redux获取最终布局
+    this.layout = store.getState().layout || this.layout;
+
+    console.log('.... this.layout')
+    console.log(this.layout)
+    
+    return this.layout;
   }
 
   /**
-   * 处理单个动作
-   * @param {Object} action - 要处理的动作
+   * 顺序执行动作
+   * @param {Array} actionSequence - 要执行的动作数组
+   * @param {Object} executor - 动作执行器实例
+   * @private
    */
-  processAction(action) {
-    if (!action || !action.type) {
-      throw new Error('无效的动作对象');
+  _executeActionsSequentially(actionSequence, executor) {
+    if (!actionSequence || !Array.isArray(actionSequence) || actionSequence.length === 0) {
+      console.log('没有动作需要执行');
+      return;
     }
-
-    switch (action.type) {
-      case 'ADD_ELEMENT':
-        this.addElement(action.payload);
-        break;
-      case 'UPDATE_ELEMENT':
-        this.updateElement(action.payload);
-        break;
-      case 'REMOVE_ELEMENT':
-        this.removeElement(action.payload);
-        break;
-      case 'MOVE_ELEMENT':
-        this.moveElement(action.payload);
-        break;
-      case 'SET_CANVAS_SIZE':
-        this.setCanvasSize(action.payload);
-        break;
-      default:
-        console.warn(`未知的动作类型: ${action.type}`);
+    
+    console.log(`开始执行动作序列，动作数量: ${actionSequence.length}`);
+    
+    // 逐一执行动作
+    for (let i = 0; i < actionSequence.length; i++) {
+      const action = actionSequence[i];
+      
+      // 输出进度信息
+      console.log(`执行动作 ${i + 1}/${actionSequence.length}: ${action.type || '未知类型'}`);
+      
+      // 根据动作类型执行
+      try {
+        // 动作数据已经符合executor的格式，直接执行
+        if (action.category && action.actionId) {
+          executor.executeAction(action.category, action.actionId, action.params || {}, action.result);
+        } else {
+          console.warn(`动作格式不正确:`, action);
+        }
+      } catch (error) {
+        console.error(`执行动作失败:`, error);
+        // 继续执行其余动作
+      }
     }
+    
+    console.log('动作序列执行完成');
   }
 
   /**

@@ -4,8 +4,8 @@
  * 负责执行动作配置中定义的各种动作，并提供录制和回放功能
  * 这个版本使用 Redux 进行状态管理，以确保全局状态的一致性
  */
-import { getActionDefinition } from './actionConfig';
-import { store, actions } from './reduxStore'; // 导入 Redux store
+import { getActionDefinition } from './actionConfig.js';
+import { store, actions } from './reduxStore.js'; // 导入 Redux store
 
 // 记录当前录制状态
 const recordingState = {
