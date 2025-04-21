@@ -10,7 +10,7 @@ import MarkdownParser from './MarkdownParser';
 import JsonInputPanel from './JsonInputPanel';
 import CanvasSettingsPanel from './CanvasSettingsPanel'; // 新增：导入画布设置面板
 import ReduxActionExecutor from '../../utils/reduxActionExecutor'; // 导入 Redux 版本的 ActionExecutor
-import { store, actions } from '../../utils/reduxStore'; // 导入 Redux store及actions
+import { actions } from '../../utils/reduxStore'; // 导入 Redux store及actions
 import { useLayoutEditorAdapter } from './layoutEditorAdapter'; // 导入 LayoutEditor 适配器
 
 /**
@@ -629,8 +629,6 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
       selectedPresetTab: true // 让动作面板显示预设标签页
     }));
   };
-
-  console.log('.... current layout', layout)
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
