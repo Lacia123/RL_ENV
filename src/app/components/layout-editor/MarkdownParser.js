@@ -34,7 +34,6 @@ const MarkdownParser = ({
     const elements = [];
     const lines = markdown.split('\n');
     
-    let currentListItems = [];
     let inCodeBlock = false;
     let codeContent = '';
     let codeLanguage = '';
@@ -62,12 +61,6 @@ const MarkdownParser = ({
         continue;
       }
       
-      // 处理列表结束
-      if (currentListItems.length > 0 && (line === '' || !line.startsWith('- '))) {
-        elements.push(createListElement(currentListItems));
-        currentListItems = [];
-      }
-      
       // 跳过空行
       if (line === '') continue;
       
@@ -85,9 +78,9 @@ const MarkdownParser = ({
       } else if (line.startsWith('###### ')) {
         elements.push(createHeadingElement(line.slice(7), 6));
       }
-      // 处理列表项
+      // 处理列表项 - 现在每个列表项都成为独立的文本元素
       else if (line.startsWith('- ')) {
-        currentListItems.push(line.slice(2));
+        elements.push(createListItemElement(line.slice(2)));
       }
       // 处理图片
       else if (line.match(/!\[.*?\]\(.*?\)/)) {
@@ -105,19 +98,10 @@ const MarkdownParser = ({
         const url = urlMatch ? urlMatch[1] : '';
         elements.push(createButtonElement(text, url));
       }
-      // 处理水平分割线
-      else if (line === '---' || line === '***' || line === '___') {
-        elements.push(createDividerElement());
-      }
       // 处理普通段落
       else {
         elements.push(createParagraphElement(line));
       }
-    }
-    
-    // 处理最后可能剩余的列表项
-    if (currentListItems.length > 0) {
-      elements.push(createListElement(currentListItems));
     }
     
     return elements;
@@ -158,22 +142,16 @@ const MarkdownParser = ({
     };
   };
   
-  // 创建列表元素
-  const createListElement = (items) => {
+  // 创建单个列表项元素（作为独立的文本元素），后续需要处理
+  const createListItemElement = (text) => {
     return {
-      type: 'container',
-      name: '列表容器',
-      layoutPreset: 'vertical',
+      type: 'text',
+      name: `列表项 ${text.slice(0, 15)}${text.length > 15 ? '...' : ''}`,
+      typographyPreset: 'body',
+      selfAlignPreset: 'self-start',
+      textAlignPreset: 'left',
       sizePreset: 'fill-width',
-      spacingPreset: 'comfortable',
-      children: items.map((item, index) => ({
-        type: 'text',
-        name: `列表项 ${index + 1}`,
-        typographyPreset: 'body',
-        selfAlignPreset: 'self-start',
-        textAlignPreset: 'left',
-        content: { value: `• ${item}` }
-      }))
+      content: { value: `${text}` }
     };
   };
   
@@ -226,15 +204,23 @@ const MarkdownParser = ({
     };
   };
   
-  // 创建分割线元素
-  const createDividerElement = () => {
-    return {
-      type: 'divider',
-      name: '分割线',
-      selfAlignPreset: 'self-center',
-      sizePreset: 'fill-width',
-      appearancePreset: 'default'
-    };
+  // 处理Markdown文本更改
+  const handleMarkdownChange = (e) => {
+    const newText = e.target.value;
+    
+    if (onMarkdownTextChange) {
+      onMarkdownTextChange(newText);
+    }
+    
+    try {
+      const elements = parseMarkdownToElements(newText);
+      setParsedElements(elements);
+      onElementsGenerated(elements);
+      setError('');
+    } catch (err) {
+      console.error('解析Markdown出错:', err);
+      setError('Markdown解析失败，请检查格式。');
+    }
   };
 
   return (
@@ -249,63 +235,43 @@ const MarkdownParser = ({
         <textarea
           className="w-full h-40 border rounded p-2 font-mono text-sm"
           value={markdownText}
-          onChange={(e) => {
-            const newText = e.target.value;
-            // 更新父组件的markdown文本状态
-            if (onMarkdownTextChange) {
-              onMarkdownTextChange(newText);
-            }
-            // 直接解析并生成元素
-            try {
-              const elements = parseMarkdownToElements(newText);
-              setParsedElements(elements);
-              onElementsGenerated(elements);
-              setError('');
-            } catch (err) {
-              console.error('解析Markdown出错:', err);
-              setError('Markdown解析失败，请检查格式。');
-            }
-          }}
-          placeholder="输入Markdown文本以生成UI元素..."
+          onChange={handleMarkdownChange}
+          placeholder="请输入Markdown文本"
         />
-        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       </div>
       
-      {/* 解析结果预览 */}
-      <div>
-        <h4 className="text-md font-medium mb-2">生成的元素 ({parsedElements.length})</h4>
-        <div className="bg-gray-50 border rounded p-3 max-h-40 overflow-y-auto">
+      {/* 错误显示 */}
+      {error && (
+        <div className="mb-4 p-2 bg-red-50 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+      
+      {/* 预览区 */}
+      <div className="mb-4">
+        <h4 className="text-sm font-medium mb-2">解析元素预览</h4>
+        <div className="border rounded p-3 max-h-60 overflow-y-auto">
           {parsedElements.length > 0 ? (
-            <ul className="space-y-1">
+            <ul className="list-disc pl-5 space-y-1">
               {parsedElements.map((element, index) => (
-                <li key={index} className="flex items-center py-1 px-2 hover:bg-gray-100 rounded">
-                  <span className="mr-2">
-                    {element.type === 'text' ? '📝' : 
-                     element.type === 'container' ? '🔲' : 
-                     element.type === 'image' ? '🖼️' : 
-                     element.type === 'button' ? '🔘' : 
-                     element.type === 'divider' ? '➖' : '📄'}
-                  </span>
-                  <div>
-                    <div className="font-medium text-sm">
-                      {element.name || element.type}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {element.type}
-                      {element.content?.value ? 
-                        `: ${element.content.value.substring(0, 20)}${element.content.value.length > 20 ? '...' : ''}` : ''}
-                    </div>
-                  </div>
+                <li key={index} className="text-sm">
+                  <span className="font-medium">{element.type}</span>: {element.name}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500 text-center py-2">
-              {markdownText.trim() ? '解析中...' : '无元素'}
-            </p>
+            <p className="text-gray-500 text-sm">请输入Markdown内容</p>
           )}
         </div>
       </div>
+      
+      {/* 生成按钮 */}
+      <button
+        className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+        onClick={() => onElementsGenerated(parsedElements)}
+      >
+        应用到布局
+      </button>
     </div>
   );
 };
