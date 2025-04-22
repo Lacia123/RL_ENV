@@ -2,7 +2,7 @@
 
 import { analyzeLayout } from './layoutAnalysis/index.js';
 import { generateVirtualDomMeasurements } from './layoutAnalysis/virtualDom.js';
-import { generateJSDOMmeasurements } from './layoutAnalysis/domMeasure.js';
+import { generateHybridMeasurements } from './layoutAnalysis/playwrightDomMeasure.js';
 import ReduxActionExecutor from './reduxActionExecutor.js';
 import { addContainerImpl, addChildComponentImpl, applyCategoryPresetImpl, 
   updateElementStyleImpl, updateElementContentImpl, moveElementImpl } from './layoutOperations.js';
@@ -87,7 +87,7 @@ class LayoutAnalysisAPI {
       
       if (this.measurementMode === 'jsdom') {
         // 使用JSDOM生成测量数据
-        this.virtualMeasurements = await generateJSDOMmeasurements(this.layout, containerDimensions);
+        this.virtualMeasurements = await generateHybridMeasurements(this.layout, containerDimensions);
       } else {
         // 使用虚拟DOM测量
         this.virtualMeasurements = generateVirtualDomMeasurements(this.layout, containerDimensions);

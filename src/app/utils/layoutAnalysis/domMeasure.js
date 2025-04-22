@@ -2,6 +2,7 @@
 
 import { JSDOM } from 'jsdom';
 import { mergeElementPresets } from '../presetSystem.js';
+import { convertStyle, resolveToken, processStyleValue } from '../tokenResolver.js';
 
 /**
  * jsdom DOM测量系统
@@ -39,8 +40,8 @@ export async function generateJSDOMmeasurements(layout, containerDimensions = { 
     </body>
     </html>
   `, { 
-    resources: 'usable', 
-    runScripts: 'dangerously',
+    // resources: 'usable', 
+    // runScripts: 'dangerously',
   });
 
   const { window } = dom;
@@ -50,15 +51,26 @@ export async function generateJSDOMmeasurements(layout, containerDimensions = { 
   const measurements = {
     container: { ...containerDimensions }
   };
+
   
   // 递归创建DOM元素
   await createDOMTree(layout, document.getElementById('root'), document);
+
+
+  const entireHTML = document.documentElement.outerHTML;
+  console.log('..... entireHTML')
+  console.log(entireHTML);
   
   // 等待样式计算完成
   await new Promise(resolve => setTimeout(resolve, 50));
   
+
+  
   // 收集测量数据
   collectMeasurements(layout, document, measurements, containerDimensions);
+
+  console.log('.... measurements')
+  console.log(measurements)
   
   // 清理jsdom资源
   window.close();
@@ -114,15 +126,18 @@ async function createDOMTree(element, parentNode, document) {
     ...(element.style || {})
   };
   
+  // 解析样式中的令牌并转换为实际值
+  const resolvedStyle = convertStyle(style);
+  
   // 应用样式到DOM元素
-  Object.keys(style).forEach(key => {
-    let value = style[key];
+  Object.keys(resolvedStyle).forEach(key => {
+    let value = resolvedStyle[key];
     // 确保数值属性有单位
     if (typeof value === 'number' && 
         ['fontSize', 'lineHeight', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
          'marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'letterSpacing', 'wordSpacing',
-         'borderRadius', 'borderWidth', 'gap'].includes(key)) {
-      value = `${value}px`;
+         'borderRadius', 'borderWidth', 'gap', 'width', 'height'].includes(key)) {
+      value = processStyleValue(value, 'px', '0px');
     }
     domElement.style[key] = value;
   });
@@ -133,8 +148,8 @@ async function createDOMTree(element, parentNode, document) {
   }
   
   // 为按钮元素添加内容
-  if (element.type === 'button' && element.content && element.content.value) {
-    domElement.textContent = element.content.value;
+  if (element.type === 'button' && element.content && element.content.text) {
+    domElement.textContent = element.content.text;
   }
   
   // 为图像元素添加占位符

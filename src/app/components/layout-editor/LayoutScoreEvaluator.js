@@ -329,7 +329,8 @@ const getScoreColorClass = (score) => {
  */
 export const evaluateLayout = (layout, domMeasurements = null) => {
   // 使用新的模块化分析系统
-
+  console.log('....  evaluateLayout domMeasurements')
+  console.log(domMeasurements)
   const analysisResult = analyzeLayout(layout, domMeasurements);
 
   // 将分析结果转换为组件所需的格式
