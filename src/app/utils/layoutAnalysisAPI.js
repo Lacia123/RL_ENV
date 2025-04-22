@@ -307,9 +307,6 @@ class LayoutAnalysisAPI {
 
     // 从Redux获取最终布局
     this.layout = store.getState().layout || this.layout;
-
-    console.log('.... this.layout')
-    console.log(this.layout)
     
     return this.layout;
   }

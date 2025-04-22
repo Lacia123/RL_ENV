@@ -3,9 +3,10 @@
 /**
  * 分析布局的对齐质量
  * @param {Object} layout - 布局对象
+ * @param {Object} domMeasurements - DOM 测量数据
  * @returns {Object} 对齐分析结果
  */
-export function analyzeAlignment(layout) {
+export function analyzeAlignment(layout, domMeasurements) {
   const results = {
     score: 100,
     horizontalAlignment: 'strong',
@@ -15,20 +16,20 @@ export function analyzeAlignment(layout) {
     details: []
   };
   
-  // 如果没有布局或子元素，返回默认结果
-  if (!layout || !layout.children || layout.children.length === 0) {
+  // 如果没有布局或测量数据，返回默认结果
+  if (!layout || !layout.children || layout.children.length === 0 || !domMeasurements) {
     results.details.push({
       type: 'warning',
-      message: '布局为空或没有子元素，无法评估对齐'
+      message: '布局为空或没有DOM测量数据，无法评估对齐'
     });
     return results;
   }
   
   // 分析水平对齐
-  const horizontalLines = findHorizontalAlignmentLines(layout);
+  const horizontalLines = findHorizontalAlignmentLines(layout, domMeasurements);
   
   // 分析垂直对齐
-  const verticalLines = findVerticalAlignmentLines(layout);
+  const verticalLines = findVerticalAlignmentLines(layout, domMeasurements);
   
   // 记录所有对齐线
   results.alignmentLines = [...horizontalLines, ...verticalLines];
@@ -88,35 +89,36 @@ export function analyzeAlignment(layout) {
 /**
  * 查找水平对齐线
  * @param {Object} layout - 布局对象
+ * @param {Object} domMeasurements - DOM 测量数据
  * @returns {Array} 水平对齐线数组
  */
-function findHorizontalAlignmentLines(layout) {
+function findHorizontalAlignmentLines(layout, domMeasurements) {
   const lines = new Set();
   const threshold = 2; // 最小对齐元素数量
   
   // 递归查找所有元素的位置
   const elements = [];
-  collectElements(layout, elements);
+  collectElementsWithMeasurements(layout, elements, domMeasurements);
   
   // 查找顶部对齐
-  const topEdges = elements.map(el => el.position?.y || 0);
+  const topEdges = elements.map(el => el.y || 0);
   findAlignmentPositions(topEdges, threshold).forEach(pos => 
     lines.add({orientation: 'horizontal', position: pos, type: 'top'}));
   
   // 查找底部对齐
   const bottomEdges = elements.map(el => {
-    const pos = el.position?.y || 0;
+    const y = el.y || 0;
     const height = el.height || 0;
-    return pos + height;
+    return y + height;
   });
   findAlignmentPositions(bottomEdges, threshold).forEach(pos => 
     lines.add({orientation: 'horizontal', position: pos, type: 'bottom'}));
   
   // 查找中心对齐
   const centerPoints = elements.map(el => {
-    const pos = el.position?.y || 0;
+    const y = el.y || 0;
     const height = el.height || 0;
-    return pos + (height / 2);
+    return y + (height / 2);
   });
   findAlignmentPositions(centerPoints, threshold).forEach(pos => 
     lines.add({orientation: 'horizontal', position: pos, type: 'center'}));
@@ -127,35 +129,36 @@ function findHorizontalAlignmentLines(layout) {
 /**
  * 查找垂直对齐线
  * @param {Object} layout - 布局对象
+ * @param {Object} domMeasurements - DOM 测量数据
  * @returns {Array} 垂直对齐线数组
  */
-function findVerticalAlignmentLines(layout) {
+function findVerticalAlignmentLines(layout, domMeasurements) {
   const lines = new Set();
   const threshold = 2; // 最小对齐元素数量
   
   // 递归查找所有元素的位置
   const elements = [];
-  collectElements(layout, elements);
+  collectElementsWithMeasurements(layout, elements, domMeasurements);
   
   // 查找左侧对齐
-  const leftEdges = elements.map(el => el.position?.x || 0);
+  const leftEdges = elements.map(el => el.x || 0);
   findAlignmentPositions(leftEdges, threshold).forEach(pos => 
     lines.add({orientation: 'vertical', position: pos, type: 'left'}));
   
   // 查找右侧对齐
   const rightEdges = elements.map(el => {
-    const pos = el.position?.x || 0;
+    const x = el.x || 0;
     const width = el.width || 0;
-    return pos + width;
+    return x + width;
   });
   findAlignmentPositions(rightEdges, threshold).forEach(pos => 
     lines.add({orientation: 'vertical', position: pos, type: 'right'}));
   
   // 查找中心对齐
   const centerPoints = elements.map(el => {
-    const pos = el.position?.x || 0;
+    const x = el.x || 0;
     const width = el.width || 0;
-    return pos + (width / 2);
+    return x + (width / 2);
   });
   findAlignmentPositions(centerPoints, threshold).forEach(pos => 
     lines.add({orientation: 'vertical', position: pos, type: 'center'}));
@@ -164,29 +167,32 @@ function findVerticalAlignmentLines(layout) {
 }
 
 /**
- * 收集布局中的所有元素
+ * 收集布局中的所有元素，并添加测量数据
  * @param {Object} element - 布局元素
  * @param {Array} elements - 元素收集数组
+ * @param {Object} domMeasurements - DOM 测量数据
  */
-function collectElements(element, elements, position = { x: 0, y: 0 }) {
-  if (!element) return;
+function collectElementsWithMeasurements(element, elements, domMeasurements) {
+  if (!element || !element.id) return;
   
-  // 计算绝对位置
-  const elementPos = {
-    x: position.x + (element.position?.x || 0),
-    y: position.y + (element.position?.y || 0)
-  };
-  
-  // 添加元素到数组
-  elements.push({
-    ...element,
-    position: elementPos
-  });
+  // 获取元素的测量数据
+  const measurement = domMeasurements[element.id];
+  if (measurement) {
+    // 添加元素到数组，使用测量数据中的位置和尺寸
+    elements.push({
+      id: element.id,
+      type: element.type,
+      x: measurement.x,
+      y: measurement.y,
+      width: measurement.width,
+      height: measurement.height
+    });
+  }
   
   // 递归处理子元素
   if (element.children) {
     element.children.forEach(child => {
-      collectElements(child, elements, elementPos);
+      collectElementsWithMeasurements(child, elements, domMeasurements);
     });
   }
 }

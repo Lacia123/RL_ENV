@@ -128,14 +128,15 @@ export function analyzeLayout(layout, domMeasurements = null) {
   // 内容密度分析 - 使用DOM测量数据（如果可用）
   if (domMeasurements) {
     result.contentDensity = analyzeContentDensity(layout, domMeasurements);
+    result.alignment = analyzeAlignment(layout, domMeasurements);
     console.log('使用DOM测量数据进行内容密度分析');
   } else {
     result.contentDensity = analyzeContentDensity(layout);
+     // 对所有分析维度应用各自的分析模块
+    result.alignment = analyzeAlignment(layout);
     console.log('使用布局计算进行内容密度分析');
   }
-
-  // 对所有分析维度应用各自的分析模块
-  result.alignment = analyzeAlignment(layout);
+ 
   result.hierarchy = analyzeHierarchy(layout);
   result.visualBalance = analyzeVisualBalance(layout);
   result.responsiveDesign = analyzeResponsiveDesign(layout);

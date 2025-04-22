@@ -5,6 +5,7 @@ import { Chart, registerables } from 'chart.js';
 import { analyzeLayout } from '../../utils/layoutAnalysis/index';
 import DensityMapVisualizer from './DensityMapVisualizer';
 import EnhancedDensityVisualizer from './EnhanceDensityMapVisualizer';
+import AlignmentVisualizer from './AlignmentVisualizer';
 
 // 注册Chart.js组件
 if (typeof window !== 'undefined') {
@@ -172,7 +173,7 @@ const LayoutScoreEvaluator = ({ layout }) => {
   }, [layout, showDetailedScores, selectedDimension]);
 
   // 评估布局并获取各维度评分
-  const { overallScore, dimensionScores, feedback, densityData } = evaluateLayout(layout, domMeasurements);
+  const { overallScore, dimensionScores, feedback, densityData, alignmentData } = evaluateLayout(layout, domMeasurements);
 
   // 排序维度分数，用于显示
   const sortedDimensions = Object.entries(dimensionScores).sort((a, b) => b[1].score - a[1].score);
@@ -294,6 +295,15 @@ const LayoutScoreEvaluator = ({ layout }) => {
                         />
                       </div>
                     )}
+
+                    {/* 对齐可视化 */}
+                    {dimension === '对齐' && alignmentData && domMeasurements && (
+                      <AlignmentVisualizer
+                        alignmentData={alignmentData}
+                        layout={layout}
+                        domMeasurements={domMeasurements}
+                      />
+                    )}
                   </div>
                 )}
               </div>
@@ -329,8 +339,6 @@ const getScoreColorClass = (score) => {
  */
 export const evaluateLayout = (layout, domMeasurements = null) => {
   // 使用新的模块化分析系统
-  console.log('....  evaluateLayout domMeasurements')
-  console.log(domMeasurements)
   const analysisResult = analyzeLayout(layout, domMeasurements);
 
   // 将分析结果转换为组件所需的格式
@@ -379,14 +387,11 @@ export const evaluateLayout = (layout, domMeasurements = null) => {
 
   // 返回内容密度数据用于可视化
   const densityData = analysisResult.contentDensity;
+  
+  // 返回对齐数据用于可视化
+  const alignmentData = analysisResult.alignment;
 
-  console.log('.... layout')
-  console.log(layout)
-
-  console.log('.... densityData')
-  console.log(densityData)
-
-  return { overallScore, dimensionScores, feedback, densityData };
+  return { overallScore, dimensionScores, feedback, densityData, alignmentData };
 };
 
 
