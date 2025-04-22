@@ -50,7 +50,10 @@ class ActionExecutor {
       onResetUsedElements: callbacks.onResetUsedElements || (() => {}),
       
       // 状态同步回调
-      onStateUpdated: callbacks.onStateUpdated || (() => {})
+      onStateUpdated: callbacks.onStateUpdated || (() => {}),
+      
+      // 新增的 Markdown 数据回调
+      onUpdateMarkdownData: callbacks.onUpdateMarkdownData || (() => {})
     };
     
     // 绑定方法
@@ -892,6 +895,11 @@ class ActionExecutor {
           
           // 保存导入的序列
           const success = this.saveRecordedSequence(sequenceName, data.actions);
+
+          // 如果有markdownData，储存到Redux中
+          if (data.markdownData && this.callbacks.onUpdateMarkdownData) {
+            this.callbacks.onUpdateMarkdownData(data.markdownData);
+          }
           
           if (success) {
             resolve({

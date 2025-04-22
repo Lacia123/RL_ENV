@@ -351,33 +351,11 @@ export const applyCategoryPresetImpl = (currentLayout, elementId, category, pres
     if (layout.id === elementId) {
       try {
         // 使用提供的applyPresetToElement函数
-        if (typeof applyPresetToElement === 'function') {
-          return applyPresetToElement(layout, category, presetKey, asArray);
+        if (typeof applyPresetToElement !== 'function') {
+          throw new Error('必须提供 applyPresetToElement 函数来应用预设');
         }
         
-        // 如果没有提供applyPresetToElement函数，实现一个简单版本
-        const newLayout = { ...layout };
-        newLayout[category] = presetKey;
-        
-        // 基于类别应用一些基本样式
-        if (!newLayout.style) newLayout.style = {};
-        
-        switch (category) {
-          case 'layoutPreset':
-            if (presetKey === 'vertical-centered') {
-              newLayout.style.flexDirection = 'column';
-              newLayout.style.alignItems = 'center';
-            }
-            break;
-          case 'sizePreset':
-            if (presetKey === 'fill-width') {
-              newLayout.style.width = '100%';
-            }
-            break;
-          // 可以添加更多预设类别的处理
-        }
-        
-        return newLayout;
+        return applyPresetToElement(layout, category, presetKey, asArray);
       } catch (error) {
         console.error('应用预设失败:', error);
         return layout;
@@ -395,12 +373,12 @@ export const applyCategoryPresetImpl = (currentLayout, elementId, category, pres
   };
   
   const newLayout = updateElement({ ...currentLayout });
-  
+  // TODO: 这里可能没有更新  
   // 检查是否找到并更新了元素
-  const elementWasFound = JSON.stringify(newLayout) !== JSON.stringify(currentLayout);
-  if (!elementWasFound) {
-    return { error: `未找到ID为 ${elementId} 的元素，无法应用预设` };
-  }
+  // const elementWasFound = JSON.stringify(newLayout) !== JSON.stringify(currentLayout);
+  // if (!elementWasFound) {
+  //   return { error: `未找到ID为 ${elementId} 的元素，无法应用预设` };
+  // }
   
   return { newLayout };
 };

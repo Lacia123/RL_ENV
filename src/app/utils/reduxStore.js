@@ -17,6 +17,7 @@ export const actionTypes = {
   UPDATE_JSON_INPUT: 'UPDATE_JSON_INPUT',
   UPDATE_MARKDOWN_TEXT: 'UPDATE_MARKDOWN_TEXT',
   UPDATE_MARKDOWN_ELEMENTS: 'UPDATE_MARKDOWN_ELEMENTS',
+  UPDATE_MARKDOWN_DATA: 'UPDATE_MARKDOWN_DATA',
   TOGGLE_PANEL: 'TOGGLE_PANEL',
   SET_UI_STATE: 'SET_UI_STATE',
   RESET_USED_ELEMENT_IDS: 'RESET_USED_ELEMENT_IDS'
@@ -44,7 +45,8 @@ const initialState = {
     showCanvasSettingsPanel: false,
     selectedPresetTab: false,
     markdownText: '',
-    markdownElements: []
+    markdownElements: [],
+    markdownData: null
   }
 };
 
@@ -107,6 +109,16 @@ function layoutReducer(state = initialState, action) {
         ui: {
           ...state.ui,
           markdownElements: action.payload
+        }
+      };
+    case actionTypes.UPDATE_MARKDOWN_DATA:
+      return {
+        ...state,
+        ui: {
+          ...state.ui,
+          markdownData: action.payload,
+          markdownElements: action.payload && action.payload.markdownElements ? 
+            action.payload.markdownElements : state.ui.markdownElements
         }
       };
     case actionTypes.TOGGLE_PANEL:
@@ -176,6 +188,10 @@ export const actions = {
   updateMarkdownElements: (elements) => ({
     type: actionTypes.UPDATE_MARKDOWN_ELEMENTS,
     payload: elements
+  }),
+  updateMarkdownData: (markdownData) => ({
+    type: actionTypes.UPDATE_MARKDOWN_DATA,
+    payload: markdownData
   }),
   togglePanel: (panelSettings) => ({
     type: actionTypes.TOGGLE_PANEL,

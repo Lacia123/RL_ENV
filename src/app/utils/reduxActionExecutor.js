@@ -6,6 +6,7 @@
  */
 import { getActionDefinition } from './actionConfig.js';
 import { store, actions } from './reduxStore.js'; // 导入 Redux store
+import { applyPresetToElement } from './presetSystem.js'; // 导入 applyPresetToElement 函数
 
 // 记录当前录制状态
 const recordingState = {
@@ -31,7 +32,12 @@ class ReduxActionExecutor {
       onRemoveComponent: callbacks.onRemoveComponent || (() => {}),
       
       // 预设动作回调
-      onApplyPreset: callbacks.onApplyPreset || (() => {}),
+      onApplyPreset: callbacks.onApplyPreset || ((elementId, category, presetKey) => {
+        // 如果没有提供预设应用函数，使用导入的 applyPresetToElement
+        console.warn('未提供 onApplyPreset 回调，使用默认 applyPresetToElement 函数');
+        // 这里无法直接应用，因为需要布局信息，仅作为应急方案
+        return Promise.resolve(elementId);
+      }),
       
       // 属性动作回调
       onUpdateElementStyle: callbacks.onUpdateElementStyle || (() => {}),
@@ -51,8 +57,14 @@ class ReduxActionExecutor {
       onResetUsedElements: callbacks.onResetUsedElements || (() => {}),
       
       // 状态同步回调
-      onStateUpdated: callbacks.onStateUpdated || (() => {})
+      onStateUpdated: callbacks.onStateUpdated || (() => {}),
+      
+      // 更新Markdown数据到Redux回调
+      onUpdateMarkdownData: callbacks.onUpdateMarkdownData || (() => {}),
     };
+    
+    // 提供 applyPresetToElement 函数给组件
+    this.applyPresetToElement = applyPresetToElement;
     
     // 绑定方法
     this.executeAction = this.executeAction.bind(this);
@@ -215,8 +227,6 @@ class ReduxActionExecutor {
       
       case 'addContainer':
         // 执行添加容器的动作
-        console.log('执行addContainer动作');
-        console.log('res.....', res)
         // 确保每次添加相同内容的容器时生成一致的ID
         let elements = params.elements || [];
         
@@ -356,6 +366,7 @@ class ReduxActionExecutor {
           
           while (retries < maxRetries) {
             try {
+              // 使用回调或默认的 applyPresetToElement 函数
               await this.callbacks.onApplyPreset(elementId, presetCategory, presetKey);
               console.log(`预设 ${presetCategory}.${presetKey} 已应用到元素 ${elementId}`);
               return elementId;
@@ -700,6 +711,12 @@ class ReduxActionExecutor {
           
           // 导入序列
           this.saveRecordedSequence(name, actions);
+          console.log('.... markdownData', markdownData)
+          // 如果有 markdownData，直接调用 onUpdateMarkdownData 回调存储到 Redux
+          if (markdownData && this.callbacks.onUpdateMarkdownData) {
+            console.log('从导入文件中发现 markdownData，存储到 Redux 中...');
+            this.callbacks.onUpdateMarkdownData(markdownData);
+          }
           
           resolve({
             success: true,
@@ -847,8 +864,16 @@ class ReduxActionExecutor {
       }
       
       // 设置Markdown数据（如果有）
-      if (importResult.markdownData && this.callbacks.onSetMarkdownData) {
-        await this.callbacks.onSetMarkdownData(importResult.markdownData);
+      if (importResult.markdownData) {
+        // 使用 onSetMarkdownData 回调处理旧的兼容性逻辑
+        if (this.callbacks.onSetMarkdownData) {
+          await this.callbacks.onSetMarkdownData(importResult.markdownData);
+        }
+        
+        // 同时确保使用 onUpdateMarkdownData 将数据存储到 Redux
+        if (this.callbacks.onUpdateMarkdownData) {
+          this.callbacks.onUpdateMarkdownData(importResult.markdownData);
+        }
       }
       
       // 重置已使用元素

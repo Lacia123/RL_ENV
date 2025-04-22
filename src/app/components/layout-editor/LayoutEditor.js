@@ -205,29 +205,8 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
 
     // 如果提供了 Markdown 元素，使用它们
     if (markdownData.markdownElements && markdownData.markdownElements.length > 0) {
-      // 为每个元素应用标准化 ID
-      const standardizedElements = markdownData.markdownElements.map(element => {
-        // 返回带有标准化ID的元素
-        return {
-          ...element,
-          id: generateStandardId(element)
-        };
-      });
 
-      // 确保没有重复ID
-      const idMap = new Map();
-      const uniqueElements = standardizedElements.map(element => {
-        if (idMap.has(element.id)) {
-          // 如果ID已存在，添加随机后缀
-          const newId = `${element.id}_${Math.random().toString(36).substring(2, 7)}`;
-          return { ...element, id: newId };
-        }
-
-        idMap.set(element.id, true);
-        return element;
-      });
-
-      dispatch(actions.updateMarkdownElements(uniqueElements));
+      dispatch(actions.updateMarkdownElements(markdownData.markdownElements));
     }
 
     return true;
@@ -253,6 +232,10 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
       onMoveElementToSibling: moveElementToSibling,
       onClearLayout: clearLayout,
       onSetMarkdownData: setMarkdownData,
+      onUpdateMarkdownData: (markdownData) => {
+        console.log('更新Markdown数据到Redux:', markdownData);
+        dispatch(actions.updateMarkdownData(markdownData));
+      },
       onResetUsedElements: resetUsedElements,
       onStateUpdated: handleStateUpdate,
       onError: (error) => console.error('动作执行错误:', error)
@@ -270,7 +253,8 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
     clearLayout,
     setMarkdownData,
     resetUsedElements,
-    handleStateUpdate
+    handleStateUpdate,
+    dispatch
   ]);
 
   // 只创建一次执行器实例
@@ -696,6 +680,7 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
                   onAddContainer={handleAddContainer}
                   onClearLayout={clearLayout}
                   onSetMarkdownData={setMarkdownData}
+
                   onResetUsedElements={resetUsedElements}
                   markdownText={markdownText}
                   actionExecutor={window.actionExecutor}

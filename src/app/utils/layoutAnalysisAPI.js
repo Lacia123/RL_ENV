@@ -54,7 +54,7 @@ class LayoutAnalysisAPI {
       this.reset();
 
       // 提取请求数据
-      const { metadata, actions } = request;
+      const { metadata, actions, markdownData } = request;
       
       // 设置画布尺寸
       if (metadata && metadata.canvasWidth) {
@@ -94,7 +94,7 @@ class LayoutAnalysisAPI {
       }
 
       // 分析布局
-      const analysisResult = analyzeLayout(this.layout, this.virtualMeasurements);
+      const analysisResult = analyzeLayout(this.layout, this.virtualMeasurements, markdownData ? markdownData.markdownElements : []);
 
       return {
         success: true,

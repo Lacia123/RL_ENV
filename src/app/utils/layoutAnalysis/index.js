@@ -9,6 +9,7 @@ import { analyzeResponsiveDesign } from './responsiveDesign.js';
 import { analyzeAccessibility } from './accessibility.js';
 import { analyzeColorTypography } from './colorTypography.js';
 import { analyzePerformance } from './performance.js';
+import { analyzeElementUsage } from './elementUsage.js';
 
 /**
  * 计算元素的视觉权重
@@ -93,9 +94,10 @@ function calculateVisualWeight(element) {
  * 整合所有分析维度，生成完整的布局分析报告
  * @param {Object} layout - 布局对象
  * @param {Object} domMeasurements - DOM测量数据 (可选)
+ * @param {Array} markdownElements - Markdown导入的元素数组 (可选)
  * @returns {Object} 布局分析结果
  */
-export function analyzeLayout(layout, domMeasurements = null) {
+export function analyzeLayout(layout, domMeasurements = null, markdownElements = null) {
   if (!layout) {
     return {
       score: 0,
@@ -108,6 +110,7 @@ export function analyzeLayout(layout, domMeasurements = null) {
       accessibility: { score: 0, details: [] },
       colorTypography: { score: 0, details: [] },
       performance: { score: 0, details: [] },
+      elementUsage: { score: 0, details: [] }
     };
   }
 
@@ -123,6 +126,7 @@ export function analyzeLayout(layout, domMeasurements = null) {
     accessibility: { score: 0, details: [] },
     colorTypography: { score: 0, details: [] },
     performance: { score: 0, details: [] },
+    elementUsage: { score: 0, details: [] }
   };
 
   // 内容密度分析 - 使用DOM测量数据（如果可用）
@@ -144,6 +148,21 @@ export function analyzeLayout(layout, domMeasurements = null) {
   result.colorTypography = analyzeColorTypography(layout);
   // forbidden analyze
   // result.performance = analyzePerformance(layout);
+  
+  // 元素使用率分析 - 只有当提供了markdownElements时才进行
+  if (markdownElements) {
+    result.elementUsage = analyzeElementUsage(layout, markdownElements);
+    console.log('进行元素使用率分析');
+  } else {
+    // 没有提供markdownElements时，设置默认值
+    result.elementUsage = {
+      score: 100,
+      details: [{ 
+        type: 'success', 
+        message: '没有提供Markdown元素数据，元素使用率评分被跳过' 
+      }]
+    };
+  }
   
   // 对于任何可能缺失的结果提供默认值
   ensureCompleteResults(result);
@@ -240,6 +259,16 @@ function ensureCompleteResults(result) {
       ]
     };
   }
+  
+  // 元素使用率
+  if (!result.elementUsage.score) {
+    result.elementUsage = {
+      score: 100,
+      details: [
+        { type: 'success', message: '没有特定的Markdown元素需要包含在布局中' }
+      ]
+    };
+  }
 }
 
 /**
@@ -251,7 +280,8 @@ function collectAllDetails(result) {
   const allDetails = [];
   const dimensions = [
     'contentDensity', 'alignment', 'hierarchy', 'visualBalance',
-    'responsiveDesign', 'accessibility', 'colorTypography', 'performance'
+    'responsiveDesign', 'accessibility', 'colorTypography', 'performance',
+    'elementUsage'
   ];
 
   dimensions.forEach(dim => {
@@ -276,14 +306,15 @@ function collectAllDetails(result) {
 function calculateOverallScore(result) {
   // 各维度的权重配置
   const weights = {
-    contentDensity: 1.2,    // 内容密度权重略高
+    contentDensity: 1.2,     // 内容密度权重略高
     alignment: 1,
-    hierarchy: 1.4,         // 层次结构权重较高
+    hierarchy: 1.4,          // 层次结构权重较高
     visualBalance: 1,
-    responsiveDesign: 1.3,  // 响应式设计权重较高
-    accessibility: 1.5,     // 可访问性权重最高
+    responsiveDesign: 1.3,   // 响应式设计权重较高
+    accessibility: 1.5,      // 可访问性权重较高
     colorTypography: 1,
-    performance: 1.1        // 性能权重略高
+    performance: 1.1,        // 性能权重略高
+    elementUsage: 2.0        // 元素使用率权重最高，这是基础类别
   };
 
   // 计算加权和与权重和
@@ -314,5 +345,6 @@ export {
   analyzeAccessibility,
   analyzeColorTypography,
   analyzePerformance,
+  analyzeElementUsage,
   calculateVisualWeight
 };

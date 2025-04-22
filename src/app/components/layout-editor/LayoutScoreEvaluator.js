@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
+import { useSelector } from 'react-redux';
 import { analyzeLayout } from '../../utils/layoutAnalysis/index';
 import DensityMapVisualizer from './DensityMapVisualizer';
 import EnhancedDensityVisualizer from './EnhanceDensityMapVisualizer';
@@ -21,16 +22,20 @@ const LayoutScoreEvaluator = ({ layout }) => {
   const [selectedDimension, setSelectedDimension] = useState(null);
   const [showDetailedScores, setShowDetailedScores] = useState(false);
   const [domMeasurements, setDomMeasurements] = useState(null);
-  // We no longer need to switch between real DOM and estimated mode
   const observerRef = useRef(null);
+  
+  // 从 Redux 获取 Markdown 元素和数据
+  const markdownElements = useSelector(state => state.ui.markdownElements);
+  const markdownData = useSelector(state => state.ui.markdownData);
+  
+  // 获取有效的 Markdown 元素（优先使用 markdownData 中的 markdownElements，如果存在）
+  const effectiveMarkdownElements = markdownData?.markdownElements || markdownElements;
+
+  console.log('.... effectiveMarkdownElements')
+  console.log(effectiveMarkdownElements)
 
   // 收集DOM测量数据
   useEffect(() => {
-    // 只在详细视图打开且选择了内容密度时测量
-    // if (!showDetailedScores || selectedDimension !== '内容密度') {
-    //   return;
-    // }
-
     // 创建ResizeObserver来监控元素尺寸
     const collectDomMeasurements = () => {
       const measurements = {};
@@ -172,11 +177,18 @@ const LayoutScoreEvaluator = ({ layout }) => {
     };
   }, [layout, showDetailedScores, selectedDimension]);
 
-  // 评估布局并获取各维度评分
-  const { overallScore, dimensionScores, feedback, densityData, alignmentData } = evaluateLayout(layout, domMeasurements);
+  // 评估布局并获取各维度评分 - 使用 effectiveMarkdownElements 替代传入的 markdownElements
+  const { overallScore, dimensionScores, feedback, densityData, alignmentData, elementUsageData } = evaluateLayout(layout, domMeasurements, effectiveMarkdownElements);
 
-  // 排序维度分数，用于显示
-  const sortedDimensions = Object.entries(dimensionScores).sort((a, b) => b[1].score - a[1].score);
+  // 排序维度分数，用于显示 - 将基础类别放在最前面
+  const sortedDimensions = Object.entries(dimensionScores)
+    .sort((a, b) => {
+      // 基础类别始终排在前面
+      if (a[0] === '元素使用率') return -1;
+      if (b[0] === '元素使用率') return 1;
+      // 其次按照分数从高到低排序
+      return b[1].score - a[1].score;
+    });
 
   // 准备图表数据
   const chartData = {
@@ -185,8 +197,12 @@ const LayoutScoreEvaluator = ({ layout }) => {
       {
         label: '维度评分',
         data: Object.values(dimensionScores).map(d => d.score),
-        backgroundColor: 'rgba(64, 169, 255, 0.6)',
-        borderColor: 'rgba(24, 144, 255, 1)',
+        backgroundColor: Object.keys(dimensionScores).map(dim => 
+          dim === '元素使用率' ? 'rgba(220, 53, 69, 0.6)' : 'rgba(64, 169, 255, 0.6)'
+        ),
+        borderColor: Object.keys(dimensionScores).map(dim => 
+          dim === '元素使用率' ? 'rgba(220, 53, 69, 1)' : 'rgba(24, 144, 255, 1)'
+        ),
         borderWidth: 1,
       },
     ],
@@ -201,6 +217,41 @@ const LayoutScoreEvaluator = ({ layout }) => {
         max: 100,
       },
     },
+  };
+
+  // 渲染未使用元素列表
+  const renderUnusedElementsList = () => {
+    if (!elementUsageData || !elementUsageData.unusedElements || elementUsageData.unusedElements.length === 0) {
+      return <p className="text-green-600">所有元素均已使用</p>;
+    }
+    
+    return (
+      <div className="mt-2">
+        <h6 className="font-medium text-amber-700 mb-1">未使用元素列表:</h6>
+        <ul className="list-disc pl-5 text-sm space-y-1">
+          {elementUsageData.unusedElements.map((element, index) => (
+            <li key={index} className="text-amber-700">
+              {element.name || getElementTypeName(element.type)}
+              {element.type === 'text' && element.content?.value && 
+                ` - "${element.content.value.slice(0, 20)}${element.content.value.length > 20 ? '...' : ''}"`
+              }
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+  
+  // 获取元素类型的中文名称
+  const getElementTypeName = (type) => {
+    const typeMap = {
+      'text': '文本',
+      'image': '图片',
+      'button': '按钮',
+      'container': '容器'
+    };
+    
+    return typeMap[type] || type;
   };
 
   return (
@@ -233,17 +284,20 @@ const LayoutScoreEvaluator = ({ layout }) => {
 
           <div className="mt-6 space-y-4">
             {sortedDimensions.map(([dimension, data]) => (
-              <div key={dimension} className="border rounded-md p-3">
+              <div key={dimension} className={`border rounded-md p-3 ${dimension === '元素使用率' ? 'border-red-200 bg-red-50' : ''}`}>
                 <div
                   className="flex justify-between items-center cursor-pointer"
                   onClick={() => setSelectedDimension(selectedDimension === dimension ? null : dimension)}
                 >
                   <div className="flex-1">
-                    <h4 className="font-medium">{dimension}</h4>
+                    <h4 className={`font-medium ${dimension === '元素使用率' ? 'text-red-700' : ''}`}>
+                      {dimension}
+                      {dimension === '元素使用率' && <span className="ml-2 text-xs bg-red-200 text-red-800 px-2 py-0.5 rounded">基础</span>}
+                    </h4>
                     <div className="flex items-center mt-1">
                       <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
                         <div
-                          className={`h-2 rounded-full ${getScoreColorClass(data.score)}`}
+                          className={`h-2 rounded-full ${dimension === '元素使用率' ? 'bg-red-600' : getScoreColorClass(data.score)}`}
                           style={{ width: `${data.score}%` }}
                         ></div>
                       </div>
@@ -284,10 +338,6 @@ const LayoutScoreEvaluator = ({ layout }) => {
                         <div className="flex justify-between items-center mb-2">
                           <h5 className="font-medium">密度可视化</h5>
                         </div>
-                        {/* <DensityMapVisualizer
-                          densityData={densityData}
-                          layout={layout}
-                        /> */}
                         <EnhancedDensityVisualizer
                           densityData={densityData}
                           layout={layout}
@@ -304,6 +354,24 @@ const LayoutScoreEvaluator = ({ layout }) => {
                         domMeasurements={domMeasurements}
                       />
                     )}
+                    
+                    {/* 元素使用率详情 */}
+                    {dimension === '元素使用率' && elementUsageData && (
+                      <div className="mt-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <h5 className="font-medium">元素使用情况</h5>
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                            使用率: {elementUsageData.usagePercentage}%
+                          </span>
+                        </div>
+                        
+                        {renderUnusedElementsList()}
+                        
+                        <div className="mt-3 text-xs text-gray-600">
+                          <p>元素使用率是一个基础评分项，未使用元素将严重影响总体得分</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -313,7 +381,7 @@ const LayoutScoreEvaluator = ({ layout }) => {
       )}
 
       <div className="mt-2 text-xs text-gray-500">
-        评分基于多维度指标，包括视觉平衡、层次结构、响应式设计等
+        评分基于多维度指标，包括元素使用率、视觉平衡、层次结构、响应式设计等
       </div>
     </div>
   );
@@ -335,17 +403,22 @@ const getScoreColorClass = (score) => {
  * 计算布局评分
  * @param {Object} layout - 布局对象
  * @param {Object} domMeasurements - DOM测量数据（可选）
+ * @param {Array} markdownElements - Markdown导入的元素数组 (可选)
  * @returns {Object} - 评分结果，包括总分和各维度分数
  */
-export const evaluateLayout = (layout, domMeasurements = null) => {
+export const evaluateLayout = (layout, domMeasurements = null, markdownElements = null) => {
   // 使用新的模块化分析系统
-  const analysisResult = analyzeLayout(layout, domMeasurements);
+  const analysisResult = analyzeLayout(layout, domMeasurements, markdownElements);
 
   // 将分析结果转换为组件所需的格式
   const overallScore = analysisResult.score;
 
   // 构建维度评分
   const dimensionScores = {
+    '元素使用率': {
+      score: analysisResult.elementUsage.score,
+      details: analysisResult.elementUsage.details
+    },
     '视觉平衡': {
       score: analysisResult.visualBalance.score,
       details: analysisResult.visualBalance.details
@@ -390,8 +463,11 @@ export const evaluateLayout = (layout, domMeasurements = null) => {
   
   // 返回对齐数据用于可视化
   const alignmentData = analysisResult.alignment;
+  
+  // 返回元素使用率数据
+  const elementUsageData = analysisResult.elementUsage;
 
-  return { overallScore, dimensionScores, feedback, densityData, alignmentData };
+  return { overallScore, dimensionScores, feedback, densityData, alignmentData, elementUsageData };
 };
 
 
