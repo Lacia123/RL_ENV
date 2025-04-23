@@ -1,0 +1,31 @@
+.text {
+color: #000000;
+--hyperlink-color: #0a98ff;
+min-height: 72px;
+font-size: 20px;
+max-width: 1200px;
+background-color: none;
+}
+
+.text:hover {
+--hyperlink-color: #3bb0ff;
+min-height: 72px;
+max-width: 1200px;
+font-size: 20px;
+background-color: none;
+}
+
+.text:visited {
+--hyperlink-color: #6e38c1;
+min-height: 72px;
+max-width: 1200px;
+font-size: 20px;
+background-color: none;
+}
+
+.text:active {
+--hyperlink-color: #0064b8;
+font-size: 20px;
+background-color: none;
+}
+

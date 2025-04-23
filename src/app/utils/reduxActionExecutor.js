@@ -6,7 +6,7 @@
  */
 import { getActionDefinition } from './actionConfig.js';
 import { store, actions } from './reduxStore.js'; // 导入 Redux store
-import { applyPresetToElement } from './presetSystem.js'; // 导入 applyPresetToElement 函数
+import { applyPresetToElement } from './presets/presetSystem.js'; // 导入 applyPresetToElement 函数
 
 // 记录当前录制状态
 const recordingState = {

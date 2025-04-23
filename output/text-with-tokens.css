@@ -1,0 +1,31 @@
+.text {
+color: {color.basic.opacity.black.100};
+--hyperlink-color: {color.basic.light-blue.5};
+min-height: {dimension.basic.dimension.72};
+font-size: {font.size.large};
+max-width: {dimension.basic.dimension.1200};
+background-color: none;
+}
+
+.text:hover {
+--hyperlink-color: {color.basic.light-blue.4};
+min-height: {dimension.basic.dimension.72};
+max-width: {dimension.basic.dimension.1200};
+font-size: {font.size.large};
+background-color: none;
+}
+
+.text:visited {
+--hyperlink-color: {color.basic.violet.6};
+min-height: {dimension.basic.dimension.72};
+max-width: {dimension.basic.dimension.1200};
+font-size: {font.size.large};
+background-color: none;
+}
+
+.text:active {
+--hyperlink-color: {color.basic.light-blue.7};
+font-size: {font.size.large};
+background-color: none;
+}
+

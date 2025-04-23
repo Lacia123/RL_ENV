@@ -1,0 +1,82 @@
+.button {
+background-color: {color.basic.brand.5};
+--hyperlink-color: {color.basic.opacity.white.100};
+color: {color.basic.opacity.white.100};
+border-radius: {dimension.borderradius.xxl};
+padding: {dimension.padding.20};
+gap: {dimension.gap.semitight};
+min-width: {dimension.basic.dimension.64};
+min-height: {dimension.basic.dimension.64};
+border: {dimension.borderwidth.none} solid {color.basic.opacity.white.32};
+font-size: {font.size.xl};
+box-shadow: none;
+}
+
+.button:hover {
+background-color: {color.basic.brand.4};
+padding: {dimension.padding.20};
+gap: {dimension.gap.semitight};
+border-radius: {dimension.borderradius.xxl};
+border: {dimension.borderwidth.narrow} solid {color.basic.opacity.white.32};
+font-size: {font.size.xl};
+border-color: {color.basic.opacity.white.32};
+color: {color.basic.opacity.white.100};
+min-width: {dimension.basic.dimension.64};
+min-height: {dimension.basic.dimension.64};
+box-shadow: none;
+}
+
+.button:active {
+background-color: {color.basic.brand.6};
+padding: {dimension.padding.20};
+gap: {dimension.gap.semitight};
+border-radius: {dimension.borderradius.xxl};
+border: {dimension.borderwidth.base} solid {color.basic.opacity.white.32};
+font-size: {font.size.xl};
+color: {color.basic.opacity.white.100};
+min-width: {dimension.basic.dimension.64};
+min-height: {dimension.basic.dimension.64};
+box-shadow: none;
+}
+
+.button.pressed {
+background-color: {color.basic.brand.7};
+padding: {dimension.padding.20};
+gap: {dimension.gap.semitight};
+border-radius: {dimension.borderradius.xxl};
+border: {dimension.borderwidth.narrow} solid {color.basic.opacity.white.32};
+font-size: {font.size.xl};
+color: {color.basic.opacity.white.100};
+min-width: {dimension.basic.dimension.64};
+min-height: {dimension.basic.dimension.64};
+box-shadow: none;
+}
+
+.button.loading {
+background-color: {color.gradient.gradient1.blue2yellow};
+padding: {dimension.padding.20};
+gap: {dimension.gap.semitight};
+border-radius: {dimension.borderradius.xxl};
+border: {dimension.borderwidth.narrow} solid {color.basic.opacity.white.32};
+font-size: {font.size.xl};
+border-color: {color.basic.opacity.white.32};
+color: {color.basic.opacity.white.100};
+min-width: {dimension.basic.dimension.64};
+min-height: {dimension.basic.dimension.64};
+box-shadow: none;
+}
+
+.button:disabled, .disabled {
+background-color: {color.basic.grey.2};
+padding: {dimension.padding.20};
+gap: {dimension.gap.semitight};
+border-radius: {dimension.borderradius.xxl};
+border: {dimension.borderwidth.narrow} solid {color.basic.opacity.white.32};
+font-size: {font.size.xl};
+border-color: {color.basic.opacity.white.32};
+color: {color.basic.opacity.white.100};
+min-width: {dimension.basic.dimension.64};
+min-height: {dimension.basic.dimension.64};
+box-shadow: none;
+}
+

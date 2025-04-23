@@ -14,7 +14,8 @@ import {
   moveElementImpl, deleteElementImpl, standardizeMarkdownElementsIds,
   findElement, findParentElement, handleAddContainerImpl
 } from '../../utils/layoutOperations';
-import { applyPresetToElement } from '../../utils/presetSystem';
+import presetSystem from '../../utils/presets';
+import { applyPresetToElement } from '../../utils/presets/presetSystem';
 
 /**
  * 创建LayoutEditor适配器
@@ -35,8 +36,27 @@ export const createLayoutEditorAdapter = (options = {}) => {
       usedElementIds: state.usedElementIds
     };
   };
-  // 应用预设的依赖函数
-  const applyPresetToElement = options.applyPresetToElement;
+  
+  // 新的预设系统应用预设函数
+  const applyPresetToElementImpl = (element, presetName) => {
+    if (!element) return element;
+
+    // 确保元素有presets数组
+    if (!element.presets) {
+      element.presets = [];
+    }
+    
+    // 检查预设是否已经应用
+    if (!element.presets.includes(presetName)) {
+      // 将预设添加到元素的预设数组中
+      element.presets.push(presetName);
+    }
+    
+    return element;
+  };
+  
+  // 应用预设的依赖函数 - 使用新的预设系统替代
+  const applyPresetToElement = options.applyPresetToElement || applyPresetToElementImpl;
   
   /**
    * 添加容器的适配器方法
@@ -382,6 +402,6 @@ export const useLayoutEditorAdapter = () => {
   return createLayoutEditorAdapter({
     dispatch,
     jsonRef: { current: '' }, // 提供一个空的jsonRef，会在实际调用时被覆盖
-    applyPresetToElement // 传递applyPresetToElement函数
+    applyPresetToElement // 传递导入的applyPresetToElement函数
   });
 }; 

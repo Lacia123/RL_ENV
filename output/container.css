@@ -1,0 +1,14 @@
+.container {
+background-color: {color.basic.white};
+padding: {dimension.padding.24};
+gap: {dimension.gap.medium};
+width: 100%;
+max-width: 1200px;
+min-height: {dimension.basic.dimension.100};
+border-radius: {dimension.borderradius.md};
+border: 1px solid {color.basic.opacity.black.10};
+box-shadow: {effect.shadow.sm};
+display: flex;
+flex-direction: column;
+}
+

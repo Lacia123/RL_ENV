@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token 系统测试报告</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    .summary {
+      display: flex;
+      justify-content: space-around;
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .summary-item {
+      text-align: center;
+    }
+    .summary-value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .test-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .test-table th, .test-table td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    .test-table th {
+      background-color: #f2f2f2;
+    }
+    .test-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .test-table tr:hover {
+      background-color: #f1f1f1;
+    }
+    .status {
+      font-weight: bold;
+    }
+    .pass {
+      color: #28a745;
+    }
+    .fail {
+      color: #dc3545;
+    }
+    .skip {
+      color: #ffc107;
+    }
+    .error {
+      color: #9c27b0;
+    }
+    .details {
+      background-color: #f8f9fa;
+      border-left: 4px solid #dee2e6;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    .timestamp {
+      color: #6c757d;
+      font-size: 0.85em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Token 系统测试报告</h1>
+  <p class="timestamp">生成时间: 2025/4/22 19:07:48</p>
+  
+  <div class="summary">
+    <div class="summary-item">
+      <div class="summary-value pass">13</div>
+      <div>通过</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-value fail">0</div>
+      <div>失败</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-value skip">0</div>
+      <div>跳过</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-value">13</div>
+      <div>总计</div>
+    </div>
+  </div>
+  
+  <h2>测试详情</h2>
+  <table class="test-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>测试描述</th>
+        <th>状态</th>
+        <th>执行时间</th>
+        <th>详情</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td>1</td>
+          <td>解析基本 token</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>2</td>
+          <td>解析嵌套 token</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>3</td>
+          <td>处理非 token 字符串</td>
+          <td class="status pass">通过</td>
+          <td>1ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>4</td>
+          <td>处理不存在的 token</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>5</td>
+          <td>解析尺寸类 token</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>6</td>
+          <td>解析嵌套尺寸类 token</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>7</td>
+          <td>解析字体类 token</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>8</td>
+          <td>解析动效类 token</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>9</td>
+          <td>解析文本中的所有 token 引用</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>10</td>
+          <td>处理空引用</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>11</td>
+          <td>处理多层嵌套引用</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>12</td>
+          <td>检测 token 引用</td>
+          <td class="status pass">通过</td>
+          <td>0ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+        <tr>
+          <td>13</td>
+          <td>性能测试 - 解析大量 token</td>
+          <td class="status pass">通过</td>
+          <td>2ms</td>
+          <td>
+            
+            
+          </td>
+        </tr>
+      
+    </tbody>
+  </table>
+</body>
+</html>
+  

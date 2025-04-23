@@ -2,8 +2,8 @@
 
 import { JSDOM } from 'jsdom';
 import { chromium } from 'playwright-chromium';
-import { mergeElementPresets } from '../presetSystem.js';
-import { convertStyle, resolveToken, processStyleValue } from '../tokenResolver.js';
+import { mergeElementPresets } from '../presets/presetSystem.js';
+import resolveToken, { convertStyle, processStyleValue } from '../tokens/resolveToken.js';
 
 
 /**

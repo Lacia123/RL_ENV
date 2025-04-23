@@ -1,6 +1,6 @@
 'use client';
 
-import { resolveToken } from '../tokenResolver.js';
+import resolveToken from '../tokens/resolveToken.js';
 
 /**
  * 分析布局的颜色和排版质量

@@ -274,18 +274,64 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
     }
   }, [actionExecutorCreated, createActionExecutor]);
 
-  // 组件初始化 - 如果提供了initialLayout，则初始化Redux状态
+  // 接着检查第一个useEffect
   useEffect(() => {
-    console.log('组件挂载，初始化状态...');
-
-    // 如果有初始布局且Redux布局为空，则初始化Redux布局
-    if (initialLayout && !layout) {
-      dispatch(actions.updateLayout(initialLayout));
+    // 只在初始化时执行一次的操作
+    if (!layout && initialLayout) {
+      // 更新 Redux 布局状态 - 首先深拷贝布局，防止引用问题
+      let layoutCopy = JSON.parse(JSON.stringify(initialLayout));
+      
+      // 确保 layoutCopy 有 id
+      if (!layoutCopy.id) {
+        layoutCopy = addIds(layoutCopy); // 为所有元素添加ID
+      }
+      
+      // 确保所有元素都有presets数组（适配新的预设系统）
+      const ensurePresetsArray = (element) => {
+        if (!element) return element;
+        
+        // 确保元素有presets数组
+        if (!element.presets) {
+          element.presets = [];
+        }
+        
+        // 将旧的预设格式转换到新的预设数组
+        const presetKeys = Object.keys(element).filter(key => key.endsWith('Preset'));
+        presetKeys.forEach(key => {
+          if (element[key]) {
+            // 提取预设类别和值
+            const category = key.replace('Preset', '');
+            const presetValue = element[key];
+            const presetName = `${category}:${presetValue}`;
+            
+            // 添加到presets数组，确保不重复
+            if (!element.presets.includes(presetName)) {
+              element.presets.push(presetName);
+            }
+          }
+        });
+        
+        // 递归处理子元素
+        if (element.children && Array.isArray(element.children)) {
+          element.children = element.children.map(child => ensurePresetsArray(child));
+        }
+        
+        return element;
+      };
+      
+      // 将布局中的所有预设转换为新格式
+      layoutCopy = ensurePresetsArray(layoutCopy);
+      
+      // 设置布局到Redux状态
+      dispatch(actions.updateLayout(layoutCopy));
+      
+      // 设置初始选中元素为布局根元素
+      dispatch(actions.updateSelectedElementId(layoutCopy.id));
+      
+      // 更新JSON引用
+      jsonRef.current = JSON.stringify(layoutCopy, null, 2);
     }
-
-    // 仅在组件挂载时执行一次
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialLayout, layout, dispatch]);
 
   // 处理点击外部关闭面板
   useEffect(() => {
@@ -332,7 +378,7 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
         markdownText: '',
         markdownElements: []
       }));
-    } catch (error) {
+        } catch (error) {
       console.error('应用JSON时出错:', error);
       dispatch(actions.setUiState({
         jsonError: `应用JSON失败: ${error.message}`
@@ -767,10 +813,10 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
               {/* 主要布局预览区 - 占据更多空间 */}
               <div className={`${showComponentPanel ? 'w-3/4' : 'w-full'} min-h-[70vh] p-1`}>
                 {layout ? (
-                  <LayoutPreview
+                <LayoutPreview
                     layout={layout}
                     selectedElementId={selectedElementId}
-                    onElementClick={handleElementClick}
+                  onElementClick={handleElementClick}
                     canvasWidth={canvasWidth}
                     canvasHeight={canvasHeight}
                   />
@@ -792,16 +838,16 @@ const LayoutEditor = ({ initialLayout, onLayoutChange }) => {
                     </div>
                     <div className="p-2 overflow-auto" style={{ maxHeight: "calc(70vh - 40px)" }}>
                       {layout ? (
-                        <ComponentStatusPanel
+                      <ComponentStatusPanel
                           layout={layout}
                           selectedElementId={selectedElementId}
-                          onElementClick={handleElementClick}
-                          onElementSelect={handleElementSelect}
-                          onAddComponent={addChildComponent}
-                          onDeleteElement={deleteElement}
-                          onMoveElement={moveElement}
-                          onMoveElementToSibling={moveElementToSibling}
-                        />
+                        onElementClick={handleElementClick}
+                        onElementSelect={handleElementSelect}
+                        onAddComponent={addChildComponent}
+                        onDeleteElement={deleteElement}
+                        onMoveElement={moveElement}
+                        onMoveElementToSibling={moveElementToSibling}
+                      />
                       ) : (
                         <div className="text-center text-gray-500 py-4">
                           <p>暂无组件</p>

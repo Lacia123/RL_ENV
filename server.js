@@ -13,7 +13,7 @@ const __dirname = dirname(__filename);
 // 判断是否为开发环境
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || 'localhost';
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 // 创建Next.js应用实例
 const app = next({ dev, hostname, port });

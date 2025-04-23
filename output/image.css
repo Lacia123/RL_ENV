@@ -1,0 +1,18 @@
+.image {
+image: https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png;
+border-radius: 0px;
+border-color: #00000033;
+border-width: 0px;
+box-shadow: none;
+height: 560px;
+width: 640px;
+}
+
+.image.loaded {
+image: https://i.pinimg.com/736x/35/6f/f1/356ff1848ba9affde2fbde8dacbf9891.jpg;
+border-radius: 0px;
+border-color: #00000033;
+border-width: 0px;
+box-shadow: none;
+}
+

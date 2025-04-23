@@ -1,6 +1,6 @@
 'use client';
-import tokens from '@/app/utils/token';
-import { themeSystem, resolveThemeValue } from '@/app/utils/elementDefinitions';
+import tokens from '@/app/utils/tokens/token';
+import resolveToken, { resolveTokensInText } from '@/app/utils/tokens/resolveToken.js';
 
 /**
  * 解析设计令牌值
@@ -34,8 +34,8 @@ export const resolveTokenValue = (value) => {
     return result;
   }
   
-  // 如果在tokens中没找到，尝试从theme中解析
-  return resolveThemeValue(value, themeSystem.theme);
+  // 如果在tokens中没找到，尝试从resolveToken系统解析
+  return resolveToken(value) || value;
 };
 
 /**

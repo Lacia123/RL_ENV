@@ -1,6 +1,6 @@
 'use client';
 
-import { mergeElementPresets } from '../presetSystem.js';
+import { mergeElementPresets } from '../presets/presetSystem.js';
 
 /**
  * 虚拟DOM测量系统

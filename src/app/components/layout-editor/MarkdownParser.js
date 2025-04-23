@@ -109,23 +109,21 @@ const MarkdownParser = ({
   
   // 创建标题元素
   const createHeadingElement = (text, level) => {
-    const typographyMap = {
-      1: 'h1',
-      2: 'h2',
-      3: 'h3',
-      4: 'subtitle',
-      5: 'subtitle',
-      6: 'subtitle'
+    // 映射标题级别到预设名称
+    const presetsByLevel = {
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+      6: []
     };
     
     return {
       type: 'text',
       name: `标题 ${text}`,
-      typographyPreset: typographyMap[level],
-      selfAlignPreset: 'self-start',
-      textAlignPreset: 'left',
-      sizePreset: 'fill-width',
-      content: { value: text }
+      presets: presetsByLevel[level] || [],
+      content: text,
     };
   };
   
@@ -134,24 +132,18 @@ const MarkdownParser = ({
     return {
       type: 'text',
       name: `段落 ${text.slice(0, 15)}${text.length > 15 ? '...' : ''}`,
-      typographyPreset: 'body',
-      selfAlignPreset: 'self-start',
-      textAlignPreset: 'left',
-      sizePreset: 'fill-width',
-      content: { value: text }
+      presets: [],
+      content: text,
     };
   };
   
-  // 创建单个列表项元素（作为独立的文本元素），后续需要处理
+  // 创建单个列表项元素（作为独立的文本元素）
   const createListItemElement = (text) => {
     return {
       type: 'text',
       name: `列表项 ${text.slice(0, 15)}${text.length > 15 ? '...' : ''}`,
-      typographyPreset: 'body',
-      selfAlignPreset: 'self-start',
-      textAlignPreset: 'left',
-      sizePreset: 'fill-width',
-      content: { value: `${text}` }
+      presets: [],
+      content: `${text}`,  // 添加项目符号
     };
   };
   
@@ -160,13 +152,9 @@ const MarkdownParser = ({
     return {
       type: 'image',
       name: `图片 ${alt || 'image'}`,
-      selfAlignPreset: 'self-center',
-      sizePreset: 'responsive-medium',
-      imageProportionPreset: 'original',
-      content: {
-        src,
-        alt
-      }
+      presets: [],
+      src: src,
+      alt: alt,
     };
   };
   
@@ -175,11 +163,9 @@ const MarkdownParser = ({
     return {
       type: 'button',
       name: `按钮 ${text}`,
-      buttonSizePreset: 'btn-medium',
-      selfAlignPreset: 'self-start',
-      appearancePreset: 'primary',
-      content: { text },
-      action: { type: 'link', url }
+      presets: [],
+      content: text,
+      action: { type: 'link', url },
     };
   };
   
@@ -188,19 +174,8 @@ const MarkdownParser = ({
     return {
       type: 'text',
       name: `代码块 ${language}`,
-      typographyPreset: 'body',
-      selfAlignPreset: 'self-start',
-      sizePreset: 'fill-width',
-      appearancePreset: 'card',
-      style: {
-        fontFamily: 'monospace',
-        whiteSpace: 'pre',
-        overflowX: 'auto',
-        padding: '16px',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '4px'
-      },
-      content: { value: code }
+      presets: [],
+      content: code,
     };
   };
   
@@ -256,6 +231,9 @@ const MarkdownParser = ({
               {parsedElements.map((element, index) => (
                 <li key={index} className="text-sm">
                   <span className="font-medium">{element.type}</span>: {element.name}
+                  <div className="text-xs text-gray-500 mt-1">
+                    预设: {element.presets.join(', ')}
+                  </div>
                 </li>
               ))}
             </ul>

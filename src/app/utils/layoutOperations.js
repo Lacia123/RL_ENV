@@ -95,12 +95,17 @@ export const generateStandardId = (element) => {
   }
 
   // 添加预设特征
-  const presetKeys = Object.keys(element).filter(key => key.endsWith('Preset'));
-  presetKeys.forEach(key => {
-    if (element[key]) {
-      featureString += `${key}:${element[key]};`;
-    }
-  });
+  if (element.presets && Array.isArray(element.presets)) {
+    featureString += element.presets.join(';');
+  } else {
+    // 向后兼容旧的预设格式
+    const presetKeys = Object.keys(element).filter(key => key.endsWith('Preset'));
+    presetKeys.forEach(key => {
+      if (element[key]) {
+        featureString += `${key}:${element[key]};`;
+      }
+    });
+  }
 
   // 创建唯一内容哈希
   const contentHash = contentString ? simpleHash(contentString) : '';
@@ -161,11 +166,11 @@ export const addContainerImpl = (currentLayout, elements = [], parentId = null, 
   // 创建新容器
   const newContainer = {
     type: 'container',
-    layoutPreset: 'vertical-centered',
-    flexRatioPreset: 'grow-1',
-    sizePreset: 'fill-width',
-    appearancePreset: 'card',
-    spacingPreset: 'spacious',
+    presets: [
+      'alignment:flexCenterAlignment',
+      'alignment:stackedAlignment',
+      'alignment:edgeToContentAlignment'
+    ],
     children: []
   };
   
@@ -283,12 +288,42 @@ export const addChildComponentImpl = (currentLayout, parentId, type, markdownEle
   const newElement = markdownElement || {
     type,
     id: generateStandardId({ type, content: { value: type } }),
+    presets: [], // 确保使用新的预设格式
     content: { value: type }
   };
   
   // 确保元素具有唯一ID
   if (!newElement.id || (markdownElement && !markdownElement.id)) {
     newElement.id = generateStandardId(newElement);
+  }
+  
+  // 确保所有元素都有presets数组
+  if (!newElement.presets) {
+    newElement.presets = [];
+  }
+  
+  // 向后兼容：将老式预设转换为新的预设格式
+  const convertOldPresetsToNew = (element) => {
+    const presetKeys = Object.keys(element).filter(key => key.endsWith('Preset'));
+    presetKeys.forEach(key => {
+      if (element[key]) {
+        // 从预设键中提取类别和值
+        const category = key.replace('Preset', '');
+        const presetName = `${category}:${element[key]}`;
+        
+        // 确保不重复添加
+        if (!element.presets.includes(presetName)) {
+          element.presets.push(presetName);
+        }
+      }
+    });
+    
+    return element;
+  };
+  
+  // 如果是Markdown元素，确保它使用新的预设格式
+  if (markdownElement) {
+    convertOldPresetsToNew(newElement);
   }
   
   // 确保ID唯一
@@ -344,6 +379,20 @@ export const applyCategoryPresetImpl = (currentLayout, elementId, category, pres
     return { error: `无法应用预设: 元素ID为空` };
   }
   
+  // 格式化预设名称，确保使用新的预设格式
+  const formatPresetName = (category, presetKey) => {
+    // 如果预设键已经包含完整格式，则直接返回
+    if (presetKey.includes(':')) {
+      return presetKey;
+    }
+    
+    // 否则生成新的预设名称格式
+    return `${category}:${presetKey}`;
+  };
+  
+  // 要应用的预设名称
+  const presetName = formatPresetName(category, presetKey);
+  
   // 更新元素函数
   const updateElement = (layout) => {
     if (!layout) return null;
@@ -355,7 +404,42 @@ export const applyCategoryPresetImpl = (currentLayout, elementId, category, pres
           throw new Error('必须提供 applyPresetToElement 函数来应用预设');
         }
         
-        return applyPresetToElement(layout, category, presetKey, asArray);
+        // 首先确保元素有预设数组
+        if (!layout.presets) {
+          layout.presets = [];
+        }
+        
+        // 要移除的同类别预设
+        const presetsToRemove = [];
+        
+        // 检查是否是取消选择（当已选中同一预设时）
+        const isDeselecting = layout.presets.includes(presetName);
+        
+        if (!isDeselecting) {
+          // 找出所有同类别的预设
+          layout.presets.forEach(existingPreset => {
+            // 检查是否属于同一类别
+            if (existingPreset.startsWith(`${category}:`)) {
+              presetsToRemove.push(existingPreset);
+            }
+          });
+        }
+        
+        let newPresets;
+        
+        if (isDeselecting) {
+          // 如果是取消选择，则移除该预设
+          newPresets = layout.presets.filter(p => p !== presetName);
+        } else {
+          // 否则，先移除同类别的预设，再添加新的预设
+          newPresets = layout.presets.filter(p => !presetsToRemove.includes(p));
+          newPresets.push(presetName);
+        }
+        
+        return {
+          ...layout,
+          presets: newPresets
+        };
       } catch (error) {
         console.error('应用预设失败:', error);
         return layout;
@@ -373,12 +457,6 @@ export const applyCategoryPresetImpl = (currentLayout, elementId, category, pres
   };
   
   const newLayout = updateElement({ ...currentLayout });
-  // TODO: 这里可能没有更新  
-  // 检查是否找到并更新了元素
-  // const elementWasFound = JSON.stringify(newLayout) !== JSON.stringify(currentLayout);
-  // if (!elementWasFound) {
-  //   return { error: `未找到ID为 ${elementId} 的元素，无法应用预设` };
-  // }
   
   return { newLayout };
 };
@@ -721,11 +799,9 @@ export const handleAddContainerImpl = (currentLayout, selectedElements = [], par
   // 创建新容器
   const newContainer = {
     type: 'container',
-    layoutPreset: 'vertical-centered',
-    flexRatioPreset: 'grow-1',
-    sizePreset: 'fill-width',
-    appearancePreset: 'card',
-    spacingPreset: 'spacious',
+    presets: [
+      'alignment:flexCenterAlignment'
+    ],
     children: []
   };
 

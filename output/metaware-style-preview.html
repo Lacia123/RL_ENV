@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metaware 组件样式预览</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; max-width: 1000px; margin: 0 auto; padding: 20px; color: #333; }
+    h1 { border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .summary { display: flex; gap: 20px; margin: 20px 0; }
+    .summary-item { padding: 15px; border-radius: 4px; }
+    .pass { background-color: #e6f4ea; }
+    .fail { background-color: #fce8e6; }
+    .test-case { margin-bottom: 20px; border: 1px solid #eee; border-radius: 4px; overflow: hidden; }
+    .test-header { padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
+    .pass-header { background-color: #e6f4ea; }
+    .fail-header { background-color: #fce8e6; }
+    .test-badge { padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+    .pass-badge { background-color: #34a853; color: white; }
+    .fail-badge { background-color: #ea4335; color: white; }
+    .test-content { padding: 15px; background-color: #f8f9fa; font-family: monospace; white-space: pre-wrap; }
+    .error { color: #ea4335; }
+    
+    .preview-section { margin-top: 30px; }
+    .component-preview { margin: 20px 0; }
+    .state-preview { margin: 10px 0; padding: 20px; border: 1px solid #eee; border-radius: 4px; }
+    .state-title { margin-bottom: 10px; font-weight: bold; }
+    .preview-box { display: flex; gap: 20px; }
+    .style-code { flex: 1; font-family: monospace; white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 4px; overflow: auto; max-height: 300px; }
+    .visual-preview-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; background-color: #f5f5f5; border-radius: 4px; }
+    .visual-preview { border: 1px dashed #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; }
+    .style-info { margin-top: 10px; font-size: 12px; color: #666; }
+    .dimensions { display: flex; gap: 10px; margin-top: 5px; font-family: monospace; }
+    .dimension-item { background-color: #eee; padding: 3px 8px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <h1>Metaware 组件样式预览</h1>
+  
+  <div class="summary">
+    <div class="summary-item pass">
+      <strong>通过:</strong> 5
+    </div>
+    <div class="summary-item fail">
+      <strong>失败:</strong> 0
+    </div>
+    <div class="summary-item">
+      <strong>总计:</strong> 5
+    </div>
+  </div>
+  
+  <h2>测试详情</h2>
+  
+  
+    <div class="test-case">
+      <div class="test-header pass-header">
+        <h3>1. 按钮组件 - 默认状态 (带 token 解析)</h3>
+        <span class="test-badge pass-badge">通过</span>
+      </div>
+      <div class="test-content">
+        {
+  "backgroundColor": "#615eec",
+  "--hyperlinkColor": "#ffffff",
+  "borderColor": "#ffffff52",
+  "color": "#ffffff",
+  "borderRadius": "24px",
+  "padding": "20px",
+  "gap": "8px",
+  "minWidth": "64px",
+  "minHeight": "64px",
+  "borderWidth": "0px",
+  "fontSize": "26px",
+  "boxShadow": "none"
+}
+      </div>
+    </div>
+  
+    <div class="test-case">
+      <div class="test-header pass-header">
+        <h3>2. 按钮组件 - 默认状态 (保留 token)</h3>
+        <span class="test-badge pass-badge">通过</span>
+      </div>
+      <div class="test-content">
+        {
+  "backgroundColor": "{color.basic.brand.5}",
+  "--hyperlinkColor": "{color.basic.opacity.white.100}",
+  "borderColor": "{color.basic.opacity.white.32}",
+  "color": "{color.basic.opacity.white.100}",
+  "borderRadius": "{dimension.borderradius.xxl}",
+  "padding": "{dimension.padding.20}",
+  "gap": "{dimension.gap.semitight}",
+  "minWidth": "{dimension.basic.dimension.64}",
+  "minHeight": "{dimension.basic.dimension.64}",
+  "borderWidth": "{dimension.borderwidth.none}",
+  "borderStyle": "solid",
+  "fontSize": "{font.size.xl}",
+  "boxShadow": "none"
+}
+      </div>
+    </div>
+  
+    <div class="test-case">
+      <div class="test-header pass-header">
+        <h3>3. 容器组件 - 样式对象生成</h3>
+        <span class="test-badge pass-badge">通过</span>
+      </div>
+      <div class="test-content">
+        {
+  "backgroundColor": "{color.basic.white}",
+  "padding": "{dimension.padding.24}",
+  "gap": "{dimension.gap.medium}",
+  "width": "100%",
+  "maxWidth": "1200px",
+  "minHeight": "{dimension.basic.dimension.100}",
+  "borderRadius": "{dimension.borderradius.md}",
+  "borderColor": "{color.basic.opacity.black.10}",
+  "borderWidth": "1px",
+  "borderStyle": "solid",
+  "boxShadow": "{effect.shadow.sm}",
+  "display": "flex",
+  "flexDirection": "column"
+}
+      </div>
+    </div>
+  
+    <div class="test-case">
+      <div class="test-header pass-header">
+        <h3>4. 文本组件 - 所有状态样式对象</h3>
+        <span class="test-badge pass-badge">通过</span>
+      </div>
+      <div class="test-content">
+        {
+  "default": {
+    "color": "#000000",
+    "--hyperlinkColor": "#0a98ff",
+    "minHeight": "72px",
+    "fontSize": "20px",
+    "maxWidth": "1200px",
+    "backgroundColor": "none"
+  },
+  "hover": {
+    "--hyperlinkColor": "#3bb0ff",
+    "minHeight": "72px",
+    "maxWidth": "1200px",
+    "fontSize": "20px",
+    "backgroundColor": "none"
+  },
+  "visited": {
+    "--hyperlinkColor": "#6e38c1",
+    "minHeight": "72px",
+    "maxWidth": "1200px",
+    "fontSize": "20px",
+    "backgroundColor": "none"
+  },
+  "active": {
+    "--hyperlinkColor": "#0064b8",
+    "fontSize": "20px",
+    "backgroundColor": "none"
+  }
+}
+      </div>
+    </div>
+  
+    <div class="test-case">
+      <div class="test-header pass-header">
+        <h3>5. 图片组件 - 完整样式配置生成</h3>
+        <span class="test-badge pass-badge">通过</span>
+      </div>
+      <div class="test-content">
+        {
+  "componentType": "image",
+  "styles": {
+    "default": {
+      "image": "https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png",
+      "borderRadius": "0px",
+      "borderColor": "#00000033",
+      "borderWidth": "0px",
+      "boxShadow": "none",
+      "height": "560px",
+      "width": "640px"
+    },
+    "loaded": {
+      "image": "https://i.pinimg.com/736x/35/6f/f1/356ff1848ba9affde2fbde8dacbf9891.jpg",
+      "borderRadius": "0px",
+      "borderColor": "#00000033",
+      "borderWidth": "0px",
+      "boxShadow": "none"
+    }
+  }
+}
+      </div>
+    </div>
+  
+  
+  <div class="preview-section">
+    <h2>组件样式预览</h2>
+    
+    <div class="component-preview">
+      <h3>按钮</h3>
+      <div class="state-preview">
+        <div class="state-title">默认状态</div>
+        <div class="preview-box">
+          <div class="style-code">{
+  "backgroundColor": "#615eec",
+  "--hyperlinkColor": "#ffffff",
+  "borderColor": "#ffffff52",
+  "color": "#ffffff",
+  "borderRadius": "24px",
+  "padding": "20px",
+  "gap": "8px",
+  "minWidth": "64px",
+  "minHeight": "64px",
+  "borderWidth": "0px",
+  "fontSize": "26px",
+  "boxShadow": "none"
+}</div>
+          <div class="visual-preview-container">
+            <div class="visual-preview" id="button-default-preview">按钮</div>
+          </div>
+        </div>
+        <div class="style-info">
+          <div class="dimensions">
+            <div class="dimension-item" id="button-default-minwidth"></div>
+            <div class="dimension-item" id="button-default-minheight"></div>
+          </div>
+        </div>
+      </div>
+      <div class="state-preview">
+        <div class="state-title">悬停状态</div>
+        <div class="preview-box">
+          <div class="style-code">{
+  "backgroundColor": "#7d7cf0",
+  "padding": "20px",
+  "gap": "8px",
+  "borderRadius": "24px",
+  "borderWidth": "1px",
+  "borderColor": "#ffffff52",
+  "borderStyle": "solid",
+  "fontSize": "26px",
+  "color": "#ffffff",
+  "minWidth": "64px",
+  "minHeight": "64px",
+  "boxShadow": "none"
+}</div>
+          <div class="visual-preview-container">
+            <div class="visual-preview" id="button-hover-preview">按钮</div>
+          </div>
+        </div>
+        <div class="style-info">
+          <div class="dimensions">
+            <div class="dimension-item" id="button-hover-minwidth"></div>
+            <div class="dimension-item" id="button-hover-minheight"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="component-preview">
+      <h3>容器</h3>
+      <div class="state-preview">
+        <div class="state-title">默认状态</div>
+        <div class="preview-box">
+          <div class="style-code">{
+  "backgroundColor": "{color.basic.white}",
+  "padding": "{dimension.padding.24}",
+  "gap": "{dimension.gap.medium}",
+  "width": "100%",
+  "maxWidth": "1200px",
+  "minHeight": "{dimension.basic.dimension.100}",
+  "borderRadius": "{dimension.borderradius.md}",
+  "borderColor": "{color.basic.opacity.black.10}",
+  "borderWidth": "1px",
+  "borderStyle": "solid",
+  "boxShadow": "{effect.shadow.sm}",
+  "display": "flex",
+  "flexDirection": "column"
+}</div>
+          <div class="visual-preview-container">
+            <div class="visual-preview" id="container-default-preview">容器内容</div>
+          </div>
+        </div>
+        <div class="style-info">
+          <div class="dimensions">
+            <div class="dimension-item" id="container-default-minwidth"></div>
+            <div class="dimension-item" id="container-default-minheight"></div>
+            <div class="dimension-item" id="container-default-width"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="component-preview">
+      <h3>文本</h3>
+      <div class="state-preview">
+        <div class="state-title">默认状态</div>
+        <div class="preview-box">
+          <div class="style-code">{
+  "color": "#000000",
+  "--hyperlinkColor": "#0a98ff",
+  "minHeight": "72px",
+  "fontSize": "20px",
+  "maxWidth": "1200px",
+  "backgroundColor": "none"
+}</div>
+          <div class="visual-preview-container">
+            <div class="visual-preview" id="text-default-preview">示例文本</div>
+          </div>
+        </div>
+        <div class="style-info">
+          <div class="dimensions">
+            <div class="dimension-item" id="text-default-minwidth"></div>
+            <div class="dimension-item" id="text-default-minheight"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="component-preview">
+      <h3>图片</h3>
+      <div class="state-preview">
+        <div class="state-title">默认状态</div>
+        <div class="preview-box">
+          <div class="style-code">{
+  "image": "https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png",
+  "borderRadius": "0px",
+  "borderColor": "#00000033",
+  "borderWidth": "0px",
+  "boxShadow": "none",
+  "height": "560px",
+  "width": "640px"
+}</div>
+          <div class="visual-preview-container">
+            <div class="visual-preview" id="image-default-preview">[图片占位]</div>
+          </div>
+        </div>
+        <div class="style-info">
+          <div class="dimensions">
+            <div class="dimension-item" id="image-default-minwidth"></div>
+            <div class="dimension-item" id="image-default-minheight"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 应用样式到预览元素
+    function applyStyles(elementId, styles) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        // 确保应用任何最小尺寸
+        if (styles.minWidth) {
+          element.style.minWidth = styles.minWidth;
+          updateDimensionLabel(elementId + '-minwidth', 'minWidth', styles.minWidth);
+        }
+        if (styles.minHeight) {
+          element.style.minHeight = styles.minHeight;
+          updateDimensionLabel(elementId + '-minheight', 'minHeight', styles.minHeight);
+        }
+        if (styles.width) {
+          element.style.width = styles.width;
+          updateDimensionLabel(elementId + '-width', 'width', styles.width);
+        }
+        if (styles.height) {
+          element.style.height = styles.height;
+          updateDimensionLabel(elementId + '-height', 'height', styles.height);
+        }
+        
+        // 应用其他样式
+        Object.assign(element.style, styles);
+      }
+    }
+    
+    // 更新尺寸标签
+    function updateDimensionLabel(labelId, property, value) {
+      const label = document.getElementById(labelId);
+      if (label) {
+        label.textContent = property + ': ' + value;
+      }
+    }
+    
+    // 应用所有组件的样式
+    window.onload = function() {
+      // 按钮样式
+      applyStyles('button-default-preview', {"backgroundColor":"#615eec","--hyperlinkColor":"#ffffff","borderColor":"#ffffff52","color":"#ffffff","borderRadius":"24px","padding":"20px","gap":"8px","minWidth":"64px","minHeight":"64px","borderWidth":"0px","fontSize":"26px","boxShadow":"none"});
+      applyStyles('button-hover-preview', {"backgroundColor":"#7d7cf0","padding":"20px","gap":"8px","borderRadius":"24px","borderWidth":"1px","borderColor":"#ffffff52","borderStyle":"solid","fontSize":"26px","color":"#ffffff","minWidth":"64px","minHeight":"64px","boxShadow":"none"});
+      
+      // 容器样式
+      applyStyles('container-default-preview', {"backgroundColor":"{color.basic.white}","padding":"{dimension.padding.24}","gap":"{dimension.gap.medium}","width":"100%","maxWidth":"1200px","minHeight":"{dimension.basic.dimension.100}","borderRadius":"{dimension.borderradius.md}","borderColor":"{color.basic.opacity.black.10}","borderWidth":"1px","borderStyle":"solid","boxShadow":"{effect.shadow.sm}","display":"flex","flexDirection":"column"});
+      
+      // 文本样式
+      applyStyles('text-default-preview', {"color":"#000000","--hyperlinkColor":"#0a98ff","minHeight":"72px","fontSize":"20px","maxWidth":"1200px","backgroundColor":"none"});
+      
+      // 图片样式
+      applyStyles('image-default-preview', {"image":"https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png","borderRadius":"0px","borderColor":"#00000033","borderWidth":"0px","boxShadow":"none","height":"560px","width":"640px"});
+    };
+  </script>
+</body>
+</html>
+  

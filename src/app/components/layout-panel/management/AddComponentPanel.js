@@ -1,14 +1,17 @@
 'use client';
 import React, { useState } from 'react';
-import { elementDefinitions } from '@/app/utils/elementDefinitions';
+import buttonMeta from '@/app/utils/metaware/button.js';
+import containerMeta from '@/app/utils/metaware/container.js';
+import textMeta from '@/app/utils/metaware/text.js';
+import imageMeta from '@/app/utils/metaware/image.js';
 
-// 获取元素类型下拉选项（排除背景类型）
-const elementTypeOptions = Object.keys(elementDefinitions)
-  .filter(type => type !== 'background') // 背景作为特殊类型单独处理
-  .map(type => ({
-    value: type,
-    label: type.charAt(0).toUpperCase() + type.slice(1)
-  }));
+// 获取元素类型下拉选项
+const elementTypeOptions = [
+  { value: 'container', label: 'Container' },
+  { value: 'text', label: 'Text' },
+  { value: 'button', label: 'Button' },
+  { value: 'image', label: 'Image' }
+];
 
 /**
  * 添加组件面板 - 用于向容器元素添加子组件

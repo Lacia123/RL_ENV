@@ -1,0 +1,83 @@
+.button {
+background-color: #615eec;
+--hyperlink-color: #ffffff;
+border-color: #ffffff52;
+color: #ffffff;
+border-radius: 24px;
+padding: {dimension.padding.20};
+gap: 8px;
+min-width: 64px;
+min-height: 64px;
+border-width: 0px;
+font-size: 26px;
+box-shadow: none;
+}
+
+.button:hover {
+background-color: #7d7cf0;
+padding: {dimension.padding.20};
+gap: 8px;
+border-radius: 24px;
+border: 1px solid #ffffff52;
+font-size: 26px;
+border-color: #ffffff52;
+color: #ffffff;
+min-width: 64px;
+min-height: 64px;
+box-shadow: none;
+}
+
+.button:active {
+background-color: #4f4ac8;
+padding: {dimension.padding.20};
+gap: 8px;
+border-radius: 24px;
+border: 2px solid #ffffff52;
+font-size: 26px;
+color: #ffffff;
+min-width: 64px;
+min-height: 64px;
+box-shadow: none;
+}
+
+.button.pressed {
+background-color: #3e38a5;
+padding: {dimension.padding.20};
+gap: 8px;
+border-radius: 24px;
+border: 1px solid #ffffff52;
+font-size: 26px;
+color: #ffffff;
+min-width: 64px;
+min-height: 64px;
+box-shadow: none;
+}
+
+.button.loading {
+background-color: {color.gradient.gradient1.blue2yellow};
+padding: {dimension.padding.20};
+gap: 8px;
+border-radius: 24px;
+border: 1px solid #ffffff52;
+font-size: 26px;
+border-color: #ffffff52;
+color: #ffffff;
+min-width: 64px;
+min-height: 64px;
+box-shadow: none;
+}
+
+.button:disabled, .disabled {
+background-color: #c6c6cd;
+padding: {dimension.padding.20};
+gap: 8px;
+border-radius: 24px;
+border: 1px solid #ffffff52;
+font-size: 26px;
+border-color: #ffffff52;
+color: #ffffff;
+min-width: 64px;
+min-height: 64px;
+box-shadow: none;
+}
+

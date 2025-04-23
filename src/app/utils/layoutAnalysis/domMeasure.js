@@ -1,8 +1,8 @@
 'use client';
 
 import { JSDOM } from 'jsdom';
-import { mergeElementPresets } from '../presetSystem.js';
-import { convertStyle, resolveToken, processStyleValue } from '../tokenResolver.js';
+import { mergeElementPresets } from '../presets/presetSystem.js';
+import resolveToken, { convertStyle, processStyleValue } from '../tokens/resolveToken.js';
 
 /**
  * jsdom DOM测量系统

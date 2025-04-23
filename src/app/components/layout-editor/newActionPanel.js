@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { getAvailablePresets } from "../../utils/presetSystem";
+import { getAvailablePresets } from "../../utils/presets";
 import ReduxActionExecutor from "../../utils/reduxActionExecutor"; // 使用 Redux 版本的执行器
 import { store, actions } from "../../utils/reduxStore"; // 引入 Redux 存储
 import { getAllActions, getCategoryActions } from "../../utils/actionConfig";
@@ -718,6 +718,17 @@ const NewActionPanel = ({
       }, 100); // 添加小延迟确保状态已更新
     };
 
+    // 检查某个预设是否已被选中
+    const isPresetSelected = (presetCategory, presetKey) => {
+      if (!selectedElementId || !layout) return false;
+      
+      const selectedElement = findElement(layout, selectedElementId);
+      if (!selectedElement || !selectedElement.presets) return false;
+      
+      // 检查预设是否已应用
+      return selectedElement.presets.includes(presetKey);
+    };
+
     const isActionDisabled = !layout || !selectedElementId;
     const availablePresets = selectedElementId
       ? getElementPresets(selectedElementId)
@@ -736,23 +747,33 @@ const NewActionPanel = ({
                       {getPresetName(presetCategory)}
                     </h5>
                     <div className="grid grid-cols-2 gap-2">
-                      {Object.entries(presetObj).map(([presetKey, preset]) => (
-                        <button
-                          key={`${presetCategory}-${presetKey}`}
-                          className="px-3 py-2 border rounded text-sm hover:bg-blue-50 hover:border-blue-300"
-                          onClick={() =>
-                            handleApplyPreset(presetCategory, presetKey)
-                          }
-                        >
-                          <div className="text-sm font-medium">
-                            {preset.name}
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            {preset.description?.substring(0, 20)}
-                            {preset.description?.length > 20 ? "..." : ""}
-                          </div>
-                        </button>
-                      ))}
+                      {Object.entries(presetObj).map(([presetKey, preset]) => {
+                        // 检查预设是否被选中
+                        const isSelected = isPresetSelected(presetCategory, presetKey);
+                        
+                        return (
+                          <button
+                            key={`${presetCategory}-${presetKey}`}
+                            className={`px-3 py-2 border rounded text-sm transition-colors ${
+                              isSelected 
+                                ? "bg-blue-100 border-blue-400 font-medium"
+                                : "hover:bg-blue-50 hover:border-blue-300"
+                            }`}
+                            onClick={() =>
+                              handleApplyPreset(presetCategory, presetKey)
+                            }
+                          >
+                            <div className="text-sm font-medium">
+                              {preset.name}
+                              {isSelected && <span className="ml-2 text-blue-600">✓</span>}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              {preset.description?.substring(0, 20)}
+                              {preset.description?.length > 20 ? "..." : ""}
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 ),

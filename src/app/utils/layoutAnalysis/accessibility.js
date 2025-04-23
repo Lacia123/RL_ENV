@@ -1,6 +1,6 @@
 'use client';
 
-import { resolveToken } from '../tokenResolver.js';
+import resolveToken from '../tokens/resolveToken.js';
 
 /**
  * 分析布局的可访问性

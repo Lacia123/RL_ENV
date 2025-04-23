@@ -6,7 +6,7 @@ import { generateHybridMeasurements } from './layoutAnalysis/playwrightDomMeasur
 import ReduxActionExecutor from './reduxActionExecutor.js';
 import { addContainerImpl, addChildComponentImpl, applyCategoryPresetImpl, 
   updateElementStyleImpl, updateElementContentImpl, moveElementImpl } from './layoutOperations.js';
-import { applyPresetToElement } from './presetSystem.js'
+import { applyPresetToElement } from './presets/presetSystem.js'
 import { store, actions as reduxActions } from './reduxStore.js';
 
 /**

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { getAvailablePresets } from '../../../utils/presetSystem';
+import { getAvailablePresets } from '../../../utils/presets';
 
 /**
  * 分类预设选择器组件 - 允许按类别选择预设
@@ -27,6 +27,32 @@ const CategoryPresetSelector = ({ elementType, selectedPresets = {}, onPresetSel
       return selected.includes(presetKey);
     }
     return selected === presetKey;
+  };
+  
+  // 处理预设选择，同一类别预设互斥
+  const handlePresetSelect = (category, presetKey) => {
+    // 检查是否已经选中
+    const isSelected = isPresetSelected(category, presetKey);
+    
+    if (asArray) {
+      // 多选模式 - 但同一类别仍然互斥，替换整个数组
+      if (isSelected) {
+        // 如果已选中，则取消选择
+        onPresetSelect(category, []);
+      } else {
+        // 如果未选中，则替换为该预设
+        onPresetSelect(category, [presetKey]);
+      }
+    } else {
+      // 单选模式 - 互斥选择
+      if (isSelected) {
+        // 如果已选中，则取消选择
+        onPresetSelect(category, null);
+      } else {
+        // 如果未选中，则替换为该预设
+        onPresetSelect(category, presetKey);
+      }
+    }
   };
   
   // 显示预设详情提示框
@@ -144,9 +170,11 @@ const CategoryPresetSelector = ({ elementType, selectedPresets = {}, onPresetSel
                   <div
                     key={presetKey}
                     className={`p-2 border rounded cursor-pointer hover:bg-blue-50 ${
-                      isPresetSelected(category, presetKey) ? 'bg-blue-100 border-blue-300' : 'border-gray-200'
+                      isPresetSelected(category, presetKey) 
+                        ? 'bg-blue-100 border-blue-300 shadow-sm' 
+                        : 'border-gray-200'
                     }`}
-                    onClick={() => onPresetSelect(category, presetKey, asArray)}
+                    onClick={() => handlePresetSelect(category, presetKey)}
                     onMouseEnter={(e) => showTooltip(e, category, presetKey, preset)}
                     onMouseLeave={hideTooltip}
                   >
@@ -203,6 +231,7 @@ const getCategoryName = (category) => {
     case 'buttonSize': return '按钮尺寸';
     case 'flexRatio': return 'Flex比例';
     case 'imageProportion': return '图片比例';
+    case 'alignment': return '对齐方式';
     
     // 默认情况下展示原始类别名
     default: return category.charAt(0).toUpperCase() + category.slice(1);
