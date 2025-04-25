@@ -129,6 +129,9 @@ export function analyzeLayout(layout, domMeasurements = null, markdownElements =
     elementUsage: { score: 0, details: [] }
   };
 
+  console.log('.... domMeasurements')
+  console.log(domMeasurements)
+
   // 内容密度分析 - 使用DOM测量数据（如果可用）
   if (domMeasurements) {
     result.contentDensity = analyzeContentDensity(layout, domMeasurements);

@@ -3,56 +3,68 @@
  */
 
 import presetSystem, { PRESET_STATES, getAvailablePresets } from './presetSystem.js';
-import alignmentPresets from './alignmentPreset.js';
+import alignmentPresets from './config/alignmentPreset.js';
+import spatialOrchestrationPresets from './config/spatialOrchestrationPreset.js';
+import visualHierarchyPresets from './config/visualHierarchyPreset.js';
+import contextualAdaptationPresets from './config/contextualAdaptationPreset.js';
 import elementRenderer from './elementRenderer.js';
 import resolveToken, { resolveTokensInText } from '../tokens/resolveToken.js';
 
-// 注册预设
-// 导入预设配置
-const presets = alignmentPresets.preset || {};
+// 配置预设集合
+const presetConfigs = [
+  { category: 'alignment', config: alignmentPresets },
+  { category: 'spatialOrchestration', config: spatialOrchestrationPresets },
+  { category: 'visualHierarchy', config: visualHierarchyPresets },
+  { category: 'contextualAdaptation', config: contextualAdaptationPresets }
+];
 
-// 注册预设到系统
-Object.entries(presets).forEach(([presetName, presetConfig]) => {
-  // 为每个预设创建状态对象
-  const presetWithStates = {
-    name: presetConfig.name,
-    description: presetConfig.description,
-    states: {
-      [PRESET_STATES.DEFAULT]: presetConfig.defaultStyle || {}
-      // 后期可以添加其他状态，如hover、active等
-    }
-  };
+// 注册所有预设到系统
+presetConfigs.forEach(({ category, config }) => {
+  const presets = config.preset || {};
   
-  // 注册预设
-  presetSystem.registerPreset(`alignment:${presetName}`, presetWithStates);
+  // 将每个预设注册到系统
+  Object.entries(presets).forEach(([presetName, presetConfig]) => {
+    // 为每个预设创建状态对象
+    const presetWithStates = {
+      name: presetConfig.name,
+      description: presetConfig.description,
+      states: {
+        [PRESET_STATES.DEFAULT]: presetConfig.defaultStyle || {}
+        // 后期可以添加其他状态，如hover、active等
+      }
+    };
+    
+    // 注册预设
+    presetSystem.registerPreset(`${category}:${presetName}`, presetWithStates);
+  });
+  
+  // 处理和注册通用预设到各元件类型
+  // 获取所有支持的元件类型
+  const elementTypes = Object.keys(presetSystem.elementPresets);
+  
+  // 检查预设模块的 metawareType 属性，用于决定将预设注册到哪些元件类型
+  if (config.metawareType === 'all') {
+    // 如果是 'all'，则将预设注册到所有元件类型
+    elementTypes.forEach(elementType => {
+      // 从预设对象中提取键名，创建预设键列表
+      const presetKeys = Object.keys(presets).map(presetKey => `${category}:${presetKey}`);
+      
+      // 将预设注册到每种元件类型的对应分类下
+      presetSystem.registerElementPresets(elementType, category, presetKeys);
+      
+      console.log(`已将${category}预设注册到 ${elementType} 类型元件`);
+    });
+  } else if (Array.isArray(config.metawareType)) {
+    // 如果是数组，则只注册到指定的元件类型
+    config.metawareType.forEach(elementType => {
+      if (elementTypes.includes(elementType)) {
+        const presetKeys = Object.keys(presets).map(presetKey => `${category}:${presetKey}`);
+        presetSystem.registerElementPresets(elementType, category, presetKeys);
+        console.log(`已将${category}预设注册到 ${elementType} 类型元件`);
+      }
+    });
+  }
 });
-
-// 处理和注册通用预设到各元件类型
-// 获取所有支持的元件类型
-const elementTypes = Object.keys(presetSystem.elementPresets);
-
-// 检查预设模块的 metawareType 属性，用于决定将预设注册到哪些元件类型
-if (alignmentPresets.metawareType === 'all') {
-  // 如果是 'all'，则将预设注册到所有元件类型
-  elementTypes.forEach(elementType => {
-    // 从预设对象中提取键名，创建预设键列表
-    const presetKeys = Object.keys(presets).map(presetKey => `alignment:${presetKey}`);
-    
-    // 将对齐预设注册到每种元件类型的 'alignment' 分类下
-    presetSystem.registerElementPresets(elementType, 'alignment', presetKeys);
-    
-    console.log(`已将对齐预设注册到 ${elementType} 类型元件`);
-  });
-} else if (Array.isArray(alignmentPresets.metawareType)) {
-  // 如果是数组，则只注册到指定的元件类型
-  alignmentPresets.metawareType.forEach(elementType => {
-    if (elementTypes.includes(elementType)) {
-      const presetKeys = Object.keys(presets).map(presetKey => `alignment:${presetKey}`);
-      presetSystem.registerElementPresets(elementType, 'alignment', presetKeys);
-      console.log(`已将对齐预设注册到 ${elementType} 类型元件`);
-    }
-  });
-}
 
 // 汇总所有预设系统的功能和预设
 export default {

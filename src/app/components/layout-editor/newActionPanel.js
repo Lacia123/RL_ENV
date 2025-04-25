@@ -724,6 +724,12 @@ const NewActionPanel = ({
       
       const selectedElement = findElement(layout, selectedElementId);
       if (!selectedElement || !selectedElement.presets) return false;
+
+      console.log("...... presetCategory")
+      console.log(presetCategory)
+
+      console.log("...... presetKey")
+      console.log(presetKey)
       
       // 检查预设是否已应用
       return selectedElement.presets.includes(presetKey);

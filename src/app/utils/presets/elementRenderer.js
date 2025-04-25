@@ -7,7 +7,7 @@
  * 3. 处理不同类型的元素（容器、文本、按钮等）
  */
 
-import presetSystem, { PRESET_STATES } from './presetSystem';
+import presetSystem, { PRESET_STATES } from './presetSystem.js';
 
 /**
  * 将样式对象转换为CSS字符串

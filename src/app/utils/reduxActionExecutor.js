@@ -324,7 +324,6 @@ class ReduxActionExecutor {
       case 'applyPreset':
         const { elementId, presetCategory, presetKey } = params;
         
-        // 验证参数
         if (!elementId) {
           throw new Error('缺少必要的元素ID');
         }
@@ -337,7 +336,13 @@ class ReduxActionExecutor {
           throw new Error('缺少必要的预设键名');
         }
         
-        console.log(`应用预设: ${presetCategory}.${presetKey} 到元素 ${elementId}`);
+        // 处理presetKey，确保不包含presetCategory前缀
+        const cleanPresetKey = this._normalizePresetKey(presetCategory, presetKey);
+        
+        // 构建完整的预设名称
+        const fullPresetName = `${presetCategory}:${cleanPresetKey}`;
+        
+        console.log(`应用预设: ${fullPresetName} 到元素 ${elementId}`);
         
         // 查找元素以确认它存在
         const layout = this._getReduxLayout();
@@ -367,8 +372,8 @@ class ReduxActionExecutor {
           while (retries < maxRetries) {
             try {
               // 使用回调或默认的 applyPresetToElement 函数
-              await this.callbacks.onApplyPreset(elementId, presetCategory, presetKey);
-              console.log(`预设 ${presetCategory}.${presetKey} 已应用到元素 ${elementId}`);
+              await this.callbacks.onApplyPreset(elementId, presetCategory, cleanPresetKey);
+              console.log(`预设 ${fullPresetName} 已应用到元素 ${elementId}`);
               return elementId;
             } catch (error) {
               console.warn(`应用预设失败，尝试重试 (${retries + 1}/${maxRetries}): ${error.message}`);
@@ -458,6 +463,27 @@ class ReduxActionExecutor {
   }
   
   /**
+   * 规范化预设键，确保不包含类别前缀
+   * @private
+   * @param {string} presetCategory - 预设类别
+   * @param {string} presetKey - 预设键名
+   * @returns {string} - 规范化后的预设键名
+   */
+  _normalizePresetKey(presetCategory, presetKey) {
+    if (!presetKey || !presetCategory) return presetKey;
+    
+    // 检查presetKey是否包含类别前缀，如果包含则去除
+    const prefixPattern = new RegExp(`^${presetCategory}:`);
+    if (prefixPattern.test(presetKey)) {
+      const normalizedKey = presetKey.replace(prefixPattern, '');
+      console.log(`规范化presetKey，从 [${presetKey}] 修改为 [${normalizedKey}]`);
+      return normalizedKey;
+    }
+    
+    return presetKey;
+  }
+  
+  /**
    * 记录动作
    * @private
    */
@@ -465,10 +491,21 @@ class ReduxActionExecutor {
     if (!recordingState.isRecording) return;
     
     const timestamp = Date.now();
+    
+    // 特殊处理预设动作参数，确保导出的presetKey不包含类别前缀
+    let recordParams = { ...params };
+    if (category === 'presetActions' && actionId === 'applyPreset' && recordParams.presetKey) {
+      const { presetCategory, presetKey } = recordParams;
+      recordParams = { 
+        ...recordParams, 
+        presetKey: this._normalizePresetKey(presetCategory, presetKey)
+      };
+    }
+    
     const actionEntry = {
       category,
       actionId,
-      params,
+      params: recordParams,  // 使用处理过的参数
       result,
       timestamp,
       timeSinceStart: timestamp - recordingState.startTime
@@ -602,9 +639,16 @@ class ReduxActionExecutor {
         // 等待指定的延迟
         await new Promise(resolve => setTimeout(resolve, delay));
         
+        // 处理预设动作，确保presetKey格式正确
+        let params = { ...action.params };
+        if (action.category === 'presetActions' && action.actionId === 'applyPreset' && params.presetKey) {
+          const { presetCategory, presetKey } = params;
+          params.presetKey = this._normalizePresetKey(presetCategory, presetKey);
+        }
+        
         // 执行动作
         try {
-          await this.executeAction(action.category, action.actionId, action.params, action.result);
+          await this.executeAction(action.category, action.actionId, params, action.result);
         } catch (error) {
           console.error(`回放动作 ${action.category}.${action.actionId} 失败:`, error);
           // 继续执行其余动作

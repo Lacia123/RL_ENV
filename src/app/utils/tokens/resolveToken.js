@@ -13,11 +13,21 @@ import colorSurface from './color/surface.js';
 import colorPrimary from './color/primary.js';
 import colorSecondary from './color/secondary.js';
 import colorTertiary from './color/tertiary.js';
+import colorTertiaryContainer from './color/tertiarycontainer.js';
 import colorError from './color/error.js';
 import colorSuccess from './color/success.js';
 import colorWarning from './color/warning.js';
 import colorLink from './color/link.js';
 import colorDisable from './color/disable.js';
+import colorOnPrimary from './color/onprimary.js';
+import colorOnPrimaryContainer from './color/onprimarycontainer.js';
+import colorOnSurface from './color/onsurface.js';
+import colorOnSurfaceContainer from './color/onsurfacecontainer.js';
+import colorOnSecondary from './color/onsecondary.js';
+import colorOnSecondaryContainer from './color/onsecondarycontainer.js';
+import colorOnTertiary from './color/ontertiary.js';
+import colorOnTertiaryContainer from './color/ontertiarycontainer.js';
+
 import colorDirection from './color/gradient/direction.js'
 import colorGradient from './color/gradient/gradient.js'
 
@@ -78,6 +88,16 @@ const tokenCollections = deepMerge(
   colorDisable,
   colorDirection,
   colorGradient,
+  colorTertiaryContainer,
+  colorOnPrimary,
+  colorOnPrimaryContainer,
+  colorOnSecondary,
+  colorOnSecondaryContainer,
+  colorOnTertiary,
+  colorOnTertiaryContainer,
+  colorOnSurface,
+  colorOnSurfaceContainer,
+  
 
   
   // 尺寸相关
@@ -137,6 +157,15 @@ function isTokenReference(value) {
 }
 
 /**
+ * 判断字符串是否包含 token 引用
+ * @param {string} value - 输入字符串
+ * @returns {boolean} - 是否包含 token 引用
+ */
+function containsTokenReferences(value) {
+  return typeof value === 'string' && value.includes('{') && value.includes('}');
+}
+
+/**
  * 解析 token 引用
  * @param {string} reference - token 引用字符串，如 "{color.border.white7}"
  * @returns {string} - token 路径，如 "color.border.white7"
@@ -153,26 +182,39 @@ function parseTokenReference(reference) {
  * @returns {string|null} - token 的最终值，如果无法解析则返回 null
  */
 function resolveToken(tokenReference, maxDepth = 20) {
-  
-  if (!isTokenReference(tokenReference)) {
-    return tokenReference; // 非 token 引用，直接返回
+  // 非字符串类型直接返回
+  if (typeof tokenReference !== 'string') {
+    return tokenReference;
   }
   
+  // 处理包含多个 token 的情况，委托给 resolveTokensInText 处理
+  if (!isTokenReference(tokenReference) && containsTokenReferences(tokenReference)) {
+    return resolveTokensInText(tokenReference);
+  }
+  
+  // 非 token 引用格式，直接返回
+  if (!isTokenReference(tokenReference)) {
+    return tokenReference;
+  }
+  
+  // 防止无限递归
   if (maxDepth <= 0) {
+    console.warn('达到最大解析深度，可能存在循环引用:', tokenReference);
     return null;
   }
   
+  // 解析 token 路径
   const tokenPath = parseTokenReference(tokenReference);
   const token = getTokenByPath(tokenPath);
   
-  
+  // 找不到 token
   if (!token) {
     console.error('无法找到 token:', tokenPath);
     return null;
   }
   
   // 如果 token 有 value 属性，进一步检查它是否也是引用
-  if (token.value) {
+  if (token.value !== undefined) {
     if (isTokenReference(token.value)) {
       // 递归解析引用
       return resolveToken(token.value, maxDepth - 1);
@@ -182,7 +224,7 @@ function resolveToken(tokenReference, maxDepth = 20) {
     }
   }
   
-  // token 对象本身没有 value 属性
+  // token 对象本身作为值返回
   return token;
 }
 
@@ -196,11 +238,36 @@ function resolveTokensInText(text) {
     return text;
   }
   
-  // 使用正则表达式查找所有 token 引用
-  return text.replace(/\{([^{}]+)\}/g, (match) => {
-    const resolved = resolveToken(match);
-    return resolved !== null ? resolved : match;
-  });
+  // 逐个处理每个token引用
+  // 注意：这种实现确保每个token引用都被单独处理
+  const regex = /\{([^{}]+)\}/g;
+  let result = text;
+  let matches = [];
+  let match;
+  
+  // 先收集所有匹配项
+  while ((match = regex.exec(text)) !== null) {
+    matches.push({
+      fullMatch: match[0],
+      content: match[1],
+      index: match.index
+    });
+  }
+  
+  // 从后向前替换，确保索引位置不会变化
+  for (let i = matches.length - 1; i >= 0; i--) {
+    const { fullMatch } = matches[i];
+    const tokenValue = resolveToken(fullMatch);
+    
+    if (tokenValue !== null) {
+      // 构建替换前和替换后的部分
+      const before = result.substring(0, matches[i].index);
+      const after = result.substring(matches[i].index + fullMatch.length);
+      result = before + tokenValue + after;
+    }
+  }
+  
+  return result;
 }
 
 /**
@@ -219,8 +286,8 @@ function processStyleValue(value, unit = 'px', defaultValue = '0') {
     return `${value}${unit}`;
   }
   
-  // 如果是token引用，先解析
-  if (isTokenReference(value)) {
+  // 如果是token引用或包含token引用，先解析
+  if (isTokenReference(value) || containsTokenReferences(value)) {
     const resolved = resolveToken(value);
     return resolved !== null ? resolved : defaultValue;
   }
@@ -241,9 +308,10 @@ function convertStyle(style) {
   const result = {};
   
   for (const [key, value] of Object.entries(style)) {
-    if (isTokenReference(value)) {
-      // 解析token引用
-      result[key] = resolveToken(value);
+    if (typeof value === 'string' && (isTokenReference(value) || containsTokenReferences(value))) {
+      // 对于字符串类型的值，我们使用resolveTokensInText处理
+      // 这可以处理单个token引用和包含多个token的字符串
+      result[key] = resolveTokensInText(value);
     } else if (typeof value === 'object' && value !== null) {
       // 递归处理嵌套对象
       result[key] = convertStyle(value);
@@ -260,6 +328,7 @@ export default resolveToken;
 export { 
   resolveTokensInText, 
   isTokenReference, 
+  containsTokenReferences,
   getTokenByPath,
   convertStyle,
   processStyleValue 

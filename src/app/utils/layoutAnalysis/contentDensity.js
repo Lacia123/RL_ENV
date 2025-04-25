@@ -271,6 +271,10 @@ function populateDensityMapWithDomData(element, densityMap, domMeasurements, pos
   const size = densityMap.length;
   const containerSize = domMeasurements.container || { width: 1000, height: 1000 }; // 默认容器尺寸
 
+  // 将容器尺寸保存到测量对象中，供后续使用
+  measurement.containerWidth = containerSize.width;
+  measurement.containerHeight = containerSize.height;
+
   // 计算元素在画布上的相对位置和尺寸
   const relativeX = measurement.x / containerSize.width;
   const relativeY = measurement.y / containerSize.height;
@@ -455,9 +459,10 @@ function calculateElementDensity(element, measurement = null) {
       if (measurement) {
         // 图像尺寸对密度的影响
         const area = measurement.width * measurement.height;
-        const containerArea =
-          (domMeasurements?.container?.width || 1000) *
-          (domMeasurements?.container?.height || 1000);
+        // 获取容器尺寸，确保使用传入的measurement相关的容器尺寸
+        const containerArea = 
+          (measurement.containerWidth || 1000) * 
+          (measurement.containerHeight || 1000);
 
         // 根据图像占整体视图的比例调整
         const areaRatio = area / containerArea;
@@ -471,8 +476,11 @@ function calculateElementDensity(element, measurement = null) {
         // 考虑图像位置 - 中央图像吸引更多注意力
         const centerX = 0.5;
         const centerY = 0.5;
-        const relativeX = (measurement.x + measurement.width / 2) / containerSize.width;
-        const relativeY = (measurement.y + measurement.height / 2) / containerSize.height;
+        // 确保使用容器尺寸计算相对位置
+        const containerWidth = measurement.containerWidth || 1000;
+        const containerHeight = measurement.containerHeight || 1000;
+        const relativeX = (measurement.x + measurement.width / 2) / containerWidth;
+        const relativeY = (measurement.y + measurement.height / 2) / containerHeight;
         const distanceFromCenter = Math.sqrt(
           Math.pow(relativeX - centerX, 2) + Math.pow(relativeY - centerY, 2)
         );

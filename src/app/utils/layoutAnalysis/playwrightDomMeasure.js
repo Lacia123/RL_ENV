@@ -2,9 +2,8 @@
 
 import { JSDOM } from 'jsdom';
 import { chromium } from 'playwright-chromium';
-import { mergeElementPresets } from '../presets/presetSystem.js';
-import resolveToken, { convertStyle, processStyleValue } from '../tokens/resolveToken.js';
-
+import { metawareToStyleObject } from '../metaware/metawareToCss.js';
+import presetSystem from '../presets/index.js';
 
 /**
  * JSDOM + Playwright 混合测量系统
@@ -33,6 +32,7 @@ export async function generateHybridMeasurements(layout, containerDimensions = {
           width: ${containerDimensions.width}px;
           height: ${containerDimensions.height}px;
           position: relative;
+          overflow: auto;
         }
       </style>
     </head>
@@ -45,13 +45,11 @@ export async function generateHybridMeasurements(layout, containerDimensions = {
     const { window } = dom;
     const { document } = window;
 
-    // 递归创建 DOM 元素
-    await createDOMTree(layout, document.getElementById('root'), document);
+    // 递归创建 DOM 树
+    createDOMTree(layout, document.getElementById('root'), document);
 
     // 获取生成的 HTML 内容
     const entireHTML = document.documentElement.outerHTML;
-    // console.log('..... JSDOM generated HTML');
-    // console.log(entireHTML);
 
     // 清理 JSDOM 资源
     window.close();
@@ -68,7 +66,7 @@ export async function generateHybridMeasurements(layout, containerDimensions = {
  * @param {Object} parentNode - 父 DOM 节点
  * @param {Object} document - JSDOM 文档对象
  */
-async function createDOMTree(element, parentNode, document) {
+function createDOMTree(element, parentNode, document) {
     if (!element || !element.id) return;
 
     // 创建DOM元素
@@ -77,82 +75,163 @@ async function createDOMTree(element, parentNode, document) {
     domElement.setAttribute('data-element-id', element.id);
     domElement.setAttribute('data-element-type', element.type);
 
-    // 合并预设样式和直接设置的样式
-    const mergedStyle = mergeElementPresets(element);
-    const style = {
-        position: 'relative',
-        boxSizing: 'border-box',
-        // 基础默认样式
-        fontSize: '16px',
-        lineHeight: '1.5',
-        fontWeight: 'normal',
-        color: '#000000',
-        backgroundColor: 'transparent',
-        paddingTop: '0px',
-        paddingRight: '0px',
-        paddingBottom: '0px',
-        paddingLeft: '0px',
-        marginTop: '0px',
-        marginRight: '0px',
-        marginBottom: '0px',
-        marginLeft: '0px',
-        textAlign: 'left',
-        letterSpacing: '0px',
-        wordSpacing: '0px',
-        borderRadius: '0px',
-        borderWidth: '0px',
-        display: element.type === 'container' ? 'flex' : 'block',
-        flexDirection: element.direction || 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-        gap: '0px',
-        ...mergedStyle,
-        ...(element.style || {})
-    };
-
-    // 解析样式中的令牌并转换为实际值
-    const resolvedStyle = convertStyle(style);
-
-    // 应用样式到DOM元素
-    Object.keys(resolvedStyle).forEach(key => {
-
-        let value = resolvedStyle[key];
-        // 确保数值属性有单位
-        if (typeof value === 'number' &&
-            ['fontSize', 'lineHeight', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
-                'marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'letterSpacing', 'wordSpacing',
-                'borderRadius', 'borderWidth', 'gap', 'width', 'height'].includes(key)) {
-            value = processStyleValue(value, 'px', '0px');
-        }
-        domElement.style[key] = value;
-    });
-
-    // 为文本元素添加内容
-    if (element.type === 'text' && element.content && element.content.value) {
-        domElement.textContent = element.content.value;
-    }
-
-    // 为按钮元素添加内容
-    if (element.type === 'button' && element.content && element.content.text) {
-        domElement.textContent = element.content.text;
-    }
-
-    // 为图像元素添加占位符
-    if (element.type === 'image') {
-        domElement.style.backgroundColor = '#e0e0e0'; // 图像占位符颜色
-    }
+    // 根据元素类型渲染内容
+    renderElementContent(element, domElement, document);
+    
+    // 应用样式
+    applyElementStyles(element, domElement);
 
     // 将元素添加到父节点
     parentNode.appendChild(domElement);
 
     // 递归处理子元素
     if (element.children && element.children.length > 0) {
-        for (const child of element.children) {
-            await createDOMTree(child, domElement, document);
-        }
+        element.children.forEach(child => {
+            createDOMTree(child, domElement, document);
+        });
     }
 }
 
+/**
+ * 渲染元素内容
+ * @param {Object} element - 元素对象
+ * @param {Object} domElement - DOM元素
+ * @param {Object} document - 文档对象
+ */
+function renderElementContent(element, domElement, document) {
+    switch (element.type) {
+        case 'text':
+            // 提取文本内容 - 与LayoutPreview.js保持一致
+            const textContent = 
+                typeof element.content === 'string'
+                ? element.content
+                : element.content?.value || 'Text Element';
+            domElement.textContent = textContent;
+            break;
+
+        case 'button':
+            // 提取按钮文本 - 与LayoutPreview.js保持一致
+            const buttonText = 
+                typeof element.content === 'string'
+                ? element.content
+                : element.content?.text || 'Button';
+
+            // 处理按钮图标
+            const buttonIcon = element.content?.icon;
+            const iconPosition = element.content?.iconPosition || 'left';
+
+            // 如果有图标，使用与LayoutPreview.js相同的渲染方式
+            if (buttonIcon) {
+                const iconElement = document.createElement('span');
+                iconElement.className = 'icon';
+                iconElement.style.display = 'inline-block';
+                iconElement.style.fontSize = '1.2em';
+                iconElement.style.marginLeft = iconPosition === 'right' ? '8px' : '0';
+                iconElement.style.marginRight = iconPosition === 'left' ? '8px' : '0';
+                iconElement.textContent = '•'; // 简化的图标占位符
+
+                if (iconPosition === 'left') {
+                    domElement.appendChild(iconElement);
+                    domElement.appendChild(document.createTextNode(buttonText));
+                } else {
+                    domElement.appendChild(document.createTextNode(buttonText));
+                    domElement.appendChild(iconElement);
+                }
+            } else {
+                domElement.textContent = buttonText;
+            }
+            break;
+
+        case 'image':
+            // 图片处理 - 与LayoutPreview.js保持一致
+            const imgSrc = element.src || element.content?.src || '';
+            const imgAlt = element.alt || element.content?.alt || '';
+
+            if (imgSrc) {
+                const imgElement = document.createElement('img');
+                imgElement.style.width = '100%';
+                imgElement.style.height = '100%';
+                imgElement.style.objectFit = 'cover';
+                imgElement.src = imgSrc;
+                imgElement.alt = imgAlt;
+                domElement.appendChild(imgElement);
+            } else {
+                // 图片占位符
+                domElement.style.display = 'flex';
+                domElement.style.alignItems = 'center';
+                domElement.style.justifyContent = 'center';
+                domElement.style.color = '#999';
+                domElement.style.padding = '8px';
+                domElement.style.textAlign = 'center';
+                domElement.textContent = 'Image Placeholder';
+            }
+            break;
+
+        // container和其他类型不需要特殊处理
+    }
+}
+
+/**
+ * 应用元素样式 - 与LayoutPreview.js保持一致的处理逻辑
+ * @param {Object} element - 元素对象
+ * @param {Object} domElement - DOM元素
+ */
+function applyElementStyles(element, domElement) {
+    try {
+        // 从metaware系统获取基础样式
+        const metawareStyles = metawareToStyleObject(element.type, 'default', true);
+        
+        // 从预设系统获取处理后的元素
+        const processedElement = presetSystem.processElement(element);
+        const presetStyles = processedElement.styles || {};
+        
+        // 是否选中状态 (测量时不需要选中效果)
+        const isSelected = false;
+        const selectionStyle = isSelected ? {
+            outline: '2px solid #1890FF',
+            boxShadow: '0 0 0 1px #1890FF',
+            position: 'relative',
+            zIndex: 1
+        } : {};
+        
+        // 合并样式，保持与LayoutPreview.js相同的优先级
+        const computedStyle = {
+            ...metawareStyles,         // metaware基础样式（最低优先级）
+            ...presetStyles,           // 预设样式（中等优先级）
+            ...(element.style || {}),  // 元素自身样式（高优先级）
+            ...selectionStyle          // 选中样式（最高优先级）
+        };
+        
+        // 应用合并后的样式
+        Object.keys(computedStyle).forEach(key => {
+            let value = computedStyle[key];
+            
+            // 确保数值属性有单位
+            if (typeof value === 'number' && 
+                ['fontSize', 'lineHeight', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+                'marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'letterSpacing', 'wordSpacing',
+                'borderRadius', 'borderWidth', 'gap', 'width', 'height'].includes(key)) {
+                value = `${value}px`;
+            }
+            
+            domElement.style[key] = value;
+        });
+    } catch (error) {
+        console.error(`为元素 ${element.id || 'unknown'} 应用样式失败:`, error);
+        
+        // 应用基本样式作为回退方案
+        domElement.style.boxSizing = 'border-box';
+        
+        if (element.style) {
+            Object.entries(element.style).forEach(([key, value]) => {
+                if (typeof value === 'number') {
+                    value = `${value}px`;
+                }
+                domElement.style[key] = value;
+            });
+        }
+    }
+}
 
 /**
  * 使用 Playwright 测量 DOM 元素
@@ -173,11 +252,6 @@ async function measureWithPlaywright(htmlContent, layout, containerDimensions) {
 
     // 设置页面内容
     await page.setContent(htmlContent);
-
-    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
-
-    // 等待页面渲染完成
-    //   await page.waitForLoadState('networkidle');
 
     // 收集测量数据
     const measurements = await page.evaluate(({ layoutData, containerDimensions }) => {
@@ -203,6 +277,7 @@ async function measureWithPlaywright(htmlContent, layout, containerDimensions) {
             // 获取元素位置和尺寸
             const rect = domElement.getBoundingClientRect();
             const computedStyle = window.getComputedStyle(domElement);
+            
             // 创建元素的测量数据
             measurements[element.id] = {
                 x: rect.left,
@@ -250,16 +325,26 @@ async function measureWithPlaywright(htmlContent, layout, containerDimensions) {
             });
             measurements[element.id].presets = presetProperties;
 
-            // 为文本元素添加文本内容相关数据
-            if (element.type === 'text' && element.content && element.content.value) {
-                measurements[element.id].textContent = element.content.value;
-                measurements[element.id].textLength = element.content.value.length;
-
+            // 文本元素的特殊处理
+            if (element.type === 'text') {
+                // 使用与LayoutPreview.js一致的文本提取逻辑
+                const textContent = 
+                    typeof element.content === 'string'
+                    ? element.content
+                    : element.content?.value || '';
+                
+                measurements[element.id].textContent = textContent;
+                measurements[element.id].textLength = textContent.length;
+                
                 // 计算文本密度
                 const textArea = rect.width * rect.height;
                 measurements[element.id].textDensity = textArea > 0 ?
-                    (element.content.value.length / textArea) * 10000 : 0;
+                    (textContent.length / textArea) * 10000 : 0;
             }
+            
+            // 保存容器尺寸到每个元素的测量数据
+            measurements[element.id].containerWidth = containerDimensions.width;
+            measurements[element.id].containerHeight = containerDimensions.height;
 
             // 递归处理子元素
             if (element.children && element.children.length > 0) {
@@ -273,12 +358,7 @@ async function measureWithPlaywright(htmlContent, layout, containerDimensions) {
         return measurements;
     }, { layoutData: layout, containerDimensions });
 
-    // console.log('.... measurements');
-    // console.log(measurements);
-
-    // 关闭浏览器
     await browser.close();
-
     return measurements;
 }
 

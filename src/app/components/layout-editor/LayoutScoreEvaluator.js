@@ -31,9 +31,6 @@ const LayoutScoreEvaluator = ({ layout }) => {
   // 获取有效的 Markdown 元素（优先使用 markdownData 中的 markdownElements，如果存在）
   const effectiveMarkdownElements = markdownData?.markdownElements || markdownElements;
 
-  console.log('.... effectiveMarkdownElements')
-  console.log(effectiveMarkdownElements)
-
   // 收集DOM测量数据
   useEffect(() => {
     // 创建ResizeObserver来监控元素尺寸

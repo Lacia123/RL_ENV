@@ -11,7 +11,8 @@
 import resolveToken, { 
   resolveTokensInText, 
   isTokenReference, 
-  convertStyle
+  convertStyle,
+  containsTokenReferences
 } from '../tokens/resolveToken.js';
 
 // 预设状态常量
@@ -122,12 +123,17 @@ class PresetSystem {
       return value;
     }
 
-    // 如果是 token 引用格式 (例如 {color.primary.500})
+    // 使用标准token系统处理{color.primary.500}格式的引用
     if (isTokenReference(value)) {
       return resolveToken(value);
     }
+    
+    // 处理包含多个token引用的情况，例如"{token1} {token2}"
+    if (containsTokenReferences(value)) {
+      return resolveTokensInText(value);
+    }
 
-    // 匹配{{变量名}}格式
+    // 匹配{{变量名}}格式（预设系统特有格式）
     const pattern = /\{\{([^}]+)\}\}/g;
     
     return value.replace(pattern, (match, path) => {
@@ -158,7 +164,7 @@ class PresetSystem {
       return obj;
     }
 
-    // 先处理所有标准 token 引用
+    // 首先使用convertStyle处理标准token引用和包含多个token的字符串引用
     const processedObj = convertStyle(obj);
     
     const result = Array.isArray(processedObj) ? [] : {};
@@ -166,10 +172,13 @@ class PresetSystem {
     // 然后处理预设系统特有的 {{}} 格式引用
     for (const [key, value] of Object.entries(processedObj)) {
       if (typeof value === 'object' && value !== null) {
+        // 递归处理嵌套对象
         result[key] = this.resolveTokensInObject(value);
-      } else if (typeof value === 'string') {
+      } else if (typeof value === 'string' && value.includes('{{')) {
+        // 只处理包含{{}}格式的字符串，其他token格式已由convertStyle处理
         result[key] = this.resolveTokenReference(value);
       } else {
+        // 保持原值
         result[key] = value;
       }
     }

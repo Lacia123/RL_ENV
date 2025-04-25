@@ -87,6 +87,9 @@ class LayoutAnalysisAPI {
       
       if (this.measurementMode === 'jsdom') {
         // 使用JSDOM生成测量数据
+        console.log('.... 使用JSDOM生成测量数据')
+        console.log(this.layout)
+
         this.virtualMeasurements = await generateHybridMeasurements(this.layout, containerDimensions);
       } else {
         // 使用虚拟DOM测量
