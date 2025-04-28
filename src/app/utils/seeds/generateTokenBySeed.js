@@ -71,7 +71,7 @@ const getFontWeightToken = (seed) => {
 export const calculateShapeTokens = (shapeSeedValue) => {
   const shapeMultiplier = mapShapeSeed(shapeSeedValue);
 
-  const borderRadius = {
+  const borderradius = {
     none: createTokenReference(basicTokens.dimension[0]),
     xs: getClosestToken(2 * shapeMultiplier, 4),
     small: getClosestToken(4 * shapeMultiplier, 8),
@@ -84,7 +84,7 @@ export const calculateShapeTokens = (shapeSeedValue) => {
     full: createTokenReference(basicTokens.dimension[200]),
   };
 
-  const borderWidth = {
+  const borderwidth = {
     none: createTokenReference(basicTokens.dimension[0]),
     narrow: getClosestToken(1 * shapeMultiplier, 2),
     base: getClosestToken(2 * shapeMultiplier, 4),
@@ -92,8 +92,8 @@ export const calculateShapeTokens = (shapeSeedValue) => {
   };
 
   return {
-    borderRadius,
-    borderWidth,
+    borderradius,
+    borderwidth,
   };
 };
 
@@ -551,6 +551,7 @@ export const calculateColorTokens = (seed) => {
 
 export const calculateTokens = (seed) => {
   const dimensionTokens = {};
+  const fontTokens = {};
 
   if (seed.shape !== undefined) {
     Object.assign(dimensionTokens, calculateShapeTokens(seed.shape));
@@ -559,7 +560,7 @@ export const calculateTokens = (seed) => {
     Object.assign(dimensionTokens, calculateDensityTokens(seed.degree));
   }
   if (seed.font !== undefined) {
-    Object.assign(dimensionTokens, calculateFontTokens(seed.font));
+    Object.assign(fontTokens, calculateFontTokens(seed.font));
   }
   if (seed.material !== undefined) {
     Object.assign(dimensionTokens, calculateMaterialTokens(seed.material));
@@ -569,6 +570,10 @@ export const calculateTokens = (seed) => {
 
   if (Object.keys(dimensionTokens).length > 0) {
     tokens.dimension = dimensionTokens;
+  }
+
+  if (Object.keys(fontTokens).length > 0) {
+    tokens.font = { ...fontTokens.font };
   }
 
   if (seed.color) {

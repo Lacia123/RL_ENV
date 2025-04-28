@@ -8,6 +8,14 @@ import next from 'next';
 import fs from 'fs';
 import path from 'path';
 
+// 配置Playwright的Chrome路径
+// Windows环境下的Chromium路径
+process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = process.platform === 'win32' 
+  ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
+  : process.platform === 'linux'
+    ? '/usr/bin/google-chrome'
+    : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+
 // 获取当前文件的目录
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -93,7 +101,7 @@ const handle = app.getRequestHandler();
         
         // 动态导入所需模块
         const { markdownToEightElement } = await import('./src/app/utils/eightElement/markdownToEightElement.js');
-        const renderAndEvaluateEightElement = (await import('./src/app/utils/eightElement/renderAndEvaluate.js')).default;
+        const { renderAndEvaluateEightElement } = await import('./src/app/utils/eightElement/renderAndEvaluate.js');
         
         // 处理seed参数，生成自定义设计令牌
         let designTokens = null;
@@ -115,8 +123,6 @@ const handle = app.getRequestHandler();
         
         // 转换Markdown为八要素结构
         const eightElement = markdownToEightElement(markdown);
-        
-        // 保存八要素结构到文件
         
         // 确保目录存在
         const outputDir = path.join(__dirname, 'output');
@@ -149,6 +155,11 @@ const handle = app.getRequestHandler();
         res.status(200).json({
           success: true,
           score: result.score,
+          // 返回详细评分结果 - 兼容只使用visualSpaceScore的情况
+          scoreDetails: result.categories || {
+            spaceUtilization: result.categories?.spaceUtilization || { score: 0, details: {} },
+            contentAdaptability: result.categories?.contentAdaptability || { score: 0, details: {} }
+          },
           // 如果使用了自定义设计令牌，返回相关信息
           designTokens: designTokens,
           tokensApplied: !!designTokens

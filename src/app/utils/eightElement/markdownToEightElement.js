@@ -52,6 +52,7 @@ function createTextElement(text, variant = 'normal') {
   const id = generateUUID();
   // 获取文本元素的样式配置
   const textStyleConfig = getElementStyleConfig('text', variant);
+  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
   
   return {
     id,
@@ -66,7 +67,8 @@ function createTextElement(text, variant = 'normal') {
         scale: [],
         "box-sizing": "border-box",
         primaryAxisSizingMode: "fixed",
-        position: "relative"
+        position: "relative",
+        ...layoutStyleConfig
       },
       text_body: {
         type: "container",
@@ -249,6 +251,7 @@ function createButtonElement(text, url, variant = 'primary') {
   const id = generateUUID();
   // 获取按钮元素的样式配置
   const buttonStyleConfig = getElementStyleConfig('button', variant);
+  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
 
   console.log("创建按钮元素：", { id, text, url });
 
@@ -268,7 +271,8 @@ function createButtonElement(text, url, variant = 'primary') {
         "text-overflow": "ellipsis",
         "box-sizing": "border-box",
         primaryAxisSizingMode: "fixed",
-        position: "relative"
+        position: "relative",
+        ...layoutStyleConfig
       },
       button_normal: {
         type: "container",
@@ -816,6 +820,7 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
   const id = generateUUID();
   // 获取图片元素的样式配置
   const imageStyleConfig = getElementStyleConfig('image', variant);
+  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
   
   return {
     id,
@@ -831,7 +836,8 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
         overflow: "hidden",
         "box-sizing": "border-box",
         primaryAxisSizingMode: "fixed",
-        position: "relative"
+        position: "relative",
+        ...layoutStyleConfig
       },
       background: {
         type: "container",
@@ -1281,7 +1287,6 @@ function createEightElementRoot(markdownElements) {
         "back-width": "auto",
         "back-height": "100px",
         "box-sizing": "border-box",
-        "border-top-left-radius": DIMENSION_CONSTANTS.BORDER_RADIUS[20]
       },
       children: markdownElements
     },
@@ -1328,7 +1333,7 @@ function markdownToEightElement(markdown, styleConfig) {
   return eightElementRoot;
 }
 
-// 添加辅助函数：打印八要素结构以便调试
+// 打印八要素结构工具函数
 function printEightElementStructure(element, indent = 0) {
   const indentation = ' '.repeat(indent);
 

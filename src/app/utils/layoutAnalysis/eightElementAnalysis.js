@@ -6,15 +6,13 @@
  */
 
 import { analyzeLayout } from '../layoutAnalysis/index.js'
-import fs from 'fs';
-import path from 'path';
 
 /**
  * 将八要素结构转换为标准布局结构
  * @param {Object} eightElement - 八要素结构对象
  * @returns {Object} 标准布局结构
  */
-function convertEightElementToLayout(eightElement) {
+export function convertEightElementToLayout(eightElement) {
   // 创建根布局容器
   const layout = {
     id: 'root',
@@ -146,31 +144,6 @@ function recursiveConvertElement(element, idPrefix = '') {
   return layoutElement;
 }
 
-/**
- * 保存数据到文件
- * @param {Object} data - 要保存的数据
- * @param {string} filename - 文件名
- */
-function saveToFile(data, filename) {
-  try {
-    // 确保目录存在
-    const debugDir = path.join(process.cwd(), 'debug');
-    if (!fs.existsSync(debugDir)) {
-      fs.mkdirSync(debugDir, { recursive: true });
-    }
-    
-    // 将数据序列化为JSON字符串
-    const jsonString = JSON.stringify(data, null, 2);
-    
-    // 保存到文件
-    const filePath = path.join(debugDir, filename);
-    fs.writeFileSync(filePath, jsonString, 'utf8');
-    
-    console.log(`数据已保存到文件: ${filePath}`);
-  } catch (error) {
-    console.error(`保存文件时出错: ${error.message}`);
-  }
-}
 
 /**
  * 分析八要素结构并评分

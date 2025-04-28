@@ -61,10 +61,10 @@ import layoutWrap from './layout/wrap.js';
 // 优化：使用深度合并函数，确保嵌套对象正确合并
 function deepMerge(...objects) {
   const result = {};
-  
+
   for (const obj of objects) {
     if (!obj) continue; // 跳过 null 或 undefined
-    
+
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
@@ -77,7 +77,7 @@ function deepMerge(...objects) {
       }
     }
   }
-  
+
   return result;
 }
 
@@ -115,28 +115,28 @@ const tokenCollections = deepMerge(
   layoutSizing,
   layoutState,
   layoutWrap,
-  
 
-  
+
+
   // 尺寸相关
   dimensionBasic,
   dimensionPadding,
-  dimensionMargin, 
+  dimensionMargin,
   dimensionGap,
   dimensionBorderRadius,
   dimensionBorderWidth,
-  
+
   // 字体相关
   fontSize,
   fontWeight,
   fontLineHeight,
   fontLetterSpacing,
-  
+
   // 动效相关
   motionDuration,
   motionDelay,
   motionEasingFunction,
-  
+
   // 资源相关
   assetFont
 );
@@ -181,60 +181,72 @@ function clearDynamicTokenSystem() {
  */
 function getTokenByPath(path, customTokenSystem = null) {
   if (!path) return null;
-  
+
   const parts = path.split('.');
-  
+
+
+  if (path == 'font.size.xxl') {
+    console.log('parts')
+    console.log(parts)
+  }
+
   // 优先使用传入的自定义token系统
   if (customTokenSystem) {
     let current = customTokenSystem;
     let allFound = true;
-    
+
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       if (current && Object.prototype.hasOwnProperty.call(current, part)) {
         current = current[part];
-      } else { 
+      } else {
         allFound = false;
         break;
       }
     }
-    
+
     if (allFound) {
       return current;
     }
   }
-  
+
   // 其次使用全局动态token系统
   if (dynamicTokenSystem) {
     let current = dynamicTokenSystem;
     let allFound = true;
-    
+
+
+    if (path == 'font.size.xxl') {
+      console.log('current')
+      console.log(current)
+    }
+
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       if (current && Object.prototype.hasOwnProperty.call(current, part)) {
         current = current[part];
-      } else { 
+      } else {
         allFound = false;
         break;
       }
     }
-    
+
     if (allFound) {
       return current;
     }
   }
-  
+
   // 最后使用默认token集合
   let current = tokenCollections;
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
     if (current && Object.prototype.hasOwnProperty.call(current, part)) {
       current = current[part];
-    } else { 
+    } else {
       return null; // 路径无效
     }
   }
-  
+
   return current;
 }
 
@@ -278,33 +290,41 @@ function resolveToken(tokenReference, maxDepth = 20, customTokenSystem = null) {
   if (typeof tokenReference !== 'string') {
     return tokenReference;
   }
-  
+
   // 处理包含多个 token 的情况，委托给 resolveTokensInText 处理
   if (!isTokenReference(tokenReference) && containsTokenReferences(tokenReference)) {
     return resolveTokensInText(tokenReference, maxDepth, customTokenSystem);
   }
-  
+
   // 非 token 引用格式，直接返回
   if (!isTokenReference(tokenReference)) {
     return tokenReference;
   }
-  
+
   // 防止无限递归
   if (maxDepth <= 0) {
     console.warn('达到最大解析深度，可能存在循环引用:', tokenReference);
     return null;
   }
-  
+
   // 解析 token 路径
   const tokenPath = parseTokenReference(tokenReference);
   const token = getTokenByPath(tokenPath, customTokenSystem);
-  
+
+  if (tokenReference == '{font.size.xxl}') {
+    console.log('..... tokenReference')
+    console.log(tokenReference)
+    console.log('..... tokenPath')
+    console.log(tokenPath)
+  }
+
+
   // 找不到 token
   if (!token) {
     console.warn('无法找到 token:', tokenPath);
     return null;
   }
-  
+
   // 如果 token 有 value 属性，进一步检查它是否也是引用
   if (token.value !== undefined) {
     if (isTokenReference(token.value)) {
@@ -315,7 +335,7 @@ function resolveToken(tokenReference, maxDepth = 20, customTokenSystem = null) {
       return token.value;
     }
   }
-  
+
   // token 对象本身作为值返回
   return token;
 }
@@ -331,14 +351,14 @@ function resolveTokensInText(text, maxDepth = 20, customTokenSystem = null) {
   if (typeof text !== 'string') {
     return text;
   }
-  
+
   // 逐个处理每个token引用
   // 注意：这种实现确保每个token引用都被单独处理
   const regex = /\{([^{}]+)\}/g;
   let result = text;
   let matches = [];
   let match;
-  
+
   // 先收集所有匹配项
   while ((match = regex.exec(text)) !== null) {
     matches.push({
@@ -347,12 +367,12 @@ function resolveTokensInText(text, maxDepth = 20, customTokenSystem = null) {
       index: match.index
     });
   }
-  
+
   // 从后向前替换，确保索引位置不会变化
   for (let i = matches.length - 1; i >= 0; i--) {
     const { fullMatch } = matches[i];
     const tokenValue = resolveToken(fullMatch, maxDepth, customTokenSystem);
-    
+
     if (tokenValue !== null) {
       // 构建替换前和替换后的部分
       const before = result.substring(0, matches[i].index);
@@ -360,7 +380,7 @@ function resolveTokensInText(text, maxDepth = 20, customTokenSystem = null) {
       result = before + tokenValue + after;
     }
   }
-  
+
   return result;
 }
 
@@ -376,17 +396,17 @@ function processStyleValue(value, unit = 'px', defaultValue = '0', customTokenSy
   if (value === null || value === undefined) {
     return defaultValue;
   }
-  
+
   if (typeof value === 'number') {
     return `${value}${unit}`;
   }
-  
+
   // 如果是token引用或包含token引用，先解析
   if (isTokenReference(value) || containsTokenReferences(value)) {
     const resolved = resolveToken(value, 20, customTokenSystem);
     return resolved !== null ? resolved : defaultValue;
   }
-  
+
   return value;
 }
 
@@ -400,9 +420,9 @@ function convertStyle(style, customTokenSystem = null) {
   if (!style || typeof style !== 'object') {
     return style;
   }
-  
+
   const result = {};
-  
+
   for (const [key, value] of Object.entries(style)) {
     if (typeof value === 'string' && (isTokenReference(value) || containsTokenReferences(value))) {
       // 对于字符串类型的值，我们使用resolveTokensInText处理
@@ -416,14 +436,14 @@ function convertStyle(style, customTokenSystem = null) {
       result[key] = value;
     }
   }
-  
+
   return result;
 }
 
 export default resolveToken;
-export { 
-  resolveTokensInText, 
-  isTokenReference, 
+export {
+  resolveTokensInText,
+  isTokenReference,
   containsTokenReferences,
   getTokenByPath,
   convertStyle,

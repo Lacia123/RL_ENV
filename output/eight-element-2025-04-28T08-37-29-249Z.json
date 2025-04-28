@@ -1,0 +1,2342 @@
+{
+  "dataKeys": [],
+  "id": "dd-29cdcc1a-a5a1-439c-a1db-2c4f963c623a",
+  "name": "layout",
+  "name-zh": "布局",
+  "file-type": "template",
+  "theme": "default",
+  "layout": {
+    "style": {
+      "display": "{layout.state.display.flex}",
+      "layoutMode": "{layout.direction.VERTICAL}",
+      "layoutWrap": "{layout.wrap.NO_WRAP}",
+      "primaryAxisSizingMode": "responsive",
+      "counterAxisSizingMode": "{layout.sizing.FIXED}",
+      "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+      "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+      "layoutAlign": "{layout.align.y.self.INHERIT}",
+      "layoutGrow": "{layout.grow.0}",
+      "width": "auto",
+      "height": "auto",
+      "position": "relative",
+      "back-width": "auto",
+      "back-height": "100px",
+      "box-sizing": "border-box",
+      "padding-top": "{dimension.padding.base}",
+      "padding-bottom": "{dimension.padding.base}",
+      "padding-left": "{dimension.padding.base}",
+      "padding-right": "{dimension.padding.base}",
+      "margin-top": "{dimension.margin.base}",
+      "margin-bottom": "{dimension.margin.base}",
+      "margin-left": "{dimension.margin.base}",
+      "margin-right": "{dimension.margin.base}",
+      "border-width": "{dimension.borderwidth.base}",
+      "border-color": "{color.basic.opacity.black.20}",
+      "background": "{color.basic.opacity.white.100}",
+      "border-style": "solid",
+      "border-radius": "{dimension.borderradius.large}",
+      "gap": "{dimension.padding.base}"
+    },
+    "children": [
+      {
+        "dataKeys": [],
+        "name": "layout",
+        "name-zh": "布局",
+        "file-type": "template",
+        "theme": "default",
+        "layout": {
+          "style": {
+            "display": "{layout.state.display.flex}",
+            "layoutMode": "{layout.direction.VERTICAL}",
+            "layoutWrap": "{layout.wrap.NO_WRAP}",
+            "primaryAxisSizingMode": "fixed",
+            "counterAxisSizingMode": "{layout.sizing.FIXED}",
+            "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+            "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+            "layoutAlign": "{layout.align.y.self.INHERIT}",
+            "layoutGrow": "{layout.grow.0}",
+            "boxSizing": "border-box",
+            "border-style": "solid",
+            "border-width": "{dimension.borderwidth.none}",
+            "border-color": "initial",
+            "height": "100%",
+            "width": "100%",
+            "box-sizing": "border-box",
+            "back-width": "100%",
+            "back-height": "100%",
+            "position": "relative",
+            "padding-top": "{dimension.padding.tight}",
+            "padding-bottom": "{dimension.padding.tight}",
+            "padding-left": "{dimension.padding.tight}",
+            "padding-right": "{dimension.padding.tight}",
+            "margin-top": "{dimension.margin.tight}",
+            "margin-bottom": "{dimension.margin.tight}",
+            "margin-left": "{dimension.margin.tight}",
+            "margin-right": "{dimension.margin.tight}",
+            "background-color": "none",
+            "gap": "{dimension.padding.loose}"
+          },
+          "children": [
+            {
+              "id": "dd-3230581a-5b3b-4ec5-9c60-19118b970073",
+              "name": "text",
+              "name-zh": "文本",
+              "file-type": "cell-element",
+              "layout": {
+                "style": {
+                  "background-color": [],
+                  "font": [],
+                  "border": [],
+                  "scale": [],
+                  "box-sizing": "border-box",
+                  "primaryAxisSizingMode": "fixed",
+                  "position": "relative"
+                },
+                "text_body": {
+                  "type": "container",
+                  "content": [
+                    {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  ],
+                  "resource": "",
+                  "data": [],
+                  "style": {
+                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                    "layoutGrow": "{layout.grow.0}",
+                    "overflow": "auto",
+                    "word-break": "break-all",
+                    "textColor": {
+                      "element": "color",
+                      "value": "text",
+                      "prop": "default",
+                      "token": "text"
+                    },
+                    "fill": {
+                      "element": "color",
+                      "value": "bg",
+                      "prop": "default",
+                      "token": "bg"
+                    },
+                    "fontSizes": {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  },
+                  "children": []
+                },
+                "text_hyperlink": {
+                  "type": "container",
+                  "content": [
+                    {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  ],
+                  "resource": "",
+                  "data": [],
+                  "style": {
+                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                    "layoutGrow": "{layout.grow.0}",
+                    "text-decoration": "underline",
+                    "overflow": "auto",
+                    "word-break": "break-all",
+                    "textColor": {
+                      "element": "color",
+                      "value": "text",
+                      "prop": "default",
+                      "token": "hyperlinktext"
+                    },
+                    "fill": {
+                      "element": "color",
+                      "value": "bg",
+                      "prop": "default",
+                      "token": "bg"
+                    },
+                    "fontSizes": {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  },
+                  "children": []
+                }
+              },
+              "color": {
+                "text": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "text": {
+                        "value": "{color.basic.opacity.black.100}",
+                        "type": "color",
+                        "key": "color-text"
+                      },
+                      "hyperlinktext": {
+                        "value": "{color.basic.light-blue.5}",
+                        "type": "color",
+                        "key": "color-text"
+                      }
+                    },
+                    "resource": "{color.basic.light-blue.5}"
+                  }
+                },
+                "bg": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "bg": {
+                        "value": "none",
+                        "type": "color",
+                        "key": "color-bg"
+                      }
+                    },
+                    "resource": "none"
+                  }
+                }
+              },
+              "scale": {
+                "min_height": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "min_height": {
+                        "value": "{dimension.basic.dimension.72}",
+                        "type": "sizing",
+                        "key": "scale-min_height"
+                      }
+                    },
+                    "resource": "{dimension.basic.dimension.72}"
+                  }
+                },
+                "max_width": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "max_width": {
+                        "value": "{dimension.basic.dimension.1200}",
+                        "type": "sizing",
+                        "key": "scale-max_width"
+                      }
+                    },
+                    "resource": "{dimension.basic.dimension.1200}"
+                  }
+                }
+              },
+              "font": {
+                "fontsize": {
+                  "default": {
+                    "data-key": "",
+                    "content": "春天的韵律",
+                    "style": {
+                      "fontsize": {
+                        "value": "{font.size.xxl}",
+                        "type": "fontSizes",
+                        "key": "font-fontsize"
+                      }
+                    },
+                    "resource": "{font.size.xxl}"
+                  }
+                },
+                "fontweight": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "fontweight": {
+                        "value": "{font.fontweight.bold}",
+                        "type": "fontWeight",
+                        "key": "font-fontweight"
+                      }
+                    },
+                    "resource": "{font.fontweight.bold}"
+                  }
+                }
+              },
+              "type": "text_body",
+              "state": "default",
+              "events": [
+                {}
+              ]
+            },
+            {
+              "dataKeys": [],
+              "name": "layout",
+              "name-zh": "布局",
+              "file-type": "template",
+              "theme": "default",
+              "layout": {
+                "style": {
+                  "display": "{layout.state.display.flex}",
+                  "layoutMode": "{layout.direction.VERTICAL}",
+                  "layoutWrap": "{layout.wrap.NO_WRAP}",
+                  "primaryAxisSizingMode": "fixed",
+                  "counterAxisSizingMode": "{layout.sizing.FIXED}",
+                  "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+                  "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+                  "layoutAlign": "{layout.align.y.self.INHERIT}",
+                  "layoutGrow": "{layout.grow.0}",
+                  "boxSizing": "border-box",
+                  "border-style": "solid",
+                  "border-width": "{dimension.borderwidth.none}",
+                  "border-color": "initial",
+                  "height": "100%",
+                  "width": "100%",
+                  "box-sizing": "border-box",
+                  "back-width": "100%",
+                  "back-height": "100%",
+                  "position": "relative",
+                  "padding-top": "{dimension.padding.tight}",
+                  "padding-bottom": "{dimension.padding.tight}",
+                  "padding-left": "{dimension.padding.tight}",
+                  "padding-right": "{dimension.padding.tight}",
+                  "margin-top": "{dimension.margin.tight}",
+                  "margin-bottom": "{dimension.margin.tight}",
+                  "margin-left": "{dimension.margin.tight}",
+                  "margin-right": "{dimension.margin.tight}",
+                  "background-color": "none",
+                  "gap": "{dimension.padding.loose}"
+                },
+                "children": [
+                  {
+                    "id": "dd-8bc34b25-960c-476c-b4ef-f9aebdf59028",
+                    "name": "text",
+                    "name-zh": "文本",
+                    "file-type": "cell-element",
+                    "layout": {
+                      "style": {
+                        "background-color": [],
+                        "font": [],
+                        "border": [],
+                        "scale": [],
+                        "box-sizing": "border-box",
+                        "primaryAxisSizingMode": "fixed",
+                        "position": "relative"
+                      },
+                      "text_body": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "text"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      },
+                      "text_hyperlink": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "text-decoration": "underline",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "hyperlinktext"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      }
+                    },
+                    "color": {
+                      "text": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "text": {
+                              "value": "{color.basic.opacity.black.100}",
+                              "type": "color",
+                              "key": "color-text"
+                            },
+                            "hyperlinktext": {
+                              "value": "{color.basic.light-blue.5}",
+                              "type": "color",
+                              "key": "color-text"
+                            }
+                          },
+                          "resource": "{color.basic.light-blue.5}"
+                        }
+                      },
+                      "bg": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "bg": {
+                              "value": "none",
+                              "type": "color",
+                              "key": "color-bg"
+                            }
+                          },
+                          "resource": "none"
+                        }
+                      }
+                    },
+                    "scale": {
+                      "min_height": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "min_height": {
+                              "value": "{dimension.basic.dimension.72}",
+                              "type": "sizing",
+                              "key": "scale-min_height"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.72}"
+                        }
+                      },
+                      "max_width": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "max_width": {
+                              "value": "{dimension.basic.dimension.1200}",
+                              "type": "sizing",
+                              "key": "scale-max_width"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.1200}"
+                        }
+                      }
+                    },
+                    "font": {
+                      "fontsize": {
+                        "default": {
+                          "data-key": "",
+                          "content": "春暖花开",
+                          "style": {
+                            "fontsize": {
+                              "value": "{font.size.xl}",
+                              "type": "fontSizes",
+                              "key": "font-fontsize"
+                            }
+                          },
+                          "resource": "{font.size.xl}"
+                        }
+                      },
+                      "fontweight": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "fontweight": {
+                              "value": "{font.fontweight.bold}",
+                              "type": "fontWeight",
+                              "key": "font-fontweight"
+                            }
+                          },
+                          "resource": "{font.fontweight.bold}"
+                        }
+                      }
+                    },
+                    "type": "text_body",
+                    "state": "default",
+                    "events": [
+                      {}
+                    ]
+                  },
+                  {
+                    "id": "dd-6c2d39ec-eb71-4d1d-b580-54298e76dfd6",
+                    "name": "text",
+                    "name-zh": "文本",
+                    "file-type": "cell-element",
+                    "layout": {
+                      "style": {
+                        "background-color": [],
+                        "font": [],
+                        "border": [],
+                        "scale": [],
+                        "box-sizing": "border-box",
+                        "primaryAxisSizingMode": "fixed",
+                        "position": "relative"
+                      },
+                      "text_body": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "text"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      },
+                      "text_hyperlink": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "text-decoration": "underline",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "hyperlinktext"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      }
+                    },
+                    "color": {
+                      "text": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "text": {
+                              "value": "{color.basic.opacity.black.100}",
+                              "type": "color",
+                              "key": "color-text"
+                            },
+                            "hyperlinktext": {
+                              "value": "{color.basic.light-blue.5}",
+                              "type": "color",
+                              "key": "color-text"
+                            }
+                          },
+                          "resource": "{color.basic.light-blue.5}"
+                        }
+                      },
+                      "bg": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "bg": {
+                              "value": "none",
+                              "type": "color",
+                              "key": "color-bg"
+                            }
+                          },
+                          "resource": "none"
+                        }
+                      }
+                    },
+                    "scale": {
+                      "min_height": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "min_height": {
+                              "value": "{dimension.basic.dimension.72}",
+                              "type": "sizing",
+                              "key": "scale-min_height"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.72}"
+                        }
+                      },
+                      "max_width": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "max_width": {
+                              "value": "{dimension.basic.dimension.1200}",
+                              "type": "sizing",
+                              "key": "scale-max_width"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.1200}"
+                        }
+                      }
+                    },
+                    "font": {
+                      "fontsize": {
+                        "default": {
+                          "data-key": "",
+                          "content": "春季的温度渐渐回升，万物复苏。大地解除了冬天的束缚，开始焕发出新的生机。花朵竞相绽放，为世界增添了绚丽的色彩。",
+                          "style": {
+                            "fontsize": {
+                              "value": "{font.size.medium}",
+                              "type": "fontSizes",
+                              "key": "font-fontsize"
+                            }
+                          },
+                          "resource": "{font.size.medium}"
+                        }
+                      }
+                    },
+                    "type": "text_body",
+                    "state": "default",
+                    "events": [
+                      {}
+                    ]
+                  }
+                ]
+              },
+              "description": "",
+              "id": "dd-c9ed5245-05ac-43ec-9d9a-a296ba911e8e",
+              "events": [
+                {}
+              ]
+            },
+            {
+              "dataKeys": [],
+              "name": "layout",
+              "name-zh": "布局",
+              "file-type": "template",
+              "theme": "default",
+              "layout": {
+                "style": {
+                  "display": "{layout.state.display.flex}",
+                  "layoutMode": "{layout.direction.VERTICAL}",
+                  "layoutWrap": "{layout.wrap.NO_WRAP}",
+                  "primaryAxisSizingMode": "fixed",
+                  "counterAxisSizingMode": "{layout.sizing.FIXED}",
+                  "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+                  "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+                  "layoutAlign": "{layout.align.y.self.INHERIT}",
+                  "layoutGrow": "{layout.grow.0}",
+                  "boxSizing": "border-box",
+                  "border-style": "solid",
+                  "border-width": "{dimension.borderwidth.none}",
+                  "border-color": "initial",
+                  "height": "100%",
+                  "width": "100%",
+                  "box-sizing": "border-box",
+                  "back-width": "100%",
+                  "back-height": "100%",
+                  "position": "relative",
+                  "padding-top": "{dimension.padding.tight}",
+                  "padding-bottom": "{dimension.padding.tight}",
+                  "padding-left": "{dimension.padding.tight}",
+                  "padding-right": "{dimension.padding.tight}",
+                  "margin-top": "{dimension.margin.tight}",
+                  "margin-bottom": "{dimension.margin.tight}",
+                  "margin-left": "{dimension.margin.tight}",
+                  "margin-right": "{dimension.margin.tight}",
+                  "background-color": "none",
+                  "gap": "{dimension.padding.loose}"
+                },
+                "children": [
+                  {
+                    "id": "dd-862ec0a9-6bed-4c71-b8ac-bee4f9dbf6e9",
+                    "name": "text",
+                    "name-zh": "文本",
+                    "file-type": "cell-element",
+                    "layout": {
+                      "style": {
+                        "background-color": [],
+                        "font": [],
+                        "border": [],
+                        "scale": [],
+                        "box-sizing": "border-box",
+                        "primaryAxisSizingMode": "fixed",
+                        "position": "relative"
+                      },
+                      "text_body": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "text"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      },
+                      "text_hyperlink": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "text-decoration": "underline",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "hyperlinktext"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      }
+                    },
+                    "color": {
+                      "text": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "text": {
+                              "value": "{color.basic.opacity.black.100}",
+                              "type": "color",
+                              "key": "color-text"
+                            },
+                            "hyperlinktext": {
+                              "value": "{color.basic.light-blue.5}",
+                              "type": "color",
+                              "key": "color-text"
+                            }
+                          },
+                          "resource": "{color.basic.light-blue.5}"
+                        }
+                      },
+                      "bg": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "bg": {
+                              "value": "none",
+                              "type": "color",
+                              "key": "color-bg"
+                            }
+                          },
+                          "resource": "none"
+                        }
+                      }
+                    },
+                    "scale": {
+                      "min_height": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "min_height": {
+                              "value": "{dimension.basic.dimension.72}",
+                              "type": "sizing",
+                              "key": "scale-min_height"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.72}"
+                        }
+                      },
+                      "max_width": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "max_width": {
+                              "value": "{dimension.basic.dimension.1200}",
+                              "type": "sizing",
+                              "key": "scale-max_width"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.1200}"
+                        }
+                      }
+                    },
+                    "font": {
+                      "fontsize": {
+                        "default": {
+                          "data-key": "",
+                          "content": "春雨绵绵",
+                          "style": {
+                            "fontsize": {
+                              "value": "{font.size.xl}",
+                              "type": "fontSizes",
+                              "key": "font-fontsize"
+                            }
+                          },
+                          "resource": "{font.size.xl}"
+                        }
+                      },
+                      "fontweight": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "fontweight": {
+                              "value": "{font.fontweight.bold}",
+                              "type": "fontWeight",
+                              "key": "font-fontweight"
+                            }
+                          },
+                          "resource": "{font.fontweight.bold}"
+                        }
+                      }
+                    },
+                    "type": "text_body",
+                    "state": "default",
+                    "events": [
+                      {}
+                    ]
+                  },
+                  {
+                    "id": "dd-9e30df7f-1c79-44a3-b82c-6fc6ad8c5136",
+                    "name": "text",
+                    "name-zh": "文本",
+                    "file-type": "cell-element",
+                    "layout": {
+                      "style": {
+                        "background-color": [],
+                        "font": [],
+                        "border": [],
+                        "scale": [],
+                        "box-sizing": "border-box",
+                        "primaryAxisSizingMode": "fixed",
+                        "position": "relative"
+                      },
+                      "text_body": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "text"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      },
+                      "text_hyperlink": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "text-decoration": "underline",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "hyperlinktext"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      }
+                    },
+                    "color": {
+                      "text": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "text": {
+                              "value": "{color.basic.opacity.black.100}",
+                              "type": "color",
+                              "key": "color-text"
+                            },
+                            "hyperlinktext": {
+                              "value": "{color.basic.light-blue.5}",
+                              "type": "color",
+                              "key": "color-text"
+                            }
+                          },
+                          "resource": "{color.basic.light-blue.5}"
+                        }
+                      },
+                      "bg": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "bg": {
+                              "value": "none",
+                              "type": "color",
+                              "key": "color-bg"
+                            }
+                          },
+                          "resource": "none"
+                        }
+                      }
+                    },
+                    "scale": {
+                      "min_height": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "min_height": {
+                              "value": "{dimension.basic.dimension.72}",
+                              "type": "sizing",
+                              "key": "scale-min_height"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.72}"
+                        }
+                      },
+                      "max_width": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "max_width": {
+                              "value": "{dimension.basic.dimension.1200}",
+                              "type": "sizing",
+                              "key": "scale-max_width"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.1200}"
+                        }
+                      }
+                    },
+                    "font": {
+                      "fontsize": {
+                        "default": {
+                          "data-key": "",
+                          "content": "春雨如丝，轻柔地拍打着大地。它滋润着土壤，为植物的生长提供了充足的水分。雨后的空气清新怡人，带着泥土和草木的芬芳。",
+                          "style": {
+                            "fontsize": {
+                              "value": "{font.size.medium}",
+                              "type": "fontSizes",
+                              "key": "font-fontsize"
+                            }
+                          },
+                          "resource": "{font.size.medium}"
+                        }
+                      }
+                    },
+                    "type": "text_body",
+                    "state": "default",
+                    "events": [
+                      {}
+                    ]
+                  }
+                ]
+              },
+              "description": "",
+              "id": "dd-aea93c53-e8b2-4946-8091-ddea4fb9aa35",
+              "events": [
+                {}
+              ]
+            },
+            {
+              "dataKeys": [],
+              "name": "layout",
+              "name-zh": "布局",
+              "file-type": "template",
+              "theme": "default",
+              "layout": {
+                "style": {
+                  "display": "{layout.state.display.flex}",
+                  "layoutMode": "{layout.direction.VERTICAL}",
+                  "layoutWrap": "{layout.wrap.NO_WRAP}",
+                  "primaryAxisSizingMode": "fixed",
+                  "counterAxisSizingMode": "{layout.sizing.FIXED}",
+                  "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+                  "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+                  "layoutAlign": "{layout.align.y.self.INHERIT}",
+                  "layoutGrow": "{layout.grow.0}",
+                  "boxSizing": "border-box",
+                  "border-style": "solid",
+                  "border-width": "{dimension.borderwidth.none}",
+                  "border-color": "initial",
+                  "height": "100%",
+                  "width": "100%",
+                  "box-sizing": "border-box",
+                  "back-width": "100%",
+                  "back-height": "100%",
+                  "position": "relative",
+                  "padding-top": "{dimension.padding.tight}",
+                  "padding-bottom": "{dimension.padding.tight}",
+                  "padding-left": "{dimension.padding.tight}",
+                  "padding-right": "{dimension.padding.tight}",
+                  "margin-top": "{dimension.margin.tight}",
+                  "margin-bottom": "{dimension.margin.tight}",
+                  "margin-left": "{dimension.margin.tight}",
+                  "margin-right": "{dimension.margin.tight}",
+                  "background-color": "none",
+                  "gap": "{dimension.padding.loose}"
+                },
+                "children": [
+                  {
+                    "id": "dd-49b4f101-4ed2-4dbd-b5f5-947e1b9a011b",
+                    "name": "text",
+                    "name-zh": "文本",
+                    "file-type": "cell-element",
+                    "layout": {
+                      "style": {
+                        "background-color": [],
+                        "font": [],
+                        "border": [],
+                        "scale": [],
+                        "box-sizing": "border-box",
+                        "primaryAxisSizingMode": "fixed",
+                        "position": "relative"
+                      },
+                      "text_body": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "text"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      },
+                      "text_hyperlink": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "text-decoration": "underline",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "hyperlinktext"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      }
+                    },
+                    "color": {
+                      "text": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "text": {
+                              "value": "{color.basic.opacity.black.100}",
+                              "type": "color",
+                              "key": "color-text"
+                            },
+                            "hyperlinktext": {
+                              "value": "{color.basic.light-blue.5}",
+                              "type": "color",
+                              "key": "color-text"
+                            }
+                          },
+                          "resource": "{color.basic.light-blue.5}"
+                        }
+                      },
+                      "bg": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "bg": {
+                              "value": "none",
+                              "type": "color",
+                              "key": "color-bg"
+                            }
+                          },
+                          "resource": "none"
+                        }
+                      }
+                    },
+                    "scale": {
+                      "min_height": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "min_height": {
+                              "value": "{dimension.basic.dimension.72}",
+                              "type": "sizing",
+                              "key": "scale-min_height"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.72}"
+                        }
+                      },
+                      "max_width": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "max_width": {
+                              "value": "{dimension.basic.dimension.1200}",
+                              "type": "sizing",
+                              "key": "scale-max_width"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.1200}"
+                        }
+                      }
+                    },
+                    "font": {
+                      "fontsize": {
+                        "default": {
+                          "data-key": "",
+                          "content": "春风和煦",
+                          "style": {
+                            "fontsize": {
+                              "value": "{font.size.xl}",
+                              "type": "fontSizes",
+                              "key": "font-fontsize"
+                            }
+                          },
+                          "resource": "{font.size.xl}"
+                        }
+                      },
+                      "fontweight": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "fontweight": {
+                              "value": "{font.fontweight.bold}",
+                              "type": "fontWeight",
+                              "key": "font-fontweight"
+                            }
+                          },
+                          "resource": "{font.fontweight.bold}"
+                        }
+                      }
+                    },
+                    "type": "text_body",
+                    "state": "default",
+                    "events": [
+                      {}
+                    ]
+                  },
+                  {
+                    "id": "dd-6be41f90-5d43-464b-ace7-5e8675fac0c9",
+                    "name": "text",
+                    "name-zh": "文本",
+                    "file-type": "cell-element",
+                    "layout": {
+                      "style": {
+                        "background-color": [],
+                        "font": [],
+                        "border": [],
+                        "scale": [],
+                        "box-sizing": "border-box",
+                        "primaryAxisSizingMode": "fixed",
+                        "position": "relative"
+                      },
+                      "text_body": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "text"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      },
+                      "text_hyperlink": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "text-decoration": "underline",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "hyperlinktext"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      }
+                    },
+                    "color": {
+                      "text": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "text": {
+                              "value": "{color.basic.opacity.black.100}",
+                              "type": "color",
+                              "key": "color-text"
+                            },
+                            "hyperlinktext": {
+                              "value": "{color.basic.light-blue.5}",
+                              "type": "color",
+                              "key": "color-text"
+                            }
+                          },
+                          "resource": "{color.basic.light-blue.5}"
+                        }
+                      },
+                      "bg": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "bg": {
+                              "value": "none",
+                              "type": "color",
+                              "key": "color-bg"
+                            }
+                          },
+                          "resource": "none"
+                        }
+                      }
+                    },
+                    "scale": {
+                      "min_height": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "min_height": {
+                              "value": "{dimension.basic.dimension.72}",
+                              "type": "sizing",
+                              "key": "scale-min_height"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.72}"
+                        }
+                      },
+                      "max_width": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "max_width": {
+                              "value": "{dimension.basic.dimension.1200}",
+                              "type": "sizing",
+                              "key": "scale-max_width"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.1200}"
+                        }
+                      }
+                    },
+                    "font": {
+                      "fontsize": {
+                        "default": {
+                          "data-key": "",
+                          "content": "春风轻抚过脸庞，带着温暖和生机。它吹散了冬日的寒冷，为人们带来了舒适的感觉。树叶在风中摇曳，发出沙沙的声响，仿佛在歌唱春天的赞歌。",
+                          "style": {
+                            "fontsize": {
+                              "value": "{font.size.medium}",
+                              "type": "fontSizes",
+                              "key": "font-fontsize"
+                            }
+                          },
+                          "resource": "{font.size.medium}"
+                        }
+                      }
+                    },
+                    "type": "text_body",
+                    "state": "default",
+                    "events": [
+                      {}
+                    ]
+                  }
+                ]
+              },
+              "description": "",
+              "id": "dd-eb54fb61-0085-4bdb-9fc6-6b21fb1a065d",
+              "events": [
+                {}
+              ]
+            },
+            {
+              "dataKeys": [],
+              "name": "layout",
+              "name-zh": "布局",
+              "file-type": "template",
+              "theme": "default",
+              "layout": {
+                "style": {
+                  "display": "{layout.state.display.flex}",
+                  "layoutMode": "{layout.direction.VERTICAL}",
+                  "layoutWrap": "{layout.wrap.NO_WRAP}",
+                  "primaryAxisSizingMode": "fixed",
+                  "counterAxisSizingMode": "{layout.sizing.FIXED}",
+                  "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+                  "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+                  "layoutAlign": "{layout.align.y.self.INHERIT}",
+                  "layoutGrow": "{layout.grow.0}",
+                  "boxSizing": "border-box",
+                  "border-style": "solid",
+                  "border-width": "{dimension.borderwidth.none}",
+                  "border-color": "initial",
+                  "height": "100%",
+                  "width": "100%",
+                  "box-sizing": "border-box",
+                  "back-width": "100%",
+                  "back-height": "100%",
+                  "position": "relative",
+                  "padding-top": "{dimension.padding.tight}",
+                  "padding-bottom": "{dimension.padding.tight}",
+                  "padding-left": "{dimension.padding.tight}",
+                  "padding-right": "{dimension.padding.tight}",
+                  "margin-top": "{dimension.margin.tight}",
+                  "margin-bottom": "{dimension.margin.tight}",
+                  "margin-left": "{dimension.margin.tight}",
+                  "margin-right": "{dimension.margin.tight}",
+                  "background-color": "none",
+                  "gap": "{dimension.padding.loose}"
+                },
+                "children": [
+                  {
+                    "id": "dd-4083984b-8346-4bc7-8917-319ca75feb93",
+                    "name": "text",
+                    "name-zh": "文本",
+                    "file-type": "cell-element",
+                    "layout": {
+                      "style": {
+                        "background-color": [],
+                        "font": [],
+                        "border": [],
+                        "scale": [],
+                        "box-sizing": "border-box",
+                        "primaryAxisSizingMode": "fixed",
+                        "position": "relative"
+                      },
+                      "text_body": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "text"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      },
+                      "text_hyperlink": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "text-decoration": "underline",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "hyperlinktext"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      }
+                    },
+                    "color": {
+                      "text": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "text": {
+                              "value": "{color.basic.opacity.black.100}",
+                              "type": "color",
+                              "key": "color-text"
+                            },
+                            "hyperlinktext": {
+                              "value": "{color.basic.light-blue.5}",
+                              "type": "color",
+                              "key": "color-text"
+                            }
+                          },
+                          "resource": "{color.basic.light-blue.5}"
+                        }
+                      },
+                      "bg": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "bg": {
+                              "value": "none",
+                              "type": "color",
+                              "key": "color-bg"
+                            }
+                          },
+                          "resource": "none"
+                        }
+                      }
+                    },
+                    "scale": {
+                      "min_height": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "min_height": {
+                              "value": "{dimension.basic.dimension.72}",
+                              "type": "sizing",
+                              "key": "scale-min_height"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.72}"
+                        }
+                      },
+                      "max_width": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "max_width": {
+                              "value": "{dimension.basic.dimension.1200}",
+                              "type": "sizing",
+                              "key": "scale-max_width"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.1200}"
+                        }
+                      }
+                    },
+                    "font": {
+                      "fontsize": {
+                        "default": {
+                          "data-key": "",
+                          "content": "春日生机",
+                          "style": {
+                            "fontsize": {
+                              "value": "{font.size.xl}",
+                              "type": "fontSizes",
+                              "key": "font-fontsize"
+                            }
+                          },
+                          "resource": "{font.size.xl}"
+                        }
+                      },
+                      "fontweight": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "fontweight": {
+                              "value": "{font.fontweight.bold}",
+                              "type": "fontWeight",
+                              "key": "font-fontweight"
+                            }
+                          },
+                          "resource": "{font.fontweight.bold}"
+                        }
+                      }
+                    },
+                    "type": "text_body",
+                    "state": "default",
+                    "events": [
+                      {}
+                    ]
+                  },
+                  {
+                    "id": "dd-4d446b1f-8d05-4ea8-8030-b9cccabb64dc",
+                    "name": "text",
+                    "name-zh": "文本",
+                    "file-type": "cell-element",
+                    "layout": {
+                      "style": {
+                        "background-color": [],
+                        "font": [],
+                        "border": [],
+                        "scale": [],
+                        "box-sizing": "border-box",
+                        "primaryAxisSizingMode": "fixed",
+                        "position": "relative"
+                      },
+                      "text_body": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "text"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      },
+                      "text_hyperlink": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "text-decoration": "underline",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "hyperlinktext"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      }
+                    },
+                    "color": {
+                      "text": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "text": {
+                              "value": "{color.basic.opacity.black.100}",
+                              "type": "color",
+                              "key": "color-text"
+                            },
+                            "hyperlinktext": {
+                              "value": "{color.basic.light-blue.5}",
+                              "type": "color",
+                              "key": "color-text"
+                            }
+                          },
+                          "resource": "{color.basic.light-blue.5}"
+                        }
+                      },
+                      "bg": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "bg": {
+                              "value": "none",
+                              "type": "color",
+                              "key": "color-bg"
+                            }
+                          },
+                          "resource": "none"
+                        }
+                      }
+                    },
+                    "scale": {
+                      "min_height": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "min_height": {
+                              "value": "{dimension.basic.dimension.72}",
+                              "type": "sizing",
+                              "key": "scale-min_height"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.72}"
+                        }
+                      },
+                      "max_width": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "max_width": {
+                              "value": "{dimension.basic.dimension.1200}",
+                              "type": "sizing",
+                              "key": "scale-max_width"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.1200}"
+                        }
+                      }
+                    },
+                    "font": {
+                      "fontsize": {
+                        "default": {
+                          "data-key": "",
+                          "content": "动物们从冬眠中醒来，开始了新一年的活动。鸟儿欢快地歌唱，昆虫忙碌地飞舞，大地上处处充满了生命的活力。农民们开始在田间耕作，播下希望的种子。",
+                          "style": {
+                            "fontsize": {
+                              "value": "{font.size.medium}",
+                              "type": "fontSizes",
+                              "key": "font-fontsize"
+                            }
+                          },
+                          "resource": "{font.size.medium}"
+                        }
+                      }
+                    },
+                    "type": "text_body",
+                    "state": "default",
+                    "events": [
+                      {}
+                    ]
+                  }
+                ]
+              },
+              "description": "",
+              "id": "dd-a0525b6a-3c19-41ce-a553-58b8a8aa53f9",
+              "events": [
+                {}
+              ]
+            },
+            {
+              "dataKeys": [],
+              "name": "layout",
+              "name-zh": "布局",
+              "file-type": "template",
+              "theme": "default",
+              "layout": {
+                "style": {
+                  "display": "{layout.state.display.flex}",
+                  "layoutMode": "{layout.direction.VERTICAL}",
+                  "layoutWrap": "{layout.wrap.NO_WRAP}",
+                  "primaryAxisSizingMode": "fixed",
+                  "counterAxisSizingMode": "{layout.sizing.FIXED}",
+                  "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+                  "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+                  "layoutAlign": "{layout.align.y.self.INHERIT}",
+                  "layoutGrow": "{layout.grow.0}",
+                  "boxSizing": "border-box",
+                  "border-style": "solid",
+                  "border-width": "{dimension.borderwidth.none}",
+                  "border-color": "initial",
+                  "height": "100%",
+                  "width": "100%",
+                  "box-sizing": "border-box",
+                  "back-width": "100%",
+                  "back-height": "100%",
+                  "position": "relative",
+                  "padding-top": "{dimension.padding.tight}",
+                  "padding-bottom": "{dimension.padding.tight}",
+                  "padding-left": "{dimension.padding.tight}",
+                  "padding-right": "{dimension.padding.tight}",
+                  "margin-top": "{dimension.margin.tight}",
+                  "margin-bottom": "{dimension.margin.tight}",
+                  "margin-left": "{dimension.margin.tight}",
+                  "margin-right": "{dimension.margin.tight}",
+                  "background-color": "none",
+                  "gap": "{dimension.padding.loose}"
+                },
+                "children": [
+                  {
+                    "id": "dd-9f47e9aa-2e3b-496d-a4cb-c5a54a4bf43d",
+                    "name": "text",
+                    "name-zh": "文本",
+                    "file-type": "cell-element",
+                    "layout": {
+                      "style": {
+                        "background-color": [],
+                        "font": [],
+                        "border": [],
+                        "scale": [],
+                        "box-sizing": "border-box",
+                        "primaryAxisSizingMode": "fixed",
+                        "position": "relative"
+                      },
+                      "text_body": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "text"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      },
+                      "text_hyperlink": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "text-decoration": "underline",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "hyperlinktext"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      }
+                    },
+                    "color": {
+                      "text": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "text": {
+                              "value": "{color.basic.opacity.black.100}",
+                              "type": "color",
+                              "key": "color-text"
+                            },
+                            "hyperlinktext": {
+                              "value": "{color.basic.light-blue.5}",
+                              "type": "color",
+                              "key": "color-text"
+                            }
+                          },
+                          "resource": "{color.basic.light-blue.5}"
+                        }
+                      },
+                      "bg": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "bg": {
+                              "value": "none",
+                              "type": "color",
+                              "key": "color-bg"
+                            }
+                          },
+                          "resource": "none"
+                        }
+                      }
+                    },
+                    "scale": {
+                      "min_height": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "min_height": {
+                              "value": "{dimension.basic.dimension.72}",
+                              "type": "sizing",
+                              "key": "scale-min_height"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.72}"
+                        }
+                      },
+                      "max_width": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "max_width": {
+                              "value": "{dimension.basic.dimension.1200}",
+                              "type": "sizing",
+                              "key": "scale-max_width"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.1200}"
+                        }
+                      }
+                    },
+                    "font": {
+                      "fontsize": {
+                        "default": {
+                          "data-key": "",
+                          "content": "春节文化",
+                          "style": {
+                            "fontsize": {
+                              "value": "{font.size.xl}",
+                              "type": "fontSizes",
+                              "key": "font-fontsize"
+                            }
+                          },
+                          "resource": "{font.size.xl}"
+                        }
+                      },
+                      "fontweight": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "fontweight": {
+                              "value": "{font.fontweight.bold}",
+                              "type": "fontWeight",
+                              "key": "font-fontweight"
+                            }
+                          },
+                          "resource": "{font.fontweight.bold}"
+                        }
+                      }
+                    },
+                    "type": "text_body",
+                    "state": "default",
+                    "events": [
+                      {}
+                    ]
+                  },
+                  {
+                    "id": "dd-1108ccb9-5b88-4f33-b199-064c266a3d84",
+                    "name": "text",
+                    "name-zh": "文本",
+                    "file-type": "cell-element",
+                    "layout": {
+                      "style": {
+                        "background-color": [],
+                        "font": [],
+                        "border": [],
+                        "scale": [],
+                        "box-sizing": "border-box",
+                        "primaryAxisSizingMode": "fixed",
+                        "position": "relative"
+                      },
+                      "text_body": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "text"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      },
+                      "text_hyperlink": {
+                        "type": "container",
+                        "content": [
+                          {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        ],
+                        "resource": "",
+                        "data": [],
+                        "style": {
+                          "layoutAlign": "{layout.align.y.self.INHERIT}",
+                          "layoutGrow": "{layout.grow.0}",
+                          "text-decoration": "underline",
+                          "overflow": "auto",
+                          "word-break": "break-all",
+                          "textColor": {
+                            "element": "color",
+                            "value": "text",
+                            "prop": "default",
+                            "token": "hyperlinktext"
+                          },
+                          "fill": {
+                            "element": "color",
+                            "value": "bg",
+                            "prop": "default",
+                            "token": "bg"
+                          },
+                          "fontSizes": {
+                            "element": "font",
+                            "value": "fontsize",
+                            "prop": "default",
+                            "token": "fontsize"
+                          }
+                        },
+                        "children": []
+                      }
+                    },
+                    "color": {
+                      "text": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "text": {
+                              "value": "{color.basic.opacity.black.100}",
+                              "type": "color",
+                              "key": "color-text"
+                            },
+                            "hyperlinktext": {
+                              "value": "{color.basic.light-blue.5}",
+                              "type": "color",
+                              "key": "color-text"
+                            }
+                          },
+                          "resource": "{color.basic.light-blue.5}"
+                        }
+                      },
+                      "bg": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "bg": {
+                              "value": "none",
+                              "type": "color",
+                              "key": "color-bg"
+                            }
+                          },
+                          "resource": "none"
+                        }
+                      }
+                    },
+                    "scale": {
+                      "min_height": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "min_height": {
+                              "value": "{dimension.basic.dimension.72}",
+                              "type": "sizing",
+                              "key": "scale-min_height"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.72}"
+                        }
+                      },
+                      "max_width": {
+                        "default": {
+                          "data-key": "",
+                          "style": {
+                            "max_width": {
+                              "value": "{dimension.basic.dimension.1200}",
+                              "type": "sizing",
+                              "key": "scale-max_width"
+                            }
+                          },
+                          "resource": "{dimension.basic.dimension.1200}"
+                        }
+                      }
+                    },
+                    "font": {
+                      "fontsize": {
+                        "default": {
+                          "data-key": "",
+                          "content": "在许多文化中，春天也是重要的节日季节。人们举行各种庆祝活动，欢迎新生活的开始，祈求一年的丰收和好运。这些传统习俗代代相传，丰富了春天的文化内涵。",
+                          "style": {
+                            "fontsize": {
+                              "value": "{font.size.medium}",
+                              "type": "fontSizes",
+                              "key": "font-fontsize"
+                            }
+                          },
+                          "resource": "{font.size.medium}"
+                        }
+                      }
+                    },
+                    "type": "text_body",
+                    "state": "default",
+                    "events": [
+                      {}
+                    ]
+                  }
+                ]
+              },
+              "description": "",
+              "id": "dd-7a9bf0cb-abf1-4bbb-a6c8-20f24970ebe8",
+              "events": [
+                {}
+              ]
+            }
+          ]
+        },
+        "description": "",
+        "id": "dd-65c95958-0de8-49b1-87e9-89717e1c0f65",
+        "events": [
+          {}
+        ]
+      }
+    ]
+  },
+  "events": [
+    {}
+  ]
+}
