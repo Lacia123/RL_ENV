@@ -1,149 +1,12 @@
 // markdownToEightElement.js
-// 八要素布局常量
-const LAYOUT_CONSTANTS = {
-  DISPLAY: {
-    FLEX: "{layout.state.display.flex}"
-  },
-  DIRECTION: {
-    HORIZONTAL: "{layout.direction.HORIZONTAL}",
-    VERTICAL: "{layout.direction.VERTICAL}"
-  },
-  WRAP: {
-    NO_WRAP: "{layout.wrap.NO_WRAP}"
-  },
-  SIZING: {
-    FIXED: "{layout.sizing.FIXED}",
-    AUTO: "{layout.sizing.AUTO}"
-  },
-  ALIGN: {
-    X: {
-      MIN: "{layout.align.x.MIN}",
-      CENTER: "{layout.align.x.CENTER}"
-    },
-    Y: {
-      ITEMS: {
-        MIN: "{layout.align.y.items.MIN}",
-        CENTER: "{layout.align.y.items.CENTER}"
-      },
-      SELF: {
-        INHERIT: "{layout.align.y.self.INHERIT}"
-      }
-    }
-  },
-  GROW: {
-    ZERO: "{layout.grow.0}"
-  }
-};
-
-// 颜色和维度常量
-const COLOR_CONSTANTS = {
-  PRIMARY: {
-    BRAND3: "{color.primary.brand3}",
-    BRAND4: "{color.primary.brand4}",
-    BRAND5: "{color.primary.brand5}", // 按钮
-    BRAND6: "{color.primary.brand6}"
-  },
-  BASIC: {
-    BRAND: {
-      5: "{color.basic.brand.5}",
-      4: "{color.basic.brand.4}",
-      6: "{color.basic.brand.6}",
-      7: "{color.basic.brand.7}"
-    },
-    GREY: {
-      2: "{color.basic.grey.2}"
-    },
-    OPACITY: {
-      WHITE: {
-        100: "{color.basic.opacity.white.100}",
-        32: "{color.basic.opacity.white.32}"
-      },
-      BLACK: {
-        100: "{color.basic.opacity.black.100}",
-        20: "{color.basic.opacity.black.20}"
-      }
-    },
-    LIGHT_BLUE: {
-      5: "{color.basic.light-blue.5}",
-      4: "{color.basic.light-blue.4}",
-      7: "{color.basic.light-blue.7}"
-    },
-    VIOLET: {
-      6: "{color.basic.violet.6}"
-    }
-  },
-  GRADIENT: {
-    BLUE2YELLOW: "{color.gradient.gradient.blue2yellow}"
-  }
-};
-
-// 最外层的 container 加 border
-const DIMENSION_CONSTANTS = {
-  BORDER_RADIUS: {
-    0: "{dimension.borderradius.0}",
-    8: "{dimension.borderradius.8}",
-    20: "{dimension.borderradius.20}",
-    none: "{dimension.borderradius.none}",
-    small: "{dimension.borderradius.small}",
-    medium: "{dimension.borderradius.medium}",
-    large: "{dimension.borderradius.large}",
-    xl: "{dimension.borderradius.xl}",
-    xxl: "{dimension.borderradius.xxl}",
-    xxxl: "{dimension.borderradius.xxxl}"
-  },
-  BORDER_WIDTH: {
-    none: "{dimension.borderwidth.none}",
-    narrow: "{dimension.borderwidth.narrow}",
-    base: "{dimension.borderwidth.base}",
-    wide: "{dimension.borderwidth.wide}"
-    
-  },
-  PADDING: {
-    none: "{dimension.padding.none}",
-    tight: "{dimension.padding.tight}",
-    base: "{dimension.padding.base}",
-    loose: "{dimension.padding.loose}",
-    superloose: "{dimension.padding.superloose}",
-    8: "{dimension.padding.8}"
-  },
-  GAP: {
-    none: "{dimension.padding.none}",
-    tight: "{dimension.padding.tight}",
-    base: "{dimension.padding.base}",
-    loose: "{dimension.padding.loose}",
-    superloose: "{dimension.padding.superloose}",
-    8: "{dimension.gap.8}",
-    24: "{dimension.gap.24}"
-  },
-  MARGIN: {
-    none: "{dimension.margin.none}",
-    tight: "{dimension.margin.tight}",
-    base: "{dimension.margin.base}",
-    loose: "{dimension.margin.loose}",
-    superloose: "{dimension.margin.superloose}",
-  },
-  BASIC: {
-    0: "{dimension.basic.dimension.0}",
-    72: "{dimension.basic.dimension.72}",
-    1200: "{dimension.basic.dimension.1200}"
-  }
-};
-
-const FONT_CONSTANTS = {
-  SIZE: {
-    SMALL: "{font.size.small}",
-    MEDIUM: "{font.size.medium}",
-    LARGE: "{font.size.large}",
-    XL: "{font.size.xl}",
-    XXL: "{font.size.xxl}"
-  },
-  WEIGHT: {
-    NORMAL: "{font.fontweight.normal}",
-    MEDIUM: "{font.fontweight.medium}",
-    SEMIBOLD: "{font.fontweight.semibold}",
-    BOLD: "{font.fontweight.bold}"
-  }
-};
+// 导入样式配置和常量
+import { 
+  getElementStyleConfig, 
+  LAYOUT_CONSTANTS,
+  COLOR_CONSTANTS, 
+  DIMENSION_CONSTANTS, 
+  FONT_CONSTANTS 
+} from './styleConfig.js';
 
 // 改进UUID生成，确保更唯一
 function generateUUID() {
@@ -185,8 +48,11 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
 }
 
 // 创建文本元素
-function createTextElement(text) {
+function createTextElement(text, variant = 'normal') {
   const id = generateUUID();
+  // 获取文本元素的样式配置
+  const textStyleConfig = getElementStyleConfig('text', variant);
+  
   return {
     id,
     name: "text",
@@ -286,12 +152,14 @@ function createTextElement(text) {
           "data-key": "",
           style: {
             text: {
-              value: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[100],
+              value: textStyleConfig.textColor || COLOR_CONSTANTS.BASIC.OPACITY.BLACK[100],
               type: "color",
               key: "color-text"
             },
             hyperlinktext: {
-              value: COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5],
+              value: variant === 'hyperlink' ? 
+                (textStyleConfig.textColor || COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5]) :
+                COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5],
               type: "color",
               key: "color-text"
             }
@@ -304,7 +172,7 @@ function createTextElement(text) {
           "data-key": "",
           style: {
             bg: {
-              value: "none",
+              value: textStyleConfig.fill || "none",
               type: "color",
               key: "color-bg"
             }
@@ -348,14 +216,27 @@ function createTextElement(text) {
           content: text,
           style: {
             fontsize: {
-              value: FONT_CONSTANTS.SIZE.LARGE,
+              value: textStyleConfig.fontSizes || FONT_CONSTANTS.SIZE.LARGE,
               type: "fontSizes",
               key: "font-fontsize"
             }
           },
-          resource: FONT_CONSTANTS.SIZE.LARGE
+          resource: textStyleConfig.fontSizes || FONT_CONSTANTS.SIZE.LARGE
         }
-      }
+      },
+      fontweight: textStyleConfig.fontWeight ? {
+        default: {
+          "data-key": "",
+          style: {
+            fontweight: {
+              value: textStyleConfig.fontWeight,
+              type: "fontWeight",
+              key: "font-fontweight"
+            }
+          },
+          resource: textStyleConfig.fontWeight
+        }
+      } : undefined
     },
     type: "text_body",
     state: "default",
@@ -364,8 +245,10 @@ function createTextElement(text) {
 }
 
 // 创建按钮元素（用于超链接）
-function createButtonElement(text, url) {
+function createButtonElement(text, url, variant = 'primary') {
   const id = generateUUID();
+  // 获取按钮元素的样式配置
+  const buttonStyleConfig = getElementStyleConfig('button', variant);
 
   console.log("创建按钮元素：", { id, text, url });
 
@@ -757,12 +640,12 @@ function createButtonElement(text, url) {
           "data-key": "",
           style: {
             bg: {
-              value: COLOR_CONSTANTS.PRIMARY.BRAND5,
+              value: buttonStyleConfig.fill || COLOR_CONSTANTS.PRIMARY.BRAND5,
               type: "color",
               key: "color-bg"
             }
           },
-          resource: COLOR_CONSTANTS.PRIMARY.BRAND5
+          resource: buttonStyleConfig.fill || COLOR_CONSTANTS.PRIMARY.BRAND5
         }
       },
       text: {
@@ -770,12 +653,12 @@ function createButtonElement(text, url) {
           "data-key": "",
           style: {
             text: {
-              value: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
+              value: buttonStyleConfig.fontColor || COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
               type: "color",
               key: "color-text"
             }
           },
-          resource: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100]
+          resource: buttonStyleConfig.fontColor || COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100]
         }
       },
       border: {
@@ -783,12 +666,12 @@ function createButtonElement(text, url) {
           "data-key": "",
           style: {
             border: {
-              value: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[32],
+              value: buttonStyleConfig.borderColor || COLOR_CONSTANTS.BASIC.OPACITY.WHITE[32],
               type: "color",
               key: "color-border"
             }
           },
-          resource: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[32]
+          resource: buttonStyleConfig.borderColor || COLOR_CONSTANTS.BASIC.OPACITY.WHITE[32]
         }
       },
       icon_color: {
@@ -812,12 +695,12 @@ function createButtonElement(text, url) {
           "data-key": "",
           style: {
             borderradius: {
-              value: DIMENSION_CONSTANTS.BORDER_RADIUS[8],
+              value: buttonStyleConfig.borderRadius || DIMENSION_CONSTANTS.BORDER_RADIUS[8],
               type: "borderRadius",
               key: "shape-borderradius"
             }
           },
-          resource: DIMENSION_CONSTANTS.BORDER_RADIUS[8]
+          resource: buttonStyleConfig.borderRadius || DIMENSION_CONSTANTS.BORDER_RADIUS[8]
         }
       },
       borderwidth: {
@@ -825,12 +708,12 @@ function createButtonElement(text, url) {
           "data-key": "",
           style: {
             borderwidth: {
-              value: DIMENSION_CONSTANTS.BORDER_WIDTH.none,
+              value: buttonStyleConfig.borderWidth || DIMENSION_CONSTANTS.BORDER_WIDTH.none,
               type: "borderWidth",
               key: "shape-borderwidth"
             }
           },
-          resource: DIMENSION_CONSTANTS.BORDER_WIDTH.none
+          resource: buttonStyleConfig.borderWidth || DIMENSION_CONSTANTS.BORDER_WIDTH.none
         }
       }
     },
@@ -840,12 +723,12 @@ function createButtonElement(text, url) {
           "data-key": "",
           style: {
             padding: {
-              value: DIMENSION_CONSTANTS.PADDING.base,
+              value: buttonStyleConfig.spacing || DIMENSION_CONSTANTS.PADDING.base,
               type: "spacing",
               key: "scale-padding"
             }
           },
-          resource: DIMENSION_CONSTANTS.PADDING.base
+          resource: buttonStyleConfig.spacing || DIMENSION_CONSTANTS.PADDING.base
         }
       },
       gap: {
@@ -853,12 +736,12 @@ function createButtonElement(text, url) {
           "data-key": "",
           style: {
             gap: {
-              value: DIMENSION_CONSTANTS.GAP.base,
+              value: buttonStyleConfig.itemSpacing || DIMENSION_CONSTANTS.GAP.base,
               type: "spacing",
               key: "scale-gap"
             }
           },
-          resource: DIMENSION_CONSTANTS.GAP.base
+          resource: buttonStyleConfig.itemSpacing || DIMENSION_CONSTANTS.GAP.base
         }
       },
       min_width: {
@@ -866,12 +749,12 @@ function createButtonElement(text, url) {
           "data-key": "",
           style: {
             min_width: {
-              value: DIMENSION_CONSTANTS.BASIC[0],
+              value: buttonStyleConfig.minWidth || DIMENSION_CONSTANTS.BASIC[0],
               type: "sizing",
               key: "scale-min_width"
             }
           },
-          resource: DIMENSION_CONSTANTS.BASIC[0]
+          resource: buttonStyleConfig.minWidth || DIMENSION_CONSTANTS.BASIC[0]
         }
       },
       min_height: {
@@ -879,12 +762,12 @@ function createButtonElement(text, url) {
           "data-key": "",
           style: {
             min_height: {
-              value: DIMENSION_CONSTANTS.BASIC[0],
+              value: buttonStyleConfig.minHeight || DIMENSION_CONSTANTS.BASIC[0],
               type: "sizing",
               key: "scale-min_height"
             }
           },
-          resource: DIMENSION_CONSTANTS.BASIC[0]
+          resource: buttonStyleConfig.minHeight || DIMENSION_CONSTANTS.BASIC[0]
         }
       }
     },
@@ -895,12 +778,12 @@ function createButtonElement(text, url) {
           content: text, // 按钮文本
           style: {
             fontsize: {
-              value: FONT_CONSTANTS.SIZE.XL,
+              value: buttonStyleConfig.fontSizes || FONT_CONSTANTS.SIZE.XL,
               type: "fontSizes",
               key: "font-fontsize"
             }
           },
-          resource: FONT_CONSTANTS.SIZE.XL
+          resource: buttonStyleConfig.fontSizes || FONT_CONSTANTS.SIZE.XL
         }
       }
     },
@@ -910,12 +793,12 @@ function createButtonElement(text, url) {
           "data-key": "",
           style: {
             elevation: {
-              value: "none",
+              value: buttonStyleConfig.boxShadow || "none",
               type: "boxShadow",
               key: "material-elevation"
             }
           },
-          resource: "none"
+          resource: buttonStyleConfig.boxShadow || "none"
         }
       }
     },
@@ -929,8 +812,11 @@ function createButtonElement(text, url) {
 }
 
 // 创建背景元素（用于图片）
-function createBackgroundElement(imageUrl) {
+function createBackgroundElement(imageUrl, variant = 'normal') {
   const id = generateUUID();
+  // 获取图片元素的样式配置
+  const imageStyleConfig = getElementStyleConfig('image', variant);
+  
   return {
     id,
     name: "background",
@@ -1023,12 +909,12 @@ function createBackgroundElement(imageUrl) {
           "data-key": "",
           style: {
             elevation: {
-              value: "none",
+              value: imageStyleConfig.boxShadow || "none",
               type: "boxShadow",
               key: "material-elevation"
             }
           },
-          resource: "none"
+          resource: imageStyleConfig.boxShadow || "none"
         }
       }
     },
@@ -1038,12 +924,12 @@ function createBackgroundElement(imageUrl) {
           "data-key": "",
           style: {
             borderradius: {
-              value: DIMENSION_CONSTANTS.BORDER_RADIUS.none,
+              value: imageStyleConfig.borderRadius || DIMENSION_CONSTANTS.BORDER_RADIUS.none,
               type: "borderRadius",
               key: "shape-borderradius"
             }
           },
-          resource: DIMENSION_CONSTANTS.BORDER_RADIUS.none
+          resource: imageStyleConfig.borderRadius || DIMENSION_CONSTANTS.BORDER_RADIUS.none
         }
       },
       borderwidth: {
@@ -1051,12 +937,12 @@ function createBackgroundElement(imageUrl) {
           "data-key": "",
           style: {
             borderwidth: {
-              value: DIMENSION_CONSTANTS.BORDER_WIDTH.none,
+              value: imageStyleConfig.borderWidth || DIMENSION_CONSTANTS.BORDER_WIDTH.none,
               type: "borderWidth",
               key: "shape-borderwidth"
             }
           },
-          resource: DIMENSION_CONSTANTS.BORDER_WIDTH.none
+          resource: imageStyleConfig.borderWidth || DIMENSION_CONSTANTS.BORDER_WIDTH.none
         }
       }
     },
@@ -1066,12 +952,12 @@ function createBackgroundElement(imageUrl) {
           "data-key": "",
           style: {
             border: {
-              value: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
+              value: imageStyleConfig.borderColor || COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
               type: "color",
               key: "color-border"
             }
           },
-          resource: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20]
+          resource: imageStyleConfig.borderColor || COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20]
         }
       }
     },
@@ -1084,10 +970,22 @@ function createBackgroundElement(imageUrl) {
 // 创建布局元素，支持自定义选项
 function createLayoutElement(direction, children = [], options = {}) {
   const layoutId = generateUUID();
-  const { width, height, gap } = options;
+  const { width, height, gap, variant = 'inner', isRoot = false } = options;
 
+  // 获取布局元素的样式配置
+  const layoutStyleConfig = getElementStyleConfig('layout', isRoot ? 'root' : variant);
+  
+  // 创建基础布局
   const baseLayout = createBaseLayout(direction, { width, height });
+  
+  // 应用来自配置的样式
+  Object.entries(layoutStyleConfig).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      baseLayout.style[key] = value;
+    }
+  });
 
+  // 如果提供了间距，覆盖配置
   if (gap) {
     baseLayout.style.gap = gap;
   }
@@ -1120,118 +1018,13 @@ function createHorizontalButtonLayout(buttons) {
 // 更新标题布局创建函数
 function createHeadingLayout(headingContent, subElements = [], headingLevel = 1) {
   const layout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, [], {
-    gap: DIMENSION_CONSTANTS.GAP.loose
+    gap: DIMENSION_CONSTANTS.GAP.loose,
+    variant: 'inner'
   });
 
-  // 添加标题文本
-  const headingText = createTextElement(headingContent);
-  
-  // 根据标题级别设置不同属性
-  switch(headingLevel) {
-    case 1: // h1
-      headingText.font.fontsize.default.style.fontsize.value = FONT_CONSTANTS.SIZE.XXL;
-      headingText.font.fontsize.default.resource = FONT_CONSTANTS.SIZE.XXL;
-      headingText.font.fontweight = {
-        default: {
-          "data-key": "",
-          style: {
-            fontweight: {
-              value: FONT_CONSTANTS.WEIGHT.BOLD,
-              type: "fontWeight",
-              key: "font-fontweight"
-            }
-          },
-          resource: FONT_CONSTANTS.WEIGHT.BOLD
-        }
-      };
-      break;
-    case 2: // h2
-      headingText.font.fontsize.default.style.fontsize.value = FONT_CONSTANTS.SIZE.XL;
-      headingText.font.fontsize.default.resource = FONT_CONSTANTS.SIZE.XL;
-      headingText.font.fontweight = {
-        default: {
-          "data-key": "",
-          style: {
-            fontweight: {
-              value: FONT_CONSTANTS.WEIGHT.BOLD,
-              type: "fontWeight",
-              key: "font-fontweight"
-            }
-          },
-          resource: FONT_CONSTANTS.WEIGHT.BOLD
-        }
-      };
-      break;
-    case 3: // h3
-      headingText.font.fontsize.default.style.fontsize.value = FONT_CONSTANTS.SIZE.LARGE;
-      headingText.font.fontsize.default.resource = FONT_CONSTANTS.SIZE.LARGE;
-      headingText.font.fontweight = {
-        default: {
-          "data-key": "",
-          style: {
-            fontweight: {
-              value: FONT_CONSTANTS.WEIGHT.SEMIBOLD,
-              type: "fontWeight",
-              key: "font-fontweight"
-            }
-          },
-          resource: FONT_CONSTANTS.WEIGHT.SEMIBOLD
-        }
-      };
-      break;
-    case 4: // h4
-      headingText.font.fontsize.default.style.fontsize.value = FONT_CONSTANTS.SIZE.MEDIUM;
-      headingText.font.fontsize.default.resource = FONT_CONSTANTS.SIZE.MEDIUM;
-      headingText.font.fontweight = {
-        default: {
-          "data-key": "",
-          style: {
-            fontweight: {
-              value: FONT_CONSTANTS.WEIGHT.SEMIBOLD,
-              type: "fontWeight",
-              key: "font-fontweight"
-            }
-          },
-          resource: FONT_CONSTANTS.WEIGHT.SEMIBOLD
-        }
-      };
-      break;
-    case 5: // h5
-    case 6: // h6
-      headingText.font.fontsize.default.style.fontsize.value = FONT_CONSTANTS.SIZE.SMALL;
-      headingText.font.fontsize.default.resource = FONT_CONSTANTS.SIZE.SMALL;
-      headingText.font.fontweight = {
-        default: {
-          "data-key": "",
-          style: {
-            fontweight: {
-              value: FONT_CONSTANTS.WEIGHT.MEDIUM,
-              type: "fontWeight",
-              key: "font-fontweight"
-            }
-          },
-          resource: FONT_CONSTANTS.WEIGHT.MEDIUM
-        }
-      };
-      break;
-    default:
-      // 默认使用与h1相同的设置
-      headingText.font.fontsize.default.style.fontsize.value = FONT_CONSTANTS.SIZE.XXL;
-      headingText.font.fontsize.default.resource = FONT_CONSTANTS.SIZE.XXL;
-      headingText.font.fontweight = {
-        default: {
-          "data-key": "",
-          style: {
-            fontweight: {
-              value: FONT_CONSTANTS.WEIGHT.BOLD,
-              type: "fontWeight",
-              key: "font-fontweight"
-            }
-          },
-          resource: FONT_CONSTANTS.WEIGHT.BOLD
-        }
-      };
-  }
+  // 添加标题文本，根据标题级别选择文本样式
+  const headingVariant = `h${headingLevel}`;
+  const headingText = createTextElement(headingContent, headingVariant);
   
   layout.layout.children.push(headingText);
 
@@ -1460,8 +1253,11 @@ function parseMarkdown(markdown) {
 // 创建八要素根对象
 function createEightElementRoot(markdownElements) {
   const rootId = generateUUID();
+  
+  // 获取根布局的样式配置
+  const rootStyleConfig = getElementStyleConfig('layout', 'root');
 
-  return {
+  const rootLayout = {
     dataKeys: [],
     id: rootId,
     name: "layout",
@@ -1481,9 +1277,6 @@ function createEightElementRoot(markdownElements) {
         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         width: "auto",
         height: "auto",
-        "border-width": "0",
-        "border-style": "solid",
-        "justify-content": "initial",
         position: "relative",
         "back-width": "auto",
         "back-height": "100px",
@@ -1494,12 +1287,44 @@ function createEightElementRoot(markdownElements) {
     },
     events: [{}]
   };
+  
+  // 应用根布局样式配置
+  Object.entries(rootStyleConfig).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      rootLayout.layout.style[key] = value;
+    }
+  });
+
+  return rootLayout;
 }
 
 // 主函数：将Markdown转换为八要素格式
-function markdownToEightElement(markdown) {
+function markdownToEightElement(markdown, styleConfig) {
+  // 如果提供了样式配置，设置当前配置
+  if (styleConfig) {
+    try {
+      // 动态导入避免循环依赖
+      import('./styleConfig.js').then(({ setStyleConfig }) => {
+        setStyleConfig(styleConfig);
+      });
+    } catch (error) {
+      console.warn('设置样式配置失败:', error);
+    }
+  }
+  
   const parsedElements = parseMarkdown(markdown);
   const eightElementRoot = createEightElementRoot(parsedElements);
+  
+  // 重置为默认配置
+  try {
+    // 动态导入避免循环依赖
+    import('./styleConfig.js').then(({ resetStyleConfig }) => {
+      resetStyleConfig();
+    });
+  } catch (error) {
+    console.warn('重置样式配置失败:', error);
+  }
+  
   return eightElementRoot;
 }
 
@@ -1522,7 +1347,7 @@ function printEightElementStructure(element, indent = 0) {
 }
 
 // 示例：将Markdown文本转换为八要素
-function exampleMarkdownToEightElement() {
+function exampleMarkdownToEightElement(styleConfig) {
   const markdownText = `
 # 示例标题
 
@@ -1541,7 +1366,7 @@ function exampleMarkdownToEightElement() {
 混合内容行：文本中间的[链接](https://example.com)和![图片](https://example.com/img.png)以及更多文本。
   `;
 
-  const eightElement = markdownToEightElement(markdownText);
+  const eightElement = markdownToEightElement(markdownText, styleConfig);
   return eightElement;
 }
 
