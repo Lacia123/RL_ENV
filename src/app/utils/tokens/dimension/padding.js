@@ -21,6 +21,10 @@ export default {
         "value": "{dimension.basic.dimension.6}",
         "type": "other"
       },
+      "8": {
+        "value": "{dimension.basic.dimension.8}",
+        "type": "other"
+      },
       "semitight": {
         "value": "{dimension.basic.dimension.8}",
         "type": "other"

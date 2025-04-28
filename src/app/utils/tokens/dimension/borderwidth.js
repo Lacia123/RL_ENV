@@ -5,6 +5,10 @@ export default {
         "value": "{dimension.basic.dimension.0}",
         "type": "other"
       },
+      0: {
+        "value": "{dimension.basic.dimension.0}",
+        "type": "other"
+      },
       "narrow": {
         "value": "{dimension.basic.dimension.1}",
         "type": "other"
@@ -15,6 +19,12 @@ export default {
       },
       "wide": {
         "value": "{dimension.basic.dimension.4}",
+        "type": "other"
+      }
+    },
+    "boderwidth": {
+      0: {
+        "value": "{dimension.basic.dimension.0}",
         "type": "other"
       }
     }

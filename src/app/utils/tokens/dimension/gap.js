@@ -1,6 +1,14 @@
 export default {
     "dimension": {
       "gap": {
+        "8": {
+          "value": "{dimension.basic.dimension.8}",
+          "type": "other"
+        },
+        "24": {
+          "value": "{dimension.basic.dimension.24}",
+          "type": "other"
+        },
         "none": {
           "value": "{dimension.basic.dimension.0}",
           "type": "other"

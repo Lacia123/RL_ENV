@@ -25,7 +25,7 @@ export async function POST(request) {
     console.error('布局分析API错误:', error);
     
     return NextResponse.json(
-      { 
+      {
         success: false, 
         error: '布局分析失败', 
         message: error.message 

@@ -9,12 +9,12 @@ export default {
             "type": "color"
         }
     },
-    "scale-min_height-state-default": {
-        "min_height": {
-            "value": "{dimension.basic.dimension.72}",
-            "type": "sizing"
-        }
-    },
+    // "scale-min_height-state-default": {
+    //     "min_height": {
+    //         "value": "{dimension.basic.dimension.72}",
+    //         "type": "sizing"
+    //     }
+    // },
     "font-fontsize-state-default": {
         "fontsize": {
             "value": "{font.size.large}",
@@ -39,12 +39,12 @@ export default {
             "type": "color"
         }
     },
-    "scale-min_height-state-hover": {
-        "min_height": {
-            "value": "{dimension.basic.dimension.72}",
-            "type": "sizing"
-        }
-    },
+    // "scale-min_height-state-hover": {
+    //     "min_height": {
+    //         "value": "{dimension.basic.dimension.72}",
+    //         "type": "sizing"
+    //     }
+    // },
     "scale-max_width-state-default": {
         "max_width": {
             "value": "{dimension.basic.dimension.1200}",
@@ -57,12 +57,12 @@ export default {
             "type": "sizing"
         }
     },
-    "scale-min_height-state-visited": {
-        "min_height": {
-            "value": "{dimension.basic.dimension.72}",
-            "type": "sizing"
-        }
-    },
+    // "scale-min_height-state-visited": {
+    //     "min_height": {
+    //         "value": "{dimension.basic.dimension.72}",
+    //         "type": "sizing"
+    //     }
+    // },
     "scale-max_width-state-visited": {
         "max_width": {
             "value": "{dimension.basic.dimension.1200}",

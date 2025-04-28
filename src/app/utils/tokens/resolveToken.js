@@ -49,6 +49,15 @@ import motionEasingFunction from './motion/easingfunction.js';
 
 import assetFont from './asset/font.js';
 
+
+import layoutAlign from './layout/align.js';
+import layoutDirection from './layout/direction.js';
+import layoutGrow from './layout/grow.js';
+import layoutSizing from './layout/sizing.js';
+import layoutState from './layout/state.js';
+import layoutWrap from './layout/wrap.js';
+
+
 // 优化：使用深度合并函数，确保嵌套对象正确合并
 function deepMerge(...objects) {
   const result = {};
@@ -97,6 +106,15 @@ const tokenCollections = deepMerge(
   colorOnTertiaryContainer,
   colorOnSurface,
   colorOnSurfaceContainer,
+
+
+  // 布局相关
+  layoutAlign,
+  layoutDirection,
+  layoutGrow,
+  layoutSizing,
+  layoutState,
+  layoutWrap,
   
 
   
@@ -123,18 +141,91 @@ const tokenCollections = deepMerge(
   assetFont
 );
 
+// 存储动态token系统，初始为null
+let dynamicTokenSystem = null;
+
+/**
+ * 设置动态token系统
+ * @param {Object} tokenSystem - 动态token对象
+ */
+function setDynamicTokenSystem(tokenSystem) {
+  if (tokenSystem && typeof tokenSystem === 'object') {
+    dynamicTokenSystem = tokenSystem;
+    console.log('已设置动态token系统');
+    return true;
+  }
+  return false;
+}
+
+/**
+ * 获取当前动态token系统
+ * @returns {Object|null} - 当前设置的动态token系统
+ */
+function getDynamicTokenSystem() {
+  return dynamicTokenSystem;
+}
+
+/**
+ * 清除当前动态token系统
+ */
+function clearDynamicTokenSystem() {
+  dynamicTokenSystem = null;
+  console.log('已清除动态token系统');
+}
+
 /**
  * 解析 token 路径字符串，返回对应的值
  * @param {string} path - token 路径，如 "color.border.white7"
+ * @param {Object} [customTokenSystem=null] - 可选的自定义token系统
  * @returns {Object} - 包含 token 值及其类型的对象
  */
-function getTokenByPath(path) {
+function getTokenByPath(path, customTokenSystem = null) {
   if (!path) return null;
   
   const parts = path.split('.');
+  
+  // 优先使用传入的自定义token系统
+  if (customTokenSystem) {
+    let current = customTokenSystem;
+    let allFound = true;
+    
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (current && Object.prototype.hasOwnProperty.call(current, part)) {
+        current = current[part];
+      } else { 
+        allFound = false;
+        break;
+      }
+    }
+    
+    if (allFound) {
+      return current;
+    }
+  }
+  
+  // 其次使用全局动态token系统
+  if (dynamicTokenSystem) {
+    let current = dynamicTokenSystem;
+    let allFound = true;
+    
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (current && Object.prototype.hasOwnProperty.call(current, part)) {
+        current = current[part];
+      } else { 
+        allFound = false;
+        break;
+      }
+    }
+    
+    if (allFound) {
+      return current;
+    }
+  }
+  
+  // 最后使用默认token集合
   let current = tokenCollections;
-  
-  
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
     if (current && Object.prototype.hasOwnProperty.call(current, part)) {
@@ -178,10 +269,11 @@ function parseTokenReference(reference) {
 /**
  * 解析 token 引用并返回最终值
  * @param {string} tokenReference - token 引用字符串，如 "{color.border.white7}"
- * @param {number} [maxDepth=10] - 最大解析深度，防止循环引用
+ * @param {number} [maxDepth=20] - 最大解析深度，防止循环引用
+ * @param {Object} [customTokenSystem=null] - 可选的自定义token系统
  * @returns {string|null} - token 的最终值，如果无法解析则返回 null
  */
-function resolveToken(tokenReference, maxDepth = 20) {
+function resolveToken(tokenReference, maxDepth = 20, customTokenSystem = null) {
   // 非字符串类型直接返回
   if (typeof tokenReference !== 'string') {
     return tokenReference;
@@ -189,7 +281,7 @@ function resolveToken(tokenReference, maxDepth = 20) {
   
   // 处理包含多个 token 的情况，委托给 resolveTokensInText 处理
   if (!isTokenReference(tokenReference) && containsTokenReferences(tokenReference)) {
-    return resolveTokensInText(tokenReference);
+    return resolveTokensInText(tokenReference, maxDepth, customTokenSystem);
   }
   
   // 非 token 引用格式，直接返回
@@ -205,11 +297,11 @@ function resolveToken(tokenReference, maxDepth = 20) {
   
   // 解析 token 路径
   const tokenPath = parseTokenReference(tokenReference);
-  const token = getTokenByPath(tokenPath);
+  const token = getTokenByPath(tokenPath, customTokenSystem);
   
   // 找不到 token
   if (!token) {
-    console.error('无法找到 token:', tokenPath);
+    console.warn('无法找到 token:', tokenPath);
     return null;
   }
   
@@ -217,7 +309,7 @@ function resolveToken(tokenReference, maxDepth = 20) {
   if (token.value !== undefined) {
     if (isTokenReference(token.value)) {
       // 递归解析引用
-      return resolveToken(token.value, maxDepth - 1);
+      return resolveToken(token.value, maxDepth - 1, customTokenSystem);
     } else {
       // 找到最终值
       return token.value;
@@ -231,9 +323,11 @@ function resolveToken(tokenReference, maxDepth = 20) {
 /**
  * 解析字符串中的所有 token 引用
  * @param {string} text - 包含 token 引用的字符串
+ * @param {number} [maxDepth=20] - 最大解析深度 
+ * @param {Object} [customTokenSystem=null] - 可选的自定义token系统
  * @returns {string} - 所有 token 引用都被替换为实际值的字符串
  */
-function resolveTokensInText(text) {
+function resolveTokensInText(text, maxDepth = 20, customTokenSystem = null) {
   if (typeof text !== 'string') {
     return text;
   }
@@ -257,7 +351,7 @@ function resolveTokensInText(text) {
   // 从后向前替换，确保索引位置不会变化
   for (let i = matches.length - 1; i >= 0; i--) {
     const { fullMatch } = matches[i];
-    const tokenValue = resolveToken(fullMatch);
+    const tokenValue = resolveToken(fullMatch, maxDepth, customTokenSystem);
     
     if (tokenValue !== null) {
       // 构建替换前和替换后的部分
@@ -275,9 +369,10 @@ function resolveTokensInText(text) {
  * @param {any} value - 样式值
  * @param {string} [unit='px'] - 默认单位
  * @param {string} [defaultValue='0'] - 默认值
+ * @param {Object} [customTokenSystem=null] - 可选的自定义token系统
  * @returns {string} - 处理后的样式值
  */
-function processStyleValue(value, unit = 'px', defaultValue = '0') {
+function processStyleValue(value, unit = 'px', defaultValue = '0', customTokenSystem = null) {
   if (value === null || value === undefined) {
     return defaultValue;
   }
@@ -288,7 +383,7 @@ function processStyleValue(value, unit = 'px', defaultValue = '0') {
   
   // 如果是token引用或包含token引用，先解析
   if (isTokenReference(value) || containsTokenReferences(value)) {
-    const resolved = resolveToken(value);
+    const resolved = resolveToken(value, 20, customTokenSystem);
     return resolved !== null ? resolved : defaultValue;
   }
   
@@ -298,9 +393,10 @@ function processStyleValue(value, unit = 'px', defaultValue = '0') {
 /**
  * 将样式对象中的所有token引用转换为实际值
  * @param {Object} style - 样式对象
+ * @param {Object} [customTokenSystem=null] - 可选的自定义token系统
  * @returns {Object} - 转换后的样式对象
  */
-function convertStyle(style) {
+function convertStyle(style, customTokenSystem = null) {
   if (!style || typeof style !== 'object') {
     return style;
   }
@@ -311,10 +407,10 @@ function convertStyle(style) {
     if (typeof value === 'string' && (isTokenReference(value) || containsTokenReferences(value))) {
       // 对于字符串类型的值，我们使用resolveTokensInText处理
       // 这可以处理单个token引用和包含多个token的字符串
-      result[key] = resolveTokensInText(value);
+      result[key] = resolveTokensInText(value, 20, customTokenSystem);
     } else if (typeof value === 'object' && value !== null) {
       // 递归处理嵌套对象
-      result[key] = convertStyle(value);
+      result[key] = convertStyle(value, customTokenSystem);
     } else {
       // 保持原值
       result[key] = value;
@@ -331,5 +427,8 @@ export {
   containsTokenReferences,
   getTokenByPath,
   convertStyle,
-  processStyleValue 
+  processStyleValue,
+  setDynamicTokenSystem,
+  getDynamicTokenSystem,
+  clearDynamicTokenSystem
 }; 

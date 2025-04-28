@@ -52,17 +52,24 @@ const PROPERTY_MAP = {
 
 // 获取组件类型对应的 metaware 定义
 const getMetaware = (componentType) => {
-  switch (componentType.toLowerCase()) {
+  const type = componentType.toLowerCase();
+  
+  // 兼容layout和container作为同一类型
+  if (type === 'layout' || type === 'container') {
+    return containerMeta;
+  }
+  
+  switch (type) {
     case 'button':
       return buttonMeta;
-    case 'container':
-      return containerMeta;
     case 'text':
       return textMeta;
     case 'image':
+    case 'background': // 兼容background作为image类型
       return imageMeta;
     default:
-      throw new Error(`不支持的组件类型: ${componentType}`);
+      console.warn(`未找到组件类型: ${componentType}，使用container作为默认值`);
+      return containerMeta; // 默认使用container，这样可以避免报错
   }
 };
 
