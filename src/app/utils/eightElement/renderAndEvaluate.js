@@ -21,6 +21,9 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
   
   // 渲染HTML和预处理八要素结构
   const { html, processedEightElement } = renderEightElementToHtml(eightElement, { width, height });
+
+  console.log('.... html')
+  console.log(html)
   
   // 使用Playwright进行测量
   const measurements = await measureWithPlaywright(html, processedEightElement, { width, height });
