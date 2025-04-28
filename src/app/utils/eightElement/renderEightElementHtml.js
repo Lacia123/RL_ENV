@@ -268,15 +268,33 @@ function processButtonElement(processedElement, originalElement) {
   
   processedElement.buttonType = buttonType;
   
-  // 处理按钮文本内容
-  if (buttonConfig.content && Array.isArray(buttonConfig.content)) {
+  // 处理按钮文本内容 - 优先级：children > content > 默认值
+  // 1. 检查是否有子元素中的文本
+  if (buttonConfig.children && Array.isArray(buttonConfig.children)) {
+    const textChild = buttonConfig.children.find(child => child.type === 'text');
+    if (textChild && textChild.content && Array.isArray(textChild.content)) {
+      const fontRef = textChild.content.find(item => item.element === 'font');
+      if (fontRef && originalElement.font && originalElement.font[fontRef.value]) {
+        const content = originalElement.font[fontRef.value][fontRef.prop]?.content || '';
+        processedElement.buttonText = content;
+      }
+    }
+  } 
+  // 2. 如果没有从子元素中找到文本，查找content
+  else if (buttonConfig.content && Array.isArray(buttonConfig.content)) {
     const fontRef = buttonConfig.content.find(item => item.element === 'font');
     if (fontRef && originalElement.font && originalElement.font[fontRef.value]) {
       const content = originalElement.font[fontRef.value][fontRef.prop]?.content || '';
       processedElement.buttonText = content;
     }
-  } else if (originalElement.font && originalElement.font.fontsize && originalElement.font.fontsize.default) {
+  } 
+  // 3. 使用默认字体设置
+  else if (originalElement.font && originalElement.font.fontsize && originalElement.font.fontsize.default) {
     processedElement.buttonText = originalElement.font.fontsize.default.content || 'Button';
+  }
+  // 4. 最后的后备选项
+  else {
+    processedElement.buttonText = 'Button';
   }
   
   // 处理URL
@@ -569,13 +587,13 @@ function renderButtonElement(element) {
   buttonText = escapeHtml(buttonText);
   
   // 构建按钮HTML
-  return `
+    return `
     <div id="${element.id || ''}" data-element-type="button" ${styleAttr}>
       <a href="${buttonUrl}" style="display:block;width:100%;height:100%;text-decoration:none;color:inherit;">
         ${buttonText}
       </a>
-    </div>
-  `;
+      </div>
+    `;
 }
 
 /**

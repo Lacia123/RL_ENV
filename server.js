@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { parse } from 'url';
 import next from 'next';
+import fs from 'fs';
+import path from 'path';
 
 // 获取当前文件的目录
 const __filename = fileURLToPath(import.meta.url);
@@ -113,6 +115,21 @@ const handle = app.getRequestHandler();
         
         // 转换Markdown为八要素结构
         const eightElement = markdownToEightElement(markdown);
+        
+        // 保存八要素结构到文件
+        
+        // 确保目录存在
+        const outputDir = path.join(__dirname, 'output');
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+        
+        // 生成带时间戳的文件名
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const outputPath = path.join(outputDir, `eight-element-${timestamp}.json`);
+        
+        // 写入文件
+        fs.writeFileSync(outputPath, JSON.stringify(eightElement, null, 2), 'utf8');
         
         // 使用Playwright渲染并评分
         const result = await renderAndEvaluateEightElement(eightElement, { width, height });

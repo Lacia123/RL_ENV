@@ -297,81 +297,10 @@ function createTextElement(text) {
             }
           },
           resource: COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5]
-        },
-        hover: {
-          "data-key": "",
-          style: {
-            text: {
-              value: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[100],
-              type: "color",
-              key: "color-text"
-            },
-            hyperlinktext: {
-              value: COLOR_CONSTANTS.BASIC.LIGHT_BLUE[4],
-              type: "color",
-              key: "color-text"
-            }
-          },
-          resource: COLOR_CONSTANTS.BASIC.LIGHT_BLUE[4]
-        },
-        visited: {
-          "data-key": "",
-          style: {
-            hyperlinktext: {
-              value: COLOR_CONSTANTS.BASIC.VIOLET[6],
-              type: "color",
-              key: "color-text"
-            }
-          },
-          resource: COLOR_CONSTANTS.BASIC.VIOLET[6]
-        },
-        active: {
-          "data-key": "",
-          style: {
-            hyperlinktext: {
-              value: COLOR_CONSTANTS.BASIC.LIGHT_BLUE[7],
-              type: "color",
-              key: "color-text"
-            }
-          },
-          resource: COLOR_CONSTANTS.BASIC.LIGHT_BLUE[7]
         }
       },
       bg: {
         default: {
-          "data-key": "",
-          style: {
-            bg: {
-              value: "none",
-              type: "color",
-              key: "color-bg"
-            }
-          },
-          resource: "none"
-        },
-        hover: {
-          "data-key": "",
-          style: {
-            bg: {
-              value: "none",
-              type: "color",
-              key: "color-bg"
-            }
-          },
-          resource: "none"
-        },
-        visited: {
-          "data-key": "",
-          style: {
-            bg: {
-              value: "none",
-              type: "color",
-              key: "color-bg"
-            }
-          },
-          resource: "none"
-        },
-        active: {
           "data-key": "",
           style: {
             bg: {
@@ -396,54 +325,10 @@ function createTextElement(text) {
             }
           },
           resource: DIMENSION_CONSTANTS.BASIC[72]
-        },
-        hover: {
-          "data-key": "",
-          style: {
-            min_height: {
-              value: DIMENSION_CONSTANTS.BASIC[72],
-              type: "sizing",
-              key: "scale-min_height"
-            }
-          },
-          resource: DIMENSION_CONSTANTS.BASIC[72]
-        },
-        visited: {
-          "data-key": "",
-          style: {
-            min_height: {
-              value: DIMENSION_CONSTANTS.BASIC[72],
-              type: "sizing",
-              key: "scale-min_height"
-            }
-          },
-          resource: DIMENSION_CONSTANTS.BASIC[72]
         }
       },
       max_width: {
         default: {
-          "data-key": "",
-          style: {
-            max_width: {
-              value: DIMENSION_CONSTANTS.BASIC[1200],
-              type: "sizing",
-              key: "scale-max_width"
-            }
-          },
-          resource: DIMENSION_CONSTANTS.BASIC[1200]
-        },
-        hover: {
-          "data-key": "",
-          style: {
-            max_width: {
-              value: DIMENSION_CONSTANTS.BASIC[1200],
-              type: "sizing",
-              key: "scale-max_width"
-            }
-          },
-          resource: DIMENSION_CONSTANTS.BASIC[1200]
-        },
-        visited: {
           "data-key": "",
           style: {
             max_width: {
@@ -461,42 +346,6 @@ function createTextElement(text) {
         default: {
           "data-key": "",
           content: text,
-          style: {
-            fontsize: {
-              value: FONT_CONSTANTS.SIZE.LARGE,
-              type: "fontSizes",
-              key: "font-fontsize"
-            }
-          },
-          resource: FONT_CONSTANTS.SIZE.LARGE
-        },
-        hover: {
-          "data-key": "",
-          content: "默认文本",
-          style: {
-            fontsize: {
-              value: FONT_CONSTANTS.SIZE.LARGE,
-              type: "fontSizes",
-              key: "font-fontsize"
-            }
-          },
-          resource: FONT_CONSTANTS.SIZE.LARGE
-        },
-        visited: {
-          "data-key": "",
-          content: "默认文本",
-          style: {
-            fontsize: {
-              value: FONT_CONSTANTS.SIZE.LARGE,
-              type: "fontSizes",
-              key: "font-fontsize"
-            }
-          },
-          resource: FONT_CONSTANTS.SIZE.LARGE
-        },
-        active: {
-          "data-key": "",
-          content: "默认文本",
           style: {
             fontsize: {
               value: FONT_CONSTANTS.SIZE.LARGE,
@@ -540,14 +389,7 @@ function createButtonElement(text, url) {
       },
       button_normal: {
         type: "container",
-        content: [
-          {
-            element: "font",
-            value: "fontsize",
-            prop: "default",
-            token: "fontsize"
-          }
-        ],
+        content: [],
         resource: "",
         data: [],
         style: {
@@ -921,61 +763,6 @@ function createButtonElement(text, url) {
             }
           },
           resource: COLOR_CONSTANTS.PRIMARY.BRAND5
-        },
-        hover: {
-          "data-key": "",
-          style: {
-            bg: {
-              value: COLOR_CONSTANTS.PRIMARY.BRAND4,
-              type: "color",
-              key: "color-bg"
-            }
-          },
-          resource: COLOR_CONSTANTS.PRIMARY.BRAND4
-        },
-        active: {
-          "data-key": "",
-          style: {
-            bg: {
-              value: COLOR_CONSTANTS.PRIMARY.BRAND6,
-              type: "color",
-              key: "color-bg"
-            }
-          },
-          resource: COLOR_CONSTANTS.PRIMARY.BRAND6
-        },
-        pressed: {
-          "data-key": "",
-          style: {
-            bg: {
-              value: COLOR_CONSTANTS.PRIMARY.BRAND6,
-              type: "color",
-              key: "color-bg"
-            }
-          },
-          resource: COLOR_CONSTANTS.PRIMARY.BRAND6
-        },
-        loading: {
-          "data-key": "",
-          style: {
-            bg: {
-              value: COLOR_CONSTANTS.GRADIENT.BLUE2YELLOW,
-              type: "color",
-              key: "color-bg"
-            }
-          },
-          resource: COLOR_CONSTANTS.GRADIENT.BLUE2YELLOW
-        },
-        disable: {
-          "data-key": "",
-          style: {
-            bg: {
-              value: COLOR_CONSTANTS.BASIC.GREY[2],
-              type: "color",
-              key: "color-bg"
-            }
-          },
-          resource: COLOR_CONSTANTS.BASIC.GREY[2]
         }
       },
       text: {
@@ -993,17 +780,6 @@ function createButtonElement(text, url) {
       },
       border: {
         default: {
-          "data-key": "",
-          style: {
-            border: {
-              value: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[32],
-              type: "color",
-              key: "color-border"
-            }
-          },
-          resource: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[32]
-        },
-        hover: {
           "data-key": "",
           style: {
             border: {
@@ -1117,66 +893,6 @@ function createButtonElement(text, url) {
         default: {
           "data-key": "",
           content: text, // 按钮文本
-          style: {
-            fontsize: {
-              value: FONT_CONSTANTS.SIZE.XL,
-              type: "fontSizes",
-              key: "font-fontsize"
-            }
-          },
-          resource: FONT_CONSTANTS.SIZE.XL
-        },
-        hover: {
-          "data-key": "",
-          content: text,
-          style: {
-            fontsize: {
-              value: FONT_CONSTANTS.SIZE.XL,
-              type: "fontSizes",
-              key: "font-fontsize"
-            }
-          },
-          resource: FONT_CONSTANTS.SIZE.XL
-        },
-        active: {
-          "data-key": "",
-          content: text,
-          style: {
-            fontsize: {
-              value: FONT_CONSTANTS.SIZE.XL,
-              type: "fontSizes",
-              key: "font-fontsize"
-            }
-          },
-          resource: FONT_CONSTANTS.SIZE.XL
-        },
-        pressed: {
-          "data-key": "",
-          content: text,
-          style: {
-            fontsize: {
-              value: FONT_CONSTANTS.SIZE.XL,
-              type: "fontSizes",
-              key: "font-fontsize"
-            }
-          },
-          resource: FONT_CONSTANTS.SIZE.XL
-        },
-        loading: {
-          "data-key": "",
-          content: text,
-          style: {
-            fontsize: {
-              value: FONT_CONSTANTS.SIZE.XL,
-              type: "fontSizes",
-              key: "font-fontsize"
-            }
-          },
-          resource: FONT_CONSTANTS.SIZE.XL
-        },
-        disable: {
-          "data-key": "",
-          content: text,
           style: {
             fontsize: {
               value: FONT_CONSTANTS.SIZE.XL,
@@ -1300,33 +1016,10 @@ function createBackgroundElement(imageUrl) {
             }
           },
           resource: imageUrl
-        },
-        loaded: {
-          "data-key": "",
-          type: "img",
-          style: {
-            image: {
-              value: imageUrl,
-              type: "asset",
-              key: "material-image"
-            }
-          },
-          resource: imageUrl
         }
       },
       elevation: {
         default: {
-          "data-key": "",
-          style: {
-            elevation: {
-              value: "none",
-              type: "boxShadow",
-              key: "material-elevation"
-            }
-          },
-          resource: "none"
-        },
-        loaded: {
           "data-key": "",
           style: {
             elevation: {
@@ -1351,32 +1044,10 @@ function createBackgroundElement(imageUrl) {
             }
           },
           resource: DIMENSION_CONSTANTS.BORDER_RADIUS.none
-        },
-        loaded: {
-          "data-key": "",
-          style: {
-            borderradius: {
-              value: DIMENSION_CONSTANTS.BORDER_RADIUS.none,
-              type: "borderRadius",
-              key: "shape-borderradius"
-            }
-          },
-          resource: DIMENSION_CONSTANTS.BORDER_RADIUS.none
         }
       },
       borderwidth: {
         default: {
-          "data-key": "",
-          style: {
-            borderwidth: {
-              value: DIMENSION_CONSTANTS.BORDER_WIDTH.none,
-              type: "borderWidth",
-              key: "shape-borderwidth"
-            }
-          },
-          resource: DIMENSION_CONSTANTS.BORDER_WIDTH.none
-        },
-        loaded: {
           "data-key": "",
           style: {
             borderwidth: {
@@ -1392,17 +1063,6 @@ function createBackgroundElement(imageUrl) {
     color: {
       border: {
         default: {
-          "data-key": "",
-          style: {
-            border: {
-              value: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
-              type: "color",
-              key: "color-border"
-            }
-          },
-          resource: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20]
-        },
-        loaded: {
           "data-key": "",
           style: {
             border: {
