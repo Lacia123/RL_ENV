@@ -53,14 +53,14 @@ const EightElementAnalyzer = () => {
     if (markdown) {
       processMarkdown();
     }
-  }, [markdown, seed]);
+  }, [markdown, seed, dimensions]);
 
   // 处理iframe加载完成后的测量
   useEffect(() => {
     if (renderedHtml && iframeRef.current) {
       setTimeout(measureIframeContent, 500);
     }
-  }, [renderedHtml]);
+  }, [renderedHtml, dimensions]);
 
   // 处理测量结果完成后的评分
   useEffect(() => {
@@ -239,10 +239,15 @@ const EightElementAnalyzer = () => {
 
   // 添加尺寸选择处理函数
   const handleDimensionChange = (dimension) => {
+    console.log('尺寸变更为:', dimension.width, 'x', dimension.height);
     setDimensions({
       width: dimension.width,
       height: dimension.height
     });
+    // 尺寸变化后主动触发重新渲染
+    setTimeout(() => {
+      processMarkdown();
+    }, 100);
   };
 
   console.log('processedEightElement')
@@ -476,13 +481,15 @@ const EightElementAnalyzer = () => {
                 width: `${dimensions.width}px`,
                 height: `${dimensions.height}px`,
                 backgroundColor: 'white',
-                boxShadow: '0 0 10px rgba(0,0,0,0.1)'
+                boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+                transition: 'width 0.3s, height 0.3s'
               }}>
                 <iframe
                   ref={iframeRef}
                   className="w-full h-full"
                   srcDoc={renderedHtml}
                   title="Eight Element Preview"
+                  key={`iframe-${dimensions.width}-${dimensions.height}`}
                 ></iframe>
               </div>
             </div>
