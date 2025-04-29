@@ -168,16 +168,27 @@ const EightElementAnalyzer = () => {
       const iframe = iframeRef.current;
       if (!iframe || !iframe.contentWindow) return;
 
+      // 获取iframe内容的实际尺寸，而不仅仅是视口尺寸
+      const iframeDocument = iframe.contentDocument;
+      const iframeBody = iframeDocument.body;
+      
+      // 计算内容的实际尺寸（可能超出容器）
+      const scrollWidth = iframeBody.scrollWidth;
+      const scrollHeight = iframeBody.scrollHeight;
+      
+      // 使用内容的实际尺寸和容器尺寸的较大值
       const dimensions = {
-        width: iframe.clientWidth,
-        height: iframe.clientHeight
+        width: Math.max(iframe.clientWidth, scrollWidth),
+        height: Math.max(iframe.clientHeight, scrollHeight)
       };
+
+      console.log("测量iframe内容尺寸:", dimensions);
 
       // 使用通用元素测量收集函数
       const measurements = collectEightElementMeasurements(processedEightElement, {
-        document: iframe.contentDocument,
+        document: iframeDocument,
         dimensions,
-        getElementById: (id) => iframe.contentDocument.getElementById(id),
+        getElementById: (id) => iframeDocument.getElementById(id),
         getComputedStyle: (el) => window.getComputedStyle(el)
       });
 

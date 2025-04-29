@@ -1042,6 +1042,101 @@ function createHeadingLayout(headingContent, subElements = [], headingLevel = 1)
   return layout;
 }
 
+// 创建流式布局容器，用于包装一级标题块
+function createFlexWrapLayout(children = []) {
+  const layoutId = generateUUID();
+  
+  // 创建一个水平流式布局，使用CSS的flex-wrap属性
+  const layout = {
+    dataKeys: [],
+    name: "layout",
+    "name-zh": "流式布局",
+    "file-type": "template",
+    theme: "default",
+    layout: {
+      style: {
+        display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+        layoutMode: LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL,
+        // 使用CSS的flex-wrap属性
+        "flex-wrap": "wrap",
+        primaryAxisSizingMode: "fixed",
+        counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
+        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
+        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER,
+        layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
+        layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+        boxSizing: "border-box",
+        "border-style": "solid",
+        "border-width": "0",
+        "border-color": "initial",
+        height: "auto",
+        width: "100%",
+        "box-sizing": "border-box",
+        "back-width": "100%",
+        "back-height": "auto",
+        position: "relative",
+        gap: DIMENSION_CONSTANTS.GAP.base
+      },
+      children: children
+    },
+    description: "",
+    id: layoutId,
+    events: [{}]
+  };
+
+  return layout;
+}
+
+// 创建一级标题块容器，设置最小宽度和最大宽度
+function createHeadingBlockContainer(headingLayout) {
+  const layoutId = generateUUID();
+  
+  // 创建一个包装容器，设置最小宽度和flex-basis
+  const layout = {
+    dataKeys: [],
+    name: "layout",
+    "name-zh": "标题块容器",
+    "file-type": "template",
+    theme: "default",
+    layout: {
+      style: {
+        display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+        layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+        primaryAxisSizingMode: "fixed",
+        counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
+        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
+        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER,
+        layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
+        layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+        boxSizing: "border-box",
+        "border-style": "solid",
+        "border-width": "0",
+        "border-color": "initial",
+        height: "auto",
+        width: "100%",
+        minWidth: "375px",  // 设置最小宽度为375px
+        maxWidth: "50%",    // 设置最大宽度为50%，确保一行最多两个
+        // 添加flex-basis属性，使其在流式布局中正确工作
+        "flex-basis": "375px",
+        "flex-grow": "1",
+        "flex-shrink": "0",
+        "box-sizing": "border-box",
+        "back-width": "100%",
+        "back-height": "auto",
+        position: "relative",
+        padding: DIMENSION_CONSTANTS.PADDING.base,
+        margin: DIMENSION_CONSTANTS.MARGIN.tight
+      },
+      children: [headingLayout]
+    },
+    description: "",
+    id: layoutId,
+    events: [{}]
+  };
+
+  return layout;
+}
+
 // 改进Markdown解析功能，支持更复杂的内容处理
 function parseMarkdown(markdown) {
   // 分割Markdown文本为行
@@ -1049,9 +1144,15 @@ function parseMarkdown(markdown) {
 
   // 解析结果将存储在这个数组中
   const elements = [];
+  
+  // 存储一级标题块，用于后续流式布局
+  const h1Blocks = [];
 
   // 用于跟踪当前的嵌套级别
   const stack = [{ level: 0, elements: elements }];
+  
+  // 当前处理的一级标题块
+  let currentH1Block = null;
 
   // 用于收集连续的按钮元素
   let consecutiveButtons = [];
@@ -1079,17 +1180,39 @@ function parseMarkdown(markdown) {
       const level = headingMatch[1].length;
       const content = headingMatch[2].trim();
 
-      // 找到正确的父级嵌套层级
-      while (stack.length > 1 && stack[stack.length - 1].level >= level) {
-        stack.pop();
+      // 如果是一级标题，创建新的一级标题块
+      if (level === 1) {
+        // 如果已经有一个当前的一级标题块，将其添加到h1Blocks中
+        if (currentH1Block) {
+          h1Blocks.push(currentH1Block);
+        }
+        
+        // 创建新的一级标题布局
+        const newHeadingLayout = createHeadingLayout(content, [], level);
+        
+        // 创建新的一级标题块
+        currentH1Block = newHeadingLayout;
+        
+        // 重置栈，只保留根级别
+        while (stack.length > 1) {
+          stack.pop();
+        }
+        
+        // 将新的嵌套层级添加到栈中
+        stack.push({ level, elements: newHeadingLayout.layout.children });
+      } else {
+        // 对于非一级标题，找到正确的父级嵌套层级
+        while (stack.length > 1 && stack[stack.length - 1].level >= level) {
+          stack.pop();
+        }
+
+        // 创建新的嵌套层级，传递标题级别
+        const newHeadingLayout = createHeadingLayout(content, [], level);
+        stack[stack.length - 1].elements.push(newHeadingLayout);
+
+        // 将新的嵌套层级添加到栈中
+        stack.push({ level, elements: newHeadingLayout.layout.children });
       }
-
-      // 创建新的嵌套层级，传递标题级别
-      const newHeadingLayout = createHeadingLayout(content, [], level);
-      stack[stack.length - 1].elements.push(newHeadingLayout);
-
-      // 将新的嵌套层级添加到栈中
-      stack.push({ level, elements: newHeadingLayout.layout.children });
 
       continue;
     }
@@ -1253,7 +1376,123 @@ function parseMarkdown(markdown) {
     return currentLayout;
   }
 
+  // 确保处理完所有累积的内容
+  flushTextBlock();
+  flushConsecutiveButtons();
+  
+  // 如果有当前的一级标题块，将其添加到h1Blocks中
+  if (currentH1Block) {
+    h1Blocks.push(currentH1Block);
+  }
+  
+  // 如果有多个一级标题块，创建流式布局并将它们包装起来
+  if (h1Blocks.length > 1) {
+    // 将每个一级标题块包装在容器中，设置最小宽度
+    const wrappedH1Blocks = h1Blocks.map(block => createHeadingBlockContainer(block));
+    
+    // 创建流式布局容器
+    const flexLayout = createFlexWrapLayout(wrappedH1Blocks);
+    
+    // 返回流式布局
+    return [flexLayout];
+  } else if (h1Blocks.length === 1) {
+    // 如果只有一个一级标题块，直接返回
+    return [h1Blocks[0]];
+  }
+
+  // 如果没有一级标题块，返回原始元素
   return elements;
+
+  // 辅助函数：处理文本块
+  function flushTextBlock() {
+    if (currentTextBlock) {
+      const textElement = createTextElement(currentTextBlock);
+      stack[stack.length - 1].elements.push(textElement);
+      currentTextBlock = '';
+    }
+  }
+
+  // 辅助函数：将累积的按钮添加为水平布局
+  function flushConsecutiveButtons() {
+    if (consecutiveButtons.length > 0) {
+      console.log(`处理 ${consecutiveButtons.length} 个连续按钮`);
+
+      if (consecutiveButtons.length === 1) {
+        // 单个按钮不需要水平布局
+        stack[stack.length - 1].elements.push(consecutiveButtons[0]);
+        console.log(`添加单个按钮: ${consecutiveButtons[0].id}`);
+      } else {
+        // 多个连续按钮放在水平布局中
+        const buttonLayout = createHorizontalButtonLayout(consecutiveButtons);
+        stack[stack.length - 1].elements.push(buttonLayout);
+        console.log(`添加按钮布局: ${buttonLayout.id}, 包含 ${consecutiveButtons.length} 个按钮`);
+      }
+      consecutiveButtons = [];
+    }
+  }
+
+  // 辅助函数：处理混合内容行
+  function processMixedContent(line) {
+    // 创建一个水平布局元素
+    let currentLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL);
+
+    // 查找所有普通链接 [text](url) 但不是图片链接
+    const normalLinkRegex = /(?<!!)\[(.*?)\]\((.*?)\)/g;
+    const linkMatches = [...line.matchAll(normalLinkRegex)];
+    console.log(`找到 ${linkMatches.length} 个普通链接`);
+
+    // 查找所有图片 ![alt](url)
+    const imageMatches = [...line.matchAll(/!\[(.*?)\]\((.*?)\)/g)];
+    console.log(`找到 ${imageMatches.length} 个图片链接`);
+
+    // 合并并按照在原文中的位置排序
+    const allMatches = [
+      ...linkMatches.map(match => ({ type: 'link', match })),
+      ...imageMatches.map(match => ({ type: 'image', match }))
+    ].sort((a, b) => a.match.index - b.match.index);
+
+    let lastIndex = 0;
+
+    // 按顺序处理所有匹配项
+    for (const { type, match } of allMatches) {
+      const matchIndex = match.index;
+
+      // 处理匹配项前的文本
+      if (matchIndex > lastIndex) {
+        const textBefore = line.substring(lastIndex, matchIndex);
+        // 始终创建文本元素，即使只有空格
+        const textElement = createTextElement(textBefore);
+        currentLayout.layout.children.push(textElement);
+      }
+
+      // 处理匹配项
+      if (type === 'link') {
+        const linkText = match[1];
+        const linkUrl = match[2];
+        console.log(`处理混合内容中的链接: 文本="${linkText}", URL="${linkUrl}"`);
+        const buttonElement = createButtonElement(linkText, linkUrl);
+        currentLayout.layout.children.push(buttonElement);
+      } else if (type === 'image') {
+        const imgAlt = match[1];
+        const imgUrl = match[2];
+        const backgroundElement = createBackgroundElement(imgUrl);
+        currentLayout.layout.children.push(backgroundElement);
+      }
+
+      lastIndex = matchIndex + match[0].length;
+    }
+
+    // 处理最后一个匹配后的文本
+    if (lastIndex < line.length) {
+      const textAfter = line.substring(lastIndex);
+      // 始终创建尾部文本元素，即使只有空格
+      const textElement = createTextElement(textAfter);
+      currentLayout.layout.children.push(textElement);
+    }
+
+    // 直接返回layout元素，而不是包含它的数组
+    return currentLayout;
+  }
 }
 
 // 创建八要素根对象
@@ -1390,6 +1629,8 @@ export {
   createLayoutElement,
   createHorizontalButtonLayout,
   createHeadingLayout,
+  createFlexWrapLayout,
+  createHeadingBlockContainer,
   printEightElementStructure,
   exampleMarkdownToEightElement,
   LAYOUT_CONSTANTS,

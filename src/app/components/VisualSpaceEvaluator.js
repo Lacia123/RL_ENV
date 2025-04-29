@@ -28,9 +28,12 @@ const VisualSpaceEvaluator = ({ domMeasurements, layout }) => {
         canvasContainer.removeChild(canvasContainer.firstChild);
       }
       
-      // 添加新的Canvas
+      // 添加新的Canvas，并设置样式使其适应容器
       result.visualization.style.maxWidth = '100%';
       result.visualization.style.height = 'auto';
+      result.visualization.style.border = '1px solid #ddd';
+      result.visualization.style.borderRadius = '4px';
+      result.visualization.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
       canvasContainer.appendChild(result.visualization);
     }
   }, [domMeasurements, layout]);
@@ -42,11 +45,14 @@ const VisualSpaceEvaluator = ({ domMeasurements, layout }) => {
   const { score, categories, overallRecommendation } = scoreResult;
   const { spaceUtilization, contentAdaptability } = categories;
 
-  // 根据分数设置颜色
+  // 根据分数设置颜色 - 更平滑的颜色过渡
   const getScoreColor = (score) => {
     if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 70) return 'text-green-500';
+    if (score >= 60) return 'text-yellow-500';
+    if (score >= 50) return 'text-yellow-600';
+    if (score >= 40) return 'text-orange-500';
+    return 'text-orange-600'; // 最低分数为20，不会出现红色
   };
 
   return (
@@ -80,7 +86,7 @@ const VisualSpaceEvaluator = ({ domMeasurements, layout }) => {
                 (parseFloat(spaceUtilization.details.utilizationRatio) * 100).toFixed(2) || 0
               }%
               <span className="ml-2 text-blue-600 font-medium">
-                (推荐: 40%)
+                (推荐: 30-50%)
               </span>
             </div>
             <div className="mt-1 w-full bg-gray-200 rounded-full h-2.5">
@@ -123,11 +129,17 @@ const VisualSpaceEvaluator = ({ domMeasurements, layout }) => {
         {/* 布局可视化 */}
         <div className="mt-4">
           <h3 className="text-lg font-semibold mb-2">布局可视化</h3>
-          <div 
-            ref={canvasRef} 
-            className="border rounded p-2 bg-gray-100 flex justify-center"
-            style={{ minHeight: '200px' }}
+          <div
+            ref={canvasRef}
+            className="border rounded p-2 bg-gray-100 flex justify-center overflow-auto"
+            style={{ minHeight: '300px', maxHeight: '500px' }}
           ></div>
+          <div className="mt-2 text-xs text-gray-500 text-center">
+            <span className="inline-block px-2 py-1 mr-2 bg-blue-100 rounded">蓝色: 文本元素</span>
+            <span className="inline-block px-2 py-1 mr-2 bg-green-100 rounded">绿色: 图片元素</span>
+            <span className="inline-block px-2 py-1 mr-2 bg-red-100 rounded">红色: 按钮元素</span>
+            <span className="inline-block px-2 py-1 bg-gray-100 rounded">灰色: 容器元素</span>
+          </div>
         </div>
 
         {/* 详细数据 */}

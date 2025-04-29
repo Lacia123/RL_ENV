@@ -6,25 +6,20 @@ import { dirname, resolve } from 'path';
 import { parse } from 'url';
 import next from 'next';
 
-// 配置Playwright的Chrome路径
-// Windows环境下的Chromium路径
-process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = process.platform === 'win32' 
-  ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
-  : process.platform === 'linux'
-    ? '/usr/bin/google-chrome'
-    : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+// // 配置Playwright的Chrome路径
+// // Windows环境下的Chromium路径
+// process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = process.platform === 'win32' 
+//   ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
+//   : process.platform === 'linux'
+//     ? '/usr/bin/google-chrome'
+//     : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
-// 获取当前文件的目录
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 // 判断是否为开发环境
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || 'localhost';
 const port = process.env.PORT || 3001;
 
-// 根据环境确定项目根目录
-const projectRoot = dev ? __dirname : '.';
 
 // 创建Next.js应用实例
 const app = next({ dev, hostname, port });

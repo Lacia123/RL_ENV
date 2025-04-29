@@ -94,23 +94,31 @@ function calculateSpaceUtilizationScore(domMeasurements, layout) {
   // 计算空间利用率，防止除以零
   const utilizationRatio = totalArea > 0 ? effectiveArea / totalArea : 0;
   
-  // 计算评分，目标是40%左右的空间利用率（之前是70%）
-  // 使用高斯分布函数，在40%时得分最高
-  const optimalRatio = 0.4; // 最佳空间利用率从70%改为40%
-  const variance = 0.1; // 减小方差，使评分曲线更陡峭（之前是0.15）
+  // 计算评分，目标是40%左右的空间利用率
+  // 使用修改后的高斯分布函数，在40%时得分最高，但下降更平缓
+  const optimalRatio = 0.4; // 最佳空间利用率
+  const variance = 0.2; // 增大方差，使评分曲线更平缓
+  
+  // 考虑元素数量的影响 - 元素越多，对密度的容忍度越高
+  const elementCountFactor = Math.min(1.5, 1 + (elementsCount / 50)); // 最多增加50%的容忍度
+  const adjustedVariance = variance * elementCountFactor;
   
   // 安全计算指数函数，防止溢出
   let score;
   try {
-    score = 100 * Math.exp(-Math.pow(utilizationRatio - optimalRatio, 2) / (2 * Math.pow(variance, 2)));
+    // 使用修改后的评分函数，确保分数不会太快降到0
+    score = 100 * Math.exp(-Math.pow(utilizationRatio - optimalRatio, 2) / (2 * Math.pow(adjustedVariance, 2)));
+    
+    // 确保最低分数为20，而不是0
+    score = Math.max(20, score);
     
     // 验证分数是否为有效数字
     if (isNaN(score) || !isFinite(score)) {
-      score = 0;
+      score = 20; // 最低分数为20
     }
   } catch (error) {
     console.error("计算评分时出错:", error);
-    score = 0;
+    score = 20; // 出错时也给20分而不是0分
   }
   
   return {
@@ -132,15 +140,17 @@ function calculateSpaceUtilizationScore(domMeasurements, layout) {
  */
 function getUtilizationRecommendation(ratio) {
   if (ratio < 0.25) {
-    return "空间利用率过低，考虑增加元素大小、减少间距或添加更多内容";
+    return "空间利用率较低，可以考虑增加元素大小或添加更多内容";
   } else if (ratio < 0.35) {
-    return "空间利用率略低，可以适当增加元素大小或减少部分间距";
+    return "空间利用率略低，但仍在合理范围内";
   } else if (ratio <= 0.45) {
     return "空间利用率良好，处于最佳范围内";
   } else if (ratio < 0.55) {
-    return "空间利用率略高，可以适当减小元素大小或增加部分间距";
+    return "空间利用率略高，但仍在合理范围内";
+  } else if (ratio < 0.7) {
+    return "空间利用率较高，可以考虑增加适当的间距";
   } else {
-    return "空间利用率过高，考虑减小元素大小、增加间距或减少内容密度";
+    return "空间利用率过高，建议增加间距或减少内容密度";
   }
 }
 
@@ -210,24 +220,65 @@ function calculateContentAdaptabilityScore(domMeasurements, layout) {
     Math.max(0, (maxRight - containerWidth) / containerWidth) : 0;
   
   // 根据溢出情况计算评分
-  // 没有溢出得100分，溢出越多分数越低
+  // 没有溢出得100分，溢出越多分数越低，但不会降到20分以下
   let verticalScore, horizontalScore;
   
+  // 计算内容占用的屏数
+  const verticalScreens = maxBottom / containerHeight;
+  const horizontalScreens = maxRight / containerWidth;
+  
   try {
-    verticalScore = 100 * Math.exp(-5 * verticalOverflowRatio);
-    horizontalScore = 100 * Math.exp(-5 * horizontalOverflowRatio);
+    // 基于屏数的评分系统，对刚出现滚动条的情况惩罚更大
+    
+    // 垂直方向评分
+    if (verticalScreens <= 1) {
+      // 一屏内显示，满分
+      verticalScore = 100;
+    } else if (verticalScreens <= 1.1) {
+      // 刚超出一屏，分数快速下降
+      // 从100分快速下降到75分
+      verticalScore = 100 - 250 * (verticalScreens - 1);
+    } else if (verticalScreens <= 2) {
+      // 1.1到2屏，分数从75分缓慢下降到60分
+      verticalScore = 75 - 15 * ((verticalScreens - 1.1) / 0.9);
+    } else if (verticalScreens <= 3) {
+      // 2到3屏，分数从60分缓慢下降到45分
+      verticalScore = 60 - 15 * (verticalScreens - 2);
+    } else {
+      // 超过3屏，使用更平缓的指数函数
+      verticalScore = 45 * Math.exp(-0.3 * (verticalScreens - 3));
+      verticalScore = Math.max(20, verticalScore);
+    }
+    
+    // 水平方向评分（水平滚动条通常更影响用户体验）
+    if (horizontalScreens <= 1) {
+      // 一屏内显示，满分
+      horizontalScore = 100;
+    } else if (horizontalScreens <= 1.05) {
+      // 刚超出一屏，分数极速下降
+      // 从100分极速下降到70分
+      horizontalScore = 100 - 600 * (horizontalScreens - 1);
+    } else if (horizontalScreens <= 1.5) {
+      // 1.05到1.5屏，分数从70分缓慢下降到55分
+      horizontalScore = 70 - 15 * ((horizontalScreens - 1.05) / 0.45);
+    } else {
+      // 超过1.5屏，使用更平缓的指数函数
+      horizontalScore = 55 * Math.exp(-0.5 * (horizontalScreens - 1.5));
+      horizontalScore = Math.max(20, horizontalScore);
+    }
     
     // 验证分数是否为有效数字
     if (isNaN(verticalScore) || !isFinite(verticalScore)) {
-      verticalScore = 0;
+      verticalScore = 20;
     }
     if (isNaN(horizontalScore) || !isFinite(horizontalScore)) {
-      horizontalScore = 0;
+      horizontalScore = 20;
     }
+    
   } catch (error) {
     console.error("计算溢出评分时出错:", error);
-    verticalScore = 0;
-    horizontalScore = 0;
+    verticalScore = 20;
+    horizontalScore = 20;
   }
   
   // 取垂直和水平方向的较低分数作为最终分数
@@ -238,46 +289,56 @@ function calculateContentAdaptabilityScore(domMeasurements, layout) {
     details: {
       verticalOverflowRatio: verticalOverflowRatio.toFixed(2),
       horizontalOverflowRatio: horizontalOverflowRatio.toFixed(2),
+      verticalScreens: verticalScreens.toFixed(2),
+      horizontalScreens: horizontalScreens.toFixed(2),
       maxBottom,
       maxRight,
       containerHeight,
       containerWidth,
       overflowingElements,
-      recommendation: getAdaptabilityRecommendation(verticalOverflowRatio, horizontalOverflowRatio)
+      recommendation: getAdaptabilityRecommendation(verticalScreens, horizontalScreens)
     }
   };
 }
 
 /**
  * 获取内容适应性的建议
- * @param {number} verticalRatio - 垂直溢出比例
- * @param {number} horizontalRatio - 水平溢出比例
+ * @param {number} verticalScreens - 垂直方向占用的屏数
+ * @param {number} horizontalScreens - 水平方向占用的屏数
  * @returns {string} - 建议内容
  */
-function getAdaptabilityRecommendation(verticalRatio, horizontalRatio) {
-  if (verticalRatio <= 0 && horizontalRatio <= 0) {
-    return "内容完全适应当前视口，无需调整";
+function getAdaptabilityRecommendation(verticalScreens, horizontalScreens) {
+  if (verticalScreens <= 1 && horizontalScreens <= 1) {
+    return "内容完全适应当前视口，布局良好";
   }
   
   let recommendations = [];
   
-  if (verticalRatio > 0) {
-    if (verticalRatio > 0.5) {
-      recommendations.push("垂直方向溢出严重，考虑减少内容高度、调整布局或使用更合适的视口尺寸");
-    } else {
-      recommendations.push("有轻微垂直溢出，可以减小元素高度或减少垂直间距");
-    }
+  // 垂直方向建议
+  if (verticalScreens <= 1) {
+    // 不需要建议
+  } else if (verticalScreens <= 1.1) {
+    recommendations.push("内容刚刚超出视口高度，建议微调以避免出现垂直滚动条");
+  } else if (verticalScreens <= 2) {
+    recommendations.push("内容需要垂直滚动约 " + Math.round((verticalScreens - 1) * 100) + "% 的视口高度");
+  } else if (verticalScreens <= 3) {
+    recommendations.push("内容需要较多垂直滚动（约 " + Math.round(verticalScreens) + " 屏），考虑适当精简内容或增大视口");
+  } else {
+    recommendations.push("内容垂直方向过长（约 " + Math.round(verticalScreens) + " 屏），建议分页或大幅精简内容");
   }
   
-  if (horizontalRatio > 0) {
-    if (horizontalRatio > 0.3) {
-      recommendations.push("水平方向溢出严重，考虑减少内容宽度或使用响应式布局");
-    } else {
-      recommendations.push("有轻微水平溢出，可以减小元素宽度或调整水平排列");
-    }
+  // 水平方向建议
+  if (horizontalScreens <= 1) {
+    // 不需要建议
+  } else if (horizontalScreens <= 1.05) {
+    recommendations.push("内容刚刚超出水平视口，强烈建议调整以避免水平滚动条");
+  } else if (horizontalScreens <= 1.5) {
+    recommendations.push("内容超出水平视口，需要水平滚动，建议调整布局");
+  } else {
+    recommendations.push("内容水平方向溢出较多（约 " + horizontalScreens.toFixed(1) + " 屏），建议使用响应式布局或减少内容宽度");
   }
   
-  return recommendations.join("；");
+  return recommendations.length > 0 ? recommendations.join("；") : "内容适应性良好";
 }
 
 /**
@@ -286,34 +347,75 @@ function getAdaptabilityRecommendation(verticalRatio, horizontalRatio) {
  * @returns {HTMLCanvasElement} - 包含布局可视化的Canvas元素
  */
 function createLayoutVisualization(domMeasurements) {
-  if (!domMeasurements || !domMeasurements.container || !domMeasurements.elements || 
+  if (!domMeasurements || !domMeasurements.container || !domMeasurements.elements ||
       typeof document === 'undefined') {
     return null;
   }
   
   try {
     const { container, elements } = domMeasurements;
+    
+    // 计算内容的实际尺寸（可能超出容器）
+    let maxRight = 0;
+    let maxBottom = 0;
+    
+    elements.forEach(element => {
+      if (!element) return;
+      const right = (element.x || 0) + (element.width || 0);
+      const bottom = (element.y || 0) + (element.height || 0);
+      
+      if (right > maxRight) maxRight = right;
+      if (bottom > maxBottom) maxBottom = bottom;
+    });
+    
+    // 使用内容的实际尺寸和容器尺寸的较大值
     const containerWidth = container.width || 600;
     const containerHeight = container.height || 400;
+    const canvasWidth = Math.max(containerWidth, maxRight);
+    const canvasHeight = Math.max(containerHeight, maxBottom);
     
     // 创建Canvas元素
     const canvas = document.createElement('canvas');
     const scale = 1; // 可以调整缩放比例
     
-    canvas.width = containerWidth * scale;
-    canvas.height = containerHeight * scale;
+    canvas.width = canvasWidth * scale;
+    canvas.height = canvasHeight * scale;
     
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
     
-    // 绘制容器背景
-    ctx.fillStyle = '#f5f5f5';
+    // 绘制整个内容区域背景
+    ctx.fillStyle = '#f8f9fa';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 绘制容器区域背景（稍微深一点的颜色）
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fillRect(0, 0, containerWidth * scale, containerHeight * scale);
     
     // 绘制容器边界
     ctx.strokeStyle = '#666';
     ctx.lineWidth = 2;
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeRect(0, 0, containerWidth * scale, containerHeight * scale);
+    
+    // 添加网格线（每100像素一条）
+    ctx.strokeStyle = 'rgba(200, 200, 200, 0.5)';
+    ctx.lineWidth = 1;
+    
+    // 垂直网格线
+    for (let x = 100; x < canvasWidth; x += 100) {
+      ctx.beginPath();
+      ctx.moveTo(x * scale, 0);
+      ctx.lineTo(x * scale, canvasHeight * scale);
+      ctx.stroke();
+    }
+    
+    // 水平网格线
+    for (let y = 100; y < canvasHeight; y += 100) {
+      ctx.beginPath();
+      ctx.moveTo(0, y * scale);
+      ctx.lineTo(canvasWidth * scale, y * scale);
+      ctx.stroke();
+    }
     
     // 为不同类型的元素设置不同的颜色
     const colorMap = {
@@ -384,8 +486,8 @@ export function evaluateVisualSpace(domMeasurements, layout) {
     const utilizationScore = calculateSpaceUtilizationScore(domMeasurements, layout);
     const adaptabilityScore = calculateContentAdaptabilityScore(domMeasurements, layout);
     
-    // 综合评分（各占50%）
-    const totalScore = Math.round((utilizationScore.score + adaptabilityScore.score) / 2);
+    // 综合评分（各占50%），确保最低分数为20
+    const totalScore = Math.max(20, Math.round((utilizationScore.score + adaptabilityScore.score) / 2));
     
     // 创建布局可视化
     const visualizationCanvas = typeof document !== 'undefined' ? 
