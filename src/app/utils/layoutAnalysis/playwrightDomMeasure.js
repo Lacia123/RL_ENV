@@ -1,5 +1,3 @@
-'use client';
-
 import { JSDOM } from 'jsdom';
 import { chromium } from 'playwright-chromium';
 import { metawareToStyleObject } from '../metaware/metawareToCss.js';

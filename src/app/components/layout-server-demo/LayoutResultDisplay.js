@@ -51,9 +51,7 @@ export default function LayoutResultDisplay({ result }) {
   };
   
   // 排序维度分数
-  const sortedDimensions = Object.entries(dimensions)
-    .filter(([_, data]) => data && typeof data.score === 'number')
-    .sort(([_, a], [_, b]) => b.score - a.score);
+  const sortedDimensions = Object.entries(dimensions).filter(([key, data])=>data && typeof data.score === 'number').sort(([_, a], [__, b])=>b.score - a.score);
   
   // 图表数据
   const chartData = {

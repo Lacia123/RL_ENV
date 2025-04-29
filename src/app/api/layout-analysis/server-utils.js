@@ -1,4 +1,4 @@
-import { layoutAnalysisAPI } from '../../../utils/layoutAnalysisAPI.js';
+import { layoutAnalysisAPI } from '../../utils/layoutAnalysisAPI.js';
 
 /**
  * 直接在服务器端调用布局分析API的函数

@@ -5,8 +5,6 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { parse } from 'url';
 import next from 'next';
-import fs from 'fs';
-import path from 'path';
 
 // 配置Playwright的Chrome路径
 // Windows环境下的Chromium路径
@@ -24,6 +22,9 @@ const __dirname = dirname(__filename);
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || 'localhost';
 const port = process.env.PORT || 3001;
+
+// 根据环境确定项目根目录
+const projectRoot = dev ? __dirname : '.';
 
 // 创建Next.js应用实例
 const app = next({ dev, hostname, port });
@@ -53,6 +54,19 @@ const handle = app.getRequestHandler();
     });
     
     // 设置Express API路由
+    // 健康检查接口
+    server.get('/health/check', (req, res) => {
+      const timestamp = new Date().toISOString();
+      console.log(JSON.stringify({
+        status: "ok",
+        timestamp: timestamp
+      }));
+      res.status(200).json({
+        status: "ok",
+        timestamp: timestamp
+      });
+    });
+    
     // 布局分析API
     server.post('/api/layout-analysis', async (req, res) => {
       try {
@@ -67,7 +81,7 @@ const handle = app.getRequestHandler();
         }
         
         // 动态导入API模块(仅在需要时加载)，指定具体文件路径
-        const { layoutAnalysisAPI } = await import('./src/app/utils/layoutAnalysisAPI.js');
+        const { layoutAnalysisAPI } = await import(`./${dev ? 'src/app' : ''}/utils/layoutAnalysisAPI.js`);
         
         // 使用布局分析API评估布局
         const result = await layoutAnalysisAPI.evaluateLayout(request);
@@ -100,20 +114,20 @@ const handle = app.getRequestHandler();
         const { markdown, width = 1024, height = 768, seed } = request;
         
         // 动态导入所需模块
-        const { markdownToEightElement } = await import('./src/app/utils/eightElement/markdownToEightElement.js');
-        const { renderAndEvaluateEightElement } = await import('./src/app/utils/eightElement/renderAndEvaluate.js');
+        const { markdownToEightElement } = await import(`./${dev ? 'src/app' : ''}/utils/eightElement/markdownToEightElement.js`);
+        const { renderAndEvaluateEightElement } = await import(`./${dev ? 'src/app' : ''}/utils/eightElement/renderAndEvaluate.js`);
         
         // 处理seed参数，生成自定义设计令牌
         let designTokens = null;
         if (seed) {
           try {
-            const { calculateTokens } = await import('./src/app/utils/seeds/generateTokenBySeed.js');
+            const { calculateTokens } = await import(`./${dev ? 'src/app' : ''}/utils/seeds/generateTokenBySeed.js`);
             // 使用seed参数生成设计令牌
             designTokens = calculateTokens(seed);
             console.log('使用自定义种子生成设计令牌:', seed);
             
             // 使用token解析器的动态token系统
-            const { setDynamicTokenSystem } = await import('./src/app/utils/tokens/resolveToken.js');
+            const { setDynamicTokenSystem } = await import(`./${dev ? 'src/app' : ''}/utils/tokens/resolveToken.js`);
             setDynamicTokenSystem(designTokens);
             console.log('已将设计令牌设置为动态token系统');
           } catch (tokenError) {
@@ -123,27 +137,14 @@ const handle = app.getRequestHandler();
         
         // 转换Markdown为八要素结构
         const eightElement = markdownToEightElement(markdown);
-        
-        // 确保目录存在
-        const outputDir = path.join(__dirname, 'output');
-        if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir, { recursive: true });
-        }
-        
-        // 生成带时间戳的文件名
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const outputPath = path.join(outputDir, `eight-element-${timestamp}.json`);
-        
-        // 写入文件
-        fs.writeFileSync(outputPath, JSON.stringify(eightElement, null, 2), 'utf8');
-        
+                
         // 使用Playwright渲染并评分
         const result = await renderAndEvaluateEightElement(eightElement, { width, height });
         
         // 如果设置了动态token系统，需要清除
         if (designTokens) {
           try {
-            const { clearDynamicTokenSystem } = await import('./src/app/utils/tokens/resolveToken.js');
+            const { clearDynamicTokenSystem } = await import(`./${dev ? 'src/app' : ''}/utils/tokens/resolveToken.js`);
             clearDynamicTokenSystem();
             console.log('已清除动态token系统');
           } catch (error) {
@@ -164,7 +165,7 @@ const handle = app.getRequestHandler();
       } catch (error) {
         // 确保无论如何都清除动态token系统
         try {
-          const { clearDynamicTokenSystem } = await import('./src/app/utils/tokens/resolveToken.js');
+          const { clearDynamicTokenSystem } = await import(`./${dev ? 'src/app' : ''}/utils/tokens/resolveToken.js`);
           clearDynamicTokenSystem();
         } catch (clearError) {
           // 忽略清除错误
@@ -174,6 +175,81 @@ const handle = app.getRequestHandler();
         res.status(500).json({ 
           success: false, 
           error: 'Markdown评分失败', 
+          message: error.message 
+        });
+      }
+    });
+    
+    // Markdown到八要素转换API
+    server.post('/api/markdown-to-eight-element', async (req, res) => {
+      try {
+        console.log('收到Markdown转八要素请求');
+        
+        const request = req.body;
+        if (!request || !request.markdown) {
+          return res.status(400).json({ 
+            success: false, 
+            error: 'markdown参数为必填项' 
+          });
+        }
+        
+        // 提取参数
+        const { markdown, width = 1024, height = 768, seed } = request;
+        
+        // 动态导入所需模块
+        const { markdownToEightElement } = await import(`./${dev ? 'src/app' : ''}/utils/eightElement/markdownToEightElement.js`);
+        const { renderEightElementToHtml } = await import(`./${dev ? 'src/app' : ''}/utils/eightElement/renderEightElementHtml.js`);
+        
+        // 处理seed参数，生成自定义设计令牌
+        let designTokens = null;
+        if (seed) {
+          try {
+            const { calculateTokens } = await import(`./${dev ? 'src/app' : ''}/utils/seeds/generateTokenBySeed.js`);
+            // 使用seed参数生成设计令牌
+            designTokens = calculateTokens(seed);
+            console.log('使用自定义种子生成设计令牌:', seed);
+            
+            // 使用token解析器的动态token系统
+            const { setDynamicTokenSystem } = await import(`./${dev ? 'src/app' : ''}/utils/tokens/resolveToken.js`);
+            setDynamicTokenSystem(designTokens);
+            console.log('已将设计令牌设置为动态token系统');
+          } catch (tokenError) {
+            console.warn('生成设计令牌失败，将使用默认令牌:', tokenError);
+          }
+        }
+        
+        try {
+          // 转换Markdown为八要素结构
+          const eightElement = markdownToEightElement(markdown);
+                    
+          // 预处理八要素结构以应用样式
+          const { processedEightElement } = renderEightElementToHtml(eightElement, { width, height });
+                    
+          // 返回八要素结构
+          res.status(200).json({
+            success: true,
+            eightElement: processedEightElement,
+            originalEightElement: eightElement,
+            designTokens: designTokens,
+            tokensApplied: !!designTokens
+          });
+        } finally {
+          // 确保清除动态token系统
+          if (designTokens) {
+            try {
+              const { clearDynamicTokenSystem } = await import(`./${dev ? 'src/app' : ''}/utils/tokens/resolveToken.js`);
+              clearDynamicTokenSystem();
+              console.log('已清除动态token系统');
+            } catch (error) {
+              console.warn('清除动态token系统失败:', error);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Markdown转八要素失败:', error);
+        res.status(500).json({ 
+          success: false, 
+          error: 'Markdown转八要素失败', 
           message: error.message 
         });
       }
@@ -205,7 +281,7 @@ const handle = app.getRequestHandler();
         };
         
         // 动态导入API模块(仅在需要时加载)
-        const { layoutAnalysisAPI } = await import('./src/app/utils/layoutAnalysisAPI.js');
+        const { layoutAnalysisAPI } = await import(`./${dev ? 'src/app' : ''}/utils/layoutAnalysisAPI.js`);
         
         // 调用布局分析API生成布局
         const result = await layoutAnalysisAPI.evaluateLayout(apiRequest);
@@ -224,7 +300,7 @@ const handle = app.getRequestHandler();
           // 转换为八要素格式
           try {
             // 动态导入转换工具
-            const { convertToEightElementFormat } = await import('./src/app/utils/layoutToEightElements.js');
+            const { convertToEightElementFormat } = await import(`./${dev ? 'src/app' : ''}/utils/layoutToEightElements.js`);
             
             // 将layout转换为八要素格式
             const eightElementLayout = convertToEightElementFormat(result.result.layout);
