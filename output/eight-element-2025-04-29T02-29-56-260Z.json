@@ -1,0 +1,1754 @@
+{
+  "dataKeys": [],
+  "id": "dd-e0c49d3e-b3d6-46ea-8aff-c4bbf3bc02ab",
+  "name": "layout",
+  "name-zh": "布局",
+  "file-type": "template",
+  "theme": "default",
+  "layout": {
+    "style": {
+      "display": "{layout.state.display.flex}",
+      "layoutMode": "{layout.direction.VERTICAL}",
+      "layoutWrap": "{layout.wrap.NO_WRAP}",
+      "primaryAxisSizingMode": "responsive",
+      "counterAxisSizingMode": "{layout.sizing.FIXED}",
+      "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+      "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+      "layoutAlign": "{layout.align.y.self.INHERIT}",
+      "layoutGrow": "{layout.grow.0}",
+      "width": "auto",
+      "height": "auto",
+      "position": "relative",
+      "back-width": "auto",
+      "back-height": "100px",
+      "box-sizing": "border-box",
+      "padding-top": "{dimension.padding.base}",
+      "padding-bottom": "{dimension.padding.base}",
+      "padding-left": "{dimension.padding.base}",
+      "padding-right": "{dimension.padding.base}",
+      "margin-top": "{dimension.margin.base}",
+      "margin-bottom": "{dimension.margin.base}",
+      "margin-left": "{dimension.margin.base}",
+      "margin-right": "{dimension.margin.base}",
+      "border-width": "{dimension.borderwidth.base}",
+      "border-color": "{color.basic.opacity.black.20}",
+      "background": "{color.basic.opacity.white.100}",
+      "border-style": "solid",
+      "border-radius": "{dimension.borderradius.large}",
+      "gap": "{dimension.padding.base}"
+    },
+    "children": [
+      {
+        "id": "dd-327366af-ad2e-41b3-9dd9-4d7933520217",
+        "name": "background",
+        "name-zh": "背景",
+        "file-type": "cell-element",
+        "layout": {
+          "style": {
+            "background-color": "none",
+            "font": [],
+            "border": [],
+            "scale": [],
+            "overflow": "hidden",
+            "box-sizing": "border-box",
+            "primaryAxisSizingMode": "fixed",
+            "position": "relative",
+            "padding-top": "{dimension.padding.tight}",
+            "padding-bottom": "{dimension.padding.tight}",
+            "padding-left": "{dimension.padding.tight}",
+            "padding-right": "{dimension.padding.tight}",
+            "margin-top": "{dimension.margin.tight}",
+            "margin-bottom": "{dimension.margin.tight}",
+            "margin-left": "{dimension.margin.tight}",
+            "margin-right": "{dimension.margin.tight}",
+            "border-width": "{dimension.borderwidth.none}",
+            "gap": "{dimension.padding.base}"
+          },
+          "background": {
+            "type": "container",
+            "content": [
+              {
+                "element": "material",
+                "value": "image",
+                "prop": "default",
+                "token": "image"
+              }
+            ],
+            "resource": "",
+            "data": [],
+            "style": {
+              "display": "{layout.state.display.flex}",
+              "layoutMode": "{layout.direction.HORIZONTAL}",
+              "layoutWrap": "{layout.wrap.NO_WRAP}",
+              "primaryAxisSizingMode": "{layout.sizing.AUTO}",
+              "counterAxisSizingMode": "{layout.sizing.FIXED}",
+              "primaryAxisAlignItems": "{layout.align.x.MIN}",
+              "counterAxisAlignItems": "{layout.align.y.items.MIN}",
+              "layoutAlign": "{layout.align.y.self.INHERIT}",
+              "layoutGrow": "{layout.grow.0}",
+              "borderColor": {
+                "element": "color",
+                "value": "border",
+                "prop": "default",
+                "token": "border"
+              },
+              "borderRadius": {
+                "element": "shape",
+                "value": "borderradius",
+                "prop": "default",
+                "token": "borderradius"
+              },
+              "borderWidth": {
+                "element": "shape",
+                "value": "borderwidth",
+                "prop": "default",
+                "token": "borderwidth"
+              },
+              "boxShadow": {
+                "element": "material",
+                "value": "elevation",
+                "prop": "default",
+                "token": "elevation"
+              },
+              "asset": {
+                "element": "material",
+                "value": "image",
+                "prop": "default",
+                "token": "image"
+              }
+            },
+            "children": []
+          }
+        },
+        "material": {
+          "image": {
+            "default": {
+              "data-key": "",
+              "type": "img",
+              "style": {
+                "image": {
+                  "value": "https://example.com/image_1238.png",
+                  "type": "asset",
+                  "key": "material-image"
+                }
+              },
+              "resource": "https://example.com/image_1238.png"
+            }
+          },
+          "elevation": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "elevation": {
+                  "value": "none",
+                  "type": "boxShadow",
+                  "key": "material-elevation"
+                }
+              },
+              "resource": "none"
+            }
+          }
+        },
+        "shape": {
+          "borderradius": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "borderradius": {
+                  "value": "{dimension.borderradius.none}",
+                  "type": "borderRadius",
+                  "key": "shape-borderradius"
+                }
+              },
+              "resource": "{dimension.borderradius.none}"
+            }
+          },
+          "borderwidth": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "borderwidth": {
+                  "value": "{dimension.borderwidth.none}",
+                  "type": "borderWidth",
+                  "key": "shape-borderwidth"
+                }
+              },
+              "resource": "{dimension.borderwidth.none}"
+            }
+          }
+        },
+        "color": {
+          "border": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "border": {
+                  "value": "{color.basic.opacity.black.20}",
+                  "type": "color",
+                  "key": "color-border"
+                }
+              },
+              "resource": "{color.basic.opacity.black.20}"
+            }
+          }
+        },
+        "type": "background",
+        "state": "default",
+        "events": [
+          {}
+        ]
+      },
+      {
+        "id": "dd-6b0e7ec1-af01-4450-bafe-ec06f05902de",
+        "name": "text",
+        "name-zh": "文本",
+        "file-type": "cell-element",
+        "layout": {
+          "style": {
+            "background-color": "none",
+            "font": [],
+            "border": [],
+            "scale": [],
+            "box-sizing": "border-box",
+            "primaryAxisSizingMode": "fixed",
+            "position": "relative",
+            "padding-top": "{dimension.padding.tight}",
+            "padding-bottom": "{dimension.padding.tight}",
+            "padding-left": "{dimension.padding.tight}",
+            "padding-right": "{dimension.padding.tight}",
+            "margin-top": "{dimension.margin.tight}",
+            "margin-bottom": "{dimension.margin.tight}",
+            "margin-left": "{dimension.margin.tight}",
+            "margin-right": "{dimension.margin.tight}",
+            "border-width": "{dimension.borderwidth.none}",
+            "gap": "{dimension.padding.base}"
+          },
+          "text_body": {
+            "type": "container",
+            "content": [
+              {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            ],
+            "resource": "",
+            "data": [],
+            "style": {
+              "layoutAlign": "{layout.align.y.self.INHERIT}",
+              "layoutGrow": "{layout.grow.0}",
+              "overflow": "auto",
+              "word-break": "break-all",
+              "textColor": {
+                "element": "color",
+                "value": "text",
+                "prop": "default",
+                "token": "text"
+              },
+              "fill": {
+                "element": "color",
+                "value": "bg",
+                "prop": "default",
+                "token": "bg"
+              },
+              "fontSizes": {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            },
+            "children": []
+          },
+          "text_hyperlink": {
+            "type": "container",
+            "content": [
+              {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            ],
+            "resource": "",
+            "data": [],
+            "style": {
+              "layoutAlign": "{layout.align.y.self.INHERIT}",
+              "layoutGrow": "{layout.grow.0}",
+              "text-decoration": "underline",
+              "overflow": "auto",
+              "word-break": "break-all",
+              "textColor": {
+                "element": "color",
+                "value": "text",
+                "prop": "default",
+                "token": "hyperlinktext"
+              },
+              "fill": {
+                "element": "color",
+                "value": "bg",
+                "prop": "default",
+                "token": "bg"
+              },
+              "fontSizes": {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            },
+            "children": []
+          }
+        },
+        "color": {
+          "text": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "text": {
+                  "value": "{color.basic.opacity.black.100}",
+                  "type": "color",
+                  "key": "color-text"
+                },
+                "hyperlinktext": {
+                  "value": "{color.basic.light-blue.5}",
+                  "type": "color",
+                  "key": "color-text"
+                }
+              },
+              "resource": "{color.basic.light-blue.5}"
+            }
+          },
+          "bg": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "bg": {
+                  "value": "none",
+                  "type": "color",
+                  "key": "color-bg"
+                }
+              },
+              "resource": "none"
+            }
+          }
+        },
+        "scale": {
+          "min_height": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "min_height": {
+                  "value": "{dimension.basic.dimension.72}",
+                  "type": "sizing",
+                  "key": "scale-min_height"
+                }
+              },
+              "resource": "{dimension.basic.dimension.72}"
+            }
+          },
+          "max_width": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "max_width": {
+                  "value": "{dimension.basic.dimension.1200}",
+                  "type": "sizing",
+                  "key": "scale-max_width"
+                }
+              },
+              "resource": "{dimension.basic.dimension.1200}"
+            }
+          }
+        },
+        "font": {
+          "fontsize": {
+            "default": {
+              "data-key": "",
+              "content": "> 样式 测试 响应式 快速 测试 模块 现代 体验 模块 示例 功能。",
+              "style": {
+                "fontsize": {
+                  "value": "{font.size.medium}",
+                  "type": "fontSizes",
+                  "key": "font-fontsize"
+                }
+              },
+              "resource": "{font.size.medium}"
+            }
+          }
+        },
+        "type": "text_body",
+        "state": "default",
+        "events": [
+          {}
+        ]
+      },
+      {
+        "id": "dd-f388245c-e318-4c3a-8bb5-c730050c2e71",
+        "name": "text",
+        "name-zh": "文本",
+        "file-type": "cell-element",
+        "layout": {
+          "style": {
+            "background-color": "none",
+            "font": [],
+            "border": [],
+            "scale": [],
+            "box-sizing": "border-box",
+            "primaryAxisSizingMode": "fixed",
+            "position": "relative",
+            "padding-top": "{dimension.padding.tight}",
+            "padding-bottom": "{dimension.padding.tight}",
+            "padding-left": "{dimension.padding.tight}",
+            "padding-right": "{dimension.padding.tight}",
+            "margin-top": "{dimension.margin.tight}",
+            "margin-bottom": "{dimension.margin.tight}",
+            "margin-left": "{dimension.margin.tight}",
+            "margin-right": "{dimension.margin.tight}",
+            "border-width": "{dimension.borderwidth.none}",
+            "gap": "{dimension.padding.base}"
+          },
+          "text_body": {
+            "type": "container",
+            "content": [
+              {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            ],
+            "resource": "",
+            "data": [],
+            "style": {
+              "layoutAlign": "{layout.align.y.self.INHERIT}",
+              "layoutGrow": "{layout.grow.0}",
+              "overflow": "auto",
+              "word-break": "break-all",
+              "textColor": {
+                "element": "color",
+                "value": "text",
+                "prop": "default",
+                "token": "text"
+              },
+              "fill": {
+                "element": "color",
+                "value": "bg",
+                "prop": "default",
+                "token": "bg"
+              },
+              "fontSizes": {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            },
+            "children": []
+          },
+          "text_hyperlink": {
+            "type": "container",
+            "content": [
+              {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            ],
+            "resource": "",
+            "data": [],
+            "style": {
+              "layoutAlign": "{layout.align.y.self.INHERIT}",
+              "layoutGrow": "{layout.grow.0}",
+              "text-decoration": "underline",
+              "overflow": "auto",
+              "word-break": "break-all",
+              "textColor": {
+                "element": "color",
+                "value": "text",
+                "prop": "default",
+                "token": "hyperlinktext"
+              },
+              "fill": {
+                "element": "color",
+                "value": "bg",
+                "prop": "default",
+                "token": "bg"
+              },
+              "fontSizes": {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            },
+            "children": []
+          }
+        },
+        "color": {
+          "text": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "text": {
+                  "value": "{color.basic.opacity.black.100}",
+                  "type": "color",
+                  "key": "color-text"
+                },
+                "hyperlinktext": {
+                  "value": "{color.basic.light-blue.5}",
+                  "type": "color",
+                  "key": "color-text"
+                }
+              },
+              "resource": "{color.basic.light-blue.5}"
+            }
+          },
+          "bg": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "bg": {
+                  "value": "none",
+                  "type": "color",
+                  "key": "color-bg"
+                }
+              },
+              "resource": "none"
+            }
+          }
+        },
+        "scale": {
+          "min_height": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "min_height": {
+                  "value": "{dimension.basic.dimension.72}",
+                  "type": "sizing",
+                  "key": "scale-min_height"
+                }
+              },
+              "resource": "{dimension.basic.dimension.72}"
+            }
+          },
+          "max_width": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "max_width": {
+                  "value": "{dimension.basic.dimension.1200}",
+                  "type": "sizing",
+                  "key": "scale-max_width"
+                }
+              },
+              "resource": "{dimension.basic.dimension.1200}"
+            }
+          }
+        },
+        "font": {
+          "fontsize": {
+            "default": {
+              "data-key": "",
+              "content": "> 简单 兼容 多样 自适应 丰富 测试 测试 多样 灵活 丰富 丰富 布局 体验 高效。",
+              "style": {
+                "fontsize": {
+                  "value": "{font.size.medium}",
+                  "type": "fontSizes",
+                  "key": "font-fontsize"
+                }
+              },
+              "resource": "{font.size.medium}"
+            }
+          }
+        },
+        "type": "text_body",
+        "state": "default",
+        "events": [
+          {}
+        ]
+      },
+      {
+        "id": "dd-83627a87-29af-4d2a-8178-9ad4d8ef5050",
+        "name": "text",
+        "name-zh": "文本",
+        "file-type": "cell-element",
+        "layout": {
+          "style": {
+            "background-color": "none",
+            "font": [],
+            "border": [],
+            "scale": [],
+            "box-sizing": "border-box",
+            "primaryAxisSizingMode": "fixed",
+            "position": "relative",
+            "padding-top": "{dimension.padding.tight}",
+            "padding-bottom": "{dimension.padding.tight}",
+            "padding-left": "{dimension.padding.tight}",
+            "padding-right": "{dimension.padding.tight}",
+            "margin-top": "{dimension.margin.tight}",
+            "margin-bottom": "{dimension.margin.tight}",
+            "margin-left": "{dimension.margin.tight}",
+            "margin-right": "{dimension.margin.tight}",
+            "border-width": "{dimension.borderwidth.none}",
+            "gap": "{dimension.padding.base}"
+          },
+          "text_body": {
+            "type": "container",
+            "content": [
+              {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            ],
+            "resource": "",
+            "data": [],
+            "style": {
+              "layoutAlign": "{layout.align.y.self.INHERIT}",
+              "layoutGrow": "{layout.grow.0}",
+              "overflow": "auto",
+              "word-break": "break-all",
+              "textColor": {
+                "element": "color",
+                "value": "text",
+                "prop": "default",
+                "token": "text"
+              },
+              "fill": {
+                "element": "color",
+                "value": "bg",
+                "prop": "default",
+                "token": "bg"
+              },
+              "fontSizes": {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            },
+            "children": []
+          },
+          "text_hyperlink": {
+            "type": "container",
+            "content": [
+              {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            ],
+            "resource": "",
+            "data": [],
+            "style": {
+              "layoutAlign": "{layout.align.y.self.INHERIT}",
+              "layoutGrow": "{layout.grow.0}",
+              "text-decoration": "underline",
+              "overflow": "auto",
+              "word-break": "break-all",
+              "textColor": {
+                "element": "color",
+                "value": "text",
+                "prop": "default",
+                "token": "hyperlinktext"
+              },
+              "fill": {
+                "element": "color",
+                "value": "bg",
+                "prop": "default",
+                "token": "bg"
+              },
+              "fontSizes": {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            },
+            "children": []
+          }
+        },
+        "color": {
+          "text": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "text": {
+                  "value": "{color.basic.opacity.black.100}",
+                  "type": "color",
+                  "key": "color-text"
+                },
+                "hyperlinktext": {
+                  "value": "{color.basic.light-blue.5}",
+                  "type": "color",
+                  "key": "color-text"
+                }
+              },
+              "resource": "{color.basic.light-blue.5}"
+            }
+          },
+          "bg": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "bg": {
+                  "value": "none",
+                  "type": "color",
+                  "key": "color-bg"
+                }
+              },
+              "resource": "none"
+            }
+          }
+        },
+        "scale": {
+          "min_height": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "min_height": {
+                  "value": "{dimension.basic.dimension.72}",
+                  "type": "sizing",
+                  "key": "scale-min_height"
+                }
+              },
+              "resource": "{dimension.basic.dimension.72}"
+            }
+          },
+          "max_width": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "max_width": {
+                  "value": "{dimension.basic.dimension.1200}",
+                  "type": "sizing",
+                  "key": "scale-max_width"
+                }
+              },
+              "resource": "{dimension.basic.dimension.1200}"
+            }
+          }
+        },
+        "font": {
+          "fontsize": {
+            "default": {
+              "data-key": "",
+              "content": "---",
+              "style": {
+                "fontsize": {
+                  "value": "{font.size.medium}",
+                  "type": "fontSizes",
+                  "key": "font-fontsize"
+                }
+              },
+              "resource": "{font.size.medium}"
+            }
+          }
+        },
+        "type": "text_body",
+        "state": "default",
+        "events": [
+          {}
+        ]
+      },
+      {
+        "id": "dd-09a8663e-0369-4ed8-9ec7-a8bdc211feaf",
+        "name": "text",
+        "name-zh": "文本",
+        "file-type": "cell-element",
+        "layout": {
+          "style": {
+            "background-color": "none",
+            "font": [],
+            "border": [],
+            "scale": [],
+            "box-sizing": "border-box",
+            "primaryAxisSizingMode": "fixed",
+            "position": "relative",
+            "padding-top": "{dimension.padding.tight}",
+            "padding-bottom": "{dimension.padding.tight}",
+            "padding-left": "{dimension.padding.tight}",
+            "padding-right": "{dimension.padding.tight}",
+            "margin-top": "{dimension.margin.tight}",
+            "margin-bottom": "{dimension.margin.tight}",
+            "margin-left": "{dimension.margin.tight}",
+            "margin-right": "{dimension.margin.tight}",
+            "border-width": "{dimension.borderwidth.none}",
+            "gap": "{dimension.padding.base}"
+          },
+          "text_body": {
+            "type": "container",
+            "content": [
+              {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            ],
+            "resource": "",
+            "data": [],
+            "style": {
+              "layoutAlign": "{layout.align.y.self.INHERIT}",
+              "layoutGrow": "{layout.grow.0}",
+              "overflow": "auto",
+              "word-break": "break-all",
+              "textColor": {
+                "element": "color",
+                "value": "text",
+                "prop": "default",
+                "token": "text"
+              },
+              "fill": {
+                "element": "color",
+                "value": "bg",
+                "prop": "default",
+                "token": "bg"
+              },
+              "fontSizes": {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            },
+            "children": []
+          },
+          "text_hyperlink": {
+            "type": "container",
+            "content": [
+              {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            ],
+            "resource": "",
+            "data": [],
+            "style": {
+              "layoutAlign": "{layout.align.y.self.INHERIT}",
+              "layoutGrow": "{layout.grow.0}",
+              "text-decoration": "underline",
+              "overflow": "auto",
+              "word-break": "break-all",
+              "textColor": {
+                "element": "color",
+                "value": "text",
+                "prop": "default",
+                "token": "hyperlinktext"
+              },
+              "fill": {
+                "element": "color",
+                "value": "bg",
+                "prop": "default",
+                "token": "bg"
+              },
+              "fontSizes": {
+                "element": "font",
+                "value": "fontsize",
+                "prop": "default",
+                "token": "fontsize"
+              }
+            },
+            "children": []
+          }
+        },
+        "color": {
+          "text": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "text": {
+                  "value": "{color.basic.opacity.black.100}",
+                  "type": "color",
+                  "key": "color-text"
+                },
+                "hyperlinktext": {
+                  "value": "{color.basic.light-blue.5}",
+                  "type": "color",
+                  "key": "color-text"
+                }
+              },
+              "resource": "{color.basic.light-blue.5}"
+            }
+          },
+          "bg": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "bg": {
+                  "value": "none",
+                  "type": "color",
+                  "key": "color-bg"
+                }
+              },
+              "resource": "none"
+            }
+          }
+        },
+        "scale": {
+          "min_height": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "min_height": {
+                  "value": "{dimension.basic.dimension.72}",
+                  "type": "sizing",
+                  "key": "scale-min_height"
+                }
+              },
+              "resource": "{dimension.basic.dimension.72}"
+            }
+          },
+          "max_width": {
+            "default": {
+              "data-key": "",
+              "style": {
+                "max_width": {
+                  "value": "{dimension.basic.dimension.1200}",
+                  "type": "sizing",
+                  "key": "scale-max_width"
+                }
+              },
+              "resource": "{dimension.basic.dimension.1200}"
+            }
+          }
+        },
+        "font": {
+          "fontsize": {
+            "default": {
+              "data-key": "",
+              "content": "| 表头1 | 表头2 |\n|:----|:----|\n| 响应式 功能 模块。 | 样式 现代。 |\n| 丰富 多样 样式。 | 响应式 模块。 |",
+              "style": {
+                "fontsize": {
+                  "value": "{font.size.medium}",
+                  "type": "fontSizes",
+                  "key": "font-fontsize"
+                }
+              },
+              "resource": "{font.size.medium}"
+            }
+          }
+        },
+        "type": "text_body",
+        "state": "default",
+        "events": [
+          {}
+        ]
+      },
+      {
+        "dataKeys": [],
+        "name": "layout",
+        "name-zh": "布局",
+        "file-type": "template",
+        "theme": "default",
+        "layout": {
+          "style": {
+            "display": "{layout.state.display.flex}",
+            "layoutMode": "{layout.direction.VERTICAL}",
+            "layoutWrap": "{layout.wrap.NO_WRAP}",
+            "primaryAxisSizingMode": "fixed",
+            "counterAxisSizingMode": "{layout.sizing.FIXED}",
+            "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+            "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+            "layoutAlign": "{layout.align.y.self.INHERIT}",
+            "layoutGrow": "{layout.grow.0}",
+            "boxSizing": "border-box",
+            "border-style": "solid",
+            "border-width": "{dimension.borderwidth.none}",
+            "border-color": "initial",
+            "height": "100%",
+            "width": "100%",
+            "box-sizing": "border-box",
+            "back-width": "100%",
+            "back-height": "100%",
+            "position": "relative",
+            "padding-top": "{dimension.padding.tight}",
+            "padding-bottom": "{dimension.padding.tight}",
+            "padding-left": "{dimension.padding.tight}",
+            "padding-right": "{dimension.padding.tight}",
+            "margin-top": "{dimension.margin.tight}",
+            "margin-bottom": "{dimension.margin.tight}",
+            "margin-left": "{dimension.margin.tight}",
+            "margin-right": "{dimension.margin.tight}",
+            "background-color": "none",
+            "gap": "{dimension.padding.loose}"
+          },
+          "children": [
+            {
+              "id": "dd-4bdc39b8-6bf9-41cc-80f2-1d9ae40263e9",
+              "name": "text",
+              "name-zh": "文本",
+              "file-type": "cell-element",
+              "layout": {
+                "style": {
+                  "background-color": "none",
+                  "font": [],
+                  "border": [],
+                  "scale": [],
+                  "box-sizing": "border-box",
+                  "primaryAxisSizingMode": "fixed",
+                  "position": "relative",
+                  "padding-top": "{dimension.padding.tight}",
+                  "padding-bottom": "{dimension.padding.tight}",
+                  "padding-left": "{dimension.padding.tight}",
+                  "padding-right": "{dimension.padding.tight}",
+                  "margin-top": "{dimension.margin.tight}",
+                  "margin-bottom": "{dimension.margin.tight}",
+                  "margin-left": "{dimension.margin.tight}",
+                  "margin-right": "{dimension.margin.tight}",
+                  "border-width": "{dimension.borderwidth.none}",
+                  "gap": "{dimension.padding.base}"
+                },
+                "text_body": {
+                  "type": "container",
+                  "content": [
+                    {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  ],
+                  "resource": "",
+                  "data": [],
+                  "style": {
+                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                    "layoutGrow": "{layout.grow.0}",
+                    "overflow": "auto",
+                    "word-break": "break-all",
+                    "textColor": {
+                      "element": "color",
+                      "value": "text",
+                      "prop": "default",
+                      "token": "text"
+                    },
+                    "fill": {
+                      "element": "color",
+                      "value": "bg",
+                      "prop": "default",
+                      "token": "bg"
+                    },
+                    "fontSizes": {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  },
+                  "children": []
+                },
+                "text_hyperlink": {
+                  "type": "container",
+                  "content": [
+                    {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  ],
+                  "resource": "",
+                  "data": [],
+                  "style": {
+                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                    "layoutGrow": "{layout.grow.0}",
+                    "text-decoration": "underline",
+                    "overflow": "auto",
+                    "word-break": "break-all",
+                    "textColor": {
+                      "element": "color",
+                      "value": "text",
+                      "prop": "default",
+                      "token": "hyperlinktext"
+                    },
+                    "fill": {
+                      "element": "color",
+                      "value": "bg",
+                      "prop": "default",
+                      "token": "bg"
+                    },
+                    "fontSizes": {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  },
+                  "children": []
+                }
+              },
+              "color": {
+                "text": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "text": {
+                        "value": "{color.basic.opacity.black.100}",
+                        "type": "color",
+                        "key": "color-text"
+                      },
+                      "hyperlinktext": {
+                        "value": "{color.basic.light-blue.5}",
+                        "type": "color",
+                        "key": "color-text"
+                      }
+                    },
+                    "resource": "{color.basic.light-blue.5}"
+                  }
+                },
+                "bg": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "bg": {
+                        "value": "none",
+                        "type": "color",
+                        "key": "color-bg"
+                      }
+                    },
+                    "resource": "none"
+                  }
+                }
+              },
+              "scale": {
+                "min_height": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "min_height": {
+                        "value": "{dimension.basic.dimension.72}",
+                        "type": "sizing",
+                        "key": "scale-min_height"
+                      }
+                    },
+                    "resource": "{dimension.basic.dimension.72}"
+                  }
+                },
+                "max_width": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "max_width": {
+                        "value": "{dimension.basic.dimension.1200}",
+                        "type": "sizing",
+                        "key": "scale-max_width"
+                      }
+                    },
+                    "resource": "{dimension.basic.dimension.1200}"
+                  }
+                }
+              },
+              "font": {
+                "fontsize": {
+                  "default": {
+                    "data-key": "",
+                    "content": "界面 界面。",
+                    "style": {
+                      "fontsize": {
+                        "value": "{font.size.xl}",
+                        "type": "fontSizes",
+                        "key": "font-fontsize"
+                      }
+                    },
+                    "resource": "{font.size.xl}"
+                  }
+                },
+                "fontweight": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "fontweight": {
+                        "value": "{font.fontweight.bold}",
+                        "type": "fontWeight",
+                        "key": "font-fontweight"
+                      }
+                    },
+                    "resource": "{font.fontweight.bold}"
+                  }
+                }
+              },
+              "type": "text_body",
+              "state": "default",
+              "events": [
+                {}
+              ]
+            },
+            {
+              "id": "dd-b63139ef-2ce3-4def-b939-62f0d47c60a2",
+              "name": "text",
+              "name-zh": "文本",
+              "file-type": "cell-element",
+              "layout": {
+                "style": {
+                  "background-color": "none",
+                  "font": [],
+                  "border": [],
+                  "scale": [],
+                  "box-sizing": "border-box",
+                  "primaryAxisSizingMode": "fixed",
+                  "position": "relative",
+                  "padding-top": "{dimension.padding.tight}",
+                  "padding-bottom": "{dimension.padding.tight}",
+                  "padding-left": "{dimension.padding.tight}",
+                  "padding-right": "{dimension.padding.tight}",
+                  "margin-top": "{dimension.margin.tight}",
+                  "margin-bottom": "{dimension.margin.tight}",
+                  "margin-left": "{dimension.margin.tight}",
+                  "margin-right": "{dimension.margin.tight}",
+                  "border-width": "{dimension.borderwidth.none}",
+                  "gap": "{dimension.padding.base}"
+                },
+                "text_body": {
+                  "type": "container",
+                  "content": [
+                    {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  ],
+                  "resource": "",
+                  "data": [],
+                  "style": {
+                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                    "layoutGrow": "{layout.grow.0}",
+                    "overflow": "auto",
+                    "word-break": "break-all",
+                    "textColor": {
+                      "element": "color",
+                      "value": "text",
+                      "prop": "default",
+                      "token": "text"
+                    },
+                    "fill": {
+                      "element": "color",
+                      "value": "bg",
+                      "prop": "default",
+                      "token": "bg"
+                    },
+                    "fontSizes": {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  },
+                  "children": []
+                },
+                "text_hyperlink": {
+                  "type": "container",
+                  "content": [
+                    {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  ],
+                  "resource": "",
+                  "data": [],
+                  "style": {
+                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                    "layoutGrow": "{layout.grow.0}",
+                    "text-decoration": "underline",
+                    "overflow": "auto",
+                    "word-break": "break-all",
+                    "textColor": {
+                      "element": "color",
+                      "value": "text",
+                      "prop": "default",
+                      "token": "hyperlinktext"
+                    },
+                    "fill": {
+                      "element": "color",
+                      "value": "bg",
+                      "prop": "default",
+                      "token": "bg"
+                    },
+                    "fontSizes": {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  },
+                  "children": []
+                }
+              },
+              "color": {
+                "text": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "text": {
+                        "value": "{color.basic.opacity.black.100}",
+                        "type": "color",
+                        "key": "color-text"
+                      },
+                      "hyperlinktext": {
+                        "value": "{color.basic.light-blue.5}",
+                        "type": "color",
+                        "key": "color-text"
+                      }
+                    },
+                    "resource": "{color.basic.light-blue.5}"
+                  }
+                },
+                "bg": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "bg": {
+                        "value": "none",
+                        "type": "color",
+                        "key": "color-bg"
+                      }
+                    },
+                    "resource": "none"
+                  }
+                }
+              },
+              "scale": {
+                "min_height": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "min_height": {
+                        "value": "{dimension.basic.dimension.72}",
+                        "type": "sizing",
+                        "key": "scale-min_height"
+                      }
+                    },
+                    "resource": "{dimension.basic.dimension.72}"
+                  }
+                },
+                "max_width": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "max_width": {
+                        "value": "{dimension.basic.dimension.1200}",
+                        "type": "sizing",
+                        "key": "scale-max_width"
+                      }
+                    },
+                    "resource": "{dimension.basic.dimension.1200}"
+                  }
+                }
+              },
+              "font": {
+                "fontsize": {
+                  "default": {
+                    "data-key": "",
+                    "content": "| 表头1 | 表头2 |\n|:----|:----|\n| 高效 功能 模块。 | 现代 现代 示例。 |\n| 响应式 现代 丰富。 | 测试 模块 丰富 响应式。 |\n| 样式 样式 示例 用户。 | 示例 快速。 |",
+                    "style": {
+                      "fontsize": {
+                        "value": "{font.size.medium}",
+                        "type": "fontSizes",
+                        "key": "font-fontsize"
+                      }
+                    },
+                    "resource": "{font.size.medium}"
+                  }
+                }
+              },
+              "type": "text_body",
+              "state": "default",
+              "events": [
+                {}
+              ]
+            },
+            {
+              "id": "dd-51505d76-6e2b-4187-a57d-a790e0395df2",
+              "name": "text",
+              "name-zh": "文本",
+              "file-type": "cell-element",
+              "layout": {
+                "style": {
+                  "background-color": "none",
+                  "font": [],
+                  "border": [],
+                  "scale": [],
+                  "box-sizing": "border-box",
+                  "primaryAxisSizingMode": "fixed",
+                  "position": "relative",
+                  "padding-top": "{dimension.padding.tight}",
+                  "padding-bottom": "{dimension.padding.tight}",
+                  "padding-left": "{dimension.padding.tight}",
+                  "padding-right": "{dimension.padding.tight}",
+                  "margin-top": "{dimension.margin.tight}",
+                  "margin-bottom": "{dimension.margin.tight}",
+                  "margin-left": "{dimension.margin.tight}",
+                  "margin-right": "{dimension.margin.tight}",
+                  "border-width": "{dimension.borderwidth.none}",
+                  "gap": "{dimension.padding.base}"
+                },
+                "text_body": {
+                  "type": "container",
+                  "content": [
+                    {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  ],
+                  "resource": "",
+                  "data": [],
+                  "style": {
+                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                    "layoutGrow": "{layout.grow.0}",
+                    "overflow": "auto",
+                    "word-break": "break-all",
+                    "textColor": {
+                      "element": "color",
+                      "value": "text",
+                      "prop": "default",
+                      "token": "text"
+                    },
+                    "fill": {
+                      "element": "color",
+                      "value": "bg",
+                      "prop": "default",
+                      "token": "bg"
+                    },
+                    "fontSizes": {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  },
+                  "children": []
+                },
+                "text_hyperlink": {
+                  "type": "container",
+                  "content": [
+                    {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  ],
+                  "resource": "",
+                  "data": [],
+                  "style": {
+                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                    "layoutGrow": "{layout.grow.0}",
+                    "text-decoration": "underline",
+                    "overflow": "auto",
+                    "word-break": "break-all",
+                    "textColor": {
+                      "element": "color",
+                      "value": "text",
+                      "prop": "default",
+                      "token": "hyperlinktext"
+                    },
+                    "fill": {
+                      "element": "color",
+                      "value": "bg",
+                      "prop": "default",
+                      "token": "bg"
+                    },
+                    "fontSizes": {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  },
+                  "children": []
+                }
+              },
+              "color": {
+                "text": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "text": {
+                        "value": "{color.basic.opacity.black.100}",
+                        "type": "color",
+                        "key": "color-text"
+                      },
+                      "hyperlinktext": {
+                        "value": "{color.basic.light-blue.5}",
+                        "type": "color",
+                        "key": "color-text"
+                      }
+                    },
+                    "resource": "{color.basic.light-blue.5}"
+                  }
+                },
+                "bg": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "bg": {
+                        "value": "none",
+                        "type": "color",
+                        "key": "color-bg"
+                      }
+                    },
+                    "resource": "none"
+                  }
+                }
+              },
+              "scale": {
+                "min_height": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "min_height": {
+                        "value": "{dimension.basic.dimension.72}",
+                        "type": "sizing",
+                        "key": "scale-min_height"
+                      }
+                    },
+                    "resource": "{dimension.basic.dimension.72}"
+                  }
+                },
+                "max_width": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "max_width": {
+                        "value": "{dimension.basic.dimension.1200}",
+                        "type": "sizing",
+                        "key": "scale-max_width"
+                      }
+                    },
+                    "resource": "{dimension.basic.dimension.1200}"
+                  }
+                }
+              },
+              "font": {
+                "fontsize": {
+                  "default": {
+                    "data-key": "",
+                    "content": "| 表头1 | 表头2 |\n|:----|:----|\n| 测试 布局 丰富。 | 兼容 高效 高效。 |\n| 布局 响应式。 | 功能 自适应。 |\n| 丰富 体验 用户 体验。 | 灵活 测试。 |\n| 示例 功能 布局 测试。 | 用户 多样 响应式 响应式。 |",
+                    "style": {
+                      "fontsize": {
+                        "value": "{font.size.medium}",
+                        "type": "fontSizes",
+                        "key": "font-fontsize"
+                      }
+                    },
+                    "resource": "{font.size.medium}"
+                  }
+                }
+              },
+              "type": "text_body",
+              "state": "default",
+              "events": [
+                {}
+              ]
+            },
+            {
+              "id": "dd-fd8bca12-3706-4bd5-92b1-00868a6bd7a8",
+              "name": "text",
+              "name-zh": "文本",
+              "file-type": "cell-element",
+              "layout": {
+                "style": {
+                  "background-color": "none",
+                  "font": [],
+                  "border": [],
+                  "scale": [],
+                  "box-sizing": "border-box",
+                  "primaryAxisSizingMode": "fixed",
+                  "position": "relative",
+                  "padding-top": "{dimension.padding.tight}",
+                  "padding-bottom": "{dimension.padding.tight}",
+                  "padding-left": "{dimension.padding.tight}",
+                  "padding-right": "{dimension.padding.tight}",
+                  "margin-top": "{dimension.margin.tight}",
+                  "margin-bottom": "{dimension.margin.tight}",
+                  "margin-left": "{dimension.margin.tight}",
+                  "margin-right": "{dimension.margin.tight}",
+                  "border-width": "{dimension.borderwidth.none}",
+                  "gap": "{dimension.padding.base}"
+                },
+                "text_body": {
+                  "type": "container",
+                  "content": [
+                    {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  ],
+                  "resource": "",
+                  "data": [],
+                  "style": {
+                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                    "layoutGrow": "{layout.grow.0}",
+                    "overflow": "auto",
+                    "word-break": "break-all",
+                    "textColor": {
+                      "element": "color",
+                      "value": "text",
+                      "prop": "default",
+                      "token": "text"
+                    },
+                    "fill": {
+                      "element": "color",
+                      "value": "bg",
+                      "prop": "default",
+                      "token": "bg"
+                    },
+                    "fontSizes": {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  },
+                  "children": []
+                },
+                "text_hyperlink": {
+                  "type": "container",
+                  "content": [
+                    {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  ],
+                  "resource": "",
+                  "data": [],
+                  "style": {
+                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                    "layoutGrow": "{layout.grow.0}",
+                    "text-decoration": "underline",
+                    "overflow": "auto",
+                    "word-break": "break-all",
+                    "textColor": {
+                      "element": "color",
+                      "value": "text",
+                      "prop": "default",
+                      "token": "hyperlinktext"
+                    },
+                    "fill": {
+                      "element": "color",
+                      "value": "bg",
+                      "prop": "default",
+                      "token": "bg"
+                    },
+                    "fontSizes": {
+                      "element": "font",
+                      "value": "fontsize",
+                      "prop": "default",
+                      "token": "fontsize"
+                    }
+                  },
+                  "children": []
+                }
+              },
+              "color": {
+                "text": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "text": {
+                        "value": "{color.basic.opacity.black.100}",
+                        "type": "color",
+                        "key": "color-text"
+                      },
+                      "hyperlinktext": {
+                        "value": "{color.basic.light-blue.5}",
+                        "type": "color",
+                        "key": "color-text"
+                      }
+                    },
+                    "resource": "{color.basic.light-blue.5}"
+                  }
+                },
+                "bg": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "bg": {
+                        "value": "none",
+                        "type": "color",
+                        "key": "color-bg"
+                      }
+                    },
+                    "resource": "none"
+                  }
+                }
+              },
+              "scale": {
+                "min_height": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "min_height": {
+                        "value": "{dimension.basic.dimension.72}",
+                        "type": "sizing",
+                        "key": "scale-min_height"
+                      }
+                    },
+                    "resource": "{dimension.basic.dimension.72}"
+                  }
+                },
+                "max_width": {
+                  "default": {
+                    "data-key": "",
+                    "style": {
+                      "max_width": {
+                        "value": "{dimension.basic.dimension.1200}",
+                        "type": "sizing",
+                        "key": "scale-max_width"
+                      }
+                    },
+                    "resource": "{dimension.basic.dimension.1200}"
+                  }
+                }
+              },
+              "font": {
+                "fontsize": {
+                  "default": {
+                    "data-key": "",
+                    "content": "自适应 多样 功能 布局 响应式 智能 响应式 兼容 智能。",
+                    "style": {
+                      "fontsize": {
+                        "value": "{font.size.medium}",
+                        "type": "fontSizes",
+                        "key": "font-fontsize"
+                      }
+                    },
+                    "resource": "{font.size.medium}"
+                  }
+                }
+              },
+              "type": "text_body",
+              "state": "default",
+              "events": [
+                {}
+              ]
+            }
+          ]
+        },
+        "description": "",
+        "id": "dd-aa8fc59c-4710-4a07-8762-a9579f850c55",
+        "events": [
+          {}
+        ]
+      }
+    ]
+  },
+  "events": [
+    {}
+  ]
+}

@@ -7,6 +7,7 @@ import { setDynamicTokenSystem, clearDynamicTokenSystem } from '../utils/tokens/
 import { calculateTokens } from '../utils/seeds/generateTokenBySeed';
 import { collectElementMeasurements } from '../utils/eightElement/collectMeasurements';
 import VisualSpaceEvaluator from '../components/VisualSpaceEvaluator';
+import collectEightElementMeasurements from '../utils/eightElement/collectElementMeasurements.js';
 
 const EightElementAnalyzer = () => {
   const [markdown, setMarkdown] = useState('# 八要素测试文档\n\n这是一个简单的测试文档，用于测试Markdown到八要素的转换功能。\n\n## 基本元素\n\n### 文本\n这是一段普通文本，将被转换为text元素。\n\n### 按钮（超链接）\n这是一个[按钮链接](https://example.com)，将被转换为button元素。');
@@ -161,87 +162,25 @@ const EightElementAnalyzer = () => {
     processMarkdown();
   };
 
-  // 测量iframe中的HTML内容
+  // 测量iframe内容时使用通用函数替换内联逻辑
   const measureIframeContent = () => {
     try {
       const iframe = iframeRef.current;
       if (!iframe || !iframe.contentWindow) return;
 
-      const measurements = {
-        container: {
-          width: iframe.clientWidth,
-          height: iframe.clientHeight
-        },
-        elements: []
+      const dimensions = {
+        width: iframe.clientWidth,
+        height: iframe.clientHeight
       };
 
-      // 将八要素结构的元素ID和测量数据关联
-      const collectMeasurements = (element, parent = null) => {
-        if (!element) return;
-        
-        // 找到iframe中的对应元素
-        const elementId = element.id;
-        if (!elementId) return;
-        
-        const domElement = iframe.contentDocument.getElementById(elementId);
-        if (!domElement) return;
-        
-        const rect = domElement.getBoundingClientRect();
-        
-        // 创建元素的测量数据
-        const elementData = {
-          id: elementId,
-          x: rect.left,
-          y: rect.top,
-          width: rect.width,
-          height: rect.height,
-          type: element.name === 'text' ? 'text' : 
-                element.name === 'button' ? 'button' : 
-                element.name === 'background' || element.name === 'image' ? 'image' : 'container',
-          style: {}
-        };
-        
-        // 获取计算样式
-        const computedStyle = window.getComputedStyle(domElement);
-        elementData.style = {
-          fontSize: parseFloat(computedStyle.fontSize),
-          lineHeight: parseFloat(computedStyle.lineHeight),
-          color: computedStyle.color,
-          backgroundColor: computedStyle.backgroundColor,
-          padding: {
-            top: parseFloat(computedStyle.paddingTop),
-            right: parseFloat(computedStyle.paddingRight),
-            bottom: parseFloat(computedStyle.paddingBottom),
-            left: parseFloat(computedStyle.paddingLeft)
-          },
-          margin: {
-            top: parseFloat(computedStyle.marginTop),
-            right: parseFloat(computedStyle.marginRight),
-            bottom: parseFloat(computedStyle.marginBottom),
-            left: parseFloat(computedStyle.marginLeft)
-          }
-        };
-        
-        // 特殊类型处理
-        if (elementData.type === 'text') {
-          elementData.textContent = domElement.textContent;
-          elementData.textLength = domElement.textContent.length;
-          const textArea = rect.width * rect.height;
-          elementData.textDensity = textArea > 0 ? (elementData.textLength / textArea) * 10000 : 0;
-        }
-        
-        // 添加到测量结果
-        measurements.elements.push(elementData);
-        
-        // 递归处理子元素
-        if (element.layout && element.layout.children) {
-          element.layout.children.forEach(child => collectMeasurements(child, element));
-        }
-      };
-      
-      // 从根元素开始收集测量数据
-      collectMeasurements(processedEightElement);
-      
+      // 使用通用元素测量收集函数
+      const measurements = collectEightElementMeasurements(processedEightElement, {
+        document: iframe.contentDocument,
+        dimensions,
+        getElementById: (id) => iframe.contentDocument.getElementById(id),
+        getComputedStyle: (el) => window.getComputedStyle(el)
+      });
+
       setDomMeasurements(measurements);
     } catch (error) {
       console.error('测量iframe内容时出错:', error);

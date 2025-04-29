@@ -155,11 +155,8 @@ const handle = app.getRequestHandler();
         res.status(200).json({
           success: true,
           score: result.score,
-          // 返回详细评分结果 - 兼容只使用visualSpaceScore的情况
-          scoreDetails: result.categories || {
-            spaceUtilization: result.categories?.spaceUtilization || { score: 0, details: {} },
-            contentAdaptability: result.categories?.contentAdaptability || { score: 0, details: {} }
-          },
+          // 确保scoreDetails与result.score.categories保持一致
+          scoreDetails: result.score.categories,
           // 如果使用了自定义设计令牌，返回相关信息
           designTokens: designTokens,
           tokensApplied: !!designTokens

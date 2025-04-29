@@ -34,7 +34,7 @@ export function renderEightElementToHtml(eightElement, options = {}) {
           width: ${width}px;
           height: ${height}px;
           position: relative;
-          overflow: hidden;
+          overflow: auto;
         }
         * {
           box-sizing: border-box;
@@ -151,13 +151,7 @@ function processStyleReferences(processedElement, originalElement, styleConfig) 
         else if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
             const resolvedValue = resolveToken(value) || value;
             applyStylesToElement(processedElement.computedStyle, key, resolvedValue);
-            if (value == '{font.size.xxl}') {
-                console.log('..... value')
-                console.log(value)
-                console.log('..... resolvedValue')
-                console.log(resolvedValue)
-            }
-
+    
         }
         // 处理普通值
         else if (typeof value === 'string' || typeof value === 'number') {
