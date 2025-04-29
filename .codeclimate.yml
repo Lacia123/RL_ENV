@@ -1,0 +1,38 @@
+version: "2"
+
+exclude_patterns:
+  - "target/**/*" # Rust 编译输出目录
+  - "node_modules/**/*" # 前端依赖
+  - "tests/**/*" # 单元测试代码通常不做质量检查
+  - "dist/**/*" # Svelte 编译输出
+  - "public/**/*" # 静态资源文件
+
+plugins:
+  # ESLint 代码分析（适用于 Svelte/TypeScript/JavaScript）
+  eslint:
+    enabled: true
+    config:
+      extensions:
+        - .js
+        - .ts
+        - .svelte
+      ignore-path: .eslintignore # 使用项目中的 .eslintignore
+
+  # Rust Clippy 代码质量检查
+  clippy:
+    enabled: true
+
+  # 代码重复性检查
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - rust
+        - javascript
+        - typescript
+        - svelte
+
+  # 安全漏洞检查（Rust + Svelte）
+  security:
+    enabled: true
+
