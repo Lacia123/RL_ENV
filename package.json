@@ -12,6 +12,8 @@
     "start:win": "set NODE_ENV=production&& node server.js",
     "start:prod": "NODE_ENV=production node .next/server.js",
     "start:prod:win": "set NODE_ENV=production&& node .next/server.js",
+    "start:dev": "set NODE_ENV=development&& node .next/server.js",
+    "start:alpha": "set NODE_ENV=alpha&& node .next/server.js",
     "prepare-deploy": "cd .next && npm install --production",
     "lint": "next lint"
   },
