@@ -24,11 +24,14 @@ const nextConfig = {
   },
   // 排除Playwright和jsdom在客户端打包
   experimental: {
-    // 旧选项
-    // serverComponentsExternalPackages: ['playwright-chromium', 'jsdom']
   },
   // 新选项
-  serverExternalPackages: ['playwright-chromium', 'jsdom']
+  serverExternalPackages: ['playwright-chromium', 'jsdom'],
+  
+  // 配置日志级别，帮助调试
+  logging: {
+    level: 'info',
+  }
 };
 
 export default nextConfig; 
