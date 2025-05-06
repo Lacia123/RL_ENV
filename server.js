@@ -1,8 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
 import { parse } from 'url';
 import next from 'next';
 
@@ -18,11 +16,7 @@ import next from 'next';
 // 判断是否为开发环境
 const dev = !process.env.NODE_ENV;
 const hostname = process.env.HOSTNAME || 'localhost';
-const port = process.env.PORT || 3001;
-
-console.log(process.env.NODE_ENV)
-console.log('...... dev')
-console.log(dev);
+const port = process.env.PORT || 3002;
 
 
 // 创建Next.js应用实例
@@ -65,37 +59,7 @@ const handle = app.getRequestHandler();
         timestamp: timestamp
       });
     });
-    
-    // 布局分析API
-    server.post('/api/layout-analysis', async (req, res) => {
-      try {
-        console.log('收到布局分析请求');
         
-        const request = req.body;
-        if (!request || !request.actions) {
-          return res.status(400).json({ 
-            success: false, 
-            error: '无效的请求格式' 
-          });
-        }
-        
-        // 动态导入API模块(仅在需要时加载)，指定具体文件路径
-        const { layoutAnalysisAPI } = await import(`./${dev ? 'src/app' : ''}/utils/layoutAnalysisAPI.js`);
-        
-        // 使用布局分析API评估布局
-        const result = await layoutAnalysisAPI.evaluateLayout(request);
-        
-        res.status(200).json(result);
-      } catch (error) {
-        console.error('布局分析API错误:', error);
-        res.status(500).json({ 
-          success: false, 
-          error: '布局分析失败', 
-          message: error.message 
-        });
-      }
-    });
-    
     // Markdown评分API
     server.post('/api/markdown-evaluate', async (req, res) => {
       try {
@@ -253,87 +217,7 @@ const handle = app.getRequestHandler();
         });
       }
     });
-    
-    // 布局生成API - 仅将actions转换为layout对象，不进行布局分析评估
-    server.post('/api/layout-from-actions', async (req, res) => {
-      try {
-        console.log('收到布局生成请求');
         
-        const requestData = req.body;
-        
-        // 验证请求数据
-        if (!requestData || !requestData.actions || !Array.isArray(requestData.actions)) {
-          return res.status(400).json({ 
-            success: false, 
-            message: '无效的请求数据，actions必须是数组'
-          });
-        }
-        
-        // 构建布局分析API请求
-        const apiRequest = {
-          metadata: {
-            canvasWidth: requestData.canvasWidth || 1024,
-            canvasHeight: requestData.canvasHeight || 768,
-            measurementMode: 'virtual' // 使用虚拟DOM测量，更轻量
-          },
-          actions: requestData.actions
-        };
-        
-        // 动态导入API模块(仅在需要时加载)
-        const { layoutAnalysisAPI } = await import(`./${dev ? 'src/app' : ''}/utils/layoutAnalysisAPI.js`);
-        
-        // 调用布局分析API生成布局
-        const result = await layoutAnalysisAPI.evaluateLayout(apiRequest);
-        
-        if (!result.success) {
-          return res.status(500).json({ 
-            success: false, 
-            message: result.error || '布局生成失败'
-          });
-        }
-        
-        // 处理输出格式
-        const outputFormat = requestData.outputFormat || 'standard'; // 默认为标准格式
-        
-        if (outputFormat === 'eightElements') {
-          // 转换为八要素格式
-          try {
-            // 动态导入转换工具
-            const { convertToEightElementFormat } = await import(`./${dev ? 'src/app' : ''}/utils/layoutToEightElements.js`);
-            
-            // 将layout转换为八要素格式
-            const eightElementLayout = convertToEightElementFormat(result.result.layout);
-            
-            // 返回八要素格式的布局
-            return res.status(200).json({
-              success: true,
-              layout: eightElementLayout
-            });
-          } catch (conversionError) {
-            console.error('转换为八要素格式失败:', conversionError);
-            return res.status(500).json({
-              success: false,
-              message: '转换为八要素格式失败',
-              error: conversionError.message
-            });
-          }
-        } else {
-          // 返回标准格式的布局
-          res.status(200).json({
-            success: true,
-            layout: result.result.layout
-          });
-        }
-      } catch (error) {
-        console.error('布局生成错误:', error);
-        res.status(500).json({ 
-          success: false, 
-          message: '处理布局数据时出错', 
-          error: error.message 
-        });
-      }
-    });
-    
     // 添加静态文件服务(可选)
     server.use(express.static('public'));
     

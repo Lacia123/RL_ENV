@@ -85,26 +85,6 @@ try {
     'utf8'
   );
 
-  // 创建启动指南
-  console.log('创建部署指南...');
-  const deployGuide = `
-  # 部署指南
-
-  构建已完成，请按照以下步骤部署应用：
-
-  1. 将.next目录复制到目标服务器
-  2. 在.next目录中运行：npm install --production
-  3. 启动服务器：NODE_ENV=production node server.js (Linux/Mac)
-     或者：set NODE_ENV=production&& node server.js (Windows)
-
-  注意：确保服务器上安装了Node.js (版本16+)
-  `;
-
-  fs.writeFileSync(
-    path.join(buildDir, 'DEPLOY.md'),
-    deployGuide,
-    'utf8'
-  );
 
   console.log('文件复制完成！构建已准备就绪。');
 } catch (error) {

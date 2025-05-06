@@ -10,10 +10,9 @@
 /**
  * 计算空间利用率评分
  * @param {Object} domMeasurements - DOM测量数据
- * @param {Object} layout - 布局数据
  * @returns {Object} - 评分详情
  */
-function calculateSpaceUtilizationScore(domMeasurements, layout) {
+function calculateSpaceUtilizationScore(domMeasurements) {
   if (!domMeasurements || !domMeasurements.container || !domMeasurements.elements) {
     return {
       score: 0,

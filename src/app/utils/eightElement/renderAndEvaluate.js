@@ -85,7 +85,6 @@ async function measureWithPlaywright(htmlContent, processedEightElement, contain
       container: { ...containerDimensions },
       elements: []
     };
-    
     // 辅助函数: 解析样式值
     function parseStyleValue(value, defaultValue = 0) {
       if (!value || value === 'normal' || value === 'none' || value === 'auto') {

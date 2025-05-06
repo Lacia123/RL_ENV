@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { renderEightElementToHtml } from '../utils/eightElement/renderEightElementHtml';
-import { analyzeEightElement, convertEightElementToLayout } from '../utils/layoutAnalysis/eightElementAnalysis';
+import { convertEightElementToLayout } from '../utils/layoutAnalysis/eightElementAnalysis';
 import { markdownToEightElement } from '../utils/eightElement/markdownToEightElement';
 import { setDynamicTokenSystem, clearDynamicTokenSystem } from '../utils/tokens/resolveToken';
 import { calculateTokens } from '../utils/seeds/generateTokenBySeed';
@@ -61,14 +61,6 @@ const EightElementAnalyzer = () => {
       setTimeout(measureIframeContent, 500);
     }
   }, [renderedHtml, dimensions]);
-
-  // 处理测量结果完成后的评分
-  useEffect(() => {
-    if (processedEightElement && domMeasurements) {
-      const result = analyzeEightElement(domMeasurements, processedEightElement);
-      setScoreResult(result);
-    }
-  }, [processedEightElement, domMeasurements]);
 
   // 处理Seed的更新（通过滑块）
   const handleSeedChange = (key, value) => {

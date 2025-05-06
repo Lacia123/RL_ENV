@@ -5,8 +5,6 @@
  * 作为layoutAnalysis模块的扩展，处理特定于八要素结构的分析逻辑
  */
 
-import { analyzeLayout } from '../layoutAnalysis/index.js'
-
 /**
  * 将八要素结构转换为标准布局结构
  * @param {Object} eightElement - 八要素结构对象
@@ -145,27 +143,6 @@ function recursiveConvertElement(element, idPrefix = '') {
 }
 
 
-/**
- * 分析八要素结构并评分
- * @param {Object} domMeasurements - DOM测量结果
- * @param {Object} eightElement - 八要素结构对象
- * @param {Object} options - 分析选项
- * @returns {Object} 评分结果
- */
-export function analyzeEightElement(domMeasurements, eightElement, options = {}) {
-  // 将八要素结构转换为标准布局结构
-  const layout = convertEightElementToLayout(eightElement);
-  
-  // 保存转换后的layout和domMeasurements到文件
-    // saveToFile(layout, 'eight_element_layout.json');
-    // saveToFile(domMeasurements, 'eight_element_measurements.json');
-    // saveToFile(eightElement, 'original_eight_element.json');
-  
-  // 使用标准的布局分析逻辑进行评分
-  return analyzeLayout(layout, domMeasurements, options.markdownElements);
-}
-
 export default {
-  analyzeEightElement,
   convertEightElementToLayout
 }; 

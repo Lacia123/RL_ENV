@@ -1,7 +1,5 @@
 "use client"
 import React from 'react';
-import { Provider } from 'react-redux';
-import { store } from './utils/reduxStore';
 import EightElementAnalyzer from './eight-element-analyzer/page';
 
 /**
@@ -20,14 +18,12 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-      
+
       {/* 内容区域 */}
       <div className="w-full">
-        <Provider store={store}>
-          <EightElementAnalyzer />
-        </Provider>
+        <EightElementAnalyzer />
       </div>
-        
+
       {/* 页脚信息 */}
       <div className="w-full bg-white border-t py-4 mt-8">
         <div className="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
