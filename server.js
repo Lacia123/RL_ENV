@@ -16,9 +16,13 @@ import next from 'next';
 
 
 // 判断是否为开发环境
-const dev = process.env.NODE_ENV !== 'production';
+const dev = !process.env.NODE_ENV;
 const hostname = process.env.HOSTNAME || 'localhost';
 const port = process.env.PORT || 3001;
+
+console.log(process.env.NODE_ENV)
+console.log('...... dev')
+console.log(dev);
 
 
 // 创建Next.js应用实例

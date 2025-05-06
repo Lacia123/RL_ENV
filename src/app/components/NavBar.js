@@ -10,8 +10,6 @@ const NavBar = () => {
   // 导航项
   const navItems = [
     { name: '首页', href: '/' },
-    { name: '布局编辑器', href: '/layout-editor' },
-    { name: 'API文档', href: '/api-docs' },
     { name: '八要素分析', href: '/eight-element-analyzer' }
   ];
 
