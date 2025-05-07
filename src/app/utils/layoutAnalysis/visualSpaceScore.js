@@ -28,12 +28,30 @@ function calculateSpaceUtilizationScore(domMeasurements) {
 
   const { container, elements } = domMeasurements;
 
+  // 获取实际容器尺寸（考虑可能的滚动条），提供默认最小值
+  const containerWidth = Math.max(container.width || 0, 320); // 最小宽度320px
+  const containerHeight = Math.max(container.height || 0, 240); // 最小高度240px
 
+  // 计算容器实际大小（使用最大元素位置计算实际大小）
+  let maxRight = 0;
+  let maxBottom = 0;
+  
+  elements.forEach(element => {
+    if (!element) return;
+    
+    const right = (element.x || 0) + (element.width || 0);
+    const bottom = (element.y || 0) + (element.height || 0);
+    
+    if (right > maxRight) maxRight = right;
+    if (bottom > maxBottom) maxBottom = bottom;
+  });
+  
+  // 使用较大值作为总面积计算基础
+  const totalWidth = Math.max(containerWidth, maxRight);
+  const totalHeight = Math.max(containerHeight, maxBottom);
+  const totalArea = totalWidth * totalHeight;
 
-  const totalArea = (container.width || 0) * (container.height || 0);
-
-  console.log('.... container W', container.width)
-  console.log('.... container H', container.height)
+  console.log('.... total area', totalArea);
   
   // 防止总面积为0
   if (totalArea <= 0) {
@@ -49,7 +67,7 @@ function calculateSpaceUtilizationScore(domMeasurements) {
     };
   }
   
-  // 计算有效元素（文本、图片、按钮）占用的总面积
+  // 计算有效元素占用的总面积
   let effectiveArea = 0;
   let elementsCount = 0;
   
@@ -72,64 +90,133 @@ function calculateSpaceUtilizationScore(domMeasurements) {
       
       const width = element.width || 0;
       const height = element.height || 0;
-
-      console.log('.... element')
-      console.log(element)
-
-      console.log('.... width', width)
-      console.log('.... height', height)
       
       // 确保宽高为正数
       if (width > 0 && height > 0) {
-        // 文字和按钮元素占空间权重为3倍
-        let weightMultiplier = 1;
-        if (element.type === 'text' || 
-            element.type === 'p' || 
-            element.type === 'span' || 
-            element.type === 'h1' || 
-            element.type === 'h2' || 
-            element.type === 'h3' || 
-            element.type === 'h4' || 
-            element.type === 'h5' || 
-            element.type === 'h6' || 
-            element.type === 'button') {
-          weightMultiplier = 3; // 文字和按钮元素的权重为3倍
+        // 初始化有效尺寸
+        let effectiveWidth = width;
+        let effectiveHeight = height;
+        
+        // 获取样式信息
+        const style = element.style || {};
+        const computedStyle = element.computedStyle || {};
+        
+        // 处理margin和padding
+        let marginLeft = 0;
+        let marginRight = 0;
+        let marginTop = 0;
+        let marginBottom = 0;
+        let paddingLeft = 0;
+        let paddingRight = 0;
+        let paddingTop = 0;
+        let paddingBottom = 0;
+        
+        // 从新数据结构中提取边距值
+        if (style.margin) {
+          marginLeft = style.margin.left || 0;
+          marginRight = style.margin.right || 0;
+          marginTop = style.margin.top || 0;
+          marginBottom = style.margin.bottom || 0;
         }
         
-        effectiveArea += width * height * weightMultiplier;
+        if (style.padding) {
+          paddingLeft = style.padding.left || 0;
+          paddingRight = style.padding.right || 0;
+          paddingTop = style.padding.top || 0;
+          paddingBottom = style.padding.bottom || 0;
+        }
+        
+        // 如果新结构中没有找到，尝试旧结构
+        if (marginLeft === 0 && computedStyle) {
+          marginLeft = parseFloat(computedStyle.marginLeft) || 0;
+          marginRight = parseFloat(computedStyle.marginRight) || 0;
+          marginTop = parseFloat(computedStyle.marginTop) || 0;
+          marginBottom = parseFloat(computedStyle.marginBottom) || 0;
+        }
+        
+        if (paddingLeft === 0 && computedStyle) {
+          paddingLeft = parseFloat(computedStyle.paddingLeft) || 0;
+          paddingRight = parseFloat(computedStyle.paddingRight) || 0;
+          paddingTop = parseFloat(computedStyle.paddingTop) || 0;
+          paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
+        }
+        
+        // 根据元素类型应用不同的计算规则
+        const isTextElement = element.type === 'text' || 
+                             element.type === 'p' || 
+                             element.type === 'span' || 
+                             element.type === 'h1' || 
+                             element.type === 'h2' || 
+                             element.type === 'h3' || 
+                             element.type === 'h4' || 
+                             element.type === 'h5' || 
+                             element.type === 'h6';
+        
+        // 文本元素：减去margin和padding
+        if (isTextElement) {
+          effectiveWidth -= (marginLeft + marginRight + paddingLeft + paddingRight);
+          effectiveHeight -= (marginTop + marginBottom + paddingTop + paddingBottom);
+        } 
+        // 按钮元素：只减去margin
+        else if (element.type === 'button') {
+          effectiveWidth -= (marginLeft + marginRight);
+          effectiveHeight -= (marginTop + marginBottom);
+        }
+        
+        // 确保有效尺寸不小于0
+        effectiveWidth = Math.max(0, effectiveWidth);
+        effectiveHeight = Math.max(0, effectiveHeight);
+        
+        // 应用权重
+        let weightMultiplier = 1;
+        if (isTextElement || element.type === 'button') {
+          weightMultiplier = 3; // 文字和按钮元素权重为3倍
+        }
+        
+        // 计算元素的有效面积
+        const elementEffectiveArea = effectiveWidth * effectiveHeight * weightMultiplier;
+        
+        // 考虑文本密度（如果有）
+        if (element.textDensity !== undefined && isTextElement) {
+          // 文本密度越高，视觉重要性越高
+          const densityFactor = Math.min(2, 1 + (element.textDensity / 50)); // 最多增加100%
+          effectiveArea += elementEffectiveArea * densityFactor;
+        } else {
+          effectiveArea += elementEffectiveArea;
+        }
+        
         elementsCount++;
       }
     }
   });
   
-  // 计算空间利用率，防止除以零
+  // 计算空间利用率
   const utilizationRatio = totalArea > 0 ? effectiveArea / totalArea : 0;
   
   // 计算评分，目标是40%左右的空间利用率
-  // 使用修改后的高斯分布函数，在40%时得分最高，但下降更平缓
   const optimalRatio = 0.4; // 最佳空间利用率
-  const variance = 0.2; // 增大方差，使评分曲线更平缓
+  const variance = 0.2; // 方差，使评分曲线平缓
   
   // 考虑元素数量的影响 - 元素越多，对密度的容忍度越高
   const elementCountFactor = Math.min(1.5, 1 + (elementsCount / 50)); // 最多增加50%的容忍度
   const adjustedVariance = variance * elementCountFactor;
   
-  // 安全计算指数函数，防止溢出
+  // 安全计算分数
   let score;
   try {
-    // 使用修改后的评分函数，确保分数不会太快降到0
+    // 使用高斯分布函数计算评分
     score = 100 * Math.exp(-Math.pow(utilizationRatio - optimalRatio, 2) / (2 * Math.pow(adjustedVariance, 2)));
     
-    // 确保最低分数为20，而不是0
+    // 确保分数在合理范围内
     score = Math.max(20, score);
     
-    // 验证分数是否为有效数字
+    // 验证分数是否有效
     if (isNaN(score) || !isFinite(score)) {
-      score = 20; // 最低分数为20
+      score = 20; // 出错时默认给20分
     }
   } catch (error) {
     console.error("计算评分时出错:", error);
-    score = 20; // 出错时也给20分而不是0分
+    score = 20; // 出错时默认给20分
   }
   
   return {
@@ -139,6 +226,10 @@ function calculateSpaceUtilizationScore(domMeasurements) {
       effectiveArea,
       totalArea,
       elementsCount,
+      containerWidth,
+      containerHeight,
+      actualWidth: totalWidth,
+      actualHeight: totalHeight,
       recommendation: getUtilizationRecommendation(utilizationRatio)
     }
   };
@@ -189,8 +280,9 @@ function calculateContentAdaptabilityScore(domMeasurements, layout) {
   }
   
   const { container, elements } = domMeasurements;
-  const containerWidth = container.width || 0;
-  const containerHeight = container.height || 0;
+  // 设置容器最小尺寸
+  const containerWidth = Math.max(container.width || 0, 320); // 最小宽度320px
+  const containerHeight = Math.max(container.height || 0, 240); // 最小高度240px
   
   // 检查是否有内容超出容器
   let maxBottom = 0;
@@ -230,35 +322,47 @@ function calculateContentAdaptabilityScore(domMeasurements, layout) {
   const horizontalOverflowRatio = containerWidth > 0 ? 
     Math.max(0, (maxRight - containerWidth) / containerWidth) : 0;
   
-  // 根据溢出情况计算评分
-  // 没有溢出得100分，溢出越多分数越低，但不会降到20分以下
-  let verticalScore, horizontalScore;
+  // 判断是否有滚动条
+  const hasVerticalScrollbar = verticalOverflowRatio > 0;
+  const hasHorizontalScrollbar = horizontalOverflowRatio > 0;
   
   // 计算内容占用的屏数
   const verticalScreens = maxBottom / containerHeight;
   const horizontalScreens = maxRight / containerWidth;
+
+  // 基于屏数的评分系统，对滚动条存在情况进行特殊处理
+    let verticalScore = 100; // 默认初始值
+    let horizontalScore = 100; // 默认初始值
   
   try {
-    // 基于屏数的评分系统，对刚出现滚动条的情况惩罚更大
+    // 滚动条惩罚系数
+    const verticalScrollbarPenalty = hasVerticalScrollbar ? 15 : 0; // 垂直滚动条惩罚15分
+    const horizontalScrollbarPenalty = hasHorizontalScrollbar ? 25 : 0; // 水平滚动条惩罚25分（更严重）
     
     // 垂直方向评分
     if (verticalScreens <= 1) {
       // 一屏内显示，满分
       verticalScore = 100;
     } else if (verticalScreens <= 1.1) {
-      // 刚超出一屏，分数快速下降
-      // 从100分快速下降到75分
+      // 刚超出一屏，分数快速下降 
       verticalScore = 100 - 250 * (verticalScreens - 1);
+      // 应用滚动条惩罚
+      verticalScore -= verticalScrollbarPenalty;
     } else if (verticalScreens <= 2) {
       // 1.1到2屏，分数从75分缓慢下降到60分
       verticalScore = 75 - 15 * ((verticalScreens - 1.1) / 0.9);
+      // 应用滚动条惩罚
+      verticalScore -= verticalScrollbarPenalty;
     } else if (verticalScreens <= 3) {
       // 2到3屏，分数从60分缓慢下降到45分
       verticalScore = 60 - 15 * (verticalScreens - 2);
+      // 应用滚动条惩罚
+      verticalScore -= verticalScrollbarPenalty;
     } else {
       // 超过3屏，使用更平缓的指数函数
       verticalScore = 45 * Math.exp(-0.3 * (verticalScreens - 3));
-      verticalScore = Math.max(20, verticalScore);
+      // 应用滚动条惩罚
+      verticalScore -= verticalScrollbarPenalty;
     }
     
     // 水平方向评分（水平滚动条通常更影响用户体验）
@@ -269,14 +373,23 @@ function calculateContentAdaptabilityScore(domMeasurements, layout) {
       // 刚超出一屏，分数极速下降
       // 从100分极速下降到70分
       horizontalScore = 100 - 600 * (horizontalScreens - 1);
+      // 应用滚动条惩罚
+      horizontalScore -= horizontalScrollbarPenalty;
     } else if (horizontalScreens <= 1.5) {
       // 1.05到1.5屏，分数从70分缓慢下降到55分
       horizontalScore = 70 - 15 * ((horizontalScreens - 1.05) / 0.45);
+      // 应用滚动条惩罚
+      horizontalScore -= horizontalScrollbarPenalty;
     } else {
       // 超过1.5屏，使用更平缓的指数函数
       horizontalScore = 55 * Math.exp(-0.5 * (horizontalScreens - 1.5));
-      horizontalScore = Math.max(20, horizontalScore);
+      // 应用滚动条惩罚
+      horizontalScore -= horizontalScrollbarPenalty;
     }
+    
+    // 确保分数不低于20
+    verticalScore = Math.max(20, verticalScore);
+    horizontalScore = Math.max(20, horizontalScore);
     
     // 验证分数是否为有效数字
     if (isNaN(verticalScore) || !isFinite(verticalScore)) {
@@ -302,12 +415,14 @@ function calculateContentAdaptabilityScore(domMeasurements, layout) {
       horizontalOverflowRatio: horizontalOverflowRatio.toFixed(2),
       verticalScreens: verticalScreens.toFixed(2),
       horizontalScreens: horizontalScreens.toFixed(2),
+      hasVerticalScrollbar: hasVerticalScrollbar,
+      hasHorizontalScrollbar: hasHorizontalScrollbar,
       maxBottom,
       maxRight,
       containerHeight,
       containerWidth,
       overflowingElements,
-      recommendation: getAdaptabilityRecommendation(verticalScreens, horizontalScreens)
+      recommendation: getAdaptabilityRecommendation(verticalScreens, horizontalScreens, hasVerticalScrollbar, hasHorizontalScrollbar)
     }
   };
 }
@@ -316,9 +431,11 @@ function calculateContentAdaptabilityScore(domMeasurements, layout) {
  * 获取内容适应性的建议
  * @param {number} verticalScreens - 垂直方向占用的屏数
  * @param {number} horizontalScreens - 水平方向占用的屏数
+ * @param {boolean} hasVerticalScrollbar - 是否有垂直滚动条
+ * @param {boolean} hasHorizontalScrollbar - 是否有水平滚动条
  * @returns {string} - 建议内容
  */
-function getAdaptabilityRecommendation(verticalScreens, horizontalScreens) {
+function getAdaptabilityRecommendation(verticalScreens, horizontalScreens, hasVerticalScrollbar, hasHorizontalScrollbar) {
   if (verticalScreens <= 1 && horizontalScreens <= 1) {
     return "内容完全适应当前视口，布局良好";
   }
@@ -329,9 +446,11 @@ function getAdaptabilityRecommendation(verticalScreens, horizontalScreens) {
   if (verticalScreens <= 1) {
     // 不需要建议
   } else if (verticalScreens <= 1.1) {
-    recommendations.push("内容刚刚超出视口高度，建议微调以避免出现垂直滚动条");
+    const scrollbarMsg = hasVerticalScrollbar ? "，现已出现垂直滚动条，强烈建议调整" : "，建议微调以避免出现垂直滚动条";
+    recommendations.push("内容刚刚超出视口高度" + scrollbarMsg);
   } else if (verticalScreens <= 2) {
-    recommendations.push("内容需要垂直滚动约 " + Math.round((verticalScreens - 1) * 100) + "% 的视口高度");
+    const scrollbarMsg = hasVerticalScrollbar ? "，并出现垂直滚动条" : "";
+    recommendations.push("内容需要垂直滚动约 " + Math.round((verticalScreens - 1) * 100) + "% 的视口高度" + scrollbarMsg);
   } else if (verticalScreens <= 3) {
     recommendations.push("内容需要较多垂直滚动（约 " + Math.round(verticalScreens) + " 屏），考虑适当精简内容或增大视口");
   } else {
@@ -342,7 +461,8 @@ function getAdaptabilityRecommendation(verticalScreens, horizontalScreens) {
   if (horizontalScreens <= 1) {
     // 不需要建议
   } else if (horizontalScreens <= 1.05) {
-    recommendations.push("内容刚刚超出水平视口，强烈建议调整以避免水平滚动条");
+    const scrollbarMsg = hasHorizontalScrollbar ? "，现已出现水平滚动条，必须调整" : "，强烈建议调整以避免水平滚动条";
+    recommendations.push("内容刚刚超出水平视口" + scrollbarMsg);
   } else if (horizontalScreens <= 1.5) {
     recommendations.push("内容超出水平视口，需要水平滚动，建议调整布局");
   } else {
@@ -494,7 +614,7 @@ function createLayoutVisualization(domMeasurements) {
 export function evaluateVisualSpace(domMeasurements, layout) {
   try {
     // 计算各项评分
-    const utilizationScore = calculateSpaceUtilizationScore(domMeasurements, layout);
+    const utilizationScore = calculateSpaceUtilizationScore(domMeasurements);
     const adaptabilityScore = calculateContentAdaptabilityScore(domMeasurements, layout);
     
     // 综合评分（各占50%），确保最低分数为20
