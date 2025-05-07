@@ -4,7 +4,7 @@ import { createServer } from 'http';
 // 判断是否为开发环境
 const dev = !process.env.NODE_ENV;
 const hostname = process.env.HOSTNAME || 'localhost';
-const port = process.env.PORT || 3002;
+const port = process.env.PORT || 3001;
 
 // 创建Next.js应用实例
 const app = next({ dev, hostname, port });
