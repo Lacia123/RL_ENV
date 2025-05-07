@@ -27,7 +27,13 @@ function calculateSpaceUtilizationScore(domMeasurements) {
   }
 
   const { container, elements } = domMeasurements;
+
+
+
   const totalArea = (container.width || 0) * (container.height || 0);
+
+  console.log('.... container W', container.width)
+  console.log('.... container H', container.height)
   
   // 防止总面积为0
   if (totalArea <= 0) {
@@ -66,6 +72,12 @@ function calculateSpaceUtilizationScore(domMeasurements) {
       
       const width = element.width || 0;
       const height = element.height || 0;
+
+      console.log('.... element')
+      console.log(element)
+
+      console.log('.... width', width)
+      console.log('.... height', height)
       
       // 确保宽高为正数
       if (width > 0 && height > 0) {
