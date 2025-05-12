@@ -50,8 +50,6 @@ function calculateSpaceUtilizationScore(domMeasurements) {
   const totalWidth = Math.max(containerWidth, maxRight);
   const totalHeight = Math.max(containerHeight, maxBottom);
   const totalArea = totalWidth * totalHeight;
-
-  console.log('.... total area', totalArea);
   
   // 防止总面积为0
   if (totalArea <= 0) {

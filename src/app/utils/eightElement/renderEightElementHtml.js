@@ -32,9 +32,7 @@ export function renderEightElementToHtml(eightElement, options = {}) {
         }
         .eight-element-container {
           width: ${width}px;
-          height: ${height}px;
           position: relative;
-          overflow: auto;
         }
         * {
           box-sizing: border-box;

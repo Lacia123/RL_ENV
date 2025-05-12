@@ -28,6 +28,7 @@ const EightElementAnalyzer = () => {
   const [seedInputMode, setSeedInputMode] = useState('sliders'); // 'sliders' 或 'json'
   const iframeRef = useRef(null);
   const [layout, setLayout] = useState(null);
+  const [iframeKey, setIframeKey] = useState(0);  // 添加 iframe key 状态
 
   // 先定义commonDimensions
   const commonDimensions = [
@@ -50,17 +51,22 @@ const EightElementAnalyzer = () => {
 
   // 处理markdown变化
   useEffect(() => {
-    if (markdown) {
+    if (markdown && !renderedHtml) {
       processMarkdown();
     }
-  }, [markdown, seed, dimensions]);
+  }, [markdown, seed]);
 
   // 处理iframe加载完成后的测量
   useEffect(() => {
     if (renderedHtml && iframeRef.current) {
-      setTimeout(measureIframeContent, 500);
+      const timer = setTimeout(() => {
+        measureIframeContent();
+        // 确保测量完成后再次更新 key
+        setIframeKey(prev => prev + 1);
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [renderedHtml, dimensions]);
+  }, [renderedHtml]);
 
   // 处理Seed的更新（通过滑块）
   const handleSeedChange = (key, value) => {
@@ -90,8 +96,12 @@ const EightElementAnalyzer = () => {
   };
 
   // 处理Markdown转换为八要素结构
-  const processMarkdown = () => {
+  const processMarkdown = (customDimensions = null) => {
     try {
+      // 使用传入的自定义尺寸或当前状态中的尺寸
+      const currentDimensions = customDimensions || dimensions;
+      console.log('处理Markdown使用尺寸:', currentDimensions);
+      
       // 先清除之前可能存在的动态token系统
       clearDynamicTokenSystem();
       
@@ -105,10 +115,10 @@ const EightElementAnalyzer = () => {
       const eightElementObj = markdownToEightElement(markdown);
       setEightElement(eightElementObj);
       
-      // 渲染HTML，使用dimensions中的宽高
+      // 渲染HTML，使用currentDimensions中的宽高
       const { html, processedEightElement } = renderEightElementToHtml(eightElementObj, { 
-        width: dimensions.width, 
-        height: dimensions.height
+        width: currentDimensions.width, 
+        height: currentDimensions.height
       });
       
       setRenderedHtml(html);
@@ -119,27 +129,23 @@ const EightElementAnalyzer = () => {
       setLayout(convertedLayout);
       console.log('转换后的布局结构:', convertedLayout);
 
-      // 使用collectElementMeasurements收集DOM测量数据
+      // 从根元素开始收集测量数据
       const measurements = {
         container: {
-          width: dimensions.width,
-          height: dimensions.height
+          width: currentDimensions.width,
+          height: currentDimensions.height
         },
         elements: []
       };
-
-      // 从根元素开始收集测量数据
-      const rootElement = iframeRef.current?.contentDocument?.body;
-      if (rootElement) {
-        collectElementMeasurements(rootElement, null, measurements);
-      }
       
       setDomMeasurements(measurements);
-      console.log('DOM测量数据:', measurements);
+      
+      return html; // 返回生成的HTML，方便调用者使用
     } catch (error) {
       console.error('处理Markdown时出错:', error);
       // 确保出错时也清除动态token系统
       clearDynamicTokenSystem();
+      return null;
     }
   };
 
@@ -242,15 +248,37 @@ const EightElementAnalyzer = () => {
 
   // 添加尺寸选择处理函数
   const handleDimensionChange = (dimension) => {
+    // 防止重复点击相同尺寸
+    if (dimensions.width === dimension.width && dimensions.height === dimension.height) {
+      console.log('已经是当前尺寸，无需更改');
+      return;
+    }
+    
     console.log('尺寸变更为:', dimension.width, 'x', dimension.height);
-    setDimensions({
+    
+    // 先重置 iframe key 强制重新渲染
+    setIframeKey(prev => prev + 1);
+    
+    // 先处理新尺寸的渲染，得到新的HTML
+    const newDimensions = {
       width: dimension.width,
       height: dimension.height
-    });
-    // 尺寸变化后主动触发重新渲染
-    setTimeout(() => {
-      processMarkdown();
-    }, 100);
+    };
+    
+    // 先清除旧的渲染结果
+    setRenderedHtml('');
+    setProcessedEightElement(null);
+    setDomMeasurements(null);
+    
+    // 更新维度状态
+    setDimensions(newDimensions);
+    
+    // 使用新尺寸强制重新处理
+    if (markdown) {
+      // 使用新尺寸立即生成HTML，不依赖状态更新
+      const html = processMarkdown(newDimensions);
+      console.log('使用新尺寸生成了HTML, 长度:', html?.length);
+    }
   };
 
   console.log('processedEightElement')
@@ -487,13 +515,15 @@ const EightElementAnalyzer = () => {
                 boxShadow: '0 0 10px rgba(0,0,0,0.1)',
                 transition: 'width 0.3s, height 0.3s'
               }}>
-                <iframe
-                  ref={iframeRef}
-                  className="w-full h-full"
-                  srcDoc={renderedHtml}
-                  title="Eight Element Preview"
-                  key={`iframe-${dimensions.width}-${dimensions.height}`}
-                ></iframe>
+                {renderedHtml && (  // 只在有内容时渲染 iframe
+                  <iframe
+                    ref={iframeRef}
+                    className="w-full h-full"
+                    srcDoc={renderedHtml}
+                    title="Eight Element Preview"
+                    key={iframeKey}  // 使用状态管理的 key
+                  ></iframe>
+                )}
               </div>
             </div>
           </div>
