@@ -5,12 +5,47 @@ import { convertEightElementToLayout } from '../utils/layoutAnalysis/eightElemen
 import { markdownToEightElement } from '../utils/eightElement/markdownToEightElement';
 import { setDynamicTokenSystem, clearDynamicTokenSystem } from '../utils/tokens/resolveToken';
 import { calculateTokens } from '../utils/seeds/generateTokenBySeed';
-import { collectElementMeasurements } from '../utils/eightElement/collectMeasurements';
 import VisualSpaceEvaluator from '../components/VisualSpaceEvaluator';
 import collectEightElementMeasurements from '../utils/eightElement/collectElementMeasurements.js';
 
 const EightElementAnalyzer = () => {
-  const [markdown, setMarkdown] = useState('# 八要素测试文档\n\n这是一个简单的测试文档，用于测试Markdown到八要素的转换功能。\n\n## 基本元素\n\n### 文本\n这是一段普通文本，将被转换为text元素。\n\n### 按钮（超链接）\n这是一个[按钮链接](https://example.com)，将被转换为button元素。');
+  const [markdown, setMarkdown] = useState(`# 八要素测试文档
+
+这是一个简单的测试文档，用于测试Markdown到八要素的转换功能。
+
+## 基本元素
+
+### 文本
+这是一段普通文本，将被转换为text元素。
+
+### 按钮（超链接）
+这是一个[按钮链接](https://example.com)，将被转换为button元素。
+
+### 代码块示例
+下面是一个JavaScript代码示例：
+
+\`\`\`javascript
+function greeting(name) {
+  return \`Hello, \${name}!\`;
+}
+
+// 调用函数
+const message = greeting('World');
+console.log(message);  // 输出: Hello, World!
+\`\`\`
+
+### 表格示例
+下面是一个简单的表格示例：
+
+| 功能 | 描述 | 支持状态 |
+| --- | --- | :---: |
+| 文本 | 支持普通文本和标题 | ✅ |
+| 按钮 | 支持超链接按钮 | ✅ |
+| 图片 | 支持图片显示 | ✅ |
+| 表格 | 支持表格渲染和样式 | ✅ |
+| 代码块 | 支持代码高亮显示 | ✅ |
+| 混合内容 | 支持在一行中混合[链接](https://example.com)和文本 | ✅ |
+`);
   const [seedText, setSeedText] = useState(''); // 用于存储JSON文本
   const [seed, setSeed] = useState({
     shape: 7,      // 较大圆角

@@ -1,11 +1,12 @@
 // markdownToEightElement.js
 // 导入样式配置和常量
-import { 
-  getElementStyleConfig, 
+import borderwidth from '../tokens/dimension/borderwidth.js';
+import {
+  getElementStyleConfig,
   LAYOUT_CONSTANTS,
-  COLOR_CONSTANTS, 
-  DIMENSION_CONSTANTS, 
-  FONT_CONSTANTS 
+  COLOR_CONSTANTS,
+  DIMENSION_CONSTANTS,
+  FONT_CONSTANTS
 } from './styleConfig.js';
 
 // 改进UUID生成，确保更唯一
@@ -53,7 +54,7 @@ function createTextElement(text, variant = 'normal') {
   // 获取文本元素的样式配置
   const textStyleConfig = getElementStyleConfig('text', variant);
   const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
-  
+
   return {
     id,
     name: "text",
@@ -159,7 +160,7 @@ function createTextElement(text, variant = 'normal') {
               key: "color-text"
             },
             hyperlinktext: {
-              value: variant === 'hyperlink' ? 
+              value: variant === 'hyperlink' ?
                 (textStyleConfig.textColor || COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5]) :
                 COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5],
               type: "color",
@@ -821,7 +822,7 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
   // 获取图片元素的样式配置
   const imageStyleConfig = getElementStyleConfig('image', variant);
   const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
-  
+
   return {
     id,
     name: "background",
@@ -980,10 +981,10 @@ function createLayoutElement(direction, children = [], options = {}) {
 
   // 获取布局元素的样式配置
   const layoutStyleConfig = getElementStyleConfig('layout', isRoot ? 'root' : variant);
-  
+
   // 创建基础布局
   const baseLayout = createBaseLayout(direction, { width, height });
-  
+
   // 应用来自配置的样式
   Object.entries(layoutStyleConfig).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
@@ -1031,7 +1032,7 @@ function createHeadingLayout(headingContent, subElements = [], headingLevel = 1)
   // 添加标题文本，根据标题级别选择文本样式
   const headingVariant = `h${headingLevel}`;
   const headingText = createTextElement(headingContent, headingVariant);
-  
+
   layout.layout.children.push(headingText);
 
   // 添加子元素
@@ -1045,7 +1046,7 @@ function createHeadingLayout(headingContent, subElements = [], headingLevel = 1)
 // 创建流式布局容器，用于包装一级标题块
 function createFlexWrapLayout(children = []) {
   const layoutId = generateUUID();
-  
+
   // 创建一个水平流式布局，使用CSS的flex-wrap属性
   const layout = {
     dataKeys: [],
@@ -1090,7 +1091,7 @@ function createFlexWrapLayout(children = []) {
 // 创建一级标题块容器，设置最小宽度和最大宽度
 function createHeadingBlockContainer(headingLayout) {
   const layoutId = generateUUID();
-  
+
   // 创建一个包装容器，设置最小宽度和flex-basis
   const layout = {
     dataKeys: [],
@@ -1137,6 +1138,253 @@ function createHeadingBlockContainer(headingLayout) {
   return layout;
 }
 
+// 检测markdown表格 - 采用更简单的检测方式
+function isMarkdownTable(lines) {
+  if (lines.length < 2) return false;
+
+  // 表格至少需要一个标题行和一个分隔行
+  const headerLine = lines[0].trim();
+  const separatorLine = lines[1].trim();
+
+  console.log('检查是否为表格: ', { headerLine, separatorLine });
+
+  // 基本检查: 两行都必须包含|，分隔行必须包含-
+  const headerHasSeparator = headerLine.includes('|');
+  const separatorHasSeparator = separatorLine.includes('|');
+  const separatorHasDash = separatorLine.includes('-');
+
+  // 所有条件都必须满足
+  const isTable = headerHasSeparator && separatorHasSeparator && separatorHasDash;
+
+  console.log('表格检测结果: ', {
+    headerHasSeparator,
+    separatorHasSeparator,
+    separatorHasDash,
+    isTable
+  });
+
+  return isTable;
+}
+
+// 提取完整的Markdown表格
+function extractMarkdownTable(lines, startIndex) {
+  console.log(`开始提取表格，从第${startIndex}行开始`);
+
+  const tableLines = [];
+  let i = startIndex;
+
+  // 找到表格的所有行
+  while (i < lines.length) {
+    const line = lines[i].trim();
+
+    // 如果行为空或不包含|，认为表格结束
+    if (line === '' || !line.includes('|')) {
+      console.log(`表格在第${i}行结束，因为: ${line === '' ? '空行' : '没有|字符'}`);
+      break;
+    }
+
+    console.log(`添加表格行: ${line}`);
+    tableLines.push(line);
+    i++;
+  }
+
+  // 确保至少有标题行和分隔行
+  if (tableLines.length < 2) {
+    console.log('提取的表格行数不足，无效表格');
+    return { tableContent: '', endIndex: startIndex };
+  }
+
+  const result = {
+    tableContent: tableLines.join('\n'),
+    endIndex: i - 1
+  };
+
+  console.log(`提取的表格内容 (${tableLines.length}行):`);
+  console.log(result.tableContent);
+  console.log(`表格结束索引: ${result.endIndex}`);
+
+  return result;
+}
+
+// 创建表格元素
+function createTableElement(markdownTableContent) {
+  console.log('开始创建表格元素，原始表格内容长度:', markdownTableContent.length);
+  const id = generateUUID();
+  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
+
+  // 确保表格内容不为空
+  if (!markdownTableContent.trim()) {
+    console.error('警告: 尝试创建表格元素但内容为空');
+  }
+
+  // 创建符合要求的表格元素结构
+  const tableElement = {
+    id,
+    name: "table",
+    "name-zh": "表格",
+    "file-type": "cell-element",
+    type: "table",
+    rawData: markdownTableContent,
+    layout: {
+      style: {
+        // 基础样式
+        "background-color": [],
+        font: [],
+        border: [],
+        scale: [],
+        "box-sizing": "border-box",
+        primaryAxisSizingMode: "fixed",
+        position: "relative",
+        ...layoutStyleConfig,
+
+        // 表格特定样式
+        table: {
+          borderCollapse: "collapse",
+          width: "100%",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+          fontSize: FONT_CONSTANTS.SIZE.MEDIUM,
+          color: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[100],
+          marginTop: DIMENSION_CONSTANTS.MARGIN.base,
+          marginBottom: DIMENSION_CONSTANTS.MARGIN.base
+        },
+        th: {
+          backgroundColor: COLOR_CONSTANTS.BASIC.GREY[2],
+          borderWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
+          borderColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
+          borderStyle: "solid",
+          padding: DIMENSION_CONSTANTS.PADDING.tight,
+          textAlign: "left",
+          fontWeight: FONT_CONSTANTS.WEIGHT.SEMIBOLD
+        },
+        tr: {
+          borderBottomWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
+          borderBottomColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
+          borderBottomStyle: "solid"
+        },
+        td: {
+          padding: DIMENSION_CONSTANTS.PADDING.tight,
+          borderWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
+          borderStyle: "solid",
+          borderColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
+          textAlign: "left"
+        }
+      }
+    },
+    events: [{}]
+  };
+
+  console.log('表格元素创建完成:', JSON.stringify({
+    id: tableElement.id,
+    name: tableElement.name,
+    type: tableElement.type,
+    rawData: (tableElement.rawData && tableElement.rawData.length > 0) ? '有内容' : '无内容',
+    hasTableStyles: !!(tableElement.layout?.style?.table)
+  }, null, 2));
+
+  return tableElement;
+}
+
+// 创建代码元素
+function createCodeElement(codeContent, language = '') {
+  const id = generateUUID();
+  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
+
+  console.log('创建代码元素，语言:', language);
+
+  // 创建符合要求的代码元素结构
+  const codeElement = {
+    id,
+    name: "code",
+    "name-zh": "代码",
+    "file-type": "cell-element",
+    type: "code",
+    rawData: codeContent,
+    language: language || 'plaintext', // 保存代码语言
+    layout: {
+      style: {
+        // 基础样式
+        "background-color": [],
+        font: [],
+        border: [],
+        scale: [],
+        "box-sizing": "border-box",
+        padding: DIMENSION_CONSTANTS.PADDING.base,
+        fontSize: FONT_CONSTANTS.SIZE.SMALL,
+        lineHeight: "1.5",
+        whiteSpace: "pre",
+        borderWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
+        borderStyle: "solid",
+        borderColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
+        borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.medium,
+      }
+    },
+    events: [{}]
+  };
+
+  console.log('代码元素创建完成:', JSON.stringify({
+    id: codeElement.id,
+    name: codeElement.name,
+    type: codeElement.type,
+    language: codeElement.language,
+    rawData: (codeElement.rawData && codeElement.rawData.length > 0) ? '有内容' : '无内容'
+  }, null, 2));
+
+  return codeElement;
+}
+
+// 检测Markdown代码块
+function isMarkdownCodeBlock(line) {
+  return line.trim().startsWith('```');
+}
+
+// 提取完整的Markdown代码块
+function extractMarkdownCodeBlock(lines, startIndex) {
+  console.log(`开始提取代码块，从第${startIndex}行开始`);
+
+  const startLine = lines[startIndex].trim();
+  let language = '';
+
+  // 从第一行提取语言信息
+  if (startLine.length > 3) {
+    language = startLine.substring(3).trim();
+    console.log(`检测到代码语言: ${language}`);
+  }
+
+  const codeLines = [];
+  let i = startIndex + 1;
+  let foundEnd = false;
+
+  // 查找代码块结束标记
+  while (i < lines.length) {
+    const line = lines[i];
+
+    if (line.trim() === '```') {
+      foundEnd = true;
+      i++;
+      break;
+    }
+
+    codeLines.push(line);
+    i++;
+  }
+
+  // 如果没有找到结束标记，可能是不完整的代码块
+  if (!foundEnd) {
+    console.log('警告: 未找到代码块结束标记');
+  }
+
+  const result = {
+    codeContent: codeLines.join('\n'),
+    language: language,
+    endIndex: i - 1
+  };
+
+  console.log(`提取的代码内容 (${codeLines.length}行):`);
+  console.log(`代码结束索引: ${result.endIndex}`);
+
+  return result;
+}
+
 // 改进Markdown解析功能，支持更复杂的内容处理
 function parseMarkdown(markdown) {
   // 分割Markdown文本为行
@@ -1144,13 +1392,13 @@ function parseMarkdown(markdown) {
 
   // 解析结果将存储在这个数组中
   const elements = [];
-  
+
   // 存储一级标题块，用于后续流式布局
   const h1Blocks = [];
 
   // 用于跟踪当前的嵌套级别
   const stack = [{ level: 0, elements: elements }];
-  
+
   // 当前处理的一级标题块
   let currentH1Block = null;
 
@@ -1160,18 +1408,112 @@ function parseMarkdown(markdown) {
   // 缓存当前处理的文本块
   let currentTextBlock = '';
 
-  // 处理每一行
+  // 优先预处理：识别Markdown中的表格
+  console.log('开始检查Markdown中的表格...');
+
+  // 创建一个函数来查找完整表格的起始行
+  function findTableStartLines(lines) {
+    const tableStarts = [];
+
+    for (let i = 0; i < lines.length - 1; i++) {
+      if (i + 1 < lines.length && isMarkdownTable([lines[i], lines[i + 1]])) {
+        tableStarts.push(i);
+      }
+    }
+
+    return tableStarts;
+  }
+
+  // 查找所有表格的起始行
+  const allLines = lines.map(line => line);
+  const tableStarts = findTableStartLines(allLines);
+  console.log(`找到 ${tableStarts.length} 个表格起始行: ${tableStarts.join(', ')}`);
+
+  // 标记每一行是否为表格的一部分
+  const markedLines = [];
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
+    markedLines.push({
+      line: lines[i],
+      isTable: false,
+      tableContent: null,
+      isTableStart: false
+    });
+  }
+
+  // 处理每个表格
+  for (const startIndex of tableStarts) {
+    // 提取表格内容
+    const { tableContent, endIndex } = extractMarkdownTable(allLines, startIndex);
+
+    if (tableContent) {
+      console.log(`标记表格从第${startIndex}行到第${endIndex}行`);
+
+      // 标记第一行为表格开始，并存储完整表格内容
+      markedLines[startIndex].isTable = true;
+      markedLines[startIndex].tableContent = tableContent;
+      markedLines[startIndex].isTableStart = true;
+
+      // 标记其余表格行
+      for (let j = startIndex + 1; j <= endIndex; j++) {
+        markedLines[j].isTable = true;
+      }
+    }
+  }
+
+  console.log('表格检测和标记完成');
+
+  // 处理每一行
+  for (let i = 0; i < markedLines.length; i++) {
+    const { line, isTable, tableContent, isTableStart } = markedLines[i];
+    const trimmedLine = line.trim();
+
+    // 处理表格
+    if (isTable && isTableStart && tableContent) {
+      console.log(`处理表格开始行 ${i}`);
+      // 处理之前累积的内容
+      flushTextBlock();
+      flushConsecutiveButtons();
+
+      // 创建表格元素
+      const tableElement = createTableElement(tableContent);
+      console.log(`创建表格元素: id=${tableElement.id}`);
+      stack[stack.length - 1].elements.push(tableElement);
+      continue;
+    } else if (isTable) {
+      // 跳过其余表格行
+      console.log(`跳过表格行 ${i}`);
+      continue;
+    }
+
+    // 处理代码块
+    if (isMarkdownCodeBlock(trimmedLine)) {
+      // 处理之前累积的内容
+      flushTextBlock();
+      flushConsecutiveButtons();
+
+      // 提取代码块内容和语言
+      const { codeContent, language, endIndex } = extractMarkdownCodeBlock(
+        markedLines.map(item => item.line),
+        i
+      );
+
+      // 创建代码元素
+      const codeElement = createCodeElement(codeContent, language);
+      stack[stack.length - 1].elements.push(codeElement);
+
+      // 跳过已处理的代码块行
+      i = endIndex;
+      continue;
+    }
 
     // 新段落或特殊元素开始，处理之前累积的文本块
-    if (line === '' && currentTextBlock) {
+    if (trimmedLine === '' && currentTextBlock) {
       flushTextBlock();
       continue;
     }
 
     // 解析标题
-    const headingMatch = line.match(/^(#{1,6})\s+(.*?)$/);
+    const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.*?)$/);
     if (headingMatch) {
       // 处理之前累积的内容
       flushTextBlock();
@@ -1186,18 +1528,18 @@ function parseMarkdown(markdown) {
         if (currentH1Block) {
           h1Blocks.push(currentH1Block);
         }
-        
+
         // 创建新的一级标题布局
         const newHeadingLayout = createHeadingLayout(content, [], level);
-        
+
         // 创建新的一级标题块
         currentH1Block = newHeadingLayout;
-        
+
         // 重置栈，只保留根级别
         while (stack.length > 1) {
           stack.pop();
         }
-        
+
         // 将新的嵌套层级添加到栈中
         stack.push({ level, elements: newHeadingLayout.layout.children });
       } else {
@@ -1218,11 +1560,11 @@ function parseMarkdown(markdown) {
     }
 
     // 整行是图片 ![alt](url)
-    if (line.match(/^!\[.*?\]\(.*?\)$/) && !line.match(/^!\[.*?\]\(.*?\).*?\[.*?\]\(.*?\)/)) {
+    if (trimmedLine.match(/^!\[.*?\]\(.*?\)$/) && !trimmedLine.match(/^!\[.*?\]\(.*?\).*?\[.*?\]\(.*?\)/)) {
       flushTextBlock();
       flushConsecutiveButtons();
 
-      const imgUrl = line.match(/\((.*?)\)/)[1];
+      const imgUrl = trimmedLine.match(/\((.*?)\)/)[1];
 
       const backgroundElement = createBackgroundElement(imgUrl);
       stack[stack.length - 1].elements.push(backgroundElement);
@@ -1231,20 +1573,20 @@ function parseMarkdown(markdown) {
     }
 
     // 检查是否有多个链接或混合内容
-    if (line.includes('[') && line.includes('](') && line.includes(')')) {
+    if (trimmedLine.includes('[') && trimmedLine.includes('](') && trimmedLine.includes(')')) {
       // 如果该行不仅仅只有一个链接（即前后有其他文本），视为混合内容行
-      const multiLinkMatch = line.match(/\[([^\]]+)\]\(([^)]+)\)/g);
+      const multiLinkMatch = trimmedLine.match(/\[([^\]]+)\]\(([^)]+)\)/g);
       const linkPattern = /^\[([^\]]+)\]\(([^)]+)\)$/;
-      const isLinkLine = linkPattern.test(line);
+      const isLinkLine = linkPattern.test(trimmedLine);
 
       // 如果不是纯链接行，则当作混合内容处理
       if (!isLinkLine) {
         flushTextBlock();
         flushConsecutiveButtons();
 
-        console.log(`处理混合内容行: ${line}`);
+        console.log(`处理混合内容行: ${trimmedLine}`);
 
-        const processedLayout = processMixedContent(line);
+        const processedLayout = processMixedContent(trimmedLine);
         stack[stack.length - 1].elements.push(processedLayout);
 
         continue;
@@ -1272,11 +1614,11 @@ function parseMarkdown(markdown) {
     }
 
     // 普通文本行
-    if (line !== '') {
+    if (trimmedLine !== '') {
       if (currentTextBlock) {
-        currentTextBlock += '\n' + line;
+        currentTextBlock += '\n' + trimmedLine;
       } else {
-        currentTextBlock = line;
+        currentTextBlock = trimmedLine;
       }
     }
   }
@@ -1285,114 +1627,19 @@ function parseMarkdown(markdown) {
   flushTextBlock();
   flushConsecutiveButtons();
 
-  // 辅助函数：处理文本块
-  function flushTextBlock() {
-    if (currentTextBlock) {
-      const textElement = createTextElement(currentTextBlock);
-      stack[stack.length - 1].elements.push(textElement);
-      currentTextBlock = '';
-    }
-  }
-
-  // 辅助函数：将累积的按钮添加为水平布局
-  function flushConsecutiveButtons() {
-    if (consecutiveButtons.length > 0) {
-      console.log(`处理 ${consecutiveButtons.length} 个连续按钮`);
-
-      if (consecutiveButtons.length === 1) {
-        // 单个按钮不需要水平布局
-        stack[stack.length - 1].elements.push(consecutiveButtons[0]);
-        console.log(`添加单个按钮: ${consecutiveButtons[0].id}`);
-      } else {
-        // 多个连续按钮放在水平布局中
-        const buttonLayout = createHorizontalButtonLayout(consecutiveButtons);
-        stack[stack.length - 1].elements.push(buttonLayout);
-        console.log(`添加按钮布局: ${buttonLayout.id}, 包含 ${consecutiveButtons.length} 个按钮`);
-      }
-      consecutiveButtons = [];
-    }
-  }
-
-  // 辅助函数：处理混合内容行
-  function processMixedContent(line) {
-    // 创建一个水平布局元素
-    let currentLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL);
-
-    // 查找所有普通链接 [text](url) 但不是图片链接
-    const normalLinkRegex = /(?<!!)\[(.*?)\]\((.*?)\)/g;
-    const linkMatches = [...line.matchAll(normalLinkRegex)];
-    console.log(`找到 ${linkMatches.length} 个普通链接`);
-
-    // 查找所有图片 ![alt](url)
-    const imageMatches = [...line.matchAll(/!\[(.*?)\]\((.*?)\)/g)];
-    console.log(`找到 ${imageMatches.length} 个图片链接`);
-
-    // 合并并按照在原文中的位置排序
-    const allMatches = [
-      ...linkMatches.map(match => ({ type: 'link', match })),
-      ...imageMatches.map(match => ({ type: 'image', match }))
-    ].sort((a, b) => a.match.index - b.match.index);
-
-    let lastIndex = 0;
-
-    // 按顺序处理所有匹配项
-    for (const { type, match } of allMatches) {
-      const matchIndex = match.index;
-
-      // 处理匹配项前的文本
-      if (matchIndex > lastIndex) {
-        const textBefore = line.substring(lastIndex, matchIndex);
-        // 始终创建文本元素，即使只有空格
-        const textElement = createTextElement(textBefore);
-        currentLayout.layout.children.push(textElement);
-      }
-
-      // 处理匹配项
-      if (type === 'link') {
-        const linkText = match[1];
-        const linkUrl = match[2];
-        console.log(`处理混合内容中的链接: 文本="${linkText}", URL="${linkUrl}"`);
-        const buttonElement = createButtonElement(linkText, linkUrl);
-        currentLayout.layout.children.push(buttonElement);
-      } else if (type === 'image') {
-        const imgAlt = match[1];
-        const imgUrl = match[2];
-        const backgroundElement = createBackgroundElement(imgUrl);
-        currentLayout.layout.children.push(backgroundElement);
-      }
-
-      lastIndex = matchIndex + match[0].length;
-    }
-
-    // 处理最后一个匹配后的文本
-    if (lastIndex < line.length) {
-      const textAfter = line.substring(lastIndex);
-      // 始终创建尾部文本元素，即使只有空格
-      const textElement = createTextElement(textAfter);
-      currentLayout.layout.children.push(textElement);
-    }
-
-    // 直接返回layout元素，而不是包含它的数组
-    return currentLayout;
-  }
-
-  // 确保处理完所有累积的内容
-  flushTextBlock();
-  flushConsecutiveButtons();
-  
   // 如果有当前的一级标题块，将其添加到h1Blocks中
   if (currentH1Block) {
     h1Blocks.push(currentH1Block);
   }
-  
+
   // 如果有多个一级标题块，创建流式布局并将它们包装起来
   if (h1Blocks.length > 1) {
     // 将每个一级标题块包装在容器中，设置最小宽度
     const wrappedH1Blocks = h1Blocks.map(block => createHeadingBlockContainer(block));
-    
+
     // 创建流式布局容器
     const flexLayout = createFlexWrapLayout(wrappedH1Blocks);
-    
+
     // 返回流式布局
     return [flexLayout];
   } else if (h1Blocks.length === 1) {
@@ -1498,7 +1745,7 @@ function parseMarkdown(markdown) {
 // 创建八要素根对象
 function createEightElementRoot(markdownElements) {
   const rootId = generateUUID();
-  
+
   // 获取根布局的样式配置
   const rootStyleConfig = getElementStyleConfig('layout', 'root');
 
@@ -1531,7 +1778,7 @@ function createEightElementRoot(markdownElements) {
     },
     events: [{}]
   };
-  
+
   // 应用根布局样式配置
   Object.entries(rootStyleConfig).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
@@ -1555,10 +1802,10 @@ function markdownToEightElement(markdown, styleConfig) {
       console.warn('设置样式配置失败:', error);
     }
   }
-  
+
   const parsedElements = parseMarkdown(markdown);
   const eightElementRoot = createEightElementRoot(parsedElements);
-  
+
   // 重置为默认配置
   try {
     // 动态导入避免循环依赖
@@ -1568,7 +1815,7 @@ function markdownToEightElement(markdown, styleConfig) {
   } catch (error) {
     console.warn('重置样式配置失败:', error);
   }
-  
+
   return eightElementRoot;
 }
 
@@ -1618,8 +1865,7 @@ function exampleMarkdownToEightElement(styleConfig) {
 // const example = exampleMarkdownToEightElement();
 // console.log(JSON.stringify(example, null, 2));
 
-// 增强导出功能，添加示例和调试工具
-
+// 命名导出
 export {
   markdownToEightElement,
   parseMarkdown,
@@ -1631,10 +1877,16 @@ export {
   createHeadingLayout,
   createFlexWrapLayout,
   createHeadingBlockContainer,
+  createTableElement,
+  createCodeElement,  // 导出代码创建函数
+  isMarkdownTable,
+  isMarkdownCodeBlock,  // 导出代码块检测函数
+  extractMarkdownTable,
+  extractMarkdownCodeBlock,  // 导出代码块提取函数
   printEightElementStructure,
   exampleMarkdownToEightElement,
   LAYOUT_CONSTANTS,
   COLOR_CONSTANTS,
   DIMENSION_CONSTANTS,
   FONT_CONSTANTS
-}
+};

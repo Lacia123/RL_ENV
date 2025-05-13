@@ -6,6 +6,9 @@
  */
 
 import resolveToken from '../tokens/resolveToken.js';
+import { Marked, marked } from 'marked';
+import { markedHighlight }from 'marked-highlight';
+import hljs from 'highlight.js';
 
 /**
  * 渲染八要素结构为HTML字符串，并返回预处理后的八要素结构
@@ -14,10 +17,10 @@ import resolveToken from '../tokens/resolveToken.js';
  * @returns {Object} - 包含HTML字符串和预处理后的八要素结构
  */
 export function renderEightElementToHtml(eightElement, options = {}) {
-  const { width = 1024, height = 768 } = options;
-  
-  // 创建HTML文档头部
-  const htmlHeader = `
+    const { width = 1024, height = 768 } = options;
+
+    // 创建HTML文档头部
+    const htmlHeader = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -31,11 +34,129 @@ export function renderEightElementToHtml(eightElement, options = {}) {
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
         .eight-element-container {
-          width: ${width}px;
           position: relative;
         }
         * {
           box-sizing: border-box;
+        }
+
+
+        pre code.hljs {
+            display: block;
+            overflow-x: auto;
+            padding: 1em;
+        }
+        code.hljs {
+            padding: 3px 5px;
+        }
+        /*!
+            Theme: GitHub
+            Description: Light theme as seen on github.com
+            Author: github.com
+            Maintainer: @Hirse
+            Updated: 2021-05-15
+            Outdated base version: https://github.com/primer/github-syntax-light
+            Current colors taken from GitHub's CSS
+        */
+        .hljs {
+            color: #24292e;
+            background: #ffffff;
+        }
+        .hljs-doctag,
+        .hljs-keyword,
+        .hljs-meta .hljs-keyword,
+        .hljs-template-tag,
+        .hljs-template-variable,
+        .hljs-type,
+        .hljs-variable.language_ {
+            /* prettylights-syntax-keyword */
+            color: #d73a49;
+        }
+        .hljs-title,
+        .hljs-title.class_,
+        .hljs-title.class_.inherited__,
+        .hljs-title.function_ {
+            /* prettylights-syntax-entity */
+            color: #6f42c1;
+        }
+        .hljs-attr,
+        .hljs-attribute,
+        .hljs-literal,
+        .hljs-meta,
+        .hljs-number,
+        .hljs-operator,
+        .hljs-variable,
+        .hljs-selector-attr,
+        .hljs-selector-class,
+        .hljs-selector-id {
+            /* prettylights-syntax-constant */
+            color: #005cc5;
+        }
+        .hljs-regexp,
+        .hljs-string,
+        .hljs-meta .hljs-string {
+            /* prettylights-syntax-string */
+            color: #032f62;
+        }
+        .hljs-built_in,
+        .hljs-symbol {
+            /* prettylights-syntax-variable */
+            color: #e36209;
+        }
+        .hljs-comment,
+        .hljs-code,
+        .hljs-formula {
+            /* prettylights-syntax-comment */
+            color: #6a737d;
+        }
+        .hljs-name,
+        .hljs-quote,
+        .hljs-selector-tag,
+        .hljs-selector-pseudo {
+            /* prettylights-syntax-entity-tag */
+            color: #22863a;
+        }
+        .hljs-subst {
+            /* prettylights-syntax-storage-modifier-import */
+            color: #24292e;
+        }
+        .hljs-section {
+            /* prettylights-syntax-markup-heading */
+            color: #005cc5;
+            font-weight: bold;
+        }
+        .hljs-bullet {
+            /* prettylights-syntax-markup-list */
+            color: #735c0f;
+        }
+        .hljs-emphasis {
+            /* prettylights-syntax-markup-italic */
+            color: #24292e;
+            font-style: italic;
+        }
+        .hljs-strong {
+            /* prettylights-syntax-markup-bold */
+            color: #24292e;
+            font-weight: bold;
+        }
+        .hljs-addition {
+            /* prettylights-syntax-markup-inserted */
+            color: #22863a;
+            background-color: #f0fff4;
+        }
+        .hljs-deletion {
+            /* prettylights-syntax-markup-deleted */
+            color: #b31d28;
+            background-color: #ffeef0;
+        }
+        .hljs-char.escape_,
+        .hljs-link,
+        .hljs-params,
+        .hljs-property,
+        .hljs-punctuation,
+        .hljs-tag {
+                /* purposely ignored */
+  
         }
       </style>
     </head>
@@ -45,17 +166,17 @@ export function renderEightElementToHtml(eightElement, options = {}) {
 
     // 预处理八要素结构
     const processedEightElement = preProcessEightElement(eightElement);
-  
-  // 递归渲染主体内容
+
+    // 递归渲染主体内容
     const htmlBody = renderElement(processedEightElement);
-  
-  // 创建HTML文档尾部
-  const htmlFooter = `
+
+    // 创建HTML文档尾部
+    const htmlFooter = `
       </div>
     </body>
     </html>
   `;
-  
+
     return {
         html: htmlHeader + htmlBody + htmlFooter,
         processedEightElement
@@ -89,6 +210,16 @@ function preProcessEightElement(element) {
     // 处理图片引用
     else if (element.name === 'background' || element.name === 'image') {
         processImageElement(processedElement, element);
+    }
+
+    // 处理表格元素
+    else if (element.name === 'table') {
+        processTableElement(processedElement, element);
+    }
+
+    // 处理代码元素
+    else if (element.name === 'code') {
+        processCodeElement(processedElement, element);
     }
 
     // 递归处理子元素
@@ -149,7 +280,7 @@ function processStyleReferences(processedElement, originalElement, styleConfig) 
         else if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
             const resolvedValue = resolveToken(value) || value;
             applyStylesToElement(processedElement.computedStyle, key, resolvedValue);
-    
+
         }
         // 处理普通值
         else if (typeof value === 'string' || typeof value === 'number') {
@@ -317,6 +448,84 @@ function processImageElement(processedElement, originalElement) {
         processedElement.imageUrl = originalElement.material.image.default.resource || '';
     } else if (originalElement.src) {
         processedElement.imageUrl = originalElement.src;
+    }
+}
+
+/**
+ * 处理表格元素的样式引用
+ * @param {Object} processedElement - 要修改的处理元素
+ * @param {Object} originalElement - 原始元素
+ */
+function processTableElement(processedElement, originalElement) {
+    // 保留原始的Markdown表格内容
+    processedElement.rawData = originalElement.rawData || '';
+
+    // 确保layout.style存在
+    if (!processedElement.layout) {
+        processedElement.layout = { style: {} };
+    } else if (!processedElement.layout.style) {
+        processedElement.layout.style = {};
+    }
+
+    // 确保表格样式对象存在
+    if (!processedElement.layout.style.table) processedElement.layout.style.table = {};
+    if (!processedElement.layout.style.th) processedElement.layout.style.th = {};
+    if (!processedElement.layout.style.tr) processedElement.layout.style.tr = {};
+    if (!processedElement.layout.style.td) processedElement.layout.style.td = {};
+
+    // 处理表格样式 - 确保表格样式对象存在
+    if (originalElement.layout && originalElement.layout.style) {
+        // 处理table样式
+        if (originalElement.layout.style.table) {
+            processStyleReferences(
+                { computedStyle: processedElement.layout.style.table },
+                originalElement,
+                originalElement.layout.style.table
+            );
+        }
+
+        // 处理th样式
+        if (originalElement.layout.style.th) {
+            processStyleReferences(
+                { computedStyle: processedElement.layout.style.th },
+                originalElement,
+                originalElement.layout.style.th
+            );
+        }
+
+        // 处理tr样式
+        if (originalElement.layout.style.tr) {
+            processStyleReferences(
+                { computedStyle: processedElement.layout.style.tr },
+                originalElement,
+                originalElement.layout.style.tr
+            );
+        }
+
+        // 处理td样式
+        if (originalElement.layout.style.td) {
+            processStyleReferences(
+                { computedStyle: processedElement.layout.style.td },
+                originalElement,
+                originalElement.layout.style.td
+            );
+        }
+    }
+}
+
+/**
+ * 处理代码元素的样式引用
+ * @param {Object} processedElement - 要修改的处理元素
+ * @param {Object} originalElement - 原始元素
+ */
+function processCodeElement(processedElement, originalElement) {
+    // 保留原始的代码内容和语言
+    processedElement.rawData = originalElement.rawData || '';
+    processedElement.language = originalElement.language || 'plaintext';
+    
+    // 处理样式引用
+    if (originalElement.layout && originalElement.layout.style) {
+        processStyleReferences(processedElement, originalElement, originalElement.layout.style);
     }
 }
 
@@ -497,27 +706,31 @@ function applyLayoutToken(computedStyle, key, value) {
  */
 function renderElement(element) {
 
-  if (!element) return '';
-  
-  // 处理layout容器
-  if (element.name === 'layout' && element.layout) {
-    return renderLayoutElement(element);
-  }
-  
-  // 处理具体元素类型
-  const elementType = element.name || element.type || '';
-  
-  switch (elementType.toLowerCase()) {
-    case 'text':
-      return renderTextElement(element);
-    case 'button':
-      return renderButtonElement(element);
-    case 'background':
-    case 'image':
-      return renderImageElement(element);
-    default:
-      return renderGenericElement(element);
-  }
+    if (!element) return '';
+
+    // 处理layout容器
+    if (element.name === 'layout' && element.layout) {
+        return renderLayoutElement(element);
+    }
+
+    // 处理具体元素类型
+    const elementType = element.name || element.type || '';
+
+    switch (elementType.toLowerCase()) {
+        case 'text':
+            return renderTextElement(element);
+        case 'button':
+            return renderButtonElement(element);
+        case 'background':
+        case 'image':
+            return renderImageElement(element);
+        case 'table':
+            return renderTableElement(element);
+        case 'code':
+            return renderCodeElement(element);
+        default:
+            return renderGenericElement(element);
+    }
 }
 
 /**
@@ -527,13 +740,13 @@ function renderElement(element) {
  */
 function renderLayoutElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
-  
-  let childrenHtml = '';
-  if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
-    childrenHtml = element.layout.children.map(child => renderElement(child)).join('');
-  }
-  
-  return `<div id="${element.id || ''}" data-element-type="layout" ${styleAttr}>${childrenHtml}</div>`;
+
+    let childrenHtml = '';
+    if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
+        childrenHtml = element.layout.children.map(child => renderElement(child)).join('');
+    }
+
+    return `<div id="${element.id || ''}" data-element-type="layout" ${styleAttr}>${childrenHtml}</div>`;
 }
 
 /**
@@ -544,13 +757,13 @@ function renderLayoutElement(element) {
 function renderTextElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
     let textContent = element.textContent || '';
-  
-  // 转义HTML特殊字符
-  textContent = escapeHtml(textContent);
-  
-  // 处理换行
-  textContent = textContent.replace(/\n/g, '<br>');
-  
+
+    // 转义HTML特殊字符
+    textContent = escapeHtml(textContent);
+
+    // 处理换行
+    textContent = textContent.replace(/\n/g, '<br>');
+
     // 根据textType决定HTML结构
     if (element.textType === 'text_hyperlink') {
         // 超链接文本用带样式的a标签
@@ -577,11 +790,11 @@ function renderTextElement(element) {
  */
 function renderButtonElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
-  
+
     // 获取按钮内容和URL
     let buttonText = element.buttonText || 'Button';
-  let buttonUrl = element.url || '#';
-  
+    let buttonUrl = element.url || '#';
+
     // 转义HTML特殊字符
     buttonText = escapeHtml(buttonText);
 
@@ -602,25 +815,230 @@ function renderButtonElement(element) {
  */
 function renderImageElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
-  
-  // 获取图片URL
+
+    // 获取图片URL
     let imageUrl = element.imageUrl || '';
-  
-  if (imageUrl) {
-    // 添加图片标签
-    return `
+
+    if (imageUrl) {
+        // 添加图片标签
+        return `
       <div id="${element.id || ''}" data-element-type="image" ${styleAttr}>
         <img src="${imageUrl}" alt="Element Image" style="width:100%;height:100%;object-fit:cover;">
       </div>
     `;
-  } else {
-    // 没有图片URL时显示占位符
-    return `
+    } else {
+        // 没有图片URL时显示占位符
+        return `
       <div id="${element.id || ''}" data-element-type="image" ${styleAttr} style="display:flex;align-items:center;justify-content:center;color:#999;">
         Image Placeholder
       </div>
     `;
-  }
+    }
+}
+
+/**
+ * 渲染表格元素
+ * @param {Object} element - 表格元素
+ * @returns {string} - 渲染的HTML字符串
+ */
+function renderTableElement(element) {
+    if (!element || !element.layout || !element.layout.style) {
+        return '<div>表格元素结构不完整</div>';
+    }
+
+    // 获取表格样式
+    const tableStyle = element.layout.style.table || {};
+    const thStyle = element.layout.style.th || {};
+    const trStyle = element.layout.style.tr || {};
+    const tdStyle = element.layout.style.td || {};
+
+    // 生成容器样式
+    const containerStyleAttr = generateStyleAttribute(element.computedStyle || {});
+
+    // 获取Markdown表格内容
+    const rawMarkdown = element.rawData || '';
+
+    if (!rawMarkdown.trim()) {
+        return `<div id="${element.id || ''}" data-element-type="table" ${containerStyleAttr}>
+              <p>表格内容为空</p>
+            </div>`;
+    }
+
+    try {
+        console.log('开始使用marked解析表格');
+
+        // 配置marked选项
+        const markedOptions = {
+            gfm: true,           // 启用GitHub风格Markdown
+            breaks: true,        // 允许回车换行
+            headerIds: false,    // 不生成header ID
+            mangle: false        // 不转义HTML
+        };
+
+        // 使用marked解析markdown
+        let html = marked(rawMarkdown, markedOptions);
+
+        // 从HTML中提取表格
+        const tableMatch = html.match(/<table>[\s\S]*?<\/table>/);
+        if (!tableMatch) {
+            throw new Error('无法从marked输出中提取表格HTML');
+        }
+
+        // 获取表格HTML
+        let tableHtml = tableMatch[0];
+        console.log('marked生成的原始表格HTML:', tableHtml.substring(0, 100) + '...');
+
+        // 应用样式
+        tableHtml = applyTableStyles(tableHtml, tableStyle, thStyle, trStyle, tdStyle);
+
+        console.log('.... final table html ....', tableHtml)
+
+        return `
+      <div id="${element.id || ''}" data-element-type="table" ${containerStyleAttr}>
+        ${tableHtml}
+      </div>
+    `;
+    } catch (error) {
+        console.error('表格渲染出错:', error);
+        return `
+      <div id="${element.id || ''}" data-element-type="table" ${containerStyleAttr}>
+        <p>表格解析错误: ${error.message}</p>
+        <pre>${escapeHtml(rawMarkdown)}</pre>
+      </div>
+    `;
+    }
+}
+
+/**
+ * 为表格应用样式
+ * @param {string} tableHtml - 原始表格HTML
+ * @param {Object} tableStyle - 表格样式
+ * @param {Object} thStyle - 表头样式
+ * @param {Object} trStyle - 行样式
+ * @param {Object} tdStyle - 单元格样式
+ * @returns {string} - 应用样式后的表格HTML
+ */
+function applyTableStyles(tableHtml, tableStyle, thStyle, trStyle, tdStyle) {
+        
+    // 生成样式字符串，确保它们以分号结尾
+    const ensureStyleEndsWithSemicolon = (style) => {
+        if (!style) return '';
+        return style.endsWith(';') ? style : `${style};`;
+    };
+    
+    // 生成内联样式字符串
+    const generateInlineStyle = (styleObj) => {
+        if (!styleObj || Object.keys(styleObj).length === 0) return '';
+        
+        return Object.entries(styleObj)
+            .map(([key, value]) => {
+                // 转换驼峰式为连字符式
+                const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+                // 如果值是数字但不是特定属性，添加px
+                let cssValue = value;
+                if (typeof value === 'number' && 
+                    !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
+                    cssValue = `${value}px`;
+                }
+                return `${cssKey}: ${cssValue}`;
+            })
+            .join('; ');
+    };
+    
+    // 获取各元素的样式字符串
+    const tableStyleStr = generateInlineStyle(tableStyle);
+    const thStyleStr = generateInlineStyle(thStyle);
+    const trStyleStr = generateInlineStyle(trStyle);
+    const tdStyleStr = generateInlineStyle(tdStyle);
+    
+    console.log('表格样式字符串:', {
+        table: tableStyleStr,
+        th: thStyleStr,
+        tr: trStyleStr,
+        td: tdStyleStr
+    });
+    
+    // 替换表格标签，应用样式
+    if (tableStyleStr) {
+        tableHtml = tableHtml.replace(/<table/, `<table style="${ensureStyleEndsWithSemicolon(tableStyleStr)}"`);
+    }
+    
+    // 使用安全的方式应用样式，避免错误替换
+    if (thStyleStr) {
+        tableHtml = tableHtml.replace(/<th\b/g, `<th style="${ensureStyleEndsWithSemicolon(thStyleStr)}"`);
+    }
+    
+    if (trStyleStr) {
+        tableHtml = tableHtml.replace(/<tr\b/g, `<tr style="${ensureStyleEndsWithSemicolon(trStyleStr)}"`);
+    }
+    
+    if (tdStyleStr) {
+        tableHtml = tableHtml.replace(/<td\b/g, `<td style="${ensureStyleEndsWithSemicolon(tdStyleStr)}"`);
+    }
+    
+    console.log('表格样式应用完成');
+    return tableHtml;
+}
+
+/**
+ * 渲染代码元素
+ * @param {Object} element - 代码元素
+ * @returns {string} - 渲染的HTML字符串
+ */
+function renderCodeElement(element) {
+    if (!element) {
+        return '<div>代码元素结构不完整</div>';
+    }
+    
+    // 生成容器样式
+    const containerStyleAttr = generateStyleAttribute(element.computedStyle || {});
+    
+    // 获取代码内容和语言
+    const rawCode = element.rawData || '';
+    const language = element.language || 'plaintext';
+    
+    if (!rawCode.trim()) {
+        return `<div id="${element.id || ''}" data-element-type="code" ${containerStyleAttr}>
+              <p>代码内容为空</p>
+            </div>`;
+    }
+    
+    try {
+        console.log('开始解析和高亮代码，语言:', language);
+        
+        // 配置marked选项，支持代码高亮
+        const marked = new Marked(
+            markedHighlight({
+                emptyLangClass: "hljs",
+                langPrefix: "hljs language-",
+                highlight(code, lang, info) {
+                    const language = hljs.getLanguage(lang) ? lang : "plaintext";
+                    return hljs.highlight(code, { language }).value;
+                },
+            }),
+        );
+        
+        // 包装代码为markdown格式，以便marked解析
+        const markdownCode = `\`\`\`${language}\n${rawCode}\n\`\`\``;
+        
+        // 使用marked解析代码
+        let html = marked.parse(markdownCode);
+        
+        // 包装代码块
+        return `
+      <div id="${element.id || ''}" data-element-type="code" ${containerStyleAttr}>
+        ${html}
+      </div>
+    `;
+    } catch (error) {
+        console.error('代码渲染出错:', error);
+        return `
+      <div id="${element.id || ''}" data-element-type="code" ${containerStyleAttr}>
+        <p>代码解析错误: ${error.message}</p>
+        <pre>${escapeHtml(rawCode)}</pre>
+      </div>
+    `;
+    }
 }
 
 /**
@@ -630,14 +1048,14 @@ function renderImageElement(element) {
  */
 function renderGenericElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
-  
-  // 递归渲染子元素
-  let childrenHtml = '';
-  if (element.children && Array.isArray(element.children)) {
-    childrenHtml = element.children.map(child => renderElement(child)).join('');
-  }
-  
-  return `<div id="${element.id || ''}" data-element-type="generic" ${styleAttr}>${childrenHtml}</div>`;
+
+    // 递归渲染子元素
+    let childrenHtml = '';
+    if (element.children && Array.isArray(element.children)) {
+        childrenHtml = element.children.map(child => renderElement(child)).join('');
+    }
+
+    return `<div id="${element.id || ''}" data-element-type="generic" ${styleAttr}>${childrenHtml}</div>`;
 }
 
 /**
@@ -646,26 +1064,26 @@ function renderGenericElement(element) {
  * @returns {string} - style属性字符串
  */
 function generateStyleAttribute(styleObject) {
-  if (!styleObject || typeof styleObject !== 'object') {
-    return '';
-  }
-  
-  // 将样式对象转换为样式字符串
-  const styleString = Object.entries(styleObject)
-    .map(([key, value]) => {
-      // 如果值是数字，且不是特定属性，添加px单位
-      if (typeof value === 'number' && 
-          !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
-        value = `${value}px`;
-      }
-      
-      // 转换驼峰式属性名为连字符式
-      const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
-      return `${cssKey}: ${value}`;
-    })
-    .join('; ');
-  
-  return styleString ? `style="${styleString}"` : '';
+    if (!styleObject || typeof styleObject !== 'object') {
+        return '';
+    }
+
+    // 将样式对象转换为样式字符串
+    const styleString = Object.entries(styleObject)
+        .map(([key, value]) => {
+            // 如果值是数字，且不是特定属性，添加px单位
+            if (typeof value === 'number' &&
+                !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
+                value = `${value}px`;
+            }
+
+            // 转换驼峰式属性名为连字符式
+            const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+            return `${cssKey}: ${value}`;
+        })
+        .join('; ');
+
+    return styleString ? `style="${styleString}"` : '';
 }
 
 /**
@@ -674,14 +1092,14 @@ function generateStyleAttribute(styleObject) {
  * @returns {string} - 转义后的文本
  */
 function escapeHtml(text) {
-  if (!text || typeof text !== 'string') return '';
-  
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    if (!text || typeof text !== 'string') return '';
+
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 export default renderEightElementToHtml; 

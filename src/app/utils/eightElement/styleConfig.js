@@ -172,7 +172,7 @@ export const DEFAULT_STYLE_CONFIG = {
       "background": COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
       "border-style": "solid",
       "border-radius": DIMENSION_CONSTANTS.BORDER_RADIUS.large,
-      "gap": DIMENSION_CONSTANTS.GAP.base
+      "gap": DIMENSION_CONSTANTS.GAP.tight
     },
     // 内部布局元素
     inner: {
@@ -186,7 +186,7 @@ export const DEFAULT_STYLE_CONFIG = {
       "margin-right": DIMENSION_CONSTANTS.MARGIN.tight,
       "border-width": DIMENSION_CONSTANTS.BORDER_WIDTH.none,
       "background-color": "none",
-      "gap": DIMENSION_CONSTANTS.GAP.base
+      "gap": DIMENSION_CONSTANTS.GAP.tight
     }
   },
   
