@@ -177,6 +177,7 @@ console.log(message);  // 输出: Hello, World!
       // 使用传入的自定义尺寸或当前状态中的尺寸
       const currentDimensions = customDimensions || dimensions;
       console.log('处理Markdown使用尺寸:', currentDimensions);
+
       
       // 先清除之前可能存在的动态token系统
       clearDynamicTokenSystem();
@@ -203,7 +204,6 @@ console.log(message);  // 输出: Hello, World!
       // 将八要素结构转换为标准布局结构
       const convertedLayout = convertEightElementToLayout(processedEightElement);
       setLayout(convertedLayout);
-      console.log('转换后的布局结构:', convertedLayout);
 
       // 从根元素开始收集测量数据
       const measurements = {
@@ -246,17 +246,15 @@ console.log(message);  // 输出: Hello, World!
       const iframeDocument = iframe.contentDocument;
       const iframeBody = iframeDocument.body;
       
-      // 计算内容的实际尺寸（可能超出容器）
-      const scrollWidth = iframeBody.scrollWidth;
-      const scrollHeight = iframeBody.scrollHeight;
+      // // 计算内容的实际尺寸（可能超出容器）
+      // const scrollWidth = iframeBody.scrollWidth;
+      // const scrollHeight = iframeBody.scrollHeight;
       
-      // 使用内容的实际尺寸和容器尺寸的较大值
       const dimensions = {
-        width: Math.max(iframe.clientWidth, scrollWidth),
-        height: Math.max(iframe.clientHeight, scrollHeight)
+        width: iframe.clientWidth,
+        height: iframe.clientHeight,
+        
       };
-
-      console.log("测量iframe内容尺寸:", dimensions);
 
       // 使用通用元素测量收集函数
       const measurements = collectEightElementMeasurements(processedEightElement, {
@@ -265,6 +263,9 @@ console.log(message);  // 输出: Hello, World!
         getElementById: (id) => iframeDocument.getElementById(id),
         getComputedStyle: (el) => window.getComputedStyle(el)
       });
+
+      console.log('page measurements')
+      console.log(measurements)
 
       setDomMeasurements(measurements);
     } catch (error) {
@@ -357,8 +358,6 @@ console.log(message);  // 输出: Hello, World!
     }
   };
 
-  console.log('processedEightElement')
-  console.log(processedEightElement)
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">

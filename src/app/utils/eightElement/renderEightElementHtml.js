@@ -889,7 +889,6 @@ function renderTableElement(element) {
     }
 
     try {
-        console.log('开始使用marked解析表格');
 
         // 配置marked选项
         const markedOptions = {
@@ -910,12 +909,10 @@ function renderTableElement(element) {
 
         // 获取表格HTML
         let tableHtml = tableMatch[0];
-        console.log('marked生成的原始表格HTML:', tableHtml.substring(0, 100) + '...');
 
         // 应用样式
         tableHtml = applyTableStyles(tableHtml, tableStyle, thStyle, trStyle, tdStyle);
 
-        console.log('.... final table html ....', tableHtml)
 
         return `
       <div id="${element.id || ''}" data-element-type="table" ${containerStyleAttr}>

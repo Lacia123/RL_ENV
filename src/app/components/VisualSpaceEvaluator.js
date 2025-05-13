@@ -18,6 +18,9 @@ const VisualSpaceEvaluator = ({ domMeasurements, layout }) => {
 
     // 计算评分
     const result = evaluateVisualSpace(domMeasurements, layout);
+
+    console.log('result', result);
+
     setScoreResult(result);
 
     // 如果有可视化Canvas，添加到DOM中

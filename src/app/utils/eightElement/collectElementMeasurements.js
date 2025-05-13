@@ -64,6 +64,12 @@ export function collectEightElementMeasurements(processedEightElement, options) 
       elementType = 'button';
     } else if (element.name === 'background' || element.name === 'image') {
       elementType = 'image';
+    } else if (element.type === 'chart') {
+      elementType = 'chart';
+    } else if (element.type === 'table') {
+      elementType = 'table';
+    } else if (element.type === 'code') {
+      elementType = 'code';
     }
     
     // 创建元素的测量数据
@@ -119,6 +125,46 @@ export function collectEightElementMeasurements(processedEightElement, options) 
     }
   }
   
+  // 在测量元素前，添加处理以确保完全滚动页面
+  function ensureFullPageScroll() {
+    if (typeof doc.body !== 'undefined' && typeof doc.documentElement !== 'undefined') {
+      // 首先滚动到顶部
+      doc.body.scrollTop = 0;
+      doc.documentElement.scrollTop = 0;
+      
+      // 计算页面的总高度
+      const scrollHeight = Math.max(
+        doc.body.scrollHeight, 
+        doc.documentElement.scrollHeight
+      );
+      
+      // 如果在浏览器环境中，执行分步滚动以确保所有内容加载
+      if (typeof window !== 'undefined') {
+        const scrollStep = window.innerHeight || 500;
+        let currentScroll = 0;
+        
+        // 分步滚动整个页面
+        while (currentScroll < scrollHeight) {
+          window.scrollTo(0, currentScroll);
+          currentScroll += scrollStep;
+        }
+        
+        // 确保滚动到页面底部
+        window.scrollTo(0, scrollHeight);
+        
+        // 滚动回顶部开始收集元素
+        window.scrollTo(0, 0);
+      } else {
+        // 在非浏览器环境中，只简单地模拟滚动到底部再回顶部
+        doc.documentElement.scrollTop = scrollHeight;
+        doc.documentElement.scrollTop = 0;
+      }
+    }
+  }
+  
+  // 确保页面滚动以加载所有内容
+  ensureFullPageScroll();
+  
   // 从根元素开始收集测量数据
   collectMeasurements(processedEightElement);
   
@@ -131,7 +177,8 @@ export function collectEightElementMeasurements(processedEightElement, options) 
       width: dimensions.width,
       height: dimensions.height,
       type: 'container',
-      parentId: null
+      parentId: null,
+      style: {}
     });
   }
   

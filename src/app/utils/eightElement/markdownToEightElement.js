@@ -48,14 +48,18 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
   };
 }
 
-// 创建文本元素
-function createTextElement(text, variant = 'normal') {
+// 创建文本元素 - 修改以支持富文本
+function createTextElement(text, variant = 'normal', richTextOptions = {}) {
   const id = generateUUID();
   // 获取文本元素的样式配置
   const textStyleConfig = getElementStyleConfig('text', variant);
   const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
-
-  return {
+  
+  // 判断是否有富文本选项
+  const hasRichText = Object.keys(richTextOptions).length > 0;
+  
+  // 基础文本元素结构
+  const textElement = {
     id,
     name: "text",
     "name-zh": "文本",
@@ -216,7 +220,7 @@ function createTextElement(text, variant = 'normal') {
       fontsize: {
         default: {
           "data-key": "",
-          content: text,
+          content: richTextOptions.processedText || text, // 使用处理后的富文本（如果有）
           style: {
             fontsize: {
               value: textStyleConfig.fontSizes || FONT_CONSTANTS.SIZE.LARGE,
@@ -227,24 +231,132 @@ function createTextElement(text, variant = 'normal') {
           resource: textStyleConfig.fontSizes || FONT_CONSTANTS.SIZE.LARGE
         }
       },
-      fontweight: textStyleConfig.fontWeight ? {
+      fontweight: textStyleConfig.fontWeight || (richTextOptions.isBold ? {
         default: {
           "data-key": "",
           style: {
             fontweight: {
-              value: textStyleConfig.fontWeight,
+              value: FONT_CONSTANTS.WEIGHT.BOLD,
               type: "fontWeight",
               key: "font-fontweight"
             }
           },
-          resource: textStyleConfig.fontWeight
+          resource: FONT_CONSTANTS.WEIGHT.BOLD
         }
-      } : undefined
+      } : undefined)
     },
     type: "text_body",
     state: "default",
     events: [{}]
   };
+  
+  // 添加列表样式（如果适用）
+  if (hasRichText && richTextOptions.isList) {
+    // 添加左边距和列表标识符
+    textElement.layout.style.paddingLeft = DIMENSION_CONSTANTS.PADDING.medium;
+    textElement.layout.style.position = "relative";
+    textElement.layout.style.listStyleType = richTextOptions.listType === 'unordered' ? "disc" : "decimal";
+    // 将带有列表标记的文本设置为列表项样式
+    textElement.layout.style["list-style-position"] = "outside";
+    textElement.layout.style.marginLeft = DIMENSION_CONSTANTS.MARGIN.medium;
+  }
+  
+  return textElement;
+}
+
+// 新增函数：处理文本中的加粗部分
+function processBoldText(text) {
+  // 找出所有加粗文本 **text**
+  const boldRegex = /\*\*(.*?)\*\*/g;
+  const boldMatches = [...text.matchAll(boldRegex)];
+  
+  if (boldMatches.length === 0) {
+    return { 
+      processedText: text,
+      hasBold: false 
+    };
+  }
+  
+  // 处理文本，将加粗部分用HTML标签替换
+  let processedText = text;
+  let hasBold = false;
+  
+  // 替换加粗文本为带有HTML标签的形式，这将在渲染时被解析
+  processedText = text.replace(boldRegex, (match, p1) => {
+    hasBold = true;
+    return `${p1}`;  // 使用HTML标签表示加粗
+  });
+  
+  return {
+    processedText,
+    hasBold
+  };
+}
+
+// 检测是否为列表项
+function isListItem(line) {
+  // 检测无序列表项 (-, *, +)
+  const unorderedMatch = line.trim().match(/^[-*+]\s+(.+)$/);
+  if (unorderedMatch) {
+    return { 
+      isList: true, 
+      listType: 'unordered', 
+      content: unorderedMatch[1] 
+    };
+  }
+  
+  // 检测有序列表项 (1., 2., etc.)
+  const orderedMatch = line.trim().match(/^(\d+)\.\s+(.+)$/);
+  if (orderedMatch) {
+    return { 
+      isList: true, 
+      listType: 'ordered', 
+      content: orderedMatch[2],
+      number: parseInt(orderedMatch[1]) 
+    };
+  }
+  
+  return { isList: false };
+}
+
+// 处理列表项和富文本 - 简化版本，避免拆分文本
+function processListItemAndRichText(line) {
+  // 首先检查是否为列表项
+  const listItemInfo = isListItem(line);
+  
+  // 如果是列表项，处理其内容中的富文本
+  if (listItemInfo.isList) {
+    const { content, listType } = listItemInfo;
+    
+    // 处理加粗文本
+    const { processedText, hasBold } = processBoldText(content);
+    
+    // 创建一个包含处理后文本的文本元素
+    const textElement = createTextElement(content, 'normal', { 
+      isList: true, 
+      listType: listType,
+      isBold: hasBold,
+      processedText: processedText // 传递处理后的文本
+    });
+    
+    return { element: textElement, processed: true, type: 'text' };
+  }
+  
+  // 如果不是列表项，检查是否包含加粗文本
+  const { processedText, hasBold } = processBoldText(line);
+  
+  // 如果有加粗文本，创建包含处理后文本的文本元素
+  if (hasBold) {
+    const textElement = createTextElement(line, 'normal', { 
+      isBold: true,
+      processedText: processedText // 传递处理后的文本
+    });
+    
+    return { element: textElement, processed: true, type: 'text' };
+  }
+  
+  // 如果没有特殊格式，返回未处理
+  return { processed: false };
 }
 
 // 创建按钮元素（用于超链接）
@@ -1538,10 +1650,19 @@ function isMarkdownTable(lines) {
   return isData && !isChart;
 }
 
-// 改进Markdown解析功能，支持更复杂的内容处理
+// 改进Markdown解析功能，支持列表和富文本
 function parseMarkdown(markdown) {
+  // 首先规范化换行符处理
+  // 把所有的\r\n转换为\n
+  const normalizedMarkdown = markdown.replace(/\r\n/g, '\n');
+
+
+  
+  // 把所有连续的\n\n替换为单独的分隔符，以便后续统一处理
+  const processedMarkdown = normalizedMarkdown.replace(/(\n\n)+/g, '\n').replace(/(\\n\\n)+/g, '\n').replace(/\\n/g, '\n');
+  
   // 分割Markdown文本为行
-  const lines = markdown.split('\n');
+  const lines = processedMarkdown.split('\n').filter(line => line.trim() !== '');
 
   // 解析结果将存储在这个数组中
   const elements = [];
@@ -1560,6 +1681,10 @@ function parseMarkdown(markdown) {
 
   // 缓存当前处理的文本块
   let currentTextBlock = '';
+  
+  // 标记当前正在处理的列表状态
+  let inList = false;
+  let listItems = [];
 
   // 优先预处理：识别Markdown中的表格
   console.log('开始检查Markdown中的表格...');
@@ -1622,8 +1747,27 @@ function parseMarkdown(markdown) {
   for (let i = 0; i < markedLines.length; i++) {
     const { line, isTable, tableContent, isTableStart } = markedLines[i];
     const trimmedLine = line.trim();
+    
+    // 检查是否为段落分隔符
+    if (trimmedLine === '§PARAGRAPH§') {
+      // 处理之前累积的内容
+      flushTextBlock();
+      
+      // 如果正在处理列表，结束列表
+      if (inList && listItems.length > 0) {
+        // 创建一个垂直布局来容纳列表项
+        const listLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, listItems);
+        stack[stack.length - 1].elements.push(listLayout);
+        
+        // 重置列表状态
+        inList = false;
+        listItems = [];
+      }
+      
+      continue;
+    }
 
-    // 检查是否为表格或图表数据（统一检测）
+    // 检查是否为表格或图表数据
     const { isData, isChart, chartType } = isTableOrChartData(trimmedLine);
     
     if (isData) {
@@ -1669,8 +1813,20 @@ function parseMarkdown(markdown) {
     }
 
     // 新段落或特殊元素开始，处理之前累积的文本块
-    if (trimmedLine === '' && currentTextBlock) {
+    if (trimmedLine === '') {
       flushTextBlock();
+      
+      // 如果正在处理列表，结束列表
+      if (inList && listItems.length > 0) {
+        // 创建一个垂直布局来容纳列表项
+        const listLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, listItems);
+        stack[stack.length - 1].elements.push(listLayout);
+        
+        // 重置列表状态
+        inList = false;
+        listItems = [];
+      }
+      
       continue;
     }
 
@@ -1718,6 +1874,41 @@ function parseMarkdown(markdown) {
         stack.push({ level, elements: newHeadingLayout.layout.children });
       }
 
+      continue;
+    }
+
+    // 检查是否为列表项或包含富文本的行
+    const richTextResult = processListItemAndRichText(trimmedLine);
+    
+    if (richTextResult.processed) {
+      // 处理之前累积的文本块
+      flushTextBlock();
+      
+      // 如果是列表项
+      if (richTextResult.element.layout.style.listStyleType) {
+        // 标记我们正在处理列表
+        inList = true;
+        
+        // 添加到列表项数组
+        listItems.push(richTextResult.element);
+      } 
+      // 如果不是列表项，直接添加到当前元素栈
+      else {
+        // 如果之前有列表，先处理列表
+        if (inList && listItems.length > 0) {
+          // 创建一个垂直布局来容纳列表项
+          const listLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, listItems);
+          stack[stack.length - 1].elements.push(listLayout);
+          
+          // 重置列表状态
+          inList = false;
+          listItems = [];
+        }
+        
+        // 将处理后的元素添加到栈
+        stack[stack.length - 1].elements.push(richTextResult.element);
+      }
+      
       continue;
     }
 
@@ -1788,6 +1979,13 @@ function parseMarkdown(markdown) {
   // 确保处理完所有累积的内容
   flushTextBlock();
   flushConsecutiveButtons();
+  
+  // 处理最后可能遗留的列表项
+  if (inList && listItems.length > 0) {
+    // 创建一个垂直布局来容纳列表项
+    const listLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, listItems);
+    stack[stack.length - 1].elements.push(listLayout);
+  }
 
   // 如果有当前的一级标题块，将其添加到h1Blocks中
   if (currentH1Block) {
@@ -1815,8 +2013,80 @@ function parseMarkdown(markdown) {
   // 辅助函数：处理文本块
   function flushTextBlock() {
     if (currentTextBlock) {
-      const textElement = createTextElement(currentTextBlock);
-      stack[stack.length - 1].elements.push(textElement);
+      // 检查文本块是否包含富文本或列表项
+      const lines = currentTextBlock.split('\n');
+      
+      // 如果只有一行，尝试处理富文本
+      if (lines.length === 1) {
+        const richTextResult = processListItemAndRichText(currentTextBlock);
+        
+        if (richTextResult.processed) {
+          // 如果是列表项
+          if (richTextResult.element.layout.style.listStyleType) {
+            // 标记我们正在处理列表
+            inList = true;
+            
+            // 添加到列表项数组
+            listItems.push(richTextResult.element);
+          } 
+          // 如果不是列表项，直接添加到当前元素栈
+          else {
+            // 如果之前有列表，先处理列表
+            if (inList && listItems.length > 0) {
+              // 创建一个垂直布局来容纳列表项
+              const listLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, listItems);
+              stack[stack.length - 1].elements.push(listLayout);
+              
+              // 重置列表状态
+              inList = false;
+              listItems = [];
+            }
+            
+            // 将处理后的元素添加到栈
+            stack[stack.length - 1].elements.push(richTextResult.element);
+          }
+        } else {
+          // 如果没有富文本格式，创建普通文本元素
+          const textElement = createTextElement(currentTextBlock);
+          stack[stack.length - 1].elements.push(textElement);
+        }
+      } 
+      // 如果有多行，为每行单独处理
+      else {
+        // 创建一个垂直布局来容纳多行文本
+        const textLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL);
+        
+        for (const line of lines) {
+          if (line.trim() === '') continue;
+          
+          const richTextResult = processListItemAndRichText(line);
+          
+          if (richTextResult.processed) {
+            // 如果是列表项
+            if (richTextResult.element.layout.style.listStyleType) {
+              // 标记我们正在处理列表
+              inList = true;
+              
+              // 添加到列表项数组
+              listItems.push(richTextResult.element);
+            } 
+            // 如果不是列表项，添加到布局
+            else {
+              textLayout.layout.children.push(richTextResult.element);
+            }
+          } else {
+            // 如果没有富文本格式，创建普通文本元素
+            const textElement = createTextElement(line);
+            textLayout.layout.children.push(textElement);
+          }
+        }
+        
+        // 如果布局中有元素，添加到栈
+        if (textLayout.layout.children.length > 0) {
+          stack[stack.length - 1].elements.push(textLayout);
+        }
+      }
+      
       currentTextBlock = '';
     }
   }
@@ -1965,7 +2235,32 @@ function markdownToEightElement(markdown, styleConfig) {
     }
   }
 
-  const parsedElements = parseMarkdown(markdown);
+  // 检查并规范化输入
+  let processedMarkdown = markdown;
+  
+  // 确保markdown是字符串类型
+  if (typeof processedMarkdown !== 'string') {
+    console.warn('收到非字符串类型的Markdown输入，尝试转换为字符串');
+    try {
+      processedMarkdown = String(processedMarkdown || '');
+    } catch (error) {
+      console.error('转换Markdown输入为字符串失败:', error);
+      processedMarkdown = '';
+    }
+  }
+  
+  // 确保最后有一个换行符，以正确处理最后一个段落
+  if (processedMarkdown && !processedMarkdown.endsWith('\n')) {
+    processedMarkdown += '\n';
+  }
+
+  console.log(`处理Markdown文本，长度: ${processedMarkdown.length}`);
+  
+  // 直接使用parseMarkdown函数解析Markdown为元素数组
+  const parsedElements = parseMarkdown(processedMarkdown);
+  console.log(`解析得到的元素数量: ${parsedElements.length}`);
+  
+  // 使用createEightElementRoot创建八要素根结构
   const eightElementRoot = createEightElementRoot(parsedElements);
 
   // 重置为默认配置
