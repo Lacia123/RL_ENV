@@ -1,6 +1,5 @@
 // markdownToEightElement.js
 // 导入样式配置和常量
-import borderwidth from '../tokens/dimension/borderwidth.js';
 import {
   getElementStyleConfig,
   LAYOUT_CONSTANTS,
@@ -8,6 +7,7 @@ import {
   DIMENSION_CONSTANTS,
   FONT_CONSTANTS
 } from './styleConfig.js';
+import { generateChartFromTableData } from './chartGenerator.js';
 
 // 改进UUID生成，确保更唯一
 function generateUUID() {
@@ -1138,72 +1138,122 @@ function createHeadingBlockContainer(headingLayout) {
   return layout;
 }
 
-// 检测markdown表格 - 采用更简单的检测方式
-function isMarkdownTable(lines) {
-  if (lines.length < 2) return false;
-
-  // 表格至少需要一个标题行和一个分隔行
-  const headerLine = lines[0].trim();
-  const separatorLine = lines[1].trim();
-
-  console.log('检查是否为表格: ', { headerLine, separatorLine });
-
-  // 基本检查: 两行都必须包含|，分隔行必须包含-
-  const headerHasSeparator = headerLine.includes('|');
-  const separatorHasSeparator = separatorLine.includes('|');
-  const separatorHasDash = separatorLine.includes('-');
-
-  // 所有条件都必须满足
-  const isTable = headerHasSeparator && separatorHasSeparator && separatorHasDash;
-
-  console.log('表格检测结果: ', {
-    headerHasSeparator,
-    separatorHasSeparator,
-    separatorHasDash,
-    isTable
-  });
-
-  return isTable;
+// 检测是否为表格或图表数据（统一检测）
+function isTableOrChartData(line) {
+  // 首先检查是否是图表数据标记
+  const isChart = line.trim().match(/^\[chart:(.+?)\]/);
+  
+  if (isChart) {
+    return { isData: true, isChart: true, chartType: isChart[1] };
+  }
+  
+  // 然后检查是否是普通表格
+  if (line.includes('|')) {
+    const nextLine = line.trim();
+    // 表格至少需要一个分隔符
+    const hasSeparator = nextLine.includes('|');
+    
+    if (hasSeparator) {
+      return { isData: true, isChart: false, chartType: null };
+    }
+  }
+  
+  return { isData: false, isChart: false, chartType: null };
 }
 
-// 提取完整的Markdown表格
-function extractMarkdownTable(lines, startIndex) {
-  console.log(`开始提取表格，从第${startIndex}行开始`);
-
-  const tableLines = [];
-  let i = startIndex;
-
-  // 找到表格的所有行
-  while (i < lines.length) {
-    const line = lines[i].trim();
-
-    // 如果行为空或不包含|，认为表格结束
+// 提取完整的表格或图表数据（统一提取）
+function extractTableOrChartData(lines, startIndex) {
+  console.log(`开始提取表格/图表数据，从第${startIndex}行开始`);
+  
+  // 获取第一行，检查是否包含图表标记
+  const firstLine = lines[startIndex].trim();
+  const chartMatch = firstLine.match(/^\[chart:(.+?)\]/);
+  const isChart = !!chartMatch;
+  const chartType = isChart ? chartMatch[1] : null;
+  
+  if (isChart) {
+    console.log(`检测到图表类型: ${chartType}`);
+  } else {
+    console.log('检测到普通表格');
+  }
+  
+  // 处理第一行 - 如果是图表，移除图表标记
+  const processedFirstLine = isChart 
+    ? firstLine.replace(/^\[chart:.+?\]/, '').trim() 
+    : firstLine;
+  
+  const tableLines = [processedFirstLine];
+  const remainingLines = lines.slice(startIndex + 1);
+  
+  // 继续添加后续表格行，直到遇到空行
+  let i = 0;
+  while (i < remainingLines.length) {
+    const line = remainingLines[i].trim();
+    
+    // 如果行为空或不再包含表格分隔符，认为表格结束
     if (line === '' || !line.includes('|')) {
-      console.log(`表格在第${i}行结束，因为: ${line === '' ? '空行' : '没有|字符'}`);
+      console.log(`表格/图表数据在第${startIndex + i + 1}行结束`);
       break;
     }
-
-    console.log(`添加表格行: ${line}`);
-    tableLines.push(line);
+    
+    tableLines.push(remainingLines[i]);
     i++;
   }
-
-  // 确保至少有标题行和分隔行
-  if (tableLines.length < 2) {
-    console.log('提取的表格行数不足，无效表格');
-    return { tableContent: '', endIndex: startIndex };
-  }
-
-  const result = {
-    tableContent: tableLines.join('\n'),
-    endIndex: i - 1
+  
+  console.log('提取的表格/图表行数:', tableLines.length);
+  
+  // 提取原始表格内容（用于显示和调试）
+  const originalContent = tableLines.join('\n');
+  
+  // 解析表格数据为二维数组（用于图表数据处理）
+  const tableData = parseTableData(originalContent);
+  
+  return {
+    isChart: isChart,
+    chartType: chartType,
+    tableContent: originalContent,
+    tableData: tableData,
+    endIndex: startIndex + i
   };
+}
 
-  console.log(`提取的表格内容 (${tableLines.length}行):`);
-  console.log(result.tableContent);
-  console.log(`表格结束索引: ${result.endIndex}`);
-
-  return result;
+// 处理表格数据 - 决定创建普通表格还是图表元素
+function processTableOrChartData(result, stack) {
+  const { isChart, chartType, tableContent, tableData, endIndex } = result;
+  
+  if (isChart) {
+    // 处理为图表
+    try {
+      console.log(`处理图表数据，类型: ${chartType}`);
+      // 生成SVG图表
+      const svgContent = generateChartSvg(chartType, tableData);
+      
+      // 创建图表元素
+      const chartElement = createChartElement(chartType, svgContent, tableData, tableContent);
+      stack[stack.length - 1].elements.push(chartElement);
+    } catch (error) {
+      console.error('生成图表时出错:', error);
+      // 创建一个带有错误信息的图表元素
+      const errorSvg = `<svg width="800" height="250" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#fff0f0" />
+        <text x="50" y="50" font-family="sans-serif" font-size="18" fill="#d32f2f">
+          图表生成错误
+        </text>
+        <text x="50" y="80" font-family="sans-serif" font-size="14" fill="#666">
+          ${error.message || '未知错误'}
+        </text>
+      </svg>`;
+      const chartElement = createChartElement(chartType, errorSvg, tableData, tableContent);
+      stack[stack.length - 1].elements.push(chartElement);
+    }
+  } else {
+    // 处理为普通表格
+    console.log('处理普通表格数据');
+    const tableElement = createTableElement(tableContent);
+    stack[stack.length - 1].elements.push(tableElement);
+  }
+  
+  return endIndex;
 }
 
 // 创建表格元素
@@ -1385,6 +1435,109 @@ function extractMarkdownCodeBlock(lines, startIndex) {
   return result;
 }
 
+// 使用D3生成SVG图表
+function generateChartSvg(chartType, data) {
+  console.log('开始生成图表SVG，类型:', chartType);
+  
+  try {
+    // 使用chartGenerator提供的功能生成SVG
+    return generateChartFromTableData(data, chartType);
+  } catch (error) {
+    console.error('生成图表SVG时出错:', error);
+    // 返回错误信息的SVG
+    return `<svg width="800" height="200" xmlns="http://www.w3.org/2000/svg">
+      <text x="50" y="50" font-family="sans-serif" font-size="16" fill="red">
+        图表生成错误: ${error.message}
+      </text>
+    </svg>`;
+  }
+}
+
+// 创建图表元素
+function createChartElement(chartType, svgContent, tableData, rawData) {
+  const id = generateUUID();
+  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
+  
+  console.log('创建图表元素，类型:', chartType);
+  
+  // 创建符合要求的图表元素结构
+  const chartElement = {
+    id,
+    name: "chart",
+    "name-zh": "图表",
+    "file-type": "cell-element",
+    type: "chart",
+    chartType: chartType,
+    svgContent: svgContent,
+    tableData: tableData, // 保存解析后的表格数据
+    rawData: rawData,     // 保存原始Markdown表格内容
+    layout: {
+      style: {
+        // 基础样式
+        "background-color": [],
+        font: [],
+        border: [],
+        scale: [],
+        "box-sizing": "border-box",
+        overflow: "hidden",
+        "box-sizing": "border-box",
+        primaryAxisSizingMode: "fixed",
+        position: "relative",
+        width: "100%",
+        height: "auto",
+        ...layoutStyleConfig
+      }
+    },
+    events: [{}]
+  };
+  
+  console.log('图表元素创建完成:', JSON.stringify({
+    id: chartElement.id,
+    name: chartElement.name,
+    type: chartElement.type,
+    chartType: chartElement.chartType,
+    hasTableData: !!(tableData && tableData.length),
+    dataRows: tableData ? tableData.length : 0
+  }, null, 2));
+  
+  return chartElement;
+}
+
+// 解析表格数据为二维数组
+function parseTableData(tableContent) {
+  // 分割表格内容为行
+  const lines = tableContent.trim().split('\n');
+  const data = [];
+  
+  // 解析每一行
+  for (let i = 0; i < lines.length; i++) {
+    // 跳过分隔行 (包含 --- 的行)
+    if (lines[i].match(/\|[-|\s]+\|/)) {
+      continue;
+    }
+    
+    // 移除行首尾的|，并分割单元格
+    const cells = lines[i].trim()
+      .replace(/^\||\|$/g, '')  // 移除首尾的|
+      .split('|')                // 按|分割
+      .map(cell => cell.trim()); // 移除单元格内容的空白
+    
+    data.push(cells);
+  }
+  
+  return data;
+}
+
+// 检测markdown表格 - 为了保持兼容性而保留的函数
+function isMarkdownTable(lines) {
+  if (lines.length < 2) return false;
+  
+  // 使用新的检测逻辑
+  const { isData, isChart } = isTableOrChartData(lines[0]);
+  // 只有当是表格数据且不是图表时返回true
+  return isData && !isChart;
+}
+
 // 改进Markdown解析功能，支持更复杂的内容处理
 function parseMarkdown(markdown) {
   // 分割Markdown文本为行
@@ -1416,7 +1569,9 @@ function parseMarkdown(markdown) {
     const tableStarts = [];
 
     for (let i = 0; i < lines.length - 1; i++) {
-      if (i + 1 < lines.length && isMarkdownTable([lines[i], lines[i + 1]])) {
+      // 使用新的检测逻辑检查是否为表格
+      const { isData, isChart } = isTableOrChartData(lines[i]);
+      if (isData) {
         tableStarts.push(i);
       }
     }
@@ -1442,8 +1597,9 @@ function parseMarkdown(markdown) {
 
   // 处理每个表格
   for (const startIndex of tableStarts) {
-    // 提取表格内容
-    const { tableContent, endIndex } = extractMarkdownTable(allLines, startIndex);
+    // 提取表格内容，使用新的提取函数
+    const result = extractTableOrChartData(allLines, startIndex);
+    const { tableContent, endIndex } = result;
 
     if (tableContent) {
       console.log(`标记表格从第${startIndex}行到第${endIndex}行`);
@@ -1467,21 +1623,27 @@ function parseMarkdown(markdown) {
     const { line, isTable, tableContent, isTableStart } = markedLines[i];
     const trimmedLine = line.trim();
 
-    // 处理表格
-    if (isTable && isTableStart && tableContent) {
-      console.log(`处理表格开始行 ${i}`);
+    // 检查是否为表格或图表数据（统一检测）
+    const { isData, isChart, chartType } = isTableOrChartData(trimmedLine);
+    
+    if (isData) {
+      console.log(`发现${isChart ? '图表' : '表格'}数据，行号: ${i}`);
+      
       // 处理之前累积的内容
       flushTextBlock();
       flushConsecutiveButtons();
-
-      // 创建表格元素
-      const tableElement = createTableElement(tableContent);
-      console.log(`创建表格元素: id=${tableElement.id}`);
-      stack[stack.length - 1].elements.push(tableElement);
-      continue;
-    } else if (isTable) {
-      // 跳过其余表格行
-      console.log(`跳过表格行 ${i}`);
+      
+      // 提取表格/图表数据
+      const result = extractTableOrChartData(
+        markedLines.map(item => item.line),
+        i
+      );
+      
+      // 处理表格/图表数据
+      const endIndex = processTableOrChartData(result, stack);
+      
+      // 跳过已处理的行
+      i = endIndex;
       continue;
     }
 
@@ -1878,11 +2040,13 @@ export {
   createFlexWrapLayout,
   createHeadingBlockContainer,
   createTableElement,
-  createCodeElement,  // 导出代码创建函数
+  createCodeElement,
+  createChartElement,
   isMarkdownTable,
-  isMarkdownCodeBlock,  // 导出代码块检测函数
-  extractMarkdownTable,
-  extractMarkdownCodeBlock,  // 导出代码块提取函数
+  isMarkdownCodeBlock,
+  isTableOrChartData,   // 导出表格/图表检测函数
+  extractTableOrChartData, // 导出表格/图表提取函数
+  generateChartSvg,
   printEightElementStructure,
   exampleMarkdownToEightElement,
   LAYOUT_CONSTANTS,

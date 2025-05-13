@@ -14,9 +14,11 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.1",
+    "canvas": "^3.1.0",
     "chart.js": "^4.4.8",
     "chroma-js": "^3.1.2",
     "colord": "^2.9.3",
+    "d3": "^7.9.0",
     "d3-hierarchy": "^3.1.2",
     "fs-extra": "^11.2.0",
     "highlight.js": "^11.11.1",
