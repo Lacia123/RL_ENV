@@ -1224,7 +1224,8 @@ function createFlexWrapLayout(children = []) {
         counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
         primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
         counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER, // 水平布局交叉轴居中
-        layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
+        // layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
+        "align-self": "flex-start",
         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         boxSizing: "border-box",
         "border-style": "solid",
