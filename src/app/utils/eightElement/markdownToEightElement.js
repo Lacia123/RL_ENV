@@ -1222,7 +1222,7 @@ function createFlexWrapLayout(children = []) {
         "flex-wrap": "wrap",
         primaryAxisSizingMode: "fixed",
         counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
+        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN, // 水平布局主轴左对齐
         counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER, // 水平布局交叉轴居中
         // layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
         "align-self": "flex-start",
@@ -1265,9 +1265,9 @@ function createHeadingBlockContainer(headingLayout) {
         layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
         primaryAxisSizingMode: "fixed",
         counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
-        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER,
-        layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
+        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN, // 将主轴对齐改为左对齐
+        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN, // 将交叉轴对齐改为左对齐
+        "align-self": "flex-start", // 确保自身左对齐
         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         boxSizing: "border-box",
         "border-style": "solid",
@@ -1294,6 +1294,29 @@ function createHeadingBlockContainer(headingLayout) {
     id: layoutId,
     events: [{}]
   };
+  
+  // 查找并修改headingLayout中标题文本的对齐方式
+  const updateHeadingTextAlignment = (layout) => {
+    // 检查是否是一级标题布局
+    if (layout && layout.layout && layout.layout.children && layout.layout.children.length > 0) {
+      const firstChild = layout.layout.children[0];
+      if (firstChild && firstChild.name === "text" && firstChild.layout && firstChild.layout.style) {
+        // 将标题文本对齐方式改为左对齐
+        firstChild.layout.style.textAlign = "left";
+        
+        if (firstChild.layout.text_body && firstChild.layout.text_body.style) {
+          firstChild.layout.text_body.style.textAlign = "left";
+        }
+        
+        if (firstChild.layout.text_hyperlink && firstChild.layout.text_hyperlink.style) {
+          firstChild.layout.text_hyperlink.style.textAlign = "left";
+        }
+      }
+    }
+  };
+  
+  // 应用对齐方式更改
+  updateHeadingTextAlignment(headingLayout);
 
   return layout;
 }
@@ -2066,8 +2089,35 @@ function parseMarkdown(markdown) {
 
   // 如果有多个一级标题块，创建流式布局并将它们包装起来
   if (h1Blocks.length > 1) {
+    // 标记是多标题布局的上下文
+    const isMultiTitleLayout = true;
+    
     // 将每个一级标题块包装在容器中，设置最小宽度
-    const wrappedH1Blocks = h1Blocks.map(block => createHeadingBlockContainer(block));
+    // 当多标题并排时，标题应该左对齐
+    const wrappedH1Blocks = h1Blocks.map(block => {
+      // 标题文本应该在多标题布局中左对齐
+      if (block && block.layout && block.layout.children && block.layout.children.length > 0) {
+        // 查找标题文本元素
+        const headingText = block.layout.children[0];
+        if (headingText && headingText.name === "text") {
+          // 修改标题文本为左对齐
+          if (headingText.layout && headingText.layout.style) {
+            headingText.layout.style.textAlign = "left";
+          }
+          
+          // 修改文本容器样式
+          if (headingText.layout.text_body && headingText.layout.text_body.style) {
+            headingText.layout.text_body.style.textAlign = "left";
+          }
+          
+          if (headingText.layout.text_hyperlink && headingText.layout.text_hyperlink.style) {
+            headingText.layout.text_hyperlink.style.textAlign = "left";
+          }
+        }
+      }
+      
+      return createHeadingBlockContainer(block);
+    });
 
     // 创建流式布局容器
     const flexLayout = createFlexWrapLayout(wrappedH1Blocks);
@@ -2076,6 +2126,7 @@ function parseMarkdown(markdown) {
     return [flexLayout];
   } else if (h1Blocks.length === 1) {
     // 如果只有一个一级标题块，直接返回
+    // 这种情况下标题应该居中对齐
     return [h1Blocks[0]];
   }
 
