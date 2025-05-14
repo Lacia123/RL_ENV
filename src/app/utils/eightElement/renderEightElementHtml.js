@@ -782,9 +782,6 @@ function renderTextElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
     let textContent = element.textContent || '';
 
-    // 转义HTML特殊字符
-    textContent = escapeHtml(textContent);
-
     // 处理换行
     textContent = textContent.replace(/\n/g, '<br>');
 

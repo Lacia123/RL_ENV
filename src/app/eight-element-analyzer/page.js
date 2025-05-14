@@ -243,7 +243,7 @@ console.log(message);  // 输出: Hello, World!
       if (!iframe || !iframe.contentWindow) return;
 
       // 获取iframe内容的实际尺寸，而不仅仅是视口尺寸
-      const iframeDocument = iframe.contentDocument;
+    const iframeDocument = iframe.contentDocument;
       const iframeBody = iframeDocument.body;
       
       // // 计算内容的实际尺寸（可能超出容器）

@@ -284,7 +284,7 @@ function processBoldText(text) {
   // 替换加粗文本为带有HTML标签的形式，这将在渲染时被解析
   processedText = text.replace(boldRegex, (match, p1) => {
     hasBold = true;
-    return `${p1}`;  // 使用HTML标签表示加粗
+    return `<span style="font-weight: bold;">${p1}</span>`;  // 使用HTML标签表示加粗
   });
   
   return {
@@ -1397,26 +1397,23 @@ function createTableElement(markdownTableContent) {
         "box-sizing": "border-box",
         primaryAxisSizingMode: "fixed",
         position: "relative",
+        width: "100%",
         ...layoutStyleConfig,
 
         // 表格特定样式
         table: {
           borderCollapse: "collapse",
+          backgroundColor: "transparent",
           width: "100%",
+          color: "#212529",
           fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
           fontSize: FONT_CONSTANTS.SIZE.MEDIUM,
-          color: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[100],
-          marginTop: DIMENSION_CONSTANTS.MARGIN.base,
-          marginBottom: DIMENSION_CONSTANTS.MARGIN.base
+          marginBottom: '1rem'
         },
         th: {
-          backgroundColor: COLOR_CONSTANTS.BASIC.GREY[2],
-          borderWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
-          borderColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
-          borderStyle: "solid",
-          padding: DIMENSION_CONSTANTS.PADDING.tight,
-          textAlign: "left",
-          fontWeight: FONT_CONSTANTS.WEIGHT.SEMIBOLD
+          padding: "0.75rem",
+          verticalAlign: "middle",
+          borderTop: "1px solid #dee2e6"
         },
         tr: {
           borderBottomWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
@@ -1424,11 +1421,9 @@ function createTableElement(markdownTableContent) {
           borderBottomStyle: "solid"
         },
         td: {
-          padding: DIMENSION_CONSTANTS.PADDING.tight,
-          borderWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
-          borderStyle: "solid",
-          borderColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
-          textAlign: "left"
+          padding: "0.75rem",
+          verticalAlign: "middle",
+          borderTop: "1px solid #dee2e6"
         }
       }
     },
@@ -1478,6 +1473,7 @@ function createCodeElement(codeContent, language = '') {
         borderStyle: "solid",
         borderColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
         borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.medium,
+        width: "100%",
       }
     },
     events: [{}]
