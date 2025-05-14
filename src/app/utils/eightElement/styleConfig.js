@@ -43,6 +43,7 @@ export const LAYOUT_CONSTANTS = {
 // 颜色常量定义
 export const COLOR_CONSTANTS = {
   PRIMARY: {
+    // SECONDARY1: "" // tODO, 
     BRAND3: "{color.primary.brand3}",
     BRAND4: "{color.primary.brand4}",
     BRAND5: "{color.primary.brand5}", // 按钮
@@ -161,32 +162,32 @@ export const DEFAULT_STYLE_CONFIG = {
     root: {
       "padding-top": DIMENSION_CONSTANTS.PADDING.base,
       "padding-bottom": DIMENSION_CONSTANTS.PADDING.base,
-      "padding-left": DIMENSION_CONSTANTS.PADDING.base,
+      "padding-left": DIMENSION_CONSTANTS.PADDING.loose,
       "padding-right": DIMENSION_CONSTANTS.PADDING.base,
       "margin-top": DIMENSION_CONSTANTS.MARGIN.base,
       "margin-bottom": DIMENSION_CONSTANTS.MARGIN.base,
-      "margin-left": DIMENSION_CONSTANTS.MARGIN.base,
+      "margin-left": DIMENSION_CONSTANTS.MARGIN.loose,
       "margin-right": DIMENSION_CONSTANTS.MARGIN.base,
       "border-width": DIMENSION_CONSTANTS.BORDER_WIDTH.base,
       "border-color": COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
       "background": COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
       "border-style": "solid",
       "border-radius": DIMENSION_CONSTANTS.BORDER_RADIUS.large,
-      "gap": DIMENSION_CONSTANTS.GAP.tight
+      // "gap": DIMENSION_CONSTANTS.GAP.tight
     },
     // 内部布局元素
     inner: {
       "padding-top": DIMENSION_CONSTANTS.PADDING.tight,
       "padding-bottom": DIMENSION_CONSTANTS.PADDING.tight,
-      "padding-left": DIMENSION_CONSTANTS.PADDING.tight,
-      "padding-right": DIMENSION_CONSTANTS.PADDING.tight,
+      // "padding-left": DIMENSION_CONSTANTS.PADDING.tight,
+      // "padding-right": DIMENSION_CONSTANTS.PADDING.tight,
       "margin-top": DIMENSION_CONSTANTS.MARGIN.tight,
       "margin-bottom": DIMENSION_CONSTANTS.MARGIN.tight,
-      "margin-left": DIMENSION_CONSTANTS.MARGIN.tight,
-      "margin-right": DIMENSION_CONSTANTS.MARGIN.tight,
-      "border-width": DIMENSION_CONSTANTS.BORDER_WIDTH.none,
+      // "margin-left": DIMENSION_CONSTANTS.MARGIN.tight,
+      // "margin-right": DIMENSION_CONSTANTS.MARGIN.tight,
+      // "border-width": DIMENSION_CONSTANTS.BORDER_WIDTH.none,
       "background-color": "none",
-      "gap": DIMENSION_CONSTANTS.GAP.tight
+      // "gap": DIMENSION_CONSTANTS.GAP.tight
     }
   },
   
@@ -203,7 +204,7 @@ export const DEFAULT_STYLE_CONFIG = {
       "textColor": COLOR_CONSTANTS.BASIC.OPACITY.BLACK[100],
       "fill": "none",
       "fontSizes": FONT_CONSTANTS.SIZE.XXL,
-      "fontWeight": FONT_CONSTANTS.WEIGHT.BOLD
+      "fontWeight": FONT_CONSTANTS.WEIGHT.BOLD,
     },
     h2: {
       "textColor": COLOR_CONSTANTS.BASIC.OPACITY.BLACK[100],

@@ -11,8 +11,6 @@ import collectEightElementMeasurements from '../utils/eightElement/collectElemen
 const EightElementAnalyzer = () => {
   const [markdown, setMarkdown] = useState(`# 八要素测试文档
 
-这是一个简单的测试文档，用于测试Markdown到八要素的转换功能。
-
 ## 基本元素
 
 ### 文本

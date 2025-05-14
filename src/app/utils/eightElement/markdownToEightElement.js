@@ -20,7 +20,7 @@ function generateUUID() {
 
 // 更新基础布局元素创建函数，支持自定义高宽
 function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, options = {}) {
-  const { width = "100%", height = "100%" } = options;
+  const { width = "100%", height = "100%", alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN } = options;
 
   return {
     style: {
@@ -29,8 +29,11 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
       layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
       primaryAxisSizingMode: "fixed",
       counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-      primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
-      counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER,
+      primaryAxisAlignItems: direction === LAYOUT_CONSTANTS.DIRECTION.VERTICAL ? alignItems : LAYOUT_CONSTANTS.ALIGN.X.CENTER,
+      // 当方向为水平时，交叉轴（垂直方向）居中对齐；当方向为垂直时，交叉轴（水平方向）左对齐
+      counterAxisAlignItems: direction === LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL ? 
+                            LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER : 
+                            LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
       layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
       layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
       boxSizing: "border-box",
@@ -58,6 +61,18 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
   // 判断是否有富文本选项
   const hasRichText = Object.keys(richTextOptions).length > 0;
   
+  // 为标题元素设置默认宽度和对齐
+  let textAlign = "left"; // 默认左对齐
+  let width = "auto"; // 默认宽度
+  let borderBottom = "none"; // 默认没有下边框
+  
+  // 如果是H1标题，设置特殊样式
+  if (variant === 'h1') {
+    textAlign = "center"; // H1居中对齐
+    width = "100%"; // H1宽度100%
+    borderBottom = "1px solid rgb(242, 242, 242)"; 
+  }
+  
   // 基础文本元素结构
   const textElement = {
     id,
@@ -73,6 +88,9 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
         "box-sizing": "border-box",
         primaryAxisSizingMode: "fixed",
         position: "relative",
+        textAlign: textAlign, // 根据变体设置对齐方式
+        width: width, // 设置宽度
+        "border-bottom": borderBottom, // 设置下边框
         ...layoutStyleConfig
       },
       text_body: {
@@ -92,6 +110,9 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
           overflow: "auto",
           "word-break": "break-all",
+          textAlign: textAlign, // 根据变体设置对齐方式
+          width: width, // 设置宽度
+          "border-bottom": borderBottom, // 设置下边框
           textColor: {
             element: "color",
             value: "text",
@@ -131,6 +152,9 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
           "text-decoration": "underline",
           overflow: "auto",
           "word-break": "break-all",
+          textAlign: textAlign, // 根据变体设置对齐方式
+          width: width, // 设置宽度
+          "border-bottom": borderBottom, // 设置下边框
           textColor: {
             element: "color",
             value: "text",
@@ -1089,13 +1113,21 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
 // 创建布局元素，支持自定义选项
 function createLayoutElement(direction, children = [], options = {}) {
   const layoutId = generateUUID();
-  const { width, height, gap, variant = 'inner', isRoot = false } = options;
+  const { width, height, gap, variant = 'inner', isRoot = false, 
+          alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN } = options;
+          
+  // 根据方向自动计算交叉轴对齐方式
+  // 对于水平布局，默认交叉轴居中对齐；对于垂直布局，使用传入的选项或默认左对齐
+  const counterAxisAlign = options.counterAxisAlign || 
+                          (direction === LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL ? 
+                           LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER : 
+                           LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN);
 
   // 获取布局元素的样式配置
   const layoutStyleConfig = getElementStyleConfig('layout', isRoot ? 'root' : variant);
 
   // 创建基础布局
-  const baseLayout = createBaseLayout(direction, { width, height });
+  const baseLayout = createBaseLayout(direction, { width, height, alignItems });
 
   // 应用来自配置的样式
   Object.entries(layoutStyleConfig).forEach(([key, value]) => {
@@ -1108,6 +1140,12 @@ function createLayoutElement(direction, children = [], options = {}) {
   if (gap) {
     baseLayout.style.gap = gap;
   }
+  
+  // 设置主轴对齐方式
+  baseLayout.style.primaryAxisAlignItems = alignItems;
+  
+  // 设置交叉轴对齐方式
+  baseLayout.style.counterAxisAlignItems = counterAxisAlign;
 
   const layout = {
     dataKeys: [],
@@ -1130,20 +1168,30 @@ function createLayoutElement(direction, children = [], options = {}) {
 // 更新水平按钮布局创建函数
 function createHorizontalButtonLayout(buttons) {
   return createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL, buttons, {
-    gap: DIMENSION_CONSTANTS.GAP.base
+    gap: DIMENSION_CONSTANTS.GAP.base,
+    alignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
+    // 无需明确设置counterAxisAlign，createLayoutElement会自动为水平布局设置交叉轴居中
   });
 }
 
 // 更新标题布局创建函数
 function createHeadingLayout(headingContent, subElements = [], headingLevel = 1) {
-  const layout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, [], {
-    gap: DIMENSION_CONSTANTS.GAP.loose,
-    variant: 'inner'
-  });
+  // 所有标题布局都使用左对齐
+  // 注意：标题文本的对齐方式由createTextElement函数根据变体（h1、h2等）自动处理
+  const layout = createLayoutElement(
+    LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+    [], 
+    { 
+      alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN, // 所有标题布局主轴左对齐
+      counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN // 所有标题布局交叉轴左对齐
+    }
+  );
 
   // 添加标题文本，根据标题级别选择文本样式
   const headingVariant = `h${headingLevel}`;
   const headingText = createTextElement(headingContent, headingVariant);
+  
+  // 不需要额外设置textAlign和width，createTextElement已经处理了
 
   layout.layout.children.push(headingText);
 
@@ -1175,7 +1223,7 @@ function createFlexWrapLayout(children = []) {
         primaryAxisSizingMode: "fixed",
         counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
         primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
-        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER,
+        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER, // 水平布局交叉轴居中
         layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         boxSizing: "border-box",
@@ -1187,8 +1235,7 @@ function createFlexWrapLayout(children = []) {
         "box-sizing": "border-box",
         "back-width": "100%",
         "back-height": "auto",
-        position: "relative",
-        gap: DIMENSION_CONSTANTS.GAP.base
+        position: "relative"
       },
       children: children
     },
@@ -1751,8 +1798,15 @@ function parseMarkdown(markdown) {
       
       // 如果正在处理列表，结束列表
       if (inList && listItems.length > 0) {
-        // 创建一个垂直布局来容纳列表项
-        const listLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, listItems);
+        // 创建一个垂直布局来容纳列表项，明确指定左对齐
+        const listLayout = createLayoutElement(
+          LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+          listItems,
+          {
+            alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+            counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+          }
+        );
         stack[stack.length - 1].elements.push(listLayout);
         
         // 重置列表状态
@@ -1814,8 +1868,15 @@ function parseMarkdown(markdown) {
       
       // 如果正在处理列表，结束列表
       if (inList && listItems.length > 0) {
-        // 创建一个垂直布局来容纳列表项
-        const listLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, listItems);
+        // 创建一个垂直布局来容纳列表项，明确指定左对齐
+        const listLayout = createLayoutElement(
+          LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+          listItems,
+          {
+            alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+            counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+          }
+        );
         stack[stack.length - 1].elements.push(listLayout);
         
         // 重置列表状态
@@ -1892,8 +1953,15 @@ function parseMarkdown(markdown) {
       else {
         // 如果之前有列表，先处理列表
         if (inList && listItems.length > 0) {
-          // 创建一个垂直布局来容纳列表项
-          const listLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, listItems);
+          // 创建一个垂直布局来容纳列表项，明确指定左对齐
+          const listLayout = createLayoutElement(
+            LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+            listItems,
+            {
+              alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+              counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+            }
+          );
           stack[stack.length - 1].elements.push(listLayout);
           
           // 重置列表状态
@@ -1978,8 +2046,15 @@ function parseMarkdown(markdown) {
   
   // 处理最后可能遗留的列表项
   if (inList && listItems.length > 0) {
-    // 创建一个垂直布局来容纳列表项
-    const listLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, listItems);
+    // 创建一个垂直布局来容纳列表项，明确指定左对齐
+    const listLayout = createLayoutElement(
+      LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+      listItems,
+      {
+        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+      }
+    );
     stack[stack.length - 1].elements.push(listLayout);
   }
 
@@ -2029,8 +2104,15 @@ function parseMarkdown(markdown) {
           else {
             // 如果之前有列表，先处理列表
             if (inList && listItems.length > 0) {
-              // 创建一个垂直布局来容纳列表项
-              const listLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, listItems);
+              // 创建一个垂直布局来容纳列表项，明确指定左对齐
+              const listLayout = createLayoutElement(
+                LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+                listItems,
+                {
+                  alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                  counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                }
+              );
               stack[stack.length - 1].elements.push(listLayout);
               
               // 重置列表状态
@@ -2049,8 +2131,15 @@ function parseMarkdown(markdown) {
       } 
       // 如果有多行，为每行单独处理
       else {
-        // 创建一个垂直布局来容纳多行文本
-        const textLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL);
+        // 创建一个垂直布局来容纳多行文本，明确指定左对齐
+        const textLayout = createLayoutElement(
+          LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+          [],
+          {
+            alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+            counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+          }
+        );
         
         for (const line of lines) {
           if (line.trim() === '') continue;
@@ -2191,8 +2280,8 @@ function createEightElementRoot(markdownElements) {
         layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
         primaryAxisSizingMode: "responsive",
         counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
-        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER,
+        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER, // 根容器主轴居中对齐
+        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER, // 根容器交叉轴居中对齐
         layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         width: "auto",
@@ -2213,6 +2302,10 @@ function createEightElementRoot(markdownElements) {
       rootLayout.layout.style[key] = value;
     }
   });
+
+  // 确保根容器的对齐设置不被配置覆盖
+  rootLayout.layout.style.primaryAxisAlignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
+  rootLayout.layout.style.counterAxisAlignItems = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER;
 
   return rootLayout;
 }
