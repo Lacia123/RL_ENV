@@ -1720,14 +1720,16 @@ function parseMarkdown(markdown) {
   // 首先规范化换行符处理
   // 把所有的\r\n转换为\n
   const normalizedMarkdown = markdown.replace(/\r\n/g, '\n');
-
-
   
-  // 把所有连续的\n\n替换为单独的分隔符，以便后续统一处理
-  const processedMarkdown = normalizedMarkdown.replace(/(\n\n)+/g, '\n').replace(/(\\n\\n)+/g, '\n').replace(/\\n/g, '\n');
+  // 在分割之前，在Markdown中保留空行标记，以便在解析时使用
+  // 用特殊标记替换连续的空行
+  const processedMarkdown = normalizedMarkdown
+    .replace(/\n\n+/g, '\n§PARAGRAPH§\n')  // 标记段落分隔符
+    .replace(/\\n\\n+/g, '\n§PARAGRAPH§\n')
+    .replace(/\\n/g, '\n');
   
-  // 分割Markdown文本为行
-  const lines = processedMarkdown.split('\n').filter(line => line.trim() !== '');
+  // 分割Markdown文本为行（保留空行标记）
+  const lines = processedMarkdown.split('\n');
 
   // 解析结果将存储在这个数组中
   const elements = [];
@@ -1801,7 +1803,9 @@ function parseMarkdown(markdown) {
 
       // 标记其余表格行
       for (let j = startIndex + 1; j <= endIndex; j++) {
-        markedLines[j].isTable = true;
+        if (j < markedLines.length) {
+          markedLines[j].isTable = true;
+        }
       }
     }
   }
@@ -1829,6 +1833,8 @@ function parseMarkdown(markdown) {
             counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
           }
         );
+        
+        // 添加到当前堆栈的末尾元素的children中
         stack[stack.length - 1].elements.push(listLayout);
         
         // 重置列表状态
@@ -1884,11 +1890,14 @@ function parseMarkdown(markdown) {
       continue;
     }
 
-    // 新段落或特殊元素开始，处理之前累积的文本块
-    if (trimmedLine === '') {
+    // 解析标题
+    const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.*?)$/);
+    if (headingMatch) {
+      // 处理之前累积的内容
       flushTextBlock();
+      flushConsecutiveButtons();
       
-      // 如果正在处理列表，结束列表
+      // 如果正在处理列表，先结束列表
       if (inList && listItems.length > 0) {
         // 创建一个垂直布局来容纳列表项，明确指定左对齐
         const listLayout = createLayoutElement(
@@ -1899,22 +1908,14 @@ function parseMarkdown(markdown) {
             counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
           }
         );
+        
+        // 添加到当前堆栈的末尾元素的children中
         stack[stack.length - 1].elements.push(listLayout);
         
         // 重置列表状态
         inList = false;
         listItems = [];
       }
-      
-      continue;
-    }
-
-    // 解析标题
-    const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.*?)$/);
-    if (headingMatch) {
-      // 处理之前累积的内容
-      flushTextBlock();
-      flushConsecutiveButtons();
 
       const level = headingMatch[1].length;
       const content = headingMatch[2].trim();
@@ -2219,6 +2220,26 @@ function parseMarkdown(markdown) {
         // 如果布局中有元素，添加到栈
         if (textLayout.layout.children.length > 0) {
           stack[stack.length - 1].elements.push(textLayout);
+        }
+        
+        // 如果有列表项，在此处理
+        if (inList && listItems.length > 0) {
+          // 创建一个垂直布局来容纳列表项，明确指定左对齐
+          const listLayout = createLayoutElement(
+            LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+            listItems,
+            {
+              alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+              counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+            }
+          );
+          
+          // 添加到当前堆栈的elements中
+          stack[stack.length - 1].elements.push(listLayout);
+          
+          // 重置列表状态
+          inList = false;
+          listItems = [];
         }
       }
       
