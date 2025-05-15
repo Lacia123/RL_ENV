@@ -2355,8 +2355,8 @@ function createEightElementRoot(markdownElements) {
         counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER, // 根容器交叉轴居中对齐
         layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
-        width: "auto",
-        height: "auto",
+        width: "calc(100% - 30px)",
+        height: "100%",
         position: "relative",
         "back-width": "auto",
         "back-height": "100px",

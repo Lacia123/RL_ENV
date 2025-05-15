@@ -154,15 +154,12 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
   try {
     console.log('生成分组折线图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
-    // 创建JSDOM环境
     const { svg, document } = createJsdomEnv(width, height);
     
-    // 解析颜色，确保使用有效的颜色值
     const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
     const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
     const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
     
-    // 定义颜色数组
     const colorValues = [
       colorBrand5,
       colorBrand4,
@@ -176,17 +173,27 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       '#bab0ab'
     ];
     
+    const lineStyles = [
+      { strokeWidth: 3, dashArray: "0" },      // 实线粗
+      { strokeWidth: 2.5, dashArray: "0" },    // 实线中
+      { strokeWidth: 2, dashArray: "0" },      // 实线细
+      { strokeWidth: 3.5, dashArray: "0" },    // 实线最粗
+      { strokeWidth: 1.8, dashArray: "0" },    // 实线较细
+      { strokeWidth: 2.8, dashArray: "0" },    // 实线中粗
+      { strokeWidth: 2.2, dashArray: "0" },    // 实线中细
+      { strokeWidth: 3.2, dashArray: "0" },    // 实线粗2
+      { strokeWidth: 2.3, dashArray: "0" },    // 实线中2
+      { strokeWidth: 1.9, dashArray: "0" }     // 实线细2
+    ];
+    
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
     
-    // 创建图表组容器
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
     
-    // X轴数据点
     const xValues = data.map(d => d[dateField]);
     
-    // 找出所有值字段的最大值和最小值
     let allValues = [];
     valueFields.forEach(field => {
       allValues = allValues.concat(data.map(d => d[field]));
@@ -194,7 +201,6 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     const yMin = Math.min(0, ...allValues);
     const yMax = Math.max(...allValues) * 1.1; // 上限留10%空间
     
-    // 创建比例尺
     const xScale = d3.scalePoint()
       .domain(xValues)
       .range([0, innerWidth])
@@ -203,6 +209,188 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     const yScale = d3.scaleLinear()
       .domain([yMin, yMax])
       .range([innerHeight, 0]);
+    
+    // RE-INTRODUCE Data point grouping and pre-calculation of label positions
+    const valueGroupsMap = new Map();
+    const areValuesClose = (a, b) => { 
+        if (Math.abs(a) < 0.001 && Math.abs(b) < 0.001) return true;
+        return Math.abs(a - b) < 0.5; 
+    };
+
+    data.forEach(dataPoint => {
+        const dateStr = dataPoint[dateField];
+        if (!valueGroupsMap.has(dateStr)) {
+            valueGroupsMap.set(dateStr, []);
+        }
+        let groupsForDate = valueGroupsMap.get(dateStr);
+        valueFields.forEach((field, fieldIdx) => {
+            const yVal = parseFloat(dataPoint[field]) || 0;
+            let existingGroup = groupsForDate.find(g => areValuesClose(g.value, yVal));
+            if (existingGroup) {
+                existingGroup.seriesInfo.push({ field, fieldIndex: fieldIdx, yValue: yVal });
+            } else {
+                groupsForDate.push({
+                    value: yVal,
+                    seriesInfo: [{ field, fieldIndex: fieldIdx, yValue: yVal }],
+                });
+            }
+        });
+        groupsForDate.sort((a, b) => b.value - a.value); // Crucial: Sort by value for consistent stacking logic
+    });
+
+    // RE-CALCULATE label positions for each group with refined anti-collision
+    valueGroupsMap.forEach((groupsAtDate, dateStr) => {
+        const labelHeight = 10; 
+        const verticalPadding = 2; // Minimal vertical padding
+        const yPositionOfXAxis = yScale(0);
+
+        // Default small offsets, aiming for (0,0)-like placement
+        const defaultXOffset = 6; // Slight right offset from point center
+        const defaultYOffset = 4; // Slight down offset (for text baseline below point center)
+        const textAnchorDefault = 'start';
+
+        // Keep track of Y positions used by labels at this specific X-coordinate (dateStr)
+        // This is a simple way to manage overlap for this date.
+        const occupiedYRanges = []; 
+
+        // Process groups sorted by Y value (descending) - higher values first
+        // groupsAtDate is already sorted this way from its initial population.
+
+        groupsAtDate.forEach((group, index) => {
+            let finalX = defaultXOffset;
+            let finalY = defaultYOffset;
+            let finalAnchor = textAnchorDefault;
+
+            const pointValY = yScale(group.value); // Screen Y of the data point
+            let labelTop = pointValY + finalY - labelHeight; // Estimated top of the label box
+            let labelBottom = pointValY + finalY;         // Estimated bottom of the label box (baseline)
+
+            // Simple iterative overlap avoidance for Y
+            // Try to place downwards first, then shift if overlap or below X-axis
+            let attempts = 0;
+            const maxAttempts = 5; // Prevent infinite loops in very dense scenarios
+
+            while (attempts < maxAttempts) {
+                let overlaps = false;
+                for (const range of occupiedYRanges) {
+                    if (!(labelBottom < range.top || labelTop > range.bottom)) {
+                        overlaps = true;
+                        break;
+                    }
+                }
+
+                // Check if label for non-negative value goes below X-axis
+                let belowXAxis = false;
+                if (group.value >= 0 && (labelBottom > yPositionOfXAxis + 2)) { // +2 for a little margin
+                    belowXAxis = true;
+                }
+
+                if (!overlaps && !belowXAxis) {
+                    break; // Found a good spot
+                }
+
+                // If overlap or below X-axis, try to adjust Y
+                if (belowXAxis) {
+                    // If it was trying to go down but went below axis, try to place it above the point
+                    finalY = -defaultYOffset - labelHeight; // Place above the point
+                } else if (overlaps) {
+                    // If overlap, shift it further down (or up, if we change strategy)
+                    finalY += (labelHeight + verticalPadding); // Shift down by one label height + padding
+                }
+                
+                // Recalculate label bounds for next check
+                labelTop = pointValY + finalY - labelHeight;
+                labelBottom = pointValY + finalY;
+                attempts++;
+            }
+            
+            if(attempts === maxAttempts){
+                 // Fallback for very dense cases: slightly alternate X to show something
+                finalX = defaultXOffset + (index % 2 === 0 ? 0 : 5);
+                finalY = defaultYOffset + (index % 3) * verticalPadding; // Minimal Y shift
+            }
+
+            occupiedYRanges.push({ top: labelTop, bottom: labelBottom });
+            
+            group.calculatedLabelPosition = { 
+                x: finalX, 
+                y: finalY, 
+                anchor: finalAnchor 
+            };
+        });
+    });
+
+    // DRAWING LINES, DOTS, AND THEN LABELS
+    valueFields.forEach((field, fieldIndex) => {
+        const color = colorValues[fieldIndex % colorValues.length];
+        const lineStyle = lineStyles[fieldIndex % lineStyles.length];
+        
+        const lineData = data.map(d => ({ x: d[dateField], y: d[field], original: d }));
+        
+        const line = d3.line().x(d => xScale(d.x)).y(d => yScale(d.y));
+        
+        const lineGroup = g.append('g').attr('class', 'line-group');
+
+        // 1. Draw Line PATH first
+        lineGroup.append('path')
+            .attr('class', 'line')
+            .attr('d', line(lineData))
+            .attr('stroke', color)
+            .attr('fill', 'none')
+            .attr('stroke-width', lineStyle.strokeWidth)
+            .attr('stroke-dasharray', lineStyle.dashArray);
+
+        // 2. Draw DOTS (and their groups) on top of lines
+        const dots = lineGroup.selectAll('.dot-group')
+            .data(lineData)
+            .enter()
+            .append('g')
+            .attr('class', 'dot-group')
+            .attr('transform', d => `translate(${xScale(d.x)},${yScale(d.y)})`);
+
+        dots.append('circle')
+            .attr('class', 'dot')
+            .attr('r', 4)
+            .attr('fill', color)
+            .attr('stroke', '#fff')
+            .attr('stroke-width', 1.5);
+        
+        // 3. Draw LABELS on top of dots/lines, using pre-calculated positions
+        dots.each(function(d) { // d is {x, y, original}
+            const currentDotG = d3.select(this); // This is the <g class="dot-group">
+            const groupsAtThisDate = valueGroupsMap.get(d.x);
+            let currentPointValueGroup = null;
+
+            if (groupsAtThisDate) {
+                currentPointValueGroup = groupsAtThisDate.find(g =>
+                    g.seriesInfo.some(si => si.field === field && areValuesClose(g.value, d.y))
+                );
+            }
+
+            if (currentPointValueGroup && currentPointValueGroup.calculatedLabelPosition) {
+                const designatedSeriesInfo = currentPointValueGroup.seriesInfo.reduce((prev, curr) => 
+                    (prev.fieldIndex < curr.fieldIndex ? prev : curr), currentPointValueGroup.seriesInfo[0]);
+                const isDesignatedDrawer = designatedSeriesInfo.field === field;
+
+                if (isDesignatedDrawer) {
+                    const pos = currentPointValueGroup.calculatedLabelPosition;
+                    currentDotG.append('text') // Append to the dot's <g> to keep it relative
+                        .attr('class', 'data-label')
+                        .attr('x', pos.x)
+                        .attr('y', pos.y)
+                        .attr('font-size', '10px')
+                        .attr('text-anchor', pos.anchor)
+                        .attr('fill', color) // Use series color for label
+                        .attr('font-weight', 'normal')
+                        .attr('stroke', 'white')
+                        .attr('stroke-width', '2px')
+                        .attr('stroke-opacity', '0.85')
+                        .attr('paint-order', 'stroke')
+                        .text(currentPointValueGroup.value.toFixed(1));
+                }
+            }
+        });
+    });
     
     // 添加X轴网格线
     g.append('g')
@@ -273,90 +461,70 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
           .text(d => d.toFixed(2));
       });
     
-    // 为每个值字段绘制一条线和点
-    valueFields.forEach((field, fieldIndex) => {
-      const color = colorValues[fieldIndex % colorValues.length];
-      
-      // 提取该字段的数据
-      const lineData = data.map(d => ({
-        x: d[dateField],
-        y: d[field]
-      }));
-      
-      // 创建线的生成器
-      const line = d3.line()
-        .x(d => xScale(d.x))
-        .y(d => yScale(d.y));
-      
-      // 绘制折线组
-      const lineGroup = g.append('g')
-        .attr('class', 'line-group');
-      
-      // 添加线
-      lineGroup.append('path')
-        .attr('class', 'line')
-        .attr('d', line(lineData))
-        .attr('stroke', color)
-        .attr('fill', 'none')
-        .attr('stroke-width', 2.5);
-      
-      // 添加数据点
-      lineGroup.selectAll('.dot')
-        .data(lineData)
-        .enter()
-        .append('circle')
-        .attr('class', 'dot')
-        .attr('cx', d => xScale(d.x))
-        .attr('cy', d => yScale(d.y))
-        .attr('r', 4)
-        .attr('fill', color)
-        .attr('stroke', '#fff')
-        .attr('stroke-width', 1);
-      
-      // 添加最后一个点的标签
-      if (lineData.length > 0) {
-        const lastPoint = lineData[lineData.length - 1];
-        lineGroup.append('text')
-          .attr('x', xScale(lastPoint.x) + 5)
-          .attr('y', yScale(lastPoint.y))
-          .attr('font-size', '12px')
-          .attr('fill', color)
-          .text(lastPoint.y.toFixed(2));
-      }
-    });
-    
-    // 添加图例
+    // 添加图例 - 修改图例排版以避免重叠
     const legend = g.append('g')
       .attr('class', 'legend')
-      .attr('transform', `translate(${innerWidth / 2}, -${margin.top - 30})`);
+      .attr('transform', `translate(0, -${margin.top - 10})`);
     
-    // 动态计算图例位置
-    const legendItemWidth = 150;
-    const legendItemsPerRow = Math.min(3, valueFields.length);
+    // 动态计算图例位置 - 使用更紧凑的布局
+    const legendItemWidth = 140; // 调整图例项宽度，增加间距
+    const legendItemHeight = 20; // 图例项高度
+    const legendItemsPerRow = Math.min(3, valueFields.length); // 减少每行图例数量以增加间距
     const legendWidth = legendItemsPerRow * legendItemWidth;
-    const legendStartX = -legendWidth / 2;
     
     valueFields.forEach((field, i) => {
       const row = Math.floor(i / legendItemsPerRow);
       const col = i % legendItemsPerRow;
-      const x = legendStartX + col * legendItemWidth;
-      const y = row * 25;
+      const x = col * legendItemWidth;
+      const y = row * legendItemHeight;
       const color = colorValues[i % colorValues.length];
+      const lineStyle = lineStyles[i % lineStyles.length];
       
       const legendItem = legend.append('g')
         .attr('transform', `translate(${x}, ${y})`);
       
-      legendItem.append('rect')
-        .attr('width', 15)
-        .attr('height', 15)
-        .attr('fill', color);
+      // 绘制线样式示例而不是方块，以便更好地区分
+      legendItem.append('line')
+        .attr('x1', 0)
+        .attr('y1', 6)
+        .attr('x2', 15)
+        .attr('y2', 6)
+        .attr('stroke', color)
+        .attr('stroke-width', lineStyle.strokeWidth)
+        .attr('stroke-dasharray', lineStyle.dashArray);
       
-      legendItem.append('text')
+      // 添加小圆点
+      legendItem.append('circle')
+        .attr('cx', 8)
+        .attr('cy', 6)
+        .attr('r', 3)
+        .attr('fill', color)
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 1);
+      
+      // 减小图例文字大小，截断过长的文字
+      const text = legendItem.append('text')
         .attr('x', 20)
-        .attr('y', 12.5)
-        .attr('font-size', '14px')
+        .attr('y', 9)
+        .attr('font-size', '10px') // 缩小字体大小
         .attr('alignment-baseline', 'middle')
         .text(field);
+      
+      // 如果文字太长，截断并添加省略号
+      const maxTextLength = 85; // 最大文本长度（像素）
+      const truncateText = (text, maxLength) => {
+        const node = text.node();
+        if (node) {
+          const textLength = node.getComputedTextLength ? node.getComputedTextLength() : field.length * 6;
+          if (textLength > maxLength) {
+            // 根据字符估算长度，尝试截断
+            const approxChars = Math.floor((maxLength / textLength) * field.length) - 3;
+            text.text(field.substring(0, approxChars) + '...');
+          }
+        }
+      };
+      
+      truncateText(text, maxTextLength);
     });
     
     // 将SVG转换为字符串
