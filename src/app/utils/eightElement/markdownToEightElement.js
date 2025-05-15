@@ -90,7 +90,6 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
         position: "relative",
         textAlign: textAlign, // 根据变体设置对齐方式
         width: width, // 设置宽度
-        "border-bottom": borderBottom, // 设置下边框
         ...layoutStyleConfig
       },
       text_body: {
@@ -1515,7 +1514,6 @@ function createTableElement(markdownTableContent) {
 // 创建代码元素
 function createCodeElement(codeContent, language = '') {
   const id = generateUUID();
-  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
 
   console.log('创建代码元素，语言:', language);
 
