@@ -113,13 +113,25 @@ export function generateChartFromTableData(tableData, chartType) {
     const valueFields = headers.slice(1);
     
     // 处理数据，转换为适合绘图的格式
-    const chartData = rows.map(row => {
+    let chartData = rows.map(row => {
       const item = { [dateField]: row[0] };
       valueFields.forEach((field, i) => {
         // 尝试转换为数字，如果失败则保留为0
         item[field] = parseFloat(row[i + 1]) || 0;
       });
       return item;
+    });
+
+    // Sort chartData by date ascending to ensure X-axis is chronological LTR
+    chartData.sort((a, b) => {
+        // Assuming dateField contains date strings in a format sortable (e.g., YYYY-MM-DD)
+        if (a[dateField] < b[dateField]) {
+            return -1;
+        }
+        if (a[dateField] > b[dateField]) {
+            return 1;
+        }
+        return 0;
     });
     
     // 根据图表类型生成不同的图表
