@@ -226,7 +226,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     const valueGroupsMap = new Map();
     const areValuesClose = (a, b) => { 
         if (Math.abs(a) < 0.001 && Math.abs(b) < 0.001) return true;
-        return Math.abs(a - b) < 0.5; 
+        return Math.abs(a - b) < 0.005; // Reduced threshold for closer matching
     };
 
     data.forEach(dataPoint => {
@@ -398,7 +398,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
                         .attr('stroke-width', '2px')
                         .attr('stroke-opacity', '0.85')
                         .attr('paint-order', 'stroke')
-                        .text(currentPointValueGroup.value.toFixed(1));
+                        .text(currentPointValueGroup.value.toFixed(2)); // Display two decimal places
                 }
             }
         });
