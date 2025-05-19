@@ -32,6 +32,14 @@ const message = greeting('World');
 console.log(message);  // 输出: Hello, World!
 \`\`\`
 
+### 数学公式示例
+行内公式：$E = mc^2$
+
+块级公式：
+$$ \\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi} $$\n
+我们还可以有更复杂的公式，例如：
+$$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行内也可以混合：例如 $\\alpha + \\beta = \\gamma$。
+
 ### 表格示例
 下面是一个简单的表格示例：
 
@@ -44,6 +52,7 @@ console.log(message);  // 输出: Hello, World!
 | 代码块 | 支持代码高亮显示 | ✅ |
 | 图表 | 支持数据可视化图表 | ✅ |
 | 混合内容 | 支持在一行中混合[链接](https://example.com)和文本 | ✅ |
+| 数学公式 | 支持行内和块级公式 | ✅ |
 
 ### 图表示例
 下面是一个分组折线图示例：

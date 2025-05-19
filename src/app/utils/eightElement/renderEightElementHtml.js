@@ -9,6 +9,28 @@ import resolveToken from '../tokens/resolveToken.js';
 import { Marked, marked } from 'marked';
 import { markedHighlight }from 'marked-highlight';
 import hljs from 'highlight.js';
+import markedKatex from 'marked-katex-extension';
+
+/**
+ * Configure marked globally with KaTeX and Highlight.js
+ */
+const katexOptions = {
+  throwOnError: false,
+  // displayMode: true, // This might be relevant for how $$...$$ is handled by default
+};
+
+const markedInstance = new Marked(
+  markedHighlight({
+    async: false, // Assuming synchronous highlighting for simplicity here
+    langPrefix: 'hljs language-',
+    highlight(code, lang) {
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+      return hljs.highlight(code, { language }).value;
+    }
+  })
+);
+markedInstance.use(markedKatex(katexOptions));
+// Use markedInstance.parse(markdownString) instead of marked.parse() later
 
 /**
  * 渲染八要素结构为HTML字符串，并返回预处理后的八要素结构
@@ -27,6 +49,8 @@ export function renderEightElementToHtml(eightElement, options = {}) {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Eight Element Renderer</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css" crossorigin="anonymous"></link>
       <style>
         body {
           margin: 0;
@@ -40,7 +64,6 @@ export function renderEightElementToHtml(eightElement, options = {}) {
           box-sizing: border-box;
         }
 
-
         pre code.hljs {
             display: block;
             overflow-x: auto;
@@ -48,115 +71,6 @@ export function renderEightElementToHtml(eightElement, options = {}) {
         }
         code.hljs {
             padding: 3px 5px;
-        }
-        /*!
-            Theme: GitHub
-            Description: Light theme as seen on github.com
-            Author: github.com
-            Maintainer: @Hirse
-            Updated: 2021-05-15
-            Outdated base version: https://github.com/primer/github-syntax-light
-            Current colors taken from GitHub's CSS
-        */
-        .hljs {
-            color: #24292e;
-            background: #ffffff;
-        }
-        .hljs-doctag,
-        .hljs-keyword,
-        .hljs-meta .hljs-keyword,
-        .hljs-template-tag,
-        .hljs-template-variable,
-        .hljs-type,
-        .hljs-variable.language_ {
-            /* prettylights-syntax-keyword */
-            color: #d73a49;
-        }
-        .hljs-title,
-        .hljs-title.class_,
-        .hljs-title.class_.inherited__,
-        .hljs-title.function_ {
-            /* prettylights-syntax-entity */
-            color: #6f42c1;
-        }
-        .hljs-attr,
-        .hljs-attribute,
-        .hljs-literal,
-        .hljs-meta,
-        .hljs-number,
-        .hljs-operator,
-        .hljs-variable,
-        .hljs-selector-attr,
-        .hljs-selector-class,
-        .hljs-selector-id {
-            /* prettylights-syntax-constant */
-            color: #005cc5;
-        }
-        .hljs-regexp,
-        .hljs-string,
-        .hljs-meta .hljs-string {
-            /* prettylights-syntax-string */
-            color: #032f62;
-        }
-        .hljs-built_in,
-        .hljs-symbol {
-            /* prettylights-syntax-variable */
-            color: #e36209;
-        }
-        .hljs-comment,
-        .hljs-code,
-        .hljs-formula {
-            /* prettylights-syntax-comment */
-            color: #6a737d;
-        }
-        .hljs-name,
-        .hljs-quote,
-        .hljs-selector-tag,
-        .hljs-selector-pseudo {
-            /* prettylights-syntax-entity-tag */
-            color: #22863a;
-        }
-        .hljs-subst {
-            /* prettylights-syntax-storage-modifier-import */
-            color: #24292e;
-        }
-        .hljs-section {
-            /* prettylights-syntax-markup-heading */
-            color: #005cc5;
-            font-weight: bold;
-        }
-        .hljs-bullet {
-            /* prettylights-syntax-markup-list */
-            color: #735c0f;
-        }
-        .hljs-emphasis {
-            /* prettylights-syntax-markup-italic */
-            color: #24292e;
-            font-style: italic;
-        }
-        .hljs-strong {
-            /* prettylights-syntax-markup-bold */
-            color: #24292e;
-            font-weight: bold;
-        }
-        .hljs-addition {
-            /* prettylights-syntax-markup-inserted */
-            color: #22863a;
-            background-color: #f0fff4;
-        }
-        .hljs-deletion {
-            /* prettylights-syntax-markup-deleted */
-            color: #b31d28;
-            background-color: #ffeef0;
-        }
-        .hljs-char.escape_,
-        .hljs-link,
-        .hljs-params,
-        .hljs-property,
-        .hljs-punctuation,
-        .hljs-tag {
-                /* purposely ignored */
-  
         }
       </style>
     </head>
@@ -361,27 +275,53 @@ function applyStylesToElement(computedStyle, key, value) {
  * @param {Object} originalElement - 原始元素
  */
 function processTextElement(processedElement, originalElement) {
-    // 确定使用哪种文本形态 (text_body 或 text_hyperlink)
     const textType = originalElement.type === 'text_body' ? 'text_body' : 'text_hyperlink';
     const textConfig = originalElement.layout[textType];
 
     if (!textConfig) return;
 
     processedElement.textType = textType;
+    let rawTextContent = '';
 
-    // 处理内容引用
     if (textConfig.content && Array.isArray(textConfig.content)) {
         const fontRef = textConfig.content.find(item => item.element === 'font');
         if (fontRef && originalElement.font && originalElement.font[fontRef.value]) {
-            const content = originalElement.font[fontRef.value][fontRef.prop]?.content || '';
-            processedElement.textContent = content;
+            rawTextContent = originalElement.font[fontRef.value][fontRef.prop]?.content || '';
         }
     }
+    processedElement.originalTextContent = rawTextContent; // Keep original for non-katex uses if any
 
-    // 处理文本样式引用
+    // Process with KaTeX-enabled marked
+    if (rawTextContent && typeof rawTextContent === 'string') {
+        try {
+            let preppedMarkdown = rawTextContent;
+
+            // Correctly add a space before an inline $ if it's preceded by a non-whitespace character
+            // and is not part of a $$ block delimiter.
+            preppedMarkdown = preppedMarkdown.replace(/(\S)(\$)(?!\$)/g, (match, charBefore, dollarSign) => {
+                if (charBefore === '$') { // Avoid altering existing $$ pairs
+                    return match;
+                }
+                return charBefore + ' ' + dollarSign; // Add space: e.g., "word$" -> "word $"
+            });
+            
+            // Ensure newlines in original text are treated as <br> or new paragraphs by marked
+            preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
+
+            processedElement.katexProcessedContent = markedInstance.parse(preppedMarkdown);
+        } catch (error) {
+            console.error("KaTeX or Marked parsing error for text:", error);
+            // Fallback to showing original text with an error message if parsing fails
+            const errorMessage = `<p style="color:red;">Error rendering math/markdown: ${escapeHtml(error.message)}</p>`;
+            processedElement.katexProcessedContent = errorMessage + escapeHtml(rawTextContent).replace(/\\n/g, '<br>');
+        }
+    } else {
+        processedElement.katexProcessedContent = escapeHtml(rawTextContent || '').replace(/\\n/g, '<br>'); // Handle null/undefined rawTextContent
+    }
+
     if (textConfig.style) {
         processStyleReferences(processedElement, originalElement, textConfig.style);
-  }
+    }
 }
 
 /**
@@ -439,7 +379,7 @@ function processButtonElement(processedElement, originalElement) {
     // 处理按钮样式引用
     if (buttonConfig && buttonConfig.style) {
         processStyleReferences(processedElement, originalElement, buttonConfig.style);
-  }
+    }
 }
 
 /**
@@ -453,7 +393,7 @@ function processImageElement(processedElement, originalElement) {
         processedElement.imageUrl = originalElement.material.image.default.resource || '';
     } else if (originalElement.src) {
         processedElement.imageUrl = originalElement.src;
-  }
+    }
 }
 
 /**
@@ -514,8 +454,8 @@ function processTableElement(processedElement, originalElement) {
                 originalElement,
                 originalElement.layout.style.td
             );
+        }
     }
-  }
 }
 
 /**
@@ -549,7 +489,7 @@ function processChartElement(processedElement, originalElement) {
     // 处理样式引用
     if (originalElement.layout && originalElement.layout.style) {
         processStyleReferences(processedElement, originalElement, originalElement.layout.style);
-  }
+    }
 }
 
 /**
@@ -780,25 +720,31 @@ function renderLayoutElement(element) {
  */
 function renderTextElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
-    let textContent = element.textContent || '';
+    
+    // 直接使用预处理的HTML内容
+    let contentHtml = '';
+    
+    // 如果有预处理的Markdown+KaTeX内容，直接使用
+    if (element.font && element.font.fontsize && element.font.fontsize.default) {
+      contentHtml = element.font.fontsize.default.content || '';
+      
+      // 如果content不是HTML格式（老格式或纯文本），则进行简单的HTML转义和换行处理
+      if (contentHtml && !contentHtml.includes('<')) {
+        contentHtml = escapeHtml(contentHtml).replace(/\\n/g, '<br>');
+      }
+    }
 
-    // 处理换行
-    textContent = textContent.replace(/\n/g, '<br>');
-
-    // 根据textType决定HTML结构
     if (element.textType === 'text_hyperlink') {
-        // 超链接文本用带样式的a标签
         const url = element.url || '#';
         return `
       <div id="${element.id || ''}" data-element-type="text" ${styleAttr}>
-        <a href="${url}" style="text-decoration:underline;color:inherit;">${textContent}</a>
+        <a href="${url}" style="text-decoration:underline;color:inherit;">${contentHtml}</a>
       </div>
     `;
     } else {
-        // 普通文本用span嵌套在div中
         return `
       <div id="${element.id || ''}" data-element-type="text" ${styleAttr}>
-        <span>${textContent}</span>
+        ${contentHtml}
       </div>
     `;
     }
@@ -1011,52 +957,34 @@ function renderCodeElement(element) {
     // 生成容器样式
     const containerStyleAttr = generateStyleAttribute(element.computedStyle || {});
     
-    // 获取代码内容和语言
-    const rawCode = element.rawData || '';
-    const language = element.language || 'plaintext';
+    // 使用预处理好的高亮HTML
+    let html = element.highlightedCode || '';
     
-    if (!rawCode.trim()) {
-        return `<div id="${element.id || ''}" data-element-type="code" ${containerStyleAttr}>
-              <p>代码内容为空</p>
-            </div>`;
+    // 如果没有预处理的HTML，回退到原始方式
+    if (!html) {
+        const rawCode = element.rawData || '';
+        const language = element.language || 'plaintext';
+        
+        if (!rawCode.trim()) {
+            return `<div id="${element.id || ''}" data-element-type="code" ${containerStyleAttr}>
+                  <p>代码内容为空</p>
+                </div>`;
+        }
+        
+        try {
+            // 使用原始的方式生成代码高亮
+            html = `<pre><code class="language-${language}">${escapeHtml(rawCode)}</code></pre>`;
+        } catch (error) {
+            console.error('代码渲染出错:', error);
+            html = `<p>代码解析错误: ${error.message}</p><pre>${escapeHtml(rawCode)}</pre>`;
+        }
     }
     
-    try {
-        console.log('开始解析和高亮代码，语言:', language);
-        
-        // 配置marked选项，支持代码高亮
-        const marked = new Marked(
-            markedHighlight({
-                emptyLangClass: "hljs",
-                langPrefix: "hljs language-",
-                highlight(code, lang, info) {
-                    const language = hljs.getLanguage(lang) ? lang : "plaintext";
-                    return hljs.highlight(code, { language }).value;
-                },
-            }),
-        );
-        
-        // 包装代码为markdown格式，以便marked解析
-        const markdownCode = `\`\`\`${language}\n${rawCode}\n\`\`\``;
-        
-        // 使用marked解析代码
-        let html = marked.parse(markdownCode);
-        
-        // 包装代码块
-        return `
+    return `
       <div id="${element.id || ''}" data-element-type="code" ${containerStyleAttr}>
         ${html}
       </div>
     `;
-    } catch (error) {
-        console.error('代码渲染出错:', error);
-        return `
-      <div id="${element.id || ''}" data-element-type="code" ${containerStyleAttr}>
-        <p>代码解析错误: ${error.message}</p>
-        <pre>${escapeHtml(rawCode)}</pre>
-      </div>
-    `;
-    }
 }
 
 /**
