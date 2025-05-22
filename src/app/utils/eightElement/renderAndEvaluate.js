@@ -6,14 +6,15 @@
 
 import { chromium } from 'playwright-chromium';
 import { renderEightElementToHtml } from './renderEightElementHtml.js';
+import fs from 'fs';
+import path from 'path';
 
 // 导入视觉空间评分模块
 import { evaluateVisualSpace } from '../layoutAnalysis/visualSpaceScore.js';
 
 import { convertEightElementToLayout } from '../layoutAnalysis/eightElementAnalysis.js';
 
-// 导入统一的元素测量收集模块
-import collectEightElementMeasurements from './collectElementMeasurements.js';
+import { evaluateImage } from '../aims/evaluate.js';
 
 /**
  * 渲染八要素结构并进行评分
@@ -22,20 +23,50 @@ import collectEightElementMeasurements from './collectElementMeasurements.js';
  * @returns {Object} - 测量和评分结果
  */
 export async function renderAndEvaluateEightElement(eightElement, options = {}) {
-  const { width = 1024, height = 768 } = options;
-  
+  const {
+    width = 1024,
+    height = 768,
+    outputDir = 'output',
+    saveHtml = true,
+    takeScreenshot = true,
+    outputPrefix = 'eight-element'
+  } = options;
+
+  // 确保输出目录存在
+  if ((saveHtml || takeScreenshot) && !fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
   // 渲染HTML和预处理八要素结构
   const { html, processedEightElement } = renderEightElementToHtml(eightElement, { width, height });
+
+  // 如果需要保存HTML
+  if (saveHtml) {
+    const timestamp = Date.now();
+    const htmlFilePath = path.join(outputDir, `${outputPrefix}-${timestamp}.html`);
+    fs.writeFileSync(htmlFilePath, html, 'utf-8');
+    console.log(`HTML文件已保存至: ${htmlFilePath}`);
+  }
 
   // 将八要素结构转换为标准布局格式
   const layout = convertEightElementToLayout(processedEightElement);
 
-  // 使用Playwright进行测量
-  const measurements = await measureWithPlaywright(html, processedEightElement, { width, height });
-  
+  // 使用Playwright进行测量和截图
+  const { measurements, screenshotPath } = await measureWithPlaywright(
+    html,
+    processedEightElement,
+    {
+      width,
+      height,
+      takeScreenshot,
+      outputDir,
+      outputPrefix
+    }
+  );
+
   // 仅使用visualSpaceScore模块进行评分
   const visualSpaceScore = evaluateVisualSpace(measurements, layout);
-  
+
   // 将visualSpaceScore转换为统一格式
   const score = {
     score: visualSpaceScore.score,
@@ -43,12 +74,16 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
     visualization: visualSpaceScore.visualization,
     overallRecommendation: visualSpaceScore.overallRecommendation
   };
-  
+
   return {
     measurements,
     score,
     html,
-    processedEightElement
+    processedEightElement,
+    outputFiles: {
+      screenshotPath: screenshotPath || null,
+      htmlPath: saveHtml ? path.join(outputDir, `${outputPrefix}-${Date.now()}.html`) : null
+    }
   };
 }
 
@@ -56,31 +91,39 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
  * 使用Playwright测量HTML元素
  * @param {string} htmlContent - HTML内容
  * @param {Object} processedEightElement - 预处理后的八要素结构
- * @param {Object} containerDimensions - 容器尺寸
- * @returns {Object} - 测量数据
+ * @param {Object} options - 选项包括容器尺寸和输出设置
+ * @returns {Object} - 测量数据和截图路径
  */
-async function measureWithPlaywright(htmlContent, processedEightElement, containerDimensions) {
+async function measureWithPlaywright(htmlContent, processedEightElement, options) {
+  const {
+    width = 1024,
+    height = 768,
+    takeScreenshot = false,
+    outputDir = 'output',
+    outputPrefix = 'eight-element'
+  } = options;
+
   // 尝试使用安全选项启动浏览器
-  const browser = await chromium.launch({ 
+  const browser = await chromium.launch({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
   });
-  
+
   const page = await browser.newPage();
 
   page.on('console', (message) => {
     console.log(`PAGE LOG: ${message.text()}`);
   });
-  
+
   // 设置视口尺寸
   await page.setViewportSize({
-    width: containerDimensions.width,
-    height: containerDimensions.height
+    width: width,
+    height: height
   });
-  
+
   // 设置页面内容
   await page.setContent(htmlContent);
-    
+
   // 注入统一的collectEightElementMeasurements模块到页面上下文
   // 首先注入辅助函数
   await page.addScriptTag({
@@ -246,7 +289,7 @@ async function measureWithPlaywright(htmlContent, processedEightElement, contain
       };
     `
   });
-    
+
   // 使用注入的collectEightElementMeasurements函数收集测量数据
   const measurements = await page.evaluate(({ processedEightElement, containerDimensions }) => {
     // 使用注入的全局函数进行测量
@@ -256,20 +299,73 @@ async function measureWithPlaywright(htmlContent, processedEightElement, contain
       getElementById: (id) => document.getElementById(id),
       getComputedStyle: (el) => window.getComputedStyle(el)
     });
-    
+
     console.log(`收集了 ${measurements.elements.length} 个元素的测量数据`);
     return measurements;
-  }, { processedEightElement, containerDimensions });
+  }, { processedEightElement, containerDimensions: { width, height } });
 
+  // 如果需要截图
+  let screenshotPath = null;
+  let aims = null;
+  if (takeScreenshot) {
+    // 确保页面完全渲染
+    await page.waitForTimeout(500);
 
-  console.log('final measurements')
-  console.log(measurements)
+    // 生成截图路径
+    const timestamp = Date.now();
+    screenshotPath = path.join(outputDir, `${outputPrefix}-${timestamp}.png`);
+
+    // 获取实际页面高度
+    const pageHeight = await page.evaluate(() => {
+      return Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight
+      );
+    });
+
+    // 调整视口以捕获完整内容
+    await page.setViewportSize({
+      // width: width,
+      width: 1300,
+      height: Math.min(pageHeight, 16384) // 设置一个合理的最大高度，避免过大
+    });
+
+    // 保存截图
+    // await page.screenshot({
+    //   path: screenshotPath,
+    //   fullPage: true,
+    //   type: 'png'
+    // });
+
+    const screenshotBuffer = await page.screenshot({
+      fullPage: true,
+      type: 'png'
+    });
+
+    // 转换为Base64
+    const base64Image = screenshotBuffer.toString('base64');
+
+    const buffer = Buffer.from(base64Image, 'base64');
+
+    fs.writeFileSync(screenshotPath, buffer);
+
+    aims = await evaluateImage(base64Image, ["m1"], { save_results: true });
+
+    console.log(`截图已保存至: ${screenshotPath}`);
+
+    console.log('aims')
+    console.log(aims)
+
+  }
+
 
   console.log('收集到的元素数量:', measurements.elements.length);
-  
+
   await browser.close();
-  
-  return measurements;
+
+  return { measurements, screenshotPath, aims };
 }
 
 export default renderAndEvaluateEightElement;

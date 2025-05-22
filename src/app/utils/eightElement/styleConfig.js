@@ -166,7 +166,7 @@ export const DEFAULT_STYLE_CONFIG = {
       "padding-right": DIMENSION_CONSTANTS.PADDING.base,
       "margin-top": DIMENSION_CONSTANTS.MARGIN.base,
       "margin-bottom": DIMENSION_CONSTANTS.MARGIN.base,
-      "margin-left": DIMENSION_CONSTANTS.MARGIN.loose,
+      "margin-left": DIMENSION_CONSTANTS.MARGIN.base,
       "margin-right": DIMENSION_CONSTANTS.MARGIN.base,
       "border-width": DIMENSION_CONSTANTS.BORDER_WIDTH.base,
       "border-color": COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
