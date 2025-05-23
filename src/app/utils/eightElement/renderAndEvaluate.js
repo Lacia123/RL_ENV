@@ -351,12 +351,9 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
 
     fs.writeFileSync(screenshotPath, buffer);
 
-    aims = await evaluateImage(base64Image, ["m1"], { save_results: true });
+    // aims = await evaluateImage(base64Image, ["m1"], { save_results: true });
 
     console.log(`截图已保存至: ${screenshotPath}`);
-
-    console.log('aims')
-    console.log(aims)
 
   }
 
