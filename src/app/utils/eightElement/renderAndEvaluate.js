@@ -27,7 +27,7 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
     width = 1024,
     height = 768,
     outputDir = 'output',
-    saveHtml = true,
+    saveHtml = false,
     takeScreenshot = true,
     outputPrefix = 'eight-element'
   } = options;
@@ -349,7 +349,7 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
 
     const buffer = Buffer.from(base64Image, 'base64');
 
-    fs.writeFileSync(screenshotPath, buffer);
+    // fs.writeFileSync(screenshotPath, buffer);
 
     // aims = await evaluateImage(base64Image, ["m1"], { save_results: true });
 

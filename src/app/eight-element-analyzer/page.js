@@ -143,10 +143,23 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
   useEffect(() => {
     if (renderedHtml && iframeRef.current) {
       const timer = setTimeout(() => {
-        measureIframeContent();
+        // 检查iframe是否已经完全加载
+        const iframe = iframeRef.current;
+        if (iframe && iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+          measureIframeContent();
+        } else {
+          // 如果还没加载完成，等待iframe加载事件
+          const handleIframeLoad = () => {
+            measureIframeContent();
+            iframe.removeEventListener('load', handleIframeLoad);
+          };
+          if (iframe) {
+            iframe.addEventListener('load', handleIframeLoad);
+          }
+        }
         // 确保测量完成后再次更新 key
         setIframeKey(prev => prev + 1);
-      }, 100);
+      }, 200); // 增加等待时间，确保渲染完成
       return () => clearTimeout(timer);
     }
   }, [renderedHtml]);
@@ -249,30 +262,26 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
       const iframe = iframeRef.current;
       if (!iframe || !iframe.contentWindow) return;
 
-      // 获取iframe内容的实际尺寸，而不仅仅是视口尺寸
-    const iframeDocument = iframe.contentDocument;
-      const iframeBody = iframeDocument.body;
+      // 获取iframe内容文档
+      const iframeDocument = iframe.contentDocument;
       
-      // // 计算内容的实际尺寸（可能超出容器）
-      // const scrollWidth = iframeBody.scrollWidth;
-      // const scrollHeight = iframeBody.scrollHeight;
-      
-      const dimensions = {
-        width: iframe.clientWidth,
-        height: iframe.clientHeight,
-        
+      // 使用状态中的固定尺寸，而不是iframe的实际尺寸
+      // 这样避免了iframe隐藏时测量不准确的问题
+      const measureDimensions = {
+        width: dimensions.width,
+        height: dimensions.height
       };
 
       // 使用通用元素测量收集函数
       const measurements = collectEightElementMeasurements(processedEightElement, {
         document: iframeDocument,
-        dimensions,
+        dimensions: measureDimensions,
         getElementById: (id) => iframeDocument.getElementById(id),
-        getComputedStyle: (el) => window.getComputedStyle(el)
+        getComputedStyle: (el) => iframe.contentWindow.getComputedStyle(el)
       });
 
-      console.log('page measurements')
-      console.log(measurements)
+      console.log('page measurements:', measurements);
+      console.log('使用的测量尺寸:', measureDimensions);
 
       setDomMeasurements(measurements);
     } catch (error) {
@@ -523,13 +532,21 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
             
             <div className="mt-4">
               <button
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full"
-                onClick={applyStyleSettings}
+                className={`px-4 py-2 rounded w-full ${
+                  visibleTab === 'html' 
+                    ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+                onClick={visibleTab === 'html' ? applyStyleSettings : undefined}
+                disabled={visibleTab !== 'html'}
               >
                 应用样式设置
               </button>
               <p className="text-xs text-gray-500 mt-1">
-                样式种子会影响八要素结构的视觉效果
+                {visibleTab === 'html' 
+                  ? '样式种子会影响八要素结构的视觉效果' 
+                  : '请切换到HTML预览页面后再应用样式设置'
+                }
               </p>
             </div>
           </div>
@@ -585,14 +602,12 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
             <div className="border border-gray-300 rounded p-1 overflow-auto" style={{
               width: '100%',
               height: '600px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'flex-start',
               backgroundColor: '#f5f5f5'
             }}>
               <div style={{
                 width: `${dimensions.width}px`,
                 height: `${dimensions.height}px`,
+                margin: '0 auto',
                 backgroundColor: 'white',
                 boxShadow: '0 0 10px rgba(0,0,0,0.1)',
                 transition: 'width 0.3s, height 0.3s'
