@@ -249,7 +249,9 @@ export const DEFAULT_STYLE_CONFIG = {
     primary: {
       "minWidth": DIMENSION_CONSTANTS.BASIC[0],
       "minHeight": DIMENSION_CONSTANTS.BASIC[0],
-      "spacing": DIMENSION_CONSTANTS.PADDING.base,
+      "paddingLeft": DIMENSION_CONSTANTS.PADDING.base,
+      "paddingRight": DIMENSION_CONSTANTS.PADDING.base,
+      // "spacing": DIMENSION_CONSTANTS.PADDING.base,
       "itemSpacing": DIMENSION_CONSTANTS.GAP.base,
       "fill": COLOR_CONSTANTS.PRIMARY.BRAND5,
       "fontColor": COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],

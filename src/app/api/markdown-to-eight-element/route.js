@@ -3,6 +3,7 @@ import { markdownToEightElement } from '@/app/utils/eightElement/markdownToEight
 import { renderEightElementToHtml } from '@/app/utils/eightElement/renderEightElementHtml';
 import { calculateTokens } from '@/app/utils/seeds/generateTokenBySeed';
 import { setDynamicTokenSystem, clearDynamicTokenSystem } from '@/app/utils/tokens/resolveToken';
+import { logElementStyleErrors } from '@/app/utils/logging/elementStyleLogger';
 
 export async function POST(request) {
   try {
@@ -41,6 +42,15 @@ export async function POST(request) {
                 
       // 预处理八要素结构以应用样式
       const { processedEightElement } = renderEightElementToHtml(eightElement, { width, height });
+      
+      // 异步记录按钮样式错误，不阻塞接口返回
+      setImmediate(async () => {
+        try {
+          await logElementStyleErrors(markdown, seed, eightElement, { width, height });
+        } catch (error) {
+          console.warn('异步记录元素样式错误失败:', error);
+        }
+      });
                 
       // 返回八要素结构
       return NextResponse.json({

@@ -1,0 +1,75 @@
+{
+  "date": "2025-05-27",
+  "buttonStyleError": 0,
+  "textWrapError": 0,
+  "wcagContrastError": 0,
+  "buttonBorderError": 0,
+  "logs": [
+    {
+      "timestamp": "2025-05-27T03:36:56.207Z",
+      "seed": {
+        "shape": 7,
+        "degree": 3,
+        "font": 6,
+        "material": 7,
+        "color": "#FF5757"
+      },
+      "dimensions": {
+        "width": 1024,
+        "height": 768
+      },
+      "markdownHash": "IyDlhavopoHntKDmtYvor5XmlofmoaMK",
+      "buttonIssues": [],
+      "textWrapIssues": [],
+      "buttonBorderIssues": [],
+      "wcagSummary": {
+        "score": 100,
+        "grade": "优秀",
+        "totalChecks": 3,
+        "passedChecks": 3,
+        "failedChecks": 0,
+        "pageBackgroundColor": {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        },
+        "results": [
+          {
+            "type": "text-background",
+            "description": "正文文字 vs 页面背景",
+            "contrastRatio": 21,
+            "level": "AAA",
+            "passed": true,
+            "requirement": "≥4.5:1 (AA级)",
+            "elementId": "dd-bfe546bc-9cf3-4a66-9d89-8b946621b202"
+          },
+          {
+            "type": "button-text-background",
+            "description": "按钮文字 vs 按钮背景",
+            "contrastRatio": 4.86,
+            "level": "AA",
+            "passed": true,
+            "requirement": "≥4.5:1 (AA级)",
+            "elementId": "dd-0d3d6ce7-58ab-43c8-b6a0-6deb92a93ac0"
+          },
+          {
+            "type": "button-background-page",
+            "description": "按钮背景 vs 页面背景",
+            "contrastRatio": 4.86,
+            "level": "AAA",
+            "passed": true,
+            "requirement": "≥3:1 (UI组件)",
+            "elementId": "dd-0d3d6ce7-58ab-43c8-b6a0-6deb92a93ac0"
+          }
+        ]
+      },
+      "issueCount": {
+        "button": 0,
+        "textWrap": 0,
+        "buttonBorder": 0,
+        "wcagFailed": 0,
+        "total": 0
+      }
+    }
+  ]
+}

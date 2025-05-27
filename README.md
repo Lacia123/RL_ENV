@@ -345,3 +345,9 @@ if (layoutType === 'standard') {
     <span style={cssProps(styles.tag)}>可持续发展</span>
     <span style={cssProps(styles.tag)}>绿色科技</span>
 ```
+
+
+
+```
+id 为 root 的子元素下第一个 data-element-type="layout" 的 background，任意取 data-element-type="text 的 color，data-element-type="button" 的 background color，以及 data-element-type="button" 的 color
+```

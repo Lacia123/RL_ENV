@@ -492,8 +492,6 @@ function createButtonElement(text, url, variant = 'primary') {
   const buttonStyleConfig = getElementStyleConfig('button', variant);
   const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
 
-  console.log("创建按钮元素：", { id, text, url });
-
   const buttonElement = {
     id,
     name: "button", // 确保按钮名称为"button"
@@ -511,6 +509,8 @@ function createButtonElement(text, url, variant = 'primary') {
         "box-sizing": "border-box",
         primaryAxisSizingMode: "fixed",
         position: "relative",
+        paddingLeft: buttonStyleConfig.paddingLeft,
+        paddingRight: buttonStyleConfig.paddingRight,
         ...layoutStyleConfig
       },
       button_normal: {
@@ -540,12 +540,12 @@ function createButtonElement(text, url, variant = 'primary') {
             prop: "default",
             token: "min_height"
           },
-          spacing: {
-            element: "scale",
-            value: "padding",
-            prop: "default",
-            token: "padding"
-          },
+          // spacing: {
+          //   element: "scale",
+          //   value: "padding",
+          //   prop: "default",
+          //   token: "padding"
+          // },
           itemSpacing: {
             element: "scale",
             value: "gap",
