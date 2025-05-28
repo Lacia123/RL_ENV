@@ -26,7 +26,11 @@ const EightElementAnalyzer = () => {
 六级标题正文六级标题正文六级标题正文六级标题正文六级标题正文六级标题正文
 
 ### 按钮（超链接）
-这是一个[按钮链接](https://example.com)，将被转换为button元素。
+[确认](https://example.com)
+[取消](https://example.com)
+
+### 示例图片
+![示例图片](https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg)
 
 ### 代码块示例
 下面是一个JavaScript代码示例：
@@ -60,7 +64,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
 | 表格 | 支持表格渲染和样式 | ✅ |
 | 代码块 | 支持代码高亮显示 | ✅ |
 | 图表 | 支持数据可视化图表 | ✅ |
-| 混合内容 | 支持在一行中混合[链接](https://example.com)和文本 | ✅ |
+| 混合内容 | 支持在一行中文本 | ✅ |
 | 数学公式 | 支持行内和块级公式 | ✅ |
 
 ### 图表示例

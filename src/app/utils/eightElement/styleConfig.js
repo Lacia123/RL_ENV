@@ -586,10 +586,47 @@ export const DEFAULT_STYLE_CONFIG = {
       textTransform: "uppercase",
       letterSpacing: "1px",
       background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK4,
-      padding: "{dimension.padding.supertight} {dimension.padding.tight}",
+      paddingTop: "{dimension.padding.supertight}",
+      paddingBottom: "{dimension.padding.supertight}",
+      paddingLeft: "{dimension.padding.tight}",
+      paddingRight: "{dimension.padding.tight}",
       borderRadius: "{dimension.borderradius.xs}",
       display: "inline-block"
     },
+
+    // 代码块  
+    codeBlock: {
+      fontSizes: "{font.size.small}",
+      fontWeight: "400",
+      fontFamily: "'Fira Code', 'Monaco', 'Cascadia Code', monospace",
+      lineHeight: "1.5",
+      backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_WHITE88,
+      paddingTop: "{dimension.padding.loose}",
+      paddingBottom: "{dimension.padding.loose}",
+      paddingLeft: "{dimension.padding.extraloose}",
+      paddingRight: "{dimension.padding.extraloose}",
+      marginTop: "{dimension.margin.base}",
+      marginBottom: "{dimension.margin.base}",
+      borderRadius: "{dimension.borderradius.large}",
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderStyle: "solid",
+      borderColor: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_CONTAINER_GREY7,
+      boxShadow: "{material.hierarchy.2f}",
+      overflow: 'auto',
+      position: 'relative',
+      '&::before': {
+        content: "''",
+        position: 'absolute',
+        top: '12px',
+        left: '16px',
+        width: '12px',
+        height: '12px',
+        borderRadius: '50%',
+        backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.WARNING_ORANGE5,
+        boxShadow: `24px 0 0 ${CSS_VARIABLE_SYSTEM.COLOR.WARNING_ORANGE6}, 48px 0 0 ${CSS_VARIABLE_SYSTEM.COLOR.SUCCESS_GREEN5}`
+      }
+    },
+
     // 超链接文本
     hyperlink: {
       "textColor": COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5],
@@ -619,71 +656,431 @@ export const DEFAULT_STYLE_CONFIG = {
       boxShadow: "{material.hierarchy.main}"
     }
   },
+  chart: {
+    // 图表容器  
+    container: {
+      marginTop: "{dimension.margin.loose}",
+      marginBottom: "{dimension.margin.loose}",
+      marginLeft: "0",
+      marginRight: "0",
+      padding: "{dimension.padding.extraloose}",
+      background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_WHITE100,
+      borderRadius: "{dimension.borderradius.xl}",
+      boxShadow: "{material.hierarchy.2f}",
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderStyle: "solid",
+      borderColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK12,
+    },
+    // 图表标题
+    title: {
+      fontSize: "{font.size.large}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK88,
+      marginBottom: "{dimension.margin.base}",
+      textAlign: 'center'
+    },
+    // 图例
+    legend: {
+      fontSize: "{font.size.small}",
+      fontWeight: "400",
+      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK64,
+      display: 'flex',
+      justifyContent: 'center',
+      gap: "{dimension.gap.loose}",
+      marginTop: "{dimension.margin.base}"
+    },
+    // 坐标轴  
+    axis: {
+      fontSize: "{font.size.tiny}",
+      fontWeight: "400",
+      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK48
+    },
+  },
+  // 表格元素配置
+  table: {
+    // 表格容器  
+    container: {
+      width: '100%',
+      borderCollapse: 'collapse',
+      marginTop: "{dimension.margin.loose}",
+      marginBottom: "{dimension.margin.loose}",
+      marginLeft: "0",
+      marginRight: "0",
+      background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_WHITE100,
+      borderRadius: "{dimension.borderradius.large}",
+      overflow: 'hidden',
+      boxShadow: "{material.hierarchy.1f}"
+    },
+    th: {
+      background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_GREY1,
+      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK88,
+      fontWeight: "{font.fontweight.semibold}",
+      fontSize: "{font.size.small}",
+      paddingTop: "{dimension.padding.base}",
+      paddingBottom: "{dimension.padding.base}",
+      paddingLeft: "{dimension.padding.semiloose}",
+      paddingRight: "{dimension.padding.semiloose}",
+      textAlign: 'left',
+      borderBottomWidth: "{dimension.borderwidth.base}",
+      borderBottomStyle: "solid",
+      borderBottomColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK20
+    },
+    td: {
+      fontSize: "{font.size.medium}",
+      paddingTop: "{dimension.padding.base}",
+      paddingBottom: "{dimension.padding.base}",
+      paddingLeft: "{dimension.padding.semiloose}",
+      paddingRight: "{dimension.padding.semiloose}",
+      borderBottomWidth: "{dimension.borderwidth.narrow}",
+      borderBottomStyle: "solid",
+      borderBottomColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK12,
+      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76
+    },
+    // 表格行  
+    tr: {
+      borderBottomWidth: "{dimension.borderwidth.narrow}",
+      borderBottomStyle: "solid",
+      borderBottomColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK12,
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
+      '&:hover': {
+        background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_GREY0
+      },
+      '&:last-child': {
+        borderBottom: "{dimension.borderwidth.none}"
+      }
+    }
+  },
 
   // 按钮元素配置
   button: {
+    // 主要按钮  
     primary: {
-      "minWidth": DIMENSION_CONSTANTS.BASIC[0],
-      "minHeight": DIMENSION_CONSTANTS.BASIC[0],
-      "paddingLeft": DIMENSION_CONSTANTS.PADDING.base,
-      "paddingRight": DIMENSION_CONSTANTS.PADDING.base,
-      // "spacing": DIMENSION_CONSTANTS.PADDING.base,
-      "itemSpacing": DIMENSION_CONSTANTS.GAP.base,
-      "fill": COLOR_CONSTANTS.PRIMARY.BRAND5,
-      "fontColor": COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
-      "fontSizes": FONT_CONSTANTS.SIZE.LARGE,
-      "borderRadius": DIMENSION_CONSTANTS.BORDER_RADIUS[8],
-      "borderColor": COLOR_CONSTANTS.BASIC.OPACITY.WHITE[32],
-      "borderWidth": DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
-      "boxShadow": "none"
+      fontSizes: "{font.size.medium}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: CSS_VARIABLE_SYSTEM.COLOR.ON_PRIMARY_WHITE100,
+      background: CSS_VARIABLE_SYSTEM.GRADIENT.PRIMARY,
+      border: "{dimension.borderwidth.none}",
+      borderRadius: "{dimension.borderradius.large}",
+      paddingLeft: "{dimension.padding.base}",
+      paddingRight: "{dimension.padding.base}",
+      paddingTop: "{dimension.padding.base}",
+      paddingBottom: "{dimension.padding.base}",
+      cursor: 'pointer',
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      boxShadow: "{material.hierarchy.2f}",
+      textDecoration: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: "{dimension.gap.tight}",
+      margin: "{dimension.margin.tight}",
+      '&:hover': {
+        transform: 'translateY(-2px)',
+        boxShadow: "{material.hierarchy.4f}"
+      }
     },
+    // 次要按钮  
     secondary: {
-      "minWidth": DIMENSION_CONSTANTS.BASIC[0],
-      "minHeight": DIMENSION_CONSTANTS.BASIC[0],
-      "spacing": DIMENSION_CONSTANTS.PADDING.base,
-      "itemSpacing": DIMENSION_CONSTANTS.GAP.base,
-      "fill": COLOR_CONSTANTS.BASIC.BRAND[5],
-      "fontColor": COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
-      "fontSizes": FONT_CONSTANTS.SIZE.XL,
-      "borderRadius": DIMENSION_CONSTANTS.BORDER_RADIUS[8],
-      "borderColor": COLOR_CONSTANTS.BASIC.OPACITY.WHITE[32],
-      "borderWidth": DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
-      "boxShadow": "none"
+      fontSizes: "{font.size.medium}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: CSS_VARIABLE_SYSTEM.COLOR.SECONDARY_VIOLET6,
+      backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.SECONDARY_CONTAINER_VIOLET1,
+      background: 'none',
+      borderWidth: "{dimension.borderwidth.base}",
+      borderStyle: "solid",
+      borderColor: CSS_VARIABLE_SYSTEM.COLOR.SECONDARY_VIOLET4,
+      borderRadius: "{dimension.borderradius.large}",
+      paddingTop: "{dimension.padding.base}",
+      paddingBottom: "{dimension.padding.base}",
+      paddingLeft: "{dimension.padding.extraloose}",
+      paddingRight: "{dimension.padding.extraloose}",
+      cursor: 'pointer',
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      boxShadow: "{material.hierarchy.main}",
+      textDecoration: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: "{dimension.gap.tight}",
+      margin: "{dimension.margin.tight}",
+      '&:hover': {
+        backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.SECONDARY_CONTAINER_VIOLET2,
+        color: CSS_VARIABLE_SYSTEM.COLOR.ON_SECONDARY_CONTAINER_VIOLET8,
+        transform: 'translateY(-1px)',
+        boxShadow: "{material.hierarchy.2f}"
+      }
     },
+    // 成功按钮  
+    success: {
+      fontSizes: "{font.size.medium}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: CSS_VARIABLE_SYSTEM.COLOR.ON_PRIMARY_WHITE100,
+      background: CSS_VARIABLE_SYSTEM.GRADIENT.SUCCESS,
+      border: "{dimension.borderwidth.none}",
+      borderRadius: "{dimension.borderradius.large}",
+      paddingTop: "{dimension.padding.base}",
+      paddingBottom: "{dimension.padding.base}",
+      paddingLeft: "{dimension.padding.extraloose}",
+      paddingRight: "{dimension.padding.extraloose}",
+      cursor: 'pointer',
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      boxShadow: "{material.hierarchy.1f}",
+      textDecoration: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: "{dimension.gap.tight}",
+      margin: "{dimension.margin.tight}",
+      '&:hover': {
+        transform: 'translateY(-1px)',
+        boxShadow: "{material.hierarchy.3f}"
+      }
+    },
+
+    // 警告按钮  
+    warning: {
+      fontSizes: "{font.size.medium}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: CSS_VARIABLE_SYSTEM.COLOR.ON_PRIMARY_WHITE100,
+      background: CSS_VARIABLE_SYSTEM.GRADIENT.WARNING,
+      border: "{dimension.borderwidth.none}",
+      borderRadius: "{dimension.borderradius.large}",
+      paddingTop: "{dimension.padding.base}",
+      paddingBottom: "{dimension.padding.base}",
+      paddingLeft: "{dimension.padding.extraloose}",
+      paddingRight: "{dimension.padding.extraloose}",
+      cursor: 'pointer',
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      boxShadow: "{material.hierarchy.1f}",
+      textDecoration: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: "{dimension.gap.tight}",
+      margin: "{dimension.margin.tight}",
+      '&:hover': {
+        transform: 'translateY(-1px)',
+        boxShadow: "{material.hierarchy.3f}"
+      }
+    },
+
+    // 透明按钮  
+    ghost: {
+      fontSizes: "{font.size.medium}",
+      fontWeight: "{font.fontweight.medium}",
+      color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
+      backgroundColor: "transparent",
+      border: "{dimension.borderwidth.none}",
+      borderRadius: "{dimension.borderradius.medium}",
+      paddingTop: "{dimension.padding.tight}",
+      paddingBottom: "{dimension.padding.tight}",
+      paddingLeft: "{dimension.padding.base}",
+      paddingRight: "{dimension.padding.base}",
+      cursor: 'pointer',
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
+      textDecoration: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: "{dimension.gap.tight}",
+      '&:hover': {
+        backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_CONTAINER_BRAND1,
+        color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6,
+        boxShadow: "{material.hierarchy.B1}"
+      }
+    },
+
+    // 链接按钮  
     link: {
-      "minWidth": DIMENSION_CONSTANTS.BASIC[0],
-      "minHeight": DIMENSION_CONSTANTS.BASIC[0],
-      "spacing": DIMENSION_CONSTANTS.PADDING.tight,
-      "itemSpacing": DIMENSION_CONSTANTS.GAP.tight,
-      "fill": "none",
-      "fontColor": COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5],
-      "fontSizes": FONT_CONSTANTS.SIZE.LARGE,
-      "borderRadius": DIMENSION_CONSTANTS.BORDER_RADIUS.none,
-      "borderColor": "none",
-      "borderWidth": DIMENSION_CONSTANTS.BORDER_WIDTH.none,
-      "boxShadow": "none"
+      fontSizes: "{font.size.medium}",
+      fontWeight: "{font.fontweight.medium}",
+      color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
+      backgroundColor: "transparent",
+      border: "{dimension.borderwidth.none}",
+      paddingTop: "{dimension.padding.extratight}",
+      paddingBottom: "{dimension.padding.extratight}",
+      paddingLeft: "{dimension.padding.tight}",
+      paddingRight: "{dimension.padding.tight}",
+      cursor: 'pointer',
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
+      textDecoration: "underline",
+      textDecorationColor: "transparent",
+      textUnderlineOffset: "4px",
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: "{dimension.gap.tight}",
+      '&:hover': {
+        color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6,
+        textDecorationColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_CONTAINER_BRAND2
+      }
+    },
+  },
+
+  // ==================== 列表元件 ====================
+  list: {
+    // 无序列表 
+    unordered: {
+      paddingLeft: "{dimension.padding.loose}",
+      marginBottom: "{dimension.margin.base}",
+      fontSizes: "{font.size.medium}",
+      lineHeight: "1.6",
+      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76,
+      marginBottom: "{dimension.margin.tight}",
+      position: 'relative',
+      '&::before': {
+        content: "'•'",
+        color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
+        fontSize: '1.2em',
+        position: 'absolute',
+        top: '-4px',
+        left: '0px'
+      }
+    },
+
+    // 有序列表 
+    ordered: {
+      paddingLeft: "{dimension.padding.loose}",
+      marginBottom: "{dimension.margin.base}",
+      counterReset: 'list-counter',
+      fontSizes: "{font.size.medium}",
+      lineHeight: "1.6",
+      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76,
+      marginBottom: "{dimension.margin.tight}",
+      position: 'relative',
+      counterIncrement: 'list-counter',
+      '&::before': {
+        content: 'counter(list-counter)',
+        color: CSS_VARIABLE_SYSTEM.COLOR.ON_PRIMARY_WHITE100,
+        fontWeight: "{font.fontweight.semibold}",
+        fontSize: "{font.size.small}",
+        backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
+        borderRadius: "{dimension.borderradius.full}",
+        width: '20px',
+        height: '20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute',
+        left: '0px',
+        top: '2px',
+        boxShadow: "{material.hierarchy.main}"
+      }
+
+    },
+    // 任务列表  
+    task: {
+      paddingLeft: "{dimension.padding.base}",
+      marginBottom: "{dimension.margin.base}",
+      '& > :first-child': {
+        fontSize: "{font.size.medium}",
+        lineHeight: "1.6",
+        color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76,
+        marginBottom: "{dimension.margin.tight}",
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: "{dimension.gap.tight}",
+        '& input[type="checkbox"]': {
+          marginTop: '4px',
+          accentColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5
+        }
+      }
     }
   },
 
   // 背景/图片元素配置
   image: {
+
+    // 普通图片  
     normal: {
-      "borderColor": COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
-      "borderRadius": DIMENSION_CONSTANTS.BORDER_RADIUS.none,
-      "borderWidth": DIMENSION_CONSTANTS.BORDER_WIDTH.none,
-      "boxShadow": "none"
+      borderRadius: "{dimension.borderradius.medium}",
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderStyle: "solid",
+      borderColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK16,
+      boxShadow: "{material.hierarchy.main}",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      maxWidth: "100%",
+      height: "auto",
+      '&:hover': {
+        boxShadow: "{material.hierarchy.2f}",
+        transform: "scale(1.02)"
+      }
     },
+
+    // 圆角图片  
     rounded: {
-      "borderColor": COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
-      "borderRadius": DIMENSION_CONSTANTS.BORDER_RADIUS.medium,
-      "borderWidth": DIMENSION_CONSTANTS.BORDER_WIDTH.none,
-      "boxShadow": "none"
+      borderRadius: "{dimension.borderradius.xl}",
+      borderWidth: "{dimension.borderwidth.base}",
+      borderStyle: "solid",
+      borderColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK12,
+      boxShadow: "{material.hierarchy.1f}",
+      maxWidth: "100%",
+      height: "auto",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      '&:hover': {
+        borderColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_CONTAINER_BRAND2,
+        boxShadow: "{material.hierarchy.3f}"
+      }
     },
+
+    // 圆形图片（头像）  
+    circle: {
+      borderRadius: "{dimension.borderradius.full}",
+      border: `3px solid ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_CONTAINER_BRAND2}`,
+      boxShadow: "{material.hierarchy.2f}",
+      aspectRatio: "1",
+      objectFit: "cover",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      '&:hover': {
+        borderColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND4,
+        boxShadow: "{material.hierarchy.4f}",
+        transform: "scale(1.05)"
+      }
+    },
+
+    // 带边框图片  
     framed: {
-      "borderColor": COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
-      "borderRadius": DIMENSION_CONSTANTS.BORDER_RADIUS.small,
-      "borderWidth": DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
-      "boxShadow": "none"
+      borderRadius: "{dimension.borderradius.large}",
+      borderWidth: "{dimension.borderwidth.wide}",
+      borderStyle: "solid",
+      borderColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_WHITE100,
+      boxShadow: "{material.hierarchy.3f}",
+      maxWidth: "100%",
+      height: "auto",
+      position: "relative",
+      '&::after': {
+        content: "''",
+        position: "absolute",
+        top: "-4px",
+        left: "-4px",
+        right: "-4px",
+        bottom: "-4px",
+        borderWidth: "{dimension.borderwidth.narrow}",
+        borderStyle: "solid",
+        borderColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK20,
+        borderRadius: "{dimension.borderradius.xl}",
+        pointerEvents: "none"
+      }
+    },
+
+    // 英雄图片  
+    hero: {
+      borderRadius: "{dimension.borderradius.xxl}",
+      boxShadow: "{material.hierarchy.5f}",
+      width: "100%",
+      height: "400px",
+      objectFit: "cover",
+      background: CSS_VARIABLE_SYSTEM.GRADIENT.SURFACE,
+      position: "relative",
+      '&::after': {
+        content: "''",
+        position: "absolute",
+        top: "0",
+        left: "0",
+        right: "0",
+        bottom: "0",
+        background: `linear-gradient(45deg, ${CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK16} 0%, transparent 50%)`,
+        borderRadius: "{dimension.borderradius.xxl}"
+      }
     }
   }
 };

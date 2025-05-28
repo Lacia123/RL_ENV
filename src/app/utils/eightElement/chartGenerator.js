@@ -7,7 +7,7 @@
  */
 
 import * as d3 from 'd3';
-import { COLOR_CONSTANTS } from './styleConfig.js';
+import { COLOR_CONSTANTS, DEFAULT_STYLE_CONFIG, CSS_VARIABLE_SYSTEM } from './styleConfig.js';
 import resolveToken from '../tokens/resolveToken.js';
 import { JSDOM } from 'jsdom';
 
@@ -57,11 +57,47 @@ function createJsdomEnv(width = 800, height = 500) {
       stroke: #fff;
       stroke-width: 1;
     }
+    .dot-color-brand6 {
+      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6}; 
+    }
+    .dot-color-brand5 {
+      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5}; 
+    }
+    .dot-color-brand4 {
+      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND4}; 
+    }
+    .line-color-brand6 {
+      stroke: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6}; 
+    }
+    .line-color-brand5 {
+      stroke: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5}; 
+    }
+    .line-color-brand4 {
+      stroke: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND4}; 
+    }
+    .data-label-color-brand6 {
+      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6}; 
+    }
+    .data-label-color-brand5 {
+      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5}; 
+    }
+    .data-label-color-brand4 {
+      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND4}; 
+    }
     .bar {
       fill-opacity: 0.8;
     }
     .bar:hover {
       fill-opacity: 1;
+    }
+    .bar-color-brand6 {
+      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6}; 
+    }
+    .bar-color-brand5 {
+      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5}; 
+    }
+    .bar-color-brand4 {
+      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND4}; 
     }
   `);
   
@@ -184,6 +220,12 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       '#9c755f', 
       '#bab0ab'
     ];
+
+    const colorClass = [
+      'color-brand6',
+      'color-brand5',
+      'color-brand4'
+    ]
     
     const lineStyles = [
       { strokeWidth: 3, dashArray: "0" },      // 实线粗
@@ -335,6 +377,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     // DRAWING LINES, DOTS, AND THEN LABELS
     valueFields.forEach((field, fieldIndex) => {
         const color = colorValues[fieldIndex % colorValues.length];
+        const colorClassSuffix = colorClass[fieldIndex % colorClass.length];
         const lineStyle = lineStyles[fieldIndex % lineStyles.length];
         
         const lineData = data.map(d => ({ x: d[dateField], y: d[field], original: d }));
@@ -344,10 +387,34 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
         const lineGroup = g.append('g').attr('class', 'line-group');
 
         // 1. Draw Line PATH first
+        // lineGroup.append('path')
+        //     .attr('class', 'line')
+        //     .attr('d', line(lineData))
+        //     .attr('stroke', color)
+        //     .attr('fill', 'none')
+        //     .attr('stroke-width', lineStyle.strokeWidth)
+        //     .attr('stroke-dasharray', lineStyle.dashArray);
+
+        // // 2. Draw DOTS (and their groups) on top of lines
+        // const dots = lineGroup.selectAll('.dot-group')
+        //     .data(lineData)
+        //     .enter()
+        //     .append('g')
+        //     .attr('class', 'dot-group')
+        //     .attr('transform', d => `translate(${xScale(d.x)},${yScale(d.y)})`);
+
+        // dots.append('circle')
+        //     .attr('class', 'dot')
+        //     .attr('r', 4)
+        //     .attr('fill', color)
+        //     .attr('stroke', '#fff')
+        //     .attr('stroke-width', 1.5);
+
+
         lineGroup.append('path')
-            .attr('class', 'line')
+            .attr('class', `line line-${colorClassSuffix}`)
             .attr('d', line(lineData))
-            .attr('stroke', color)
+            .attr('stroke', '#000')
             .attr('fill', 'none')
             .attr('stroke-width', lineStyle.strokeWidth)
             .attr('stroke-dasharray', lineStyle.dashArray);
@@ -361,9 +428,9 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
             .attr('transform', d => `translate(${xScale(d.x)},${yScale(d.y)})`);
 
         dots.append('circle')
-            .attr('class', 'dot')
+            .attr('class', `dot dot-${colorClassSuffix}`)
             .attr('r', 4)
-            .attr('fill', color)
+            .attr('fill', '#000')
             .attr('stroke', '#fff')
             .attr('stroke-width', 1.5);
         
@@ -387,12 +454,12 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
                 if (isDesignatedDrawer) {
                     const pos = currentPointValueGroup.calculatedLabelPosition;
                     currentDotG.append('text') // Append to the dot's <g> to keep it relative
-                        .attr('class', 'data-label')
+                        .attr('class', `data-label data-label-${colorClassSuffix}`)
                         .attr('x', pos.x)
                         .attr('y', pos.y)
                         .attr('font-size', '10px')
                         .attr('text-anchor', pos.anchor)
-                        .attr('fill', color) // Use series color for label
+                        .attr('fill', '#000') // Use series color for label
                         .attr('font-weight', 'normal')
                         .attr('stroke', 'white')
                         .attr('stroke-width', '2px')
@@ -490,6 +557,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       const x = col * legendItemWidth;
       const y = row * legendItemHeight;
       const color = colorValues[i % colorValues.length];
+      const colorClassSuffix = colorClass[i % colorClass.length];
       const lineStyle = lineStyles[i % lineStyles.length];
       
       const legendItem = legend.append('g')
@@ -501,7 +569,8 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
         .attr('y1', 6)
         .attr('x2', 15)
         .attr('y2', 6)
-        .attr('stroke', color)
+        .attr('class', `line line-${colorClassSuffix}`)
+        .attr('stroke', '#000')
         .attr('stroke-width', lineStyle.strokeWidth)
         .attr('stroke-dasharray', lineStyle.dashArray);
       
@@ -510,7 +579,8 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
         .attr('cx', 8)
         .attr('cy', 6)
         .attr('r', 3)
-        .attr('fill', color)
+        .attr('class', `dot dot-${colorClassSuffix}`)
+        .attr('fill', '#000')
         .attr('stroke', '#fff')
         .attr('stroke-width', 1);
       
@@ -632,6 +702,12 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin) 
       '#9c755f', 
       '#bab0ab'
     ];
+
+    const colorClass = [
+      'color-brand6',
+      'color-brand5',
+      'color-brand4'
+    ]
     
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
@@ -691,18 +767,18 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin) 
     
     // 获取柱状图颜色
     const barColor = colorValues[0];
-    
+    const colorClassSuffix = colorClass[0];
     // 绘制水平柱状图
     const bars = g.selectAll('.bar')
       .data(data)
       .enter()
       .append('rect')
-      .attr('class', 'bar')
+      .attr('class', `bar bar-${colorClassSuffix}`)
       .attr('y', d => yScale(d[dateField]))
       .attr('x', 0)
       .attr('height', yScale.bandwidth())
       .attr('width', d => xScale(d[valueField]))
-      .attr('fill', barColor);
+      .attr('fill', '#000');
     
     // 添加数值标签
     g.selectAll('.bar-label')

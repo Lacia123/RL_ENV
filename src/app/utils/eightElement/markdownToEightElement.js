@@ -123,32 +123,6 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
   };
 }
 
-// 检测原始文本内的公式标记
-function detectMathInContent(processedContent) {
-  if (!processedContent) return { hasInline: false, hasBlock: false };
-
-  // 行内公式标记
-  const inlinePatterns = [
-    /(?<!\$)\$(?!\$)[\s\S]*?(?<!\$)\$(?!\$)/g,  // 单个$，但不是$$
-    /\\\([\s\S]*?\\\)/g                          // \(...\)
-  ];
-
-  // 块级公式标记
-  const blockPatterns = [
-    /\$\$[\s\S]*?\$\$/g,                         // $$...$$
-    /\\\[[\s\S]*?\\\]/g,                         // \[...\]
-    /\\begin\{[^}]+\}[\s\S]*?\\end\{[^}]+\}/g    // \begin{env}...\end{env}
-  ];
-
-  const hasInlineInContent = inlinePatterns.some(pattern => pattern.test(processedContent));
-  const hasBlockInContent = blockPatterns.some(pattern => pattern.test(processedContent));
-
-  return {
-    hasInline: hasInlineInContent,
-    hasBlock: hasBlockInContent
-  };
-}
-
 // 检测处理后HTML中的KaTeX类
 function detectMathInHTML(htmlContent) {
   if (!htmlContent) return { hasInline: false, hasBlock: false };
@@ -176,14 +150,7 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
   // 判断是否有富文本选项
   const hasRichText = Object.keys(richTextOptions).length > 0;
 
-  // 为标题元素设置默认宽度和对齐
-  // let elementTextAlign = "left"; // 默认左对齐
   let elementWidth = ""; // 默认宽度
-
-  // // 如果是H1标题，设置特殊样式
-  // if (variant === 'h1') {
-  //   borderBottom = "1px solid rgb(242, 242, 242)";
-  // }
 
   // 处理文本内容 - 包括Markdown和KaTeX
   let processedContent = text;
@@ -192,25 +159,9 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
     processedContent = richTextOptions.processedText;
   }
 
-  // 检测是否包含KaTeX公式
-  // const hasKatex = processedContent &&
-  //   (processedContent.includes('$') ||
-  //     processedContent.includes('\\(') ||
-  //     processedContent.includes('\\[') ||
-  //     processedContent.includes('\\begin{'));
-
   // 应用Markdown和KaTeX处理
   const htmlContent = processText(processedContent);
 
-  // 检查处理后的HTML是否包含KaTeX生成的类或结构
-  // katex-display类表示块级公式，katex-html表示行内公式
-  // const hasKatexAfterProcessing = htmlContent &&
-  //   (htmlContent.includes('class="katex"') ||
-  //     htmlContent.includes('class="katex-display"') ||
-  //     htmlContent.includes('class="katex-html"'));
-  
-  // 
-  const contentResult = detectMathInContent(processedContent);
   const htmlResult = detectMathInHTML(htmlContent);
 
   const hasInlineMath = htmlResult.hasInline;
@@ -220,14 +171,17 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
   const containsMath = hasInlineMath || hasBlockMath;
 
   if (containsMath) {
-    console.log('processedContent', processedContent);
-    console.log('htmlContent', htmlContent);
-    console.log('hasInlineMath', hasInlineMath);
-    console.log('hasBlockMath', hasBlockMath);
     elementWidth = "100%";
     const mathVariant = hasInlineMath ? 'inline' : 'display';
     textStyleConfig = getElementStyleConfig('math', mathVariant)
   }
+
+    // 有序或无须列表样式
+    if (hasRichText && richTextOptions.isList) {
+
+      // 当前的渲染方法不支持有序列表
+      textStyleConfig = getElementStyleConfig('list', 'unordered');
+    }
 
   // 生成唯一的className
   const uniqueClassName = `text-${id}`;
@@ -264,7 +218,6 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
         style: {
           layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
-          overflow: "auto",
           "word-break": "break-all",
           width: elementWidth, // 设置宽度
           textColor: {
@@ -304,7 +257,6 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
           layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
           "text-decoration": "underline",
-          overflow: "auto",
           "word-break": "break-all",
           width: elementWidth, // 设置宽度
           textColor: {
@@ -425,17 +377,6 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
     state: "default",
     events: [{}]
   };
-
-  // 添加列表样式（如果适用）
-  if (hasRichText && richTextOptions.isList) {
-    // 添加左边距和列表标识符
-    textElement.layout.style.paddingLeft = DIMENSION_CONSTANTS.PADDING.medium;
-    textElement.layout.style.position = "relative";
-    textElement.layout.style.listStyleType = richTextOptions.listType === 'unordered' ? "disc" : "decimal";
-    // 将带有列表标记的文本设置为列表项样式
-    textElement.layout.style["list-style-position"] = "outside";
-    textElement.layout.style.marginLeft = DIMENSION_CONSTANTS.MARGIN.medium;
-  }
 
   return textElement;
 }
@@ -1619,7 +1560,12 @@ function createTableElement(markdownTableContent) {
   console.log('开始创建表格元素，原始表格内容长度:', markdownTableContent.length);
   const id = generateUUID();
   const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
-  const tableStyleConfig = getElementStyleConfig('table', 'normal');
+
+  
+  const tableContainerStyleConfig = getElementStyleConfig('table', 'container');
+  const tableHeaderStyleConfig = getElementStyleConfig('table', 'th');
+  const tableRowStyleConfig = getElementStyleConfig('table', 'tr');
+  const tableCellStyleConfig = getElementStyleConfig('table', 'td');
 
   // 确保表格内容不为空
   if (!markdownTableContent.trim()) {
@@ -1628,6 +1574,7 @@ function createTableElement(markdownTableContent) {
 
   // 生成唯一的className
   const uniqueClassName = `table-${id}`;
+  const uniqueTrClassName = `tr-${id}`;
 
   // 创建符合要求的表格元素结构
   const tableElement = {
@@ -1638,10 +1585,10 @@ function createTableElement(markdownTableContent) {
     type: "table",
     rawData: markdownTableContent,
     layout: {
-      classStyle: {
-        ...tableStyleConfig
-      },
-      className: uniqueClassName,
+      // classStyle: {
+      //   ...tableContainerStyleConfig
+      // },
+      // className: uniqueClassName,
       style: {
         // 基础样式
         "background-color": [],
@@ -1653,31 +1600,39 @@ function createTableElement(markdownTableContent) {
         position: "relative",
         width: "100%",
         ...layoutStyleConfig,
-
-        // 表格特定样式
-        table: {
-          borderCollapse: "collapse",
-          backgroundColor: "transparent",
-          width: "100%",
-          color: "#212529",
-          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-          fontSize: FONT_CONSTANTS.SIZE.MEDIUM,
-          marginBottom: '1rem'
+      },
+      // 表格特定样式
+      table: {
+        style: {
+          ...tableContainerStyleConfig
         },
-        th: {
-          padding: "0.75rem",
-          verticalAlign: "middle",
-          borderTop: "1px solid #dee2e6"
-        },
-        tr: {
-          borderBottomWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
-          borderBottomColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
-          borderBottomStyle: "solid"
-        },
-        td: {
-          padding: "0.75rem",
-          verticalAlign: "middle",
-          borderTop: "1px solid #dee2e6"
+        
+        // borderCollapse: "collapse",
+        // backgroundColor: "transparent",
+        // width: "100%",
+        // color: "#212529",
+        // fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        // fontSize: FONT_CONSTANTS.SIZE.MEDIUM,
+        // marginBottom: '1rem'
+      },
+      th: {
+        style: {
+          ...tableHeaderStyleConfig
+        }
+        
+      },
+      tr: {
+        className: uniqueTrClassName,
+        classStyle: {
+          ...tableRowStyleConfig
+        }
+        // borderBottomWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
+        // borderBottomColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
+        // borderBottomStyle: "solid"
+      },
+      td: {
+        style: {
+          ...tableCellStyleConfig
         }
       }
     },
@@ -1698,7 +1653,7 @@ function createTableElement(markdownTableContent) {
 // 创建代码元素
 function createCodeElement(codeContent, language = '') {
   const id = generateUUID();
-  const codeStyleConfig = getElementStyleConfig('code', 'normal');
+  const codeStyleConfig = getElementStyleConfig('text', 'codeBlock');
 
   console.log('创建代码元素，语言:', language);
 
@@ -1751,15 +1706,6 @@ function createCodeElement(codeContent, language = '') {
     },
     events: [{}]
   };
-
-  console.log('代码元素创建完成:', JSON.stringify({
-    id: codeElement.id,
-    name: codeElement.name,
-    type: codeElement.type,
-    language: codeElement.language,
-    rawData: (codeElement.rawData && codeElement.rawData.length > 0) ? '有内容' : '无内容'
-  }, null, 2));
-
   return codeElement;
 }
 
@@ -1842,7 +1788,7 @@ function generateChartSvg(chartType, data) {
 function createChartElement(chartType, svgContent, tableData, rawData) {
   const id = generateUUID();
   const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
-  const chartStyleConfig = getElementStyleConfig('chart', 'normal');
+  const chartStyleConfig = getElementStyleConfig('chart', 'container');
 
   console.log('创建图表元素，类型:', chartType);
 
@@ -2010,7 +1956,6 @@ function parseMarkdown(markdown) {
     const { tableContent, endIndex } = result;
 
     if (tableContent) {
-      console.log(`标记表格从第${startIndex}行到第${endIndex}行`);
 
       // 标记第一行为表格开始，并存储完整表格内容
       markedLines[startIndex].isTable = true;
@@ -2025,8 +1970,6 @@ function parseMarkdown(markdown) {
       }
     }
   }
-
-  console.log('表格检测和标记完成');
 
   // 处理每一行
   for (let i = 0; i < markedLines.length; i++) {

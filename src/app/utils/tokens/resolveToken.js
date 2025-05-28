@@ -57,6 +57,8 @@ import layoutSizing from './layout/sizing.js';
 import layoutState from './layout/state.js';
 import layoutWrap from './layout/wrap.js';
 
+import materialHierarchy from './material/hierarchy.js';
+
 
 // 优化：使用深度合并函数，确保嵌套对象正确合并
 function deepMerge(...objects) {
@@ -138,7 +140,10 @@ const tokenCollections = deepMerge(
   motionEasingFunction,
 
   // 资源相关
-  assetFont
+  assetFont,
+
+  // 材质相关
+  materialHierarchy
 );
 
 // 存储动态token系统，初始为null
@@ -236,6 +241,11 @@ function getTokenByPath(path, customTokenSystem = null) {
     }
   }
 
+  if (path == 'material.hierarchy.4f') {
+    console.log('tokenCollections')
+    console.log(tokenCollections)
+  }
+
   // 最后使用默认token集合
   let current = tokenCollections;
   for (let i = 0; i < parts.length; i++) {
@@ -311,7 +321,7 @@ function resolveToken(tokenReference, maxDepth = 20, customTokenSystem = null) {
   const tokenPath = parseTokenReference(tokenReference);
   const token = getTokenByPath(tokenPath, customTokenSystem);
 
-  if (tokenReference == '{font.size.xxl}') {
+  if (tokenReference == '{material.hierarchy.4f}') {
     console.log('..... tokenReference')
     console.log(tokenReference)
     console.log('..... tokenPath')

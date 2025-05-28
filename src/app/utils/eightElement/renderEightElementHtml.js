@@ -124,6 +124,29 @@ function collectClassStyles(element, classStyles = {}) {
         classStyles[element.layout.className] = element.layout.classStyle;
     }
 
+    // 特殊处理表格元素的classStyle（新结构：table、th、tr、td在layout下）
+    if (element.name === 'table' && element.layout) {
+        // 收集table的classStyle
+        if (element.layout.table && element.layout.table.className && element.layout.table.classStyle) {
+            classStyles[element.layout.table.className] = element.layout.table.classStyle;
+        }
+        
+        // 收集th的classStyle
+        if (element.layout.th && element.layout.th.className && element.layout.th.classStyle) {
+            classStyles[element.layout.th.className] = element.layout.th.classStyle;
+        }
+        
+        // 收集tr的classStyle
+        if (element.layout.tr && element.layout.tr.className && element.layout.tr.classStyle) {
+            classStyles[element.layout.tr.className] = element.layout.tr.classStyle;
+        }
+        
+        // 收集td的classStyle
+        if (element.layout.td && element.layout.td.className && element.layout.td.classStyle) {
+            classStyles[element.layout.td.className] = element.layout.td.classStyle;
+        }
+    }
+
     // 递归收集子元素的classStyle
     if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
         element.layout.children.forEach(child => {
@@ -269,6 +292,7 @@ function preProcessEightElement(element) {
 
     // 处理表格元素
     else if (element.name === 'table') {
+        console.log('processTable')
         processTableElement(processedElement, element);
     }
 
@@ -543,58 +567,109 @@ function processImageElement(processedElement, originalElement) {
  * @param {Object} originalElement - 原始元素
  */
 function processTableElement(processedElement, originalElement) {
+    console.log('processTableElement', processedElement, originalElement);
     // 保留原始的Markdown表格内容
     processedElement.rawData = originalElement.rawData || '';
 
-    // 确保layout.style存在
+    // 确保layout存在
     if (!processedElement.layout) {
-        processedElement.layout = { style: {} };
-    } else if (!processedElement.layout.style) {
-        processedElement.layout.style = {};
+        processedElement.layout = {};
     }
 
     // 确保表格样式对象存在
-    if (!processedElement.layout.style.table) processedElement.layout.style.table = {};
-    if (!processedElement.layout.style.th) processedElement.layout.style.th = {};
-    if (!processedElement.layout.style.tr) processedElement.layout.style.tr = {};
-    if (!processedElement.layout.style.td) processedElement.layout.style.td = {};
+    if (!processedElement.layout.table) processedElement.layout.table = {};
+    if (!processedElement.layout.th) processedElement.layout.th = {};
+    if (!processedElement.layout.tr) processedElement.layout.tr = {};
+    if (!processedElement.layout.td) processedElement.layout.td = {};
 
-    // 处理表格样式 - 确保表格样式对象存在
-    if (originalElement.layout && originalElement.layout.style) {
+    // 处理表格样式 - 支持新的结构（table、th、tr、td在layout下）
+    if (originalElement.layout) {
         // 处理table样式
-        if (originalElement.layout.style.table) {
-            processStyleReferences(
-                { computedStyle: processedElement.layout.style.table },
-                originalElement,
-                originalElement.layout.style.table
-            );
+        if (originalElement.layout.table) {
+            const tableConfig = originalElement.layout.table;
+            
+            // 处理style属性（内联样式）
+            if (tableConfig.style) {
+                processStyleReferences(
+                    { computedStyle: processedElement.layout.table },
+                    originalElement,
+                    tableConfig.style
+                );
+            }
+            
+            // 保存className和classStyle信息
+            if (tableConfig.className) {
+                processedElement.layout.table.className = tableConfig.className;
+            }
+            if (tableConfig.classStyle) {
+                processedElement.layout.table.classStyle = tableConfig.classStyle;
+            }
         }
 
         // 处理th样式
-        if (originalElement.layout.style.th) {
-            processStyleReferences(
-                { computedStyle: processedElement.layout.style.th },
-                originalElement,
-                originalElement.layout.style.th
-            );
+        if (originalElement.layout.th) {
+            const thConfig = originalElement.layout.th;
+            
+            // 处理style属性（内联样式）
+            if (thConfig.style) {
+                processStyleReferences(
+                    { computedStyle: processedElement.layout.th },
+                    originalElement,
+                    thConfig.style
+                );
+            }
+            
+            // 保存className和classStyle信息
+            if (thConfig.className) {
+                processedElement.layout.th.className = thConfig.className;
+            }
+            if (thConfig.classStyle) {
+                processedElement.layout.th.classStyle = thConfig.classStyle;
+            }
         }
 
         // 处理tr样式
-        if (originalElement.layout.style.tr) {
-            processStyleReferences(
-                { computedStyle: processedElement.layout.style.tr },
-                originalElement,
-                originalElement.layout.style.tr
-            );
+        if (originalElement.layout.tr) {
+            const trConfig = originalElement.layout.tr;
+            
+            // 处理style属性（内联样式）
+            if (trConfig.style) {
+                processStyleReferences(
+                    { computedStyle: processedElement.layout.tr },
+                    originalElement,
+                    trConfig.style
+                );
+            }
+            
+            // 保存className和classStyle信息
+            if (trConfig.className) {
+                processedElement.layout.tr.className = trConfig.className;
+            }
+            if (trConfig.classStyle) {
+                processedElement.layout.tr.classStyle = trConfig.classStyle;
+            }
         }
 
         // 处理td样式
-        if (originalElement.layout.style.td) {
-            processStyleReferences(
-                { computedStyle: processedElement.layout.style.td },
-                originalElement,
-                originalElement.layout.style.td
-            );
+        if (originalElement.layout.td) {
+            const tdConfig = originalElement.layout.td;
+            
+            // 处理style属性（内联样式）
+            if (tdConfig.style) {
+                processStyleReferences(
+                    { computedStyle: processedElement.layout.td },
+                    originalElement,
+                    tdConfig.style
+                );
+            }
+            
+            // 保存className和classStyle信息
+            if (tdConfig.className) {
+                processedElement.layout.td.className = tdConfig.className;
+            }
+            if (tdConfig.classStyle) {
+                processedElement.layout.td.classStyle = tdConfig.classStyle;
+            }
         }
     }
 }
@@ -958,15 +1033,15 @@ function renderImageElement(element) {
  * @returns {string} - 渲染的HTML字符串
  */
 function renderTableElement(element) {
-    if (!element || !element.layout || !element.layout.style) {
+    if (!element || !element.layout) {
         return '<div>表格元素结构不完整</div>';
     }
 
-    // 获取表格样式
-    const tableStyle = element.layout.style.table || {};
-    const thStyle = element.layout.style.th || {};
-    const trStyle = element.layout.style.tr || {};
-    const tdStyle = element.layout.style.td || {};
+    // 获取表格样式（新结构：table、th、tr、td在layout下）
+    const tableStyleConfig = element.layout.table || {};
+    const thStyleConfig = element.layout.th || {};
+    const trStyleConfig = element.layout.tr || {};
+    const tdStyleConfig = element.layout.td || {};
 
     // 生成容器样式
     const containerStyleAttr = generateStyleAttribute(element.computedStyle || {});
@@ -1003,7 +1078,7 @@ function renderTableElement(element) {
         let tableHtml = tableMatch[0];
 
         // 应用样式
-        tableHtml = applyTableStyles(tableHtml, tableStyle, thStyle, trStyle, tdStyle);
+        tableHtml = applyTableStyles(tableHtml, tableStyleConfig, thStyleConfig, trStyleConfig, tdStyleConfig);
 
 
         const className = element.layout && element.layout.className ? element.layout.className : '';
@@ -1028,13 +1103,13 @@ function renderTableElement(element) {
 /**
  * 为表格应用样式
  * @param {string} tableHtml - 原始表格HTML
- * @param {Object} tableStyle - 表格样式
- * @param {Object} thStyle - 表头样式
- * @param {Object} trStyle - 行样式
- * @param {Object} tdStyle - 单元格样式
+ * @param {Object} tableStyleConfig - 表格样式配置
+ * @param {Object} thStyleConfig - 表头样式配置
+ * @param {Object} trStyleConfig - 行样式配置
+ * @param {Object} tdStyleConfig - 单元格样式配置
  * @returns {string} - 应用样式后的表格HTML
  */
-function applyTableStyles(tableHtml, tableStyle, thStyle, trStyle, tdStyle) {
+function applyTableStyles(tableHtml, tableStyleConfig, thStyleConfig, trStyleConfig, tdStyleConfig) {
 
     // 生成样式字符串，确保它们以分号结尾
     const ensureStyleEndsWithSemicolon = (style) => {
@@ -1047,49 +1122,99 @@ function applyTableStyles(tableHtml, tableStyle, thStyle, trStyle, tdStyle) {
         if (!styleObj || Object.keys(styleObj).length === 0) return '';
 
         return Object.entries(styleObj)
+            .filter(([key, value]) => {
+                // 过滤掉className和classStyle，这些不是CSS样式属性
+                if (key === 'className' || key === 'classStyle') {
+                    return false;
+                }
+                
+                // 过滤掉对象类型的值，只保留基本类型（字符串、数字、布尔值）
+                if (value === null || value === undefined) {
+                    return false;
+                }
+                
+                if (typeof value === 'object') {
+                    console.warn(`跳过对象类型的样式值: ${key}:`, value);
+                    return false;
+                }
+                
+                return true;
+            })
             .map(([key, value]) => {
                 // 转换驼峰式为连字符式
                 const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+                
                 // 如果值是数字但不是特定属性，添加px
                 let cssValue = value;
                 if (typeof value === 'number' &&
                     !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
                     cssValue = `${value}px`;
                 }
+                
                 return `${cssKey}: ${cssValue}`;
             })
             .join('; ');
     };
 
-    // 获取各元素的样式字符串
-    const tableStyleStr = generateInlineStyle(tableStyle);
-    const thStyleStr = generateInlineStyle(thStyle);
-    const trStyleStr = generateInlineStyle(trStyle);
-    const tdStyleStr = generateInlineStyle(tdStyle);
+    // 获取各元素的样式字符串和className
+    const tableStyleStr = generateInlineStyle(tableStyleConfig);
+    const tableClassName = tableStyleConfig?.className || '';
+    
+    const thStyleStr = generateInlineStyle(thStyleConfig);
+    const thClassName = thStyleConfig?.className || '';
+    
+    const trStyleStr = generateInlineStyle(trStyleConfig);
+    const trClassName = trStyleConfig?.className || '';
+    
+    const tdStyleStr = generateInlineStyle(tdStyleConfig);
+    const tdClassName = tdStyleConfig?.className || '';
 
-    console.log('表格样式字符串:', {
-        table: tableStyleStr,
-        th: thStyleStr,
-        tr: trStyleStr,
-        td: tdStyleStr
-    });
-
-    // 替换表格标签，应用样式
+    // 替换表格标签，应用样式和className
+    let tableAttributes = '';
+    if (tableClassName) {
+        tableAttributes += ` class="${tableClassName}"`;
+    }
     if (tableStyleStr) {
-        tableHtml = tableHtml.replace(/<table/, `<table style="${ensureStyleEndsWithSemicolon(tableStyleStr)}"`);
+        tableAttributes += ` style="${ensureStyleEndsWithSemicolon(tableStyleStr)}"`;
+    }
+    if (tableAttributes) {
+        tableHtml = tableHtml.replace(/<table/, `<table${tableAttributes}`);
     }
 
-    // 使用安全的方式应用样式，避免错误替换
+    // 应用th样式和className
+    let thAttributes = '';
+    if (thClassName) {
+        thAttributes += ` class="${thClassName}"`;
+    }
     if (thStyleStr) {
-        tableHtml = tableHtml.replace(/<th\b/g, `<th style="${ensureStyleEndsWithSemicolon(thStyleStr)}"`);
+        thAttributes += ` style="${ensureStyleEndsWithSemicolon(thStyleStr)}"`;
+    }
+    if (thAttributes) {
+        tableHtml = tableHtml.replace(/<th\b/g, `<th${thAttributes}`);
     }
 
+    // 应用tr样式和className
+    let trAttributes = '';
+    if (trClassName) {
+        trAttributes += ` class="${trClassName}"`;
+    }
     if (trStyleStr) {
-        tableHtml = tableHtml.replace(/<tr\b/g, `<tr style="${ensureStyleEndsWithSemicolon(trStyleStr)}"`);
+        trAttributes += ` style="${ensureStyleEndsWithSemicolon(trStyleStr)}"`;
+    }
+    if (trAttributes) {
+        tableHtml = tableHtml.replace(/<tr\b/g, `<tr${trAttributes}`);
     }
 
+    // 应用td样式和className
+    let tdAttributes = '';
+    if (tdClassName) {
+        tdAttributes += ` class="${tdClassName}"`;
+    }
     if (tdStyleStr) {
-        tableHtml = tableHtml.replace(/<td\b/g, `<td style="${ensureStyleEndsWithSemicolon(tdStyleStr)}"`);
+        tdAttributes += ` style="${ensureStyleEndsWithSemicolon(tdStyleStr)}"`;
+    }
+    if (tdAttributes) {
+        tableHtml = tableHtml.replace(/<td\b/g, `<td${tdAttributes}`);
     }
 
     console.log('表格样式应用完成');

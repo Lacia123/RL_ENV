@@ -34,6 +34,7 @@ import motionDelay from './motion/delay.js';
 import motionEasingFunction from './motion/easingfunction.js';
 
 import assetFont from './asset/font.js';
+import materialHierarchy from './material/hierarchy.js';
 import { resolveTokensInText } from './resolveToken.js';
 
 // 常用的令牌分类
@@ -83,6 +84,9 @@ const tokens = {
   // 资产相关
   asset: {
     font: assetFont.asset.font
+  },
+  material: {
+    hierarchy: materialHierarchy.material.hierarchy
   }
 };
 
