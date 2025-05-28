@@ -43,7 +43,7 @@ function generateUUID() {
 // HTML转义函数，用于安全处理文本
 function escapeHtml(text) {
   if (!text || typeof text !== 'string') return '';
-  
+
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -65,7 +65,7 @@ function prepareMarkdownForKatex(text) {
     }
     return charBefore + ' ' + dollarSign; // 添加空格: "word$" -> "word $"
   });
-  
+
   // 确保换行在marked中被正确处理
   preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
 
@@ -79,7 +79,7 @@ function processText(text) {
   try {
     // 预处理文本，优化KaTeX解析
     const preparedText = prepareMarkdownForKatex(text);
-    
+
     // 使用markedInstance处理Markdown和KaTeX
     return markedInstance.parse(preparedText);
   } catch (error) {
@@ -103,9 +103,9 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
       counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
       primaryAxisAlignItems: direction === LAYOUT_CONSTANTS.DIRECTION.VERTICAL ? alignItems : LAYOUT_CONSTANTS.ALIGN.X.CENTER,
       // 当方向为水平时，交叉轴（垂直方向）居中对齐；当方向为垂直时，交叉轴（水平方向）左对齐
-      counterAxisAlignItems: direction === LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL ? 
-                            LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER : 
-                            LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
+      counterAxisAlignItems: direction === LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL ?
+        LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER :
+        LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
       layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
       layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
       boxSizing: "border-box",
@@ -123,59 +123,115 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
   };
 }
 
+// 检测原始文本内的公式标记
+function detectMathInContent(processedContent) {
+  if (!processedContent) return { hasInline: false, hasBlock: false };
+
+  // 行内公式标记
+  const inlinePatterns = [
+    /(?<!\$)\$(?!\$)[\s\S]*?(?<!\$)\$(?!\$)/g,  // 单个$，但不是$$
+    /\\\([\s\S]*?\\\)/g                          // \(...\)
+  ];
+
+  // 块级公式标记
+  const blockPatterns = [
+    /\$\$[\s\S]*?\$\$/g,                         // $$...$$
+    /\\\[[\s\S]*?\\\]/g,                         // \[...\]
+    /\\begin\{[^}]+\}[\s\S]*?\\end\{[^}]+\}/g    // \begin{env}...\end{env}
+  ];
+
+  const hasInlineInContent = inlinePatterns.some(pattern => pattern.test(processedContent));
+  const hasBlockInContent = blockPatterns.some(pattern => pattern.test(processedContent));
+
+  return {
+    hasInline: hasInlineInContent,
+    hasBlock: hasBlockInContent
+  };
+}
+
+// 检测处理后HTML中的KaTeX类
+function detectMathInHTML(htmlContent) {
+  if (!htmlContent) return { hasInline: false, hasBlock: false };
+
+  // 检测行内公式（katex类但不是katex-display）
+  const hasInlineHTML = htmlContent.includes('class="katex"') && 
+                       !htmlContent.includes('class="katex-display"');
+
+  // 检测块级公式
+  const hasBlockHTML = htmlContent.includes('class="katex-display"');
+
+  return {
+    hasInline: hasInlineHTML,
+    hasBlock: hasBlockHTML
+  };
+}
+
 // 创建文本元素 - 修改以支持富文本和KaTeX
 function createTextElement(text, variant = 'normal', richTextOptions = {}) {
   const id = generateUUID();
   // 获取文本元素的样式配置
-  const textStyleConfig = getElementStyleConfig('text', variant);
-  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
-  
+  let textStyleConfig = getElementStyleConfig('text', variant);
+  // const textLayoutStyleConfig = getElementStyleConfig('layout', 'inner');
+
   // 判断是否有富文本选项
   const hasRichText = Object.keys(richTextOptions).length > 0;
-  
+
   // 为标题元素设置默认宽度和对齐
-  let textAlign = "left"; // 默认左对齐
-  let width = "auto"; // 默认宽度
-  let borderBottom = "none"; // 默认没有下边框
-  
-  // 如果是H1标题，设置特殊样式
-  if (variant === 'h1') {
-    textAlign = "center"; // H1居中对齐
-    width = "100%"; // H1宽度100%
-    borderBottom = "1px solid rgb(242, 242, 242)"; 
-  }
-  
+  // let elementTextAlign = "left"; // 默认左对齐
+  let elementWidth = ""; // 默认宽度
+
+  // // 如果是H1标题，设置特殊样式
+  // if (variant === 'h1') {
+  //   borderBottom = "1px solid rgb(242, 242, 242)";
+  // }
+
   // 处理文本内容 - 包括Markdown和KaTeX
   let processedContent = text;
   // 如果是富文本，使用富文本处理过的内容
   if (hasRichText && richTextOptions.processedText) {
     processedContent = richTextOptions.processedText;
   }
-  
+
   // 检测是否包含KaTeX公式
-  const hasKatex = processedContent && 
-    (processedContent.includes('$') || 
-     processedContent.includes('\\(') || 
-     processedContent.includes('\\[') ||
-     processedContent.includes('\\begin{'));
-  
+  // const hasKatex = processedContent &&
+  //   (processedContent.includes('$') ||
+  //     processedContent.includes('\\(') ||
+  //     processedContent.includes('\\[') ||
+  //     processedContent.includes('\\begin{'));
+
   // 应用Markdown和KaTeX处理
   const htmlContent = processText(processedContent);
-  
+
   // 检查处理后的HTML是否包含KaTeX生成的类或结构
   // katex-display类表示块级公式，katex-html表示行内公式
-  const hasKatexAfterProcessing = htmlContent &&
-    (htmlContent.includes('class="katex"') || 
-     htmlContent.includes('class="katex-display"') ||
-     htmlContent.includes('class="katex-html"'));
+  // const hasKatexAfterProcessing = htmlContent &&
+  //   (htmlContent.includes('class="katex"') ||
+  //     htmlContent.includes('class="katex-display"') ||
+  //     htmlContent.includes('class="katex-html"'));
   
+  // 
+  const contentResult = detectMathInContent(processedContent);
+  const htmlResult = detectMathInHTML(htmlContent);
+
+  const hasInlineMath = htmlResult.hasInline;
+  const hasBlockMath = htmlResult.hasBlock;
+
   // 最终判断是否包含数学公式
-  const containsMath = hasKatex || hasKatexAfterProcessing;
+  const containsMath = hasInlineMath || hasBlockMath;
 
   if (containsMath) {
-    width = "100%";
+    console.log('processedContent', processedContent);
+    console.log('htmlContent', htmlContent);
+    console.log('hasInlineMath', hasInlineMath);
+    console.log('hasBlockMath', hasBlockMath);
+    elementWidth = "100%";
+    const mathVariant = hasInlineMath ? 'inline' : 'display';
+    textStyleConfig = getElementStyleConfig('math', mathVariant)
   }
-  
+
+  // 生成唯一的className
+  const uniqueClassName = `text-${id}`;
+
   // 基础文本元素结构
   const textElement = {
     id,
@@ -183,17 +239,15 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
     "name-zh": "文本",
     "file-type": "cell-element",
     layout: {
+      classStyle: {
+        ...textStyleConfig
+      },
+      className: uniqueClassName,
       style: {
-        "background-color": [],
-        font: [],
-        border: [],
-        scale: [],
         "box-sizing": "border-box",
         primaryAxisSizingMode: "fixed",
         position: "relative",
-        textAlign: textAlign, // 根据变体设置对齐方式
-        width: width, // 设置宽度
-        ...layoutStyleConfig
+        width: elementWidth, // 设置宽度
       },
       text_body: {
         type: "container",
@@ -212,9 +266,7 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
           overflow: "auto",
           "word-break": "break-all",
-          textAlign: textAlign, // 根据变体设置对齐方式
-          width: width, // 设置宽度
-          "border-bottom": borderBottom, // 设置下边框
+          width: elementWidth, // 设置宽度
           textColor: {
             element: "color",
             value: "text",
@@ -254,9 +306,7 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
           "text-decoration": "underline",
           overflow: "auto",
           "word-break": "break-all",
-          textAlign: textAlign, // 根据变体设置对齐方式
-          width: width, // 设置宽度
-          "border-bottom": borderBottom, // 设置下边框
+          width: elementWidth, // 设置宽度
           textColor: {
             element: "color",
             value: "text",
@@ -284,20 +334,20 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
         default: {
           "data-key": "",
           style: {
-            text: {
-              value: textStyleConfig.textColor || COLOR_CONSTANTS.BASIC.OPACITY.BLACK[100],
-              type: "color",
-              key: "color-text"
-            },
-            hyperlinktext: {
-              value: variant === 'hyperlink' ?
-                (textStyleConfig.textColor || COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5]) :
-                COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5],
-              type: "color",
-              key: "color-text"
-            }
+            // text: {
+            //   value: textStyleConfig.textColor || COLOR_CONSTANTS.BASIC.OPACITY.BLACK[100],
+            //   type: "color",
+            //   key: "color-text"
+            // },
+            // hyperlinktext: {
+            //   value: variant === 'hyperlink' ?
+            //     (textStyleConfig.textColor || COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5]) :
+            //     COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5],
+            //   type: "color",
+            //   key: "color-text"
+            // }
           },
-          resource: COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5]
+          // resource: COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5]
         }
       },
       bg: {
@@ -375,7 +425,7 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
     state: "default",
     events: [{}]
   };
-  
+
   // 添加列表样式（如果适用）
   if (hasRichText && richTextOptions.isList) {
     // 添加左边距和列表标识符
@@ -386,7 +436,7 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
     textElement.layout.style["list-style-position"] = "outside";
     textElement.layout.style.marginLeft = DIMENSION_CONSTANTS.MARGIN.medium;
   }
-  
+
   return textElement;
 }
 
@@ -395,24 +445,24 @@ function processBoldText(text) {
   // 找出所有加粗文本 **text**
   const boldRegex = /\*\*(.*?)\*\*/g;
   const boldMatches = [...text.matchAll(boldRegex)];
-  
+
   if (boldMatches.length === 0) {
-    return { 
+    return {
       processedText: text,
-      hasBold: false 
+      hasBold: false
     };
   }
-  
+
   // 处理文本，将加粗部分用HTML标签替换
   let processedText = text;
   let hasBold = false;
-  
+
   // 替换加粗文本为带有HTML标签的形式，这将在渲染时被解析
   processedText = text.replace(boldRegex, (match, p1) => {
     hasBold = true;
     return `<span style="font-weight: bold;">${p1}</span>`;  // 使用HTML标签表示加粗
   });
-  
+
   return {
     processedText,
     hasBold
@@ -424,24 +474,24 @@ function isListItem(line) {
   // 检测无序列表项 (-, *, +)
   const unorderedMatch = line.trim().match(/^[-*+]\s+(.+)$/);
   if (unorderedMatch) {
-    return { 
-      isList: true, 
-      listType: 'unordered', 
-      content: unorderedMatch[1] 
+    return {
+      isList: true,
+      listType: 'unordered',
+      content: unorderedMatch[1]
     };
   }
-  
+
   // 检测有序列表项 (1., 2., etc.)
   const orderedMatch = line.trim().match(/^(\d+)\.\s+(.+)$/);
   if (orderedMatch) {
-    return { 
-      isList: true, 
-      listType: 'ordered', 
+    return {
+      isList: true,
+      listType: 'ordered',
       content: orderedMatch[2],
-      number: parseInt(orderedMatch[1]) 
+      number: parseInt(orderedMatch[1])
     };
   }
-  
+
   return { isList: false };
 }
 
@@ -449,38 +499,38 @@ function isListItem(line) {
 function processListItemAndRichText(line) {
   // 首先检查是否为列表项
   const listItemInfo = isListItem(line);
-  
+
   // 如果是列表项，处理其内容中的富文本
   if (listItemInfo.isList) {
     const { content, listType } = listItemInfo;
-    
+
     // 处理加粗文本
     const { processedText, hasBold } = processBoldText(content);
-    
+
     // 创建一个包含处理后文本的文本元素
-    const textElement = createTextElement(content, 'normal', { 
-      isList: true, 
+    const textElement = createTextElement(content, 'normal', {
+      isList: true,
       listType: listType,
       isBold: hasBold,
       processedText: processedText // 传递处理后的文本
     });
-    
+
     return { element: textElement, processed: true, type: 'text' };
   }
-  
+
   // 如果不是列表项，检查是否包含加粗文本
   const { processedText, hasBold } = processBoldText(line);
-  
+
   // 如果有加粗文本，创建包含处理后文本的文本元素
   if (hasBold) {
-    const textElement = createTextElement(line, 'normal', { 
+    const textElement = createTextElement(line, 'normal', {
       isBold: true,
       processedText: processedText // 传递处理后的文本
     });
-    
+
     return { element: textElement, processed: true, type: 'text' };
   }
-  
+
   // 如果没有特殊格式，返回未处理
   return { processed: false };
 }
@@ -492,12 +542,19 @@ function createButtonElement(text, url, variant = 'primary') {
   const buttonStyleConfig = getElementStyleConfig('button', variant);
   const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
 
+  // 生成唯一的className
+  const uniqueClassName = `button-${id}`;
+
   const buttonElement = {
     id,
     name: "button", // 确保按钮名称为"button"
     "name-zh": "按钮",
     "file-type": "cell-element",
     layout: {
+      classStyle: {
+        ...buttonStyleConfig
+      },
+      className: uniqueClassName,
       style: {
         "background-color": [],
         font: [],
@@ -1061,12 +1118,19 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
   const imageStyleConfig = getElementStyleConfig('image', variant);
   const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
 
+  // 生成唯一的className
+  const uniqueClassName = `background-${id}`;
+
   return {
     id,
     name: "background",
     "name-zh": "背景",
     "file-type": "cell-element",
     layout: {
+      classStyle: {
+        ...imageStyleConfig
+      },
+      className: uniqueClassName,
       style: {
         "background-color": [],
         font: [],
@@ -1215,15 +1279,15 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
 // 创建布局元素，支持自定义选项
 function createLayoutElement(direction, children = [], options = {}) {
   const layoutId = generateUUID();
-  const { width, height, gap, variant = 'inner', isRoot = false, 
-          alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN } = options;
-          
+  const { width, height, gap, variant = 'inner', isRoot = false,
+    alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN } = options;
+
   // 根据方向自动计算交叉轴对齐方式
   // 对于水平布局，默认交叉轴居中对齐；对于垂直布局，使用传入的选项或默认左对齐
-  const counterAxisAlign = options.counterAxisAlign || 
-                          (direction === LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL ? 
-                           LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER : 
-                           LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN);
+  const counterAxisAlign = options.counterAxisAlign ||
+    (direction === LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL ?
+      LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER :
+      LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN);
 
   // 获取布局元素的样式配置
   const layoutStyleConfig = getElementStyleConfig('layout', isRoot ? 'root' : variant);
@@ -1242,12 +1306,15 @@ function createLayoutElement(direction, children = [], options = {}) {
   if (gap) {
     baseLayout.style.gap = gap;
   }
-  
+
   // 设置主轴对齐方式
   baseLayout.style.primaryAxisAlignItems = alignItems;
-  
+
   // 设置交叉轴对齐方式
   baseLayout.style.counterAxisAlignItems = counterAxisAlign;
+
+  // 生成唯一的className
+  const uniqueClassName = `layout-${layoutId}`;
 
   const layout = {
     dataKeys: [],
@@ -1255,7 +1322,13 @@ function createLayoutElement(direction, children = [], options = {}) {
     "name-zh": "布局",
     "file-type": "template",
     theme: "default",
-    layout: baseLayout,
+    layout: {
+      ...baseLayout,
+      classStyle: {
+        ...layoutStyleConfig
+      },
+      className: uniqueClassName
+    },
     description: "",
     id: layoutId,
     events: [{}]
@@ -1281,9 +1354,9 @@ function createHeadingLayout(headingContent, subElements = [], headingLevel = 1)
   // 所有标题布局都使用左对齐
   // 注意：标题文本的对齐方式由createTextElement函数根据变体（h1、h2等）自动处理
   const layout = createLayoutElement(
-    LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
-    [], 
-    { 
+    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+    [],
+    {
       alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN, // 所有标题布局主轴左对齐
       counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN // 所有标题布局交叉轴左对齐
     }
@@ -1292,7 +1365,7 @@ function createHeadingLayout(headingContent, subElements = [], headingLevel = 1)
   // 添加标题文本，根据标题级别选择文本样式
   const headingVariant = `h${headingLevel}`;
   const headingText = createTextElement(headingContent, headingVariant);
-  
+
   // 不需要额外设置textAlign和width，createTextElement已经处理了
 
   layout.layout.children.push(headingText);
@@ -1396,7 +1469,7 @@ function createHeadingBlockContainer(headingLayout) {
     id: layoutId,
     events: [{}]
   };
-  
+
   // 查找并修改headingLayout中标题文本的对齐方式
   const updateHeadingTextAlignment = (layout) => {
     // 检查是否是一级标题布局
@@ -1405,18 +1478,18 @@ function createHeadingBlockContainer(headingLayout) {
       if (firstChild && firstChild.name === "text" && firstChild.layout && firstChild.layout.style) {
         // 将标题文本对齐方式改为左对齐
         firstChild.layout.style.textAlign = "left";
-        
+
         if (firstChild.layout.text_body && firstChild.layout.text_body.style) {
           firstChild.layout.text_body.style.textAlign = "left";
         }
-        
+
         if (firstChild.layout.text_hyperlink && firstChild.layout.text_hyperlink.style) {
           firstChild.layout.text_hyperlink.style.textAlign = "left";
         }
       }
     }
   };
-  
+
   // 应用对齐方式更改
   updateHeadingTextAlignment(headingLayout);
 
@@ -1427,72 +1500,72 @@ function createHeadingBlockContainer(headingLayout) {
 function isTableOrChartData(line) {
   // 首先检查是否是图表数据标记
   const isChart = line.trim().match(/^\[chart:(.+?)\]/);
-  
+
   if (isChart) {
     return { isData: true, isChart: true, chartType: isChart[1] };
   }
-  
+
   // 然后检查是否是普通表格
   if (line.includes('|')) {
     const nextLine = line.trim();
     // 表格至少需要一个分隔符
     const hasSeparator = nextLine.includes('|');
-    
+
     if (hasSeparator) {
       return { isData: true, isChart: false, chartType: null };
     }
   }
-  
+
   return { isData: false, isChart: false, chartType: null };
 }
 
 // 提取完整的表格或图表数据（统一提取）
 function extractTableOrChartData(lines, startIndex) {
   console.log(`开始提取表格/图表数据，从第${startIndex}行开始`);
-  
+
   // 获取第一行，检查是否包含图表标记
   const firstLine = lines[startIndex].trim();
   const chartMatch = firstLine.match(/^\[chart:(.+?)\]/);
   const isChart = !!chartMatch;
   const chartType = isChart ? chartMatch[1] : null;
-  
+
   if (isChart) {
     console.log(`检测到图表类型: ${chartType}`);
   } else {
     console.log('检测到普通表格');
   }
-  
+
   // 处理第一行 - 如果是图表，移除图表标记
-  const processedFirstLine = isChart 
-    ? firstLine.replace(/^\[chart:.+?\]/, '').trim() 
+  const processedFirstLine = isChart
+    ? firstLine.replace(/^\[chart:.+?\]/, '').trim()
     : firstLine;
-  
+
   const tableLines = [processedFirstLine];
   const remainingLines = lines.slice(startIndex + 1);
-  
+
   // 继续添加后续表格行，直到遇到空行
   let i = 0;
   while (i < remainingLines.length) {
     const line = remainingLines[i].trim();
-    
+
     // 如果行为空或不再包含表格分隔符，认为表格结束
     if (line === '' || !line.includes('|')) {
       console.log(`表格/图表数据在第${startIndex + i + 1}行结束`);
       break;
     }
-    
+
     tableLines.push(remainingLines[i]);
     i++;
   }
-  
+
   console.log('提取的表格/图表行数:', tableLines.length);
-  
+
   // 提取原始表格内容（用于显示和调试）
   const originalContent = tableLines.join('\n');
-  
+
   // 解析表格数据为二维数组（用于图表数据处理）
   const tableData = parseTableData(originalContent);
-  
+
   return {
     isChart: isChart,
     chartType: chartType,
@@ -1505,14 +1578,14 @@ function extractTableOrChartData(lines, startIndex) {
 // 处理表格数据 - 决定创建普通表格还是图表元素
 function processTableOrChartData(result, stack) {
   const { isChart, chartType, tableContent, tableData, endIndex } = result;
-  
+
   if (isChart) {
     // 处理为图表
     try {
       console.log(`处理图表数据，类型: ${chartType}`);
       // 生成SVG图表
       const svgContent = generateChartSvg(chartType, tableData);
-      
+
       // 创建图表元素
       const chartElement = createChartElement(chartType, svgContent, tableData, tableContent);
       stack[stack.length - 1].elements.push(chartElement);
@@ -1537,7 +1610,7 @@ function processTableOrChartData(result, stack) {
     const tableElement = createTableElement(tableContent);
     stack[stack.length - 1].elements.push(tableElement);
   }
-  
+
   return endIndex;
 }
 
@@ -1546,11 +1619,15 @@ function createTableElement(markdownTableContent) {
   console.log('开始创建表格元素，原始表格内容长度:', markdownTableContent.length);
   const id = generateUUID();
   const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
+  const tableStyleConfig = getElementStyleConfig('table', 'normal');
 
   // 确保表格内容不为空
   if (!markdownTableContent.trim()) {
     console.error('警告: 尝试创建表格元素但内容为空');
   }
+
+  // 生成唯一的className
+  const uniqueClassName = `table-${id}`;
 
   // 创建符合要求的表格元素结构
   const tableElement = {
@@ -1561,6 +1638,10 @@ function createTableElement(markdownTableContent) {
     type: "table",
     rawData: markdownTableContent,
     layout: {
+      classStyle: {
+        ...tableStyleConfig
+      },
+      className: uniqueClassName,
       style: {
         // 基础样式
         "background-color": [],
@@ -1617,6 +1698,7 @@ function createTableElement(markdownTableContent) {
 // 创建代码元素
 function createCodeElement(codeContent, language = '') {
   const id = generateUUID();
+  const codeStyleConfig = getElementStyleConfig('code', 'normal');
 
   console.log('创建代码元素，语言:', language);
 
@@ -1631,6 +1713,9 @@ function createCodeElement(codeContent, language = '') {
     highlightedCode = `<pre><code>${escapeHtml(codeContent)}</code></pre>`;
   }
 
+  // 生成唯一的className
+  const uniqueClassName = `code-${id}`;
+
   // 创建符合要求的代码元素结构
   const codeElement = {
     id,
@@ -1642,6 +1727,10 @@ function createCodeElement(codeContent, language = '') {
     highlightedCode: highlightedCode, // 保存高亮后的HTML
     language: language || 'plaintext', // 保存代码语言
     layout: {
+      classStyle: {
+        ...codeStyleConfig
+      },
+      className: uniqueClassName,
       style: {
         // 基础样式
         "background-color": [],
@@ -1722,7 +1811,7 @@ function extractMarkdownCodeBlock(lines, startIndex) {
   const result = {
     codeContent: cleanedCodeLines.join('\n'),
     language: language,
-    endIndex: i - 1 
+    endIndex: i - 1
   };
 
   console.log(`提取的代码内容 (${cleanedCodeLines.length}行):`);
@@ -1734,7 +1823,7 @@ function extractMarkdownCodeBlock(lines, startIndex) {
 // 使用D3生成SVG图表
 function generateChartSvg(chartType, data) {
   console.log('开始生成图表SVG，类型:', chartType);
-  
+
   try {
     // 使用chartGenerator提供的功能生成SVG
     return generateChartFromTableData(data, chartType);
@@ -1753,9 +1842,13 @@ function generateChartSvg(chartType, data) {
 function createChartElement(chartType, svgContent, tableData, rawData) {
   const id = generateUUID();
   const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
-  
+  const chartStyleConfig = getElementStyleConfig('chart', 'normal');
+
   console.log('创建图表元素，类型:', chartType);
-  
+
+  // 生成唯一的className
+  const uniqueClassName = `chart-${id}`;
+
   // 创建符合要求的图表元素结构
   const chartElement = {
     id,
@@ -1768,6 +1861,10 @@ function createChartElement(chartType, svgContent, tableData, rawData) {
     tableData: tableData, // 保存解析后的表格数据
     rawData: rawData,     // 保存原始Markdown表格内容
     layout: {
+      classStyle: {
+        ...chartStyleConfig
+      },
+      className: uniqueClassName,
       style: {
         // 基础样式
         "background-color": [],
@@ -1786,7 +1883,7 @@ function createChartElement(chartType, svgContent, tableData, rawData) {
     },
     events: [{}]
   };
-  
+
   console.log('图表元素创建完成:', JSON.stringify({
     id: chartElement.id,
     name: chartElement.name,
@@ -1795,7 +1892,7 @@ function createChartElement(chartType, svgContent, tableData, rawData) {
     hasTableData: !!(tableData && tableData.length),
     dataRows: tableData ? tableData.length : 0
   }, null, 2));
-  
+
   return chartElement;
 }
 
@@ -1804,30 +1901,30 @@ function parseTableData(tableContent) {
   // 分割表格内容为行
   const lines = tableContent.trim().split('\n');
   const data = [];
-  
+
   // 解析每一行
   for (let i = 0; i < lines.length; i++) {
     // 跳过分隔行 (包含 --- 的行)
     if (lines[i].match(/\|[-|\s]+\|/)) {
       continue;
     }
-    
+
     // 移除行首尾的|，并分割单元格
     const cells = lines[i].trim()
       .replace(/^\||\|$/g, '')  // 移除首尾的|
       .split('|')                // 按|分割
       .map(cell => cell.trim()); // 移除单元格内容的空白
-    
+
     data.push(cells);
   }
-  
+
   return data;
 }
 
 // 检测markdown表格 - 为了保持兼容性而保留的函数
 function isMarkdownTable(lines) {
   if (lines.length < 2) return false;
-  
+
   // 使用新的检测逻辑
   const { isData, isChart } = isTableOrChartData(lines[0]);
   // 只有当是表格数据且不是图表时返回true
@@ -1839,14 +1936,14 @@ function parseMarkdown(markdown) {
   // 首先规范化换行符处理
   // 把所有的\r\n转换为\n
   const normalizedMarkdown = markdown.replace(/\r\n/g, '\n');
-  
+
   // 在分割之前，在Markdown中保留空行标记，以便在解析时使用
   // 用特殊标记替换连续的空行
   const processedMarkdown = normalizedMarkdown
     .replace(/\n\n+/g, '\n§PARAGRAPH§\n')  // 标记段落分隔符
     .replace(/\\n\\n+/g, '\n§PARAGRAPH§\n')
     .replace(/\\n/g, '\n');
-  
+
   // 分割Markdown文本为行（保留空行标记）
   const lines = processedMarkdown.split('\n');
 
@@ -1867,7 +1964,7 @@ function parseMarkdown(markdown) {
 
   // 缓存当前处理的文本块
   let currentTextBlock = '';
-  
+
   // 标记当前正在处理的列表状态
   let inList = false;
   let listItems = [];
@@ -1935,54 +2032,54 @@ function parseMarkdown(markdown) {
   for (let i = 0; i < markedLines.length; i++) {
     const { line, isTable, tableContent, isTableStart } = markedLines[i];
     const trimmedLine = line.trim();
-    
+
     // 检查是否为段落分隔符
     if (trimmedLine === '§PARAGRAPH§') {
       // 处理之前累积的内容
       flushTextBlock();
-      
+
       // 如果正在处理列表，结束列表
       if (inList && listItems.length > 0) {
         // 创建一个垂直布局来容纳列表项，明确指定左对齐
         const listLayout = createLayoutElement(
-          LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+          LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
           listItems,
           {
             alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
             counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
           }
         );
-        
+
         // 添加到当前堆栈的末尾元素的children中
         stack[stack.length - 1].elements.push(listLayout);
-        
+
         // 重置列表状态
         inList = false;
         listItems = [];
       }
-      
+
       continue;
     }
 
     // 检查是否为表格或图表数据
     const { isData, isChart, chartType } = isTableOrChartData(trimmedLine);
-    
+
     if (isData) {
       console.log(`发现${isChart ? '图表' : '表格'}数据，行号: ${i}`);
-      
+
       // 处理之前累积的内容
       flushTextBlock();
       flushConsecutiveButtons();
-      
+
       // 提取表格/图表数据
       const result = extractTableOrChartData(
         markedLines.map(item => item.line),
         i
       );
-      
+
       // 处理表格/图表数据
       const endIndex = processTableOrChartData(result, stack);
-      
+
       // 跳过已处理的行
       i = endIndex;
       continue;
@@ -2015,22 +2112,22 @@ function parseMarkdown(markdown) {
       // 处理之前累积的内容
       flushTextBlock();
       flushConsecutiveButtons();
-      
+
       // 如果正在处理列表，先结束列表
       if (inList && listItems.length > 0) {
         // 创建一个垂直布局来容纳列表项，明确指定左对齐
         const listLayout = createLayoutElement(
-          LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+          LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
           listItems,
           {
             alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
             counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
           }
         );
-        
+
         // 添加到当前堆栈的末尾元素的children中
         stack[stack.length - 1].elements.push(listLayout);
-        
+
         // 重置列表状态
         inList = false;
         listItems = [];
@@ -2078,26 +2175,26 @@ function parseMarkdown(markdown) {
 
     // 检查是否为列表项或包含富文本的行
     const richTextResult = processListItemAndRichText(trimmedLine);
-    
+
     if (richTextResult.processed) {
       // 处理之前累积的文本块
       flushTextBlock();
-      
+
       // 如果是列表项
       if (richTextResult.element.layout.style.listStyleType) {
         // 标记我们正在处理列表
         inList = true;
-        
+
         // 添加到列表项数组
         listItems.push(richTextResult.element);
-      } 
+      }
       // 如果不是列表项，直接添加到当前元素栈
       else {
         // 如果之前有列表，先处理列表
         if (inList && listItems.length > 0) {
           // 创建一个垂直布局来容纳列表项，明确指定左对齐
           const listLayout = createLayoutElement(
-            LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+            LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
             listItems,
             {
               alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
@@ -2105,16 +2202,16 @@ function parseMarkdown(markdown) {
             }
           );
           stack[stack.length - 1].elements.push(listLayout);
-          
+
           // 重置列表状态
           inList = false;
           listItems = [];
         }
-        
+
         // 将处理后的元素添加到栈
         stack[stack.length - 1].elements.push(richTextResult.element);
       }
-      
+
       continue;
     }
 
@@ -2185,12 +2282,12 @@ function parseMarkdown(markdown) {
   // 确保处理完所有累积的内容
   flushTextBlock();
   flushConsecutiveButtons();
-  
+
   // 处理最后可能遗留的列表项
   if (inList && listItems.length > 0) {
     // 创建一个垂直布局来容纳列表项，明确指定左对齐
     const listLayout = createLayoutElement(
-      LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+      LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
       listItems,
       {
         alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
@@ -2209,7 +2306,7 @@ function parseMarkdown(markdown) {
   if (h1Blocks.length > 1) {
     // 标记是多标题布局的上下文
     const isMultiTitleLayout = true;
-    
+
     // 将每个一级标题块包装在容器中，设置最小宽度
     // 当多标题并排时，标题应该左对齐
     const wrappedH1Blocks = h1Blocks.map(block => {
@@ -2222,18 +2319,18 @@ function parseMarkdown(markdown) {
           if (headingText.layout && headingText.layout.style) {
             headingText.layout.style.textAlign = "left";
           }
-          
+
           // 修改文本容器样式
           if (headingText.layout.text_body && headingText.layout.text_body.style) {
             headingText.layout.text_body.style.textAlign = "left";
           }
-          
+
           if (headingText.layout.text_hyperlink && headingText.layout.text_hyperlink.style) {
             headingText.layout.text_hyperlink.style.textAlign = "left";
           }
         }
       }
-      
+
       return createHeadingBlockContainer(block);
     });
 
@@ -2260,24 +2357,24 @@ function parseMarkdown(markdown) {
       if (cleanedTextBlock) { // 确保清理后仍有内容
         // 检查文本块是否包含富文本或列表项
         const lines = cleanedTextBlock.split('\n');
-        
+
         // 如果只有一行，尝试处理富文本
         if (lines.length === 1) {
           const singleCleanedLine = lines[0].trim();
           if (singleCleanedLine) {
             const richTextResult = processListItemAndRichText(singleCleanedLine);
-            
+
             if (richTextResult.processed) {
               // 如果是列表项
               if (richTextResult.element.layout.style.listStyleType) {
                 inList = true;
                 listItems.push(richTextResult.element);
-              } 
+              }
               // 如果不是列表项，直接添加到当前元素栈
               else {
                 if (inList && listItems.length > 0) {
                   const listLayout = createLayoutElement(
-                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
                     listItems,
                     {
                       alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
@@ -2296,7 +2393,7 @@ function parseMarkdown(markdown) {
               stack[stack.length - 1].elements.push(textElement);
             }
           }
-        } 
+        }
         // 如果有多行，为每行单独处理
         else {
           const textLayout = createLayoutElement(
@@ -2307,18 +2404,18 @@ function parseMarkdown(markdown) {
               counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
             }
           );
-          
+
           for (const line of lines) {
             const cleanedLine = line.trim();
             if (cleanedLine === '') continue;
-            
+
             const richTextResult = processListItemAndRichText(cleanedLine);
-            
+
             if (richTextResult.processed) {
               if (richTextResult.element.layout.style.listStyleType) {
                 inList = true;
                 listItems.push(richTextResult.element);
-              } 
+              }
               else {
                 textLayout.layout.children.push(richTextResult.element);
               }
@@ -2327,14 +2424,14 @@ function parseMarkdown(markdown) {
               textLayout.layout.children.push(textElement);
             }
           }
-          
+
           if (textLayout.layout.children.length > 0) {
             stack[stack.length - 1].elements.push(textLayout);
           }
-          
+
           if (inList && listItems.length > 0) {
             const listLayout = createLayoutElement(
-              LAYOUT_CONSTANTS.DIRECTION.VERTICAL, 
+              LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
               listItems,
               {
                 alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
@@ -2501,7 +2598,7 @@ function markdownToEightElement(markdown, styleConfig) {
 
   // 检查并规范化输入
   let processedMarkdown = markdown;
-  
+
   // 确保markdown是字符串类型
   if (typeof processedMarkdown !== 'string') {
     console.warn('收到非字符串类型的Markdown输入，尝试转换为字符串');
@@ -2512,18 +2609,18 @@ function markdownToEightElement(markdown, styleConfig) {
       processedMarkdown = '';
     }
   }
-  
+
   // 确保最后有一个换行符，以正确处理最后一个段落
   if (processedMarkdown && !processedMarkdown.endsWith('\n')) {
     processedMarkdown += '\n';
   }
 
   console.log(`处理Markdown文本，长度: ${processedMarkdown.length}`);
-  
+
   // 直接使用parseMarkdown函数解析Markdown为元素数组
   const parsedElements = parseMarkdown(processedMarkdown);
   console.log(`解析得到的元素数量: ${parsedElements.length}`);
-  
+
   // 使用createEightElementRoot创建八要素根结构
   const eightElementRoot = createEightElementRoot(parsedElements);
 

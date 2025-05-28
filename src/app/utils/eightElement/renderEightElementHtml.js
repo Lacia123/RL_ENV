@@ -7,7 +7,7 @@
 
 import resolveToken from '../tokens/resolveToken.js';
 import { Marked, marked } from 'marked';
-import { markedHighlight }from 'marked-highlight';
+import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
 import markedKatex from 'marked-katex-extension';
 
@@ -15,19 +15,19 @@ import markedKatex from 'marked-katex-extension';
  * Configure marked globally with KaTeX and Highlight.js
  */
 const katexOptions = {
-  throwOnError: false,
-  // displayMode: true, // This might be relevant for how $$...$$ is handled by default
+    throwOnError: false,
+    // displayMode: true, // This might be relevant for how $$...$$ is handled by default
 };
 
 const markedInstance = new Marked(
-  markedHighlight({
-    async: false, // Assuming synchronous highlighting for simplicity here
-    langPrefix: 'hljs language-',
-    highlight(code, lang) {
-      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-      return hljs.highlight(code, { language }).value;
-    }
-  })
+    markedHighlight({
+        async: false, // Assuming synchronous highlighting for simplicity here
+        langPrefix: 'hljs language-',
+        highlight(code, lang) {
+            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+            return hljs.highlight(code, { language }).value;
+        }
+    })
 );
 markedInstance.use(markedKatex(katexOptions));
 // Use markedInstance.parse(markdownString) instead of marked.parse() later
@@ -39,10 +39,17 @@ markedInstance.use(markedKatex(katexOptions));
  * @returns {Object} - 包含HTML字符串和预处理后的八要素结构
  */
 export function renderEightElementToHtml(eightElement, options = {}) {
-  const { width = 1024, height = 768 } = options;
-  
-  // 创建HTML文档头部
-  const htmlHeader = `
+    const { width = 1024, height = 768 } = options;
+
+    // 预处理八要素结构，收集所有classStyle
+    const processedEightElement = preProcessEightElement(eightElement);
+    const classStyles = collectClassStyles(processedEightElement);
+
+    // 生成CSS样式表
+    const cssStyles = generateCSSFromClassStyles(classStyles);
+
+    // 创建HTML文档头部
+    const htmlHeader = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -56,6 +63,12 @@ export function renderEightElementToHtml(eightElement, options = {}) {
           margin: 0;
           padding: 0;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        p {
+           margin-block: 0;
+           margin-inline: 0;
+           padding-block: 0;
+           padding-inline: 0;
         }
         .eight-element-container {
           position: relative;
@@ -72,29 +85,157 @@ export function renderEightElementToHtml(eightElement, options = {}) {
         code.hljs {
             padding: 3px 5px;
         }
+        
+        /* 动态生成的类样式 */
+        ${cssStyles}
       </style>
     </head>
     <body>
       <div class="eight-element-container" id="root">
   `;
 
-    // 预处理八要素结构
-    const processedEightElement = preProcessEightElement(eightElement);
-  
-  // 递归渲染主体内容
+    // 递归渲染主体内容
     const htmlBody = renderElement(processedEightElement);
-  
-  // 创建HTML文档尾部
-  const htmlFooter = `
+
+    // 创建HTML文档尾部
+    const htmlFooter = `
       </div>
     </body>
     </html>
   `;
-  
+
     return {
         html: htmlHeader + htmlBody + htmlFooter,
         processedEightElement
     };
+}
+
+/**
+ * 收集所有元素的classStyle
+ * @param {Object} element - 八要素元素
+ * @param {Object} classStyles - 收集的类样式对象
+ * @returns {Object} - 收集的类样式对象
+ */
+function collectClassStyles(element, classStyles = {}) {
+    if (!element) return classStyles;
+
+    // 收集当前元素的classStyle
+    if (element.layout && element.layout.className && element.layout.classStyle) {
+        classStyles[element.layout.className] = element.layout.classStyle;
+    }
+
+    // 递归收集子元素的classStyle
+    if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
+        element.layout.children.forEach(child => {
+            collectClassStyles(child, classStyles);
+        });
+    }
+
+    return classStyles;
+}
+
+
+function separateStyles(styleObj) {
+    const mainStyles = {};
+    const nestedStyles = {};
+
+    Object.entries(styleObj).forEach(([key, value]) => {
+        if (key.startsWith('&')) {
+            // 嵌套选择器（如 &::after, &:hover 等）
+            nestedStyles[key] = value;
+        } else {
+            // 主样式属性
+            mainStyles[key] = value;
+        }
+    });
+
+    return { mainStyles, nestedStyles };
+}
+
+
+
+/**
+ * 从classStyle对象生成CSS字符串
+ * @param {Object} classStyles - 类样式对象
+ * @returns {string} - CSS字符串
+ */
+function generateCSSFromClassStyles(classStyles) {
+    let css = '';
+
+    Object.entries(classStyles).forEach(([className, styleObj]) => {
+        if (!styleObj || typeof styleObj !== 'object') return;
+
+        // 处理主选择器的样式和嵌套选择器
+        const { mainStyles, nestedStyles } = separateStyles(styleObj);
+
+        // 生成主选择器的CSS
+        if (Object.keys(mainStyles).length > 0) {
+            css += `.${className} {\n`;
+            css += generateStyleProperties(mainStyles);
+            css += '}\n\n';
+        }
+
+        if (Object.keys(nestedStyles).length > 0) {
+            // 生成嵌套选择器的CSS
+            Object.entries(nestedStyles).forEach(([selector, nestedStyleObj]) => {
+                const fullSelector = selector.replace('&', `.${className}`);
+                css += `${fullSelector} {\n`;
+                css += generateStyleProperties(nestedStyleObj);
+                css += '}\n\n';
+            });
+        }
+    });
+
+    return css;
+}
+
+function generateStyleProperties(styleObj) {
+    let css = '';
+    Object.entries(styleObj).forEach(([property, value]) => {
+        if (value === null || value === undefined) return;
+        
+        // 解析token值
+        let resolvedValue = resolveToken(value) || value;
+        
+        // 转换属性名为CSS格式
+        const cssProperty = convertToCSSProperty(property);
+        
+        // 处理数值类型，为需要单位的属性添加px
+        if (typeof resolvedValue === 'number' && shouldAddPixelUnit(cssProperty)) {
+            resolvedValue = `${resolvedValue}px`;
+        }
+        
+        css += `  ${cssProperty}: ${resolvedValue};\n`;
+    });
+    
+    return css;
+}
+
+function convertToCSSProperty(property) {
+    // 处理特殊的CSS属性名
+    const specialProperties = {
+        'WebkitBackgroundClip': '-webkit-background-clip',
+        'WebkitTextFillColor': '-webkit-text-fill-color',
+        'MozBackgroundClip': '-moz-background-clip',
+        'MsBackgroundClip': '-ms-background-clip'
+    };
+    
+    if (specialProperties[property]) {
+        return specialProperties[property];
+    }
+    
+    // 将驼峰命名转换为短横线命名
+    return property.replace(/([A-Z])/g, '-$1').toLowerCase();
+}
+
+function shouldAddPixelUnit(cssProperty) {
+    const noUnitProperties = [
+        'font-weight', 'line-height', 'opacity', 'z-index', 
+        'flex-grow', 'flex-shrink', 'order', 'column-count',
+        'fill-opacity', 'stroke-opacity', 'stop-opacity'
+    ];
+    
+    return !noUnitProperties.includes(cssProperty);
 }
 
 /**
@@ -304,7 +445,7 @@ function processTextElement(processedElement, originalElement) {
                 }
                 return charBefore + ' ' + dollarSign; // Add space: e.g., "word$" -> "word $"
             });
-            
+
             // Ensure newlines in original text are treated as <br> or new paragraphs by marked
             preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
 
@@ -467,7 +608,7 @@ function processCodeElement(processedElement, originalElement) {
     // 保留原始的代码内容和语言
     processedElement.rawData = originalElement.rawData || '';
     processedElement.language = originalElement.language || 'plaintext';
-    
+
     // 处理样式引用
     if (originalElement.layout && originalElement.layout.style) {
         processStyleReferences(processedElement, originalElement, originalElement.layout.style);
@@ -485,7 +626,7 @@ function processChartElement(processedElement, originalElement) {
     processedElement.chartType = originalElement.chartType || 'line';
     processedElement.tableData = originalElement.tableData || []; // 保存表格数据
     processedElement.rawData = originalElement.rawData || ''; // 保存原始数据
-    
+
     // 处理样式引用
     if (originalElement.layout && originalElement.layout.style) {
         processStyleReferences(processedElement, originalElement, originalElement.layout.style);
@@ -528,66 +669,66 @@ function applyLayoutToken(computedStyle, key, value) {
 
     switch (key) {
         // 显示属性
-      case 'display':
+        case 'display':
             computedStyle.display = value;
-        break;
-        
-      // 布局方向
-      case 'layoutMode':
+            break;
+
+        // 布局方向
+        case 'layoutMode':
             if (value === 'HORIZONTAL') {
-          computedStyle.flexDirection = 'row';
+                computedStyle.flexDirection = 'row';
             } else if (value === 'VERTICAL') {
-          computedStyle.flexDirection = 'column';
+                computedStyle.flexDirection = 'column';
             } else if (value === 'NONE') {
                 computedStyle.flexDirection = 'unset';
-        }
-        break;
-        
-      // 布局换行
-      case 'layoutWrap':
+            }
+            break;
+
+        // 布局换行
+        case 'layoutWrap':
             computedStyle.flexWrap = value === 'WRAP' ? 'wrap' : 'nowrap';
-        break;
-        
+            break;
+
         // 主轴对齐
-      case 'primaryAxisAlignItems':
+        case 'primaryAxisAlignItems':
             switch (value) {
-          case 'MIN':
-            computedStyle.justifyContent = 'flex-start';
-            break;
-          case 'MAX':
-            computedStyle.justifyContent = 'flex-end';
-            break;
-          case 'CENTER':
-            computedStyle.justifyContent = 'center';
-            break;
-          case 'SPACE_BETWEEN':
-            computedStyle.justifyContent = 'space-between';
-            break;
-          default:
+                case 'MIN':
+                    computedStyle.justifyContent = 'flex-start';
+                    break;
+                case 'MAX':
+                    computedStyle.justifyContent = 'flex-end';
+                    break;
+                case 'CENTER':
+                    computedStyle.justifyContent = 'center';
+                    break;
+                case 'SPACE_BETWEEN':
+                    computedStyle.justifyContent = 'space-between';
+                    break;
+                default:
                     computedStyle.justifyContent = value; // 直接使用值
-        }
-        break;
-        
+            }
+            break;
+
         // 交叉轴对齐
-      case 'counterAxisAlignItems':
+        case 'counterAxisAlignItems':
             switch (value) {
-          case 'MIN':
-            computedStyle.alignItems = 'flex-start';
-            break;
-          case 'MAX':
-            computedStyle.alignItems = 'flex-end';
-            break;
-          case 'CENTER':
-            computedStyle.alignItems = 'center';
-            break;
-          case 'BASELINE':
-            computedStyle.alignItems = 'baseline';
-            break;
-          default:
+                case 'MIN':
+                    computedStyle.alignItems = 'flex-start';
+                    break;
+                case 'MAX':
+                    computedStyle.alignItems = 'flex-end';
+                    break;
+                case 'CENTER':
+                    computedStyle.alignItems = 'center';
+                    break;
+                case 'BASELINE':
+                    computedStyle.alignItems = 'baseline';
+                    break;
+                default:
                     computedStyle.alignItems = value; // 直接使用值
-        }
-        break;
-        
+            }
+            break;
+
         // 内边距相关
         case 'paddingTop':
             computedStyle.paddingTop = value;
@@ -609,33 +750,33 @@ function applyLayoutToken(computedStyle, key, value) {
             break;
 
         // 元素自身对齐
-      case 'layoutAlign':
+        case 'layoutAlign':
             switch (value) {
-          case 'MIN':
-            computedStyle.alignSelf = 'flex-start';
-            break;
-          case 'MAX':
-            computedStyle.alignSelf = 'flex-end';
-            break;
-          case 'CENTER':
-            computedStyle.alignSelf = 'center';
-            break;
-          case 'STRETCH':
-            computedStyle.alignSelf = 'stretch';
-            break;
-          case 'INHERIT':
-            computedStyle.alignSelf = 'inherit';
-            break;
-          default:
+                case 'MIN':
+                    computedStyle.alignSelf = 'flex-start';
+                    break;
+                case 'MAX':
+                    computedStyle.alignSelf = 'flex-end';
+                    break;
+                case 'CENTER':
+                    computedStyle.alignSelf = 'center';
+                    break;
+                case 'STRETCH':
+                    computedStyle.alignSelf = 'stretch';
+                    break;
+                case 'INHERIT':
+                    computedStyle.alignSelf = 'inherit';
+                    break;
+                default:
                     computedStyle.alignSelf = value; // 直接使用值
-        }
-        break;
-        
-      // 伸展因子
-      case 'layoutGrow':
+            }
+            break;
+
+        // 伸展因子
+        case 'layoutGrow':
             computedStyle.flexGrow = value;
-        break;
-        
+            break;
+
         // 边框相关
         case 'strokeTopWeight':
             computedStyle.borderTopWidth = value;
@@ -652,8 +793,8 @@ function applyLayoutToken(computedStyle, key, value) {
         case 'strokeLeftWeight':
             computedStyle.borderLeftWidth = value;
             computedStyle.borderStyle = computedStyle.borderStyle || 'solid';
-        break;
-        
+            break;
+
         // 其他属性直接添加
         default:
             // 转换驼峰命名为CSS属性
@@ -669,15 +810,15 @@ function applyLayoutToken(computedStyle, key, value) {
  */
 function renderElement(element) {
     if (!element) return '';
-    
+
     // 处理layout容器
     if (element.name === 'layout' && element.layout) {
         return renderLayoutElement(element);
     }
-    
+
     // 处理具体元素类型
     const elementType = element.name || element.type || '';
-    
+
     switch (elementType.toLowerCase()) {
         case 'text':
             return renderTextElement(element);
@@ -692,7 +833,7 @@ function renderElement(element) {
             return renderCodeElement(element);
         case 'chart':
             return renderChartElement(element);
-      default:
+        default:
             return renderGenericElement(element);
     }
 }
@@ -704,13 +845,15 @@ function renderElement(element) {
  */
 function renderLayoutElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
 
     let childrenHtml = '';
     if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
         childrenHtml = element.layout.children.map(child => renderElement(child)).join('');
     }
 
-    return `<div id="${element.id || ''}" data-element-type="layout" ${styleAttr}>${childrenHtml}</div>`;
+    return `<div id="${element.id || ''}" ${classAttr} data-element-type="layout" ${styleAttr}>${childrenHtml}</div>`;
 }
 
 /**
@@ -720,30 +863,32 @@ function renderLayoutElement(element) {
  */
 function renderTextElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
-    
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
+
     // 直接使用预处理的HTML内容
     let contentHtml = '';
-    
+
     // 如果有预处理的Markdown+KaTeX内容，直接使用
     if (element.font && element.font.fontsize && element.font.fontsize.default) {
-      contentHtml = element.font.fontsize.default.content || '';
-      
-      // 如果content不是HTML格式（老格式或纯文本），则进行简单的HTML转义和换行处理
-      if (contentHtml && !contentHtml.includes('<')) {
-        contentHtml = escapeHtml(contentHtml).replace(/\\n/g, '<br>');
-      }
+        contentHtml = element.font.fontsize.default.content || '';
+
+        // 如果content不是HTML格式（老格式或纯文本），则进行简单的HTML转义和换行处理
+        if (contentHtml && !contentHtml.includes('<')) {
+            contentHtml = escapeHtml(contentHtml).replace(/\\n/g, '<br>');
+        }
     }
 
     if (element.textType === 'text_hyperlink') {
         const url = element.url || '#';
         return `
-      <div id="${element.id || ''}" data-element-type="text" ${styleAttr}>
+      <div id="${element.id || ''}" ${classAttr} data-element-type="text" ${styleAttr}>
         <a href="${url}" style="text-decoration:underline;color:inherit;">${contentHtml}</a>
       </div>
     `;
     } else {
         return `
-      <div id="${element.id || ''}" data-element-type="text" ${styleAttr}>
+      <div id="${element.id || ''}" ${classAttr} data-element-type="text" ${styleAttr}>
         ${contentHtml}
       </div>
     `;
@@ -757,6 +902,8 @@ function renderTextElement(element) {
  */
 function renderButtonElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
 
     // 获取按钮内容和URL
     let buttonText = element.buttonText || 'Button';
@@ -767,7 +914,7 @@ function renderButtonElement(element) {
 
     // 构建按钮HTML
     return `
-    <div id="${element.id || ''}" data-element-type="button" ${styleAttr}>
+    <div id="${element.id || ''}" ${classAttr} data-element-type="button" ${styleAttr}>
       <a href="${buttonUrl}" style="display:block;width:100%;height:100%;text-decoration:none;color:inherit;">
         ${buttonText}
       </a>
@@ -782,6 +929,8 @@ function renderButtonElement(element) {
  */
 function renderImageElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
 
     // 获取图片URL
     let imageUrl = element.imageUrl || '';
@@ -789,14 +938,14 @@ function renderImageElement(element) {
     if (imageUrl) {
         // 添加图片标签
         return `
-      <div id="${element.id || ''}" data-element-type="image" ${styleAttr}>
+      <div id="${element.id || ''}" ${classAttr} data-element-type="image" ${styleAttr}>
         <img src="${imageUrl}" alt="Element Image" style="width:100%;height:100%;object-fit:cover;">
       </div>
     `;
     } else {
         // 没有图片URL时显示占位符
         return `
-      <div id="${element.id || ''}" data-element-type="image" ${styleAttr} style="display:flex;align-items:center;justify-content:center;color:#999;">
+      <div id="${element.id || ''}" ${classAttr} data-element-type="image" ${styleAttr} style="display:flex;align-items:center;justify-content:center;color:#999;">
         Image Placeholder
       </div>
     `;
@@ -857,8 +1006,11 @@ function renderTableElement(element) {
         tableHtml = applyTableStyles(tableHtml, tableStyle, thStyle, trStyle, tdStyle);
 
 
+        const className = element.layout && element.layout.className ? element.layout.className : '';
+        const classAttr = className ? `class="${className}"` : '';
+
         return `
-      <div id="${element.id || ''}" data-element-type="table" ${containerStyleAttr}>
+      <div id="${element.id || ''}" ${classAttr} data-element-type="table" ${containerStyleAttr}>
         ${tableHtml}
       </div>
     `;
@@ -883,24 +1035,24 @@ function renderTableElement(element) {
  * @returns {string} - 应用样式后的表格HTML
  */
 function applyTableStyles(tableHtml, tableStyle, thStyle, trStyle, tdStyle) {
-        
+
     // 生成样式字符串，确保它们以分号结尾
     const ensureStyleEndsWithSemicolon = (style) => {
         if (!style) return '';
         return style.endsWith(';') ? style : `${style};`;
     };
-    
+
     // 生成内联样式字符串
     const generateInlineStyle = (styleObj) => {
         if (!styleObj || Object.keys(styleObj).length === 0) return '';
-        
+
         return Object.entries(styleObj)
             .map(([key, value]) => {
                 // 转换驼峰式为连字符式
                 const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
                 // 如果值是数字但不是特定属性，添加px
                 let cssValue = value;
-                if (typeof value === 'number' && 
+                if (typeof value === 'number' &&
                     !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
                     cssValue = `${value}px`;
                 }
@@ -908,38 +1060,38 @@ function applyTableStyles(tableHtml, tableStyle, thStyle, trStyle, tdStyle) {
             })
             .join('; ');
     };
-    
+
     // 获取各元素的样式字符串
     const tableStyleStr = generateInlineStyle(tableStyle);
     const thStyleStr = generateInlineStyle(thStyle);
     const trStyleStr = generateInlineStyle(trStyle);
     const tdStyleStr = generateInlineStyle(tdStyle);
-    
+
     console.log('表格样式字符串:', {
         table: tableStyleStr,
         th: thStyleStr,
         tr: trStyleStr,
         td: tdStyleStr
     });
-    
+
     // 替换表格标签，应用样式
     if (tableStyleStr) {
         tableHtml = tableHtml.replace(/<table/, `<table style="${ensureStyleEndsWithSemicolon(tableStyleStr)}"`);
     }
-    
+
     // 使用安全的方式应用样式，避免错误替换
     if (thStyleStr) {
         tableHtml = tableHtml.replace(/<th\b/g, `<th style="${ensureStyleEndsWithSemicolon(thStyleStr)}"`);
     }
-    
+
     if (trStyleStr) {
         tableHtml = tableHtml.replace(/<tr\b/g, `<tr style="${ensureStyleEndsWithSemicolon(trStyleStr)}"`);
     }
-    
+
     if (tdStyleStr) {
         tableHtml = tableHtml.replace(/<td\b/g, `<td style="${ensureStyleEndsWithSemicolon(tdStyleStr)}"`);
     }
-    
+
     console.log('表格样式应用完成');
     return tableHtml;
 }
@@ -953,24 +1105,24 @@ function renderCodeElement(element) {
     if (!element) {
         return '<div>代码元素结构不完整</div>';
     }
-    
+
     // 生成容器样式
     const containerStyleAttr = generateStyleAttribute(element.computedStyle || {});
-    
+
     // 使用预处理好的高亮HTML
     let html = element.highlightedCode || '';
-    
+
     // 如果没有预处理的HTML，回退到原始方式
     if (!html) {
         const rawCode = element.rawData || '';
         const language = element.language || 'plaintext';
-        
+
         if (!rawCode.trim()) {
             return `<div id="${element.id || ''}" data-element-type="code" ${containerStyleAttr}>
                   <p>代码内容为空</p>
                 </div>`;
         }
-        
+
         try {
             // 使用原始的方式生成代码高亮
             html = `<pre><code class="language-${language}">${escapeHtml(rawCode)}</code></pre>`;
@@ -979,9 +1131,12 @@ function renderCodeElement(element) {
             html = `<p>代码解析错误: ${error.message}</p><pre>${escapeHtml(rawCode)}</pre>`;
         }
     }
-    
+
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
+
     return `
-      <div id="${element.id || ''}" data-element-type="code" ${containerStyleAttr}>
+      <div id="${element.id || ''}" ${classAttr} data-element-type="code" ${containerStyleAttr}>
         ${html}
       </div>
     `;
@@ -996,24 +1151,27 @@ function renderChartElement(element) {
     if (!element) {
         return '<div>图表元素结构不完整</div>';
     }
-    
+
     // 生成容器样式
     const containerStyleAttr = generateStyleAttribute(element.computedStyle || {});
-    
+
     // 获取SVG内容
     const svgContent = element.svgContent || '';
-    
+
     if (!svgContent) {
         return `<div id="${element.id || ''}" data-element-type="chart" ${containerStyleAttr}>
               <p>图表内容为空</p>
               <pre>${escapeHtml(element.rawData || '')}</pre>
             </div>`;
     }
-    
+
     try {
         // 直接使用生成的SVG内容
+        const className = element.layout && element.layout.className ? element.layout.className : '';
+        const classAttr = className ? `class="${className}"` : '';
+
         return `
-      <div id="${element.id || ''}" data-element-type="chart" data-chart-type="${element.chartType || ''}" ${containerStyleAttr}>
+      <div id="${element.id || ''}" ${classAttr} data-element-type="chart" data-chart-type="${element.chartType || ''}" ${containerStyleAttr}>
         ${svgContent}
       </div>
     `;
@@ -1051,26 +1209,26 @@ function renderGenericElement(element) {
  * @returns {string} - style属性字符串
  */
 function generateStyleAttribute(styleObject) {
-  if (!styleObject || typeof styleObject !== 'object') {
-    return '';
-  }
-  
-  // 将样式对象转换为样式字符串
-  const styleString = Object.entries(styleObject)
-    .map(([key, value]) => {
-      // 如果值是数字，且不是特定属性，添加px单位
-      if (typeof value === 'number' && 
-          !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
-        value = `${value}px`;
-      }
-      
-      // 转换驼峰式属性名为连字符式
-      const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
-      return `${cssKey}: ${value}`;
-    })
-    .join('; ');
-  
-  return styleString ? `style="${styleString}"` : '';
+    if (!styleObject || typeof styleObject !== 'object') {
+        return '';
+    }
+
+    // 将样式对象转换为样式字符串
+    const styleString = Object.entries(styleObject)
+        .map(([key, value]) => {
+            // 如果值是数字，且不是特定属性，添加px单位
+            if (typeof value === 'number' &&
+                !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
+                value = `${value}px`;
+            }
+
+            // 转换驼峰式属性名为连字符式
+            const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+            return `${cssKey}: ${value}`;
+        })
+        .join('; ');
+
+    return styleString ? `style="${styleString}"` : '';
 }
 
 /**
@@ -1079,14 +1237,14 @@ function generateStyleAttribute(styleObject) {
  * @returns {string} - 转义后的文本
  */
 function escapeHtml(text) {
-  if (!text || typeof text !== 'string') return '';
-  
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    if (!text || typeof text !== 'string') return '';
+
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 export default renderEightElementToHtml; 

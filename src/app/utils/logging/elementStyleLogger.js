@@ -89,7 +89,7 @@ async function detectElementStyleIssues(html, dimensions) {
     await page.setContent(html);
 
     // 等待页面渲染完成
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(200);
 
 
     page.on('console', (message) => {
@@ -295,11 +295,7 @@ async function detectElementStyleIssues(html, dimensions) {
         // 获取border-radius值
         const borderRadius = parseFloat(buttonStyle.borderRadius) || 0;
 
-        // 检查是否有任意一个padding值小于border-radius
-        const paddingValues = [paddingLeft, paddingRight, paddingTop, paddingBottom];
-        const paddingNames = ['padding-left', 'padding-right', 'padding-top', 'padding-bottom'];
         const problematicPaddings = [];
-
 
         // 垂直方向：只有当文字靠近上下边缘时，才会被圆角遮挡
         const verticalRisk = Math.min(paddingTop, paddingBottom) < borderRadius;
@@ -313,6 +309,10 @@ async function detectElementStyleIssues(html, dimensions) {
             name: 'padding',
             value: Math.min(paddingTop, paddingBottom, paddingLeft, paddingRight),
             borderRadius: borderRadius
+          });
+          buttonBorderIssues.push({
+            id: buttonElement.id || `button-${index}`,
+            problematicPaddings: problematicPaddings
           });
         }
       });
