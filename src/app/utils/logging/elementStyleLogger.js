@@ -89,7 +89,7 @@ async function detectElementStyleIssues(html, dimensions) {
     await page.setContent(html);
 
     // 等待页面渲染完成
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(500);
 
 
     page.on('console', (message) => {
@@ -298,10 +298,10 @@ async function detectElementStyleIssues(html, dimensions) {
         const problematicPaddings = [];
 
         // 垂直方向：只有当文字靠近上下边缘时，才会被圆角遮挡
-        const verticalRisk = Math.min(paddingTop, paddingBottom) < borderRadius;
+        const verticalRisk = Math.min(paddingTop, paddingBottom) * 2 < borderRadius;
 
         // 水平方向：只有当文字靠近左右边缘时，才会被圆角遮挡  
-        const horizontalRisk = Math.min(paddingLeft, paddingRight) < borderRadius;
+        const horizontalRisk = Math.min(paddingLeft, paddingRight) * 2 < borderRadius;
 
         // 只有两个方向都存在风险时，才可能真正遮挡
         if (verticalRisk && horizontalRisk) {
@@ -678,8 +678,8 @@ function getHistoryLogData(dateStr) {
 export function getLogStatistics(days = 7) {
   const stats = {
     totalErrors: 0,
-    buttonErrors: 0,
-    textWrapErrors: 0,
+    // buttonErrors: 0,
+    // textWrapErrors: 0,
     buttonBorderErrors: 0,
     wcagErrors: 0,
     dailyStats: []
@@ -693,19 +693,22 @@ export function getLogStatistics(days = 7) {
     const dayData = getHistoryLogData(dateStr);
     if (dayData) {
       
-      stats.buttonErrors += dayData.buttonStyleError;
-      stats.textWrapErrors += dayData.textWrapError;
+      // stats.buttonErrors += dayData.buttonStyleError;
+      // stats.textWrapErrors += dayData.textWrapError;
       stats.buttonBorderErrors += dayData.buttonBorderError;
       stats.wcagErrors += dayData.wcagContrastError;
-      stats.totalErrors += dayData.buttonStyleError + dayData.textWrapError + dayData.buttonBorderError + dayData.wcagContrastError;
+      stats.totalErrors += dayData.buttonBorderError + dayData.wcagContrastError;
+      // stats.totalErrors += dayData.buttonStyleError + dayData.textWrapError + dayData.buttonBorderError + dayData.wcagContrastError;
 
       stats.dailyStats.push({
         date: dateStr,
         totalLogs: dayData.logs.length,
-        buttonStyleError: dayData.buttonStyleError,
-        textWrapError: dayData.textWrapError,
+        // buttonStyleError: dayData.buttonStyleError,
+        // textWrapError: dayData.textWrapError,
         buttonBorderError: dayData.buttonBorderError,
-        wcagContrastError: dayData.wcagContrastError
+        wcagContrastError: dayData.wcagContrastError,
+        wcagScore: dayData.wcagSummary.score,
+        wcagGrade: dayData.wcagSummary.grade
       });
     }
   }
