@@ -691,6 +691,8 @@ export function getLogStatistics(days = 7) {
     const dateStr = date.toISOString().split('T')[0];
     
     const dayData = getHistoryLogData(dateStr);
+
+    console.log('dayData', dayData)
     if (dayData) {
       
       // stats.buttonErrors += dayData.buttonStyleError;
@@ -707,8 +709,9 @@ export function getLogStatistics(days = 7) {
         // textWrapError: dayData.textWrapError,
         buttonBorderError: dayData.buttonBorderError,
         wcagContrastError: dayData.wcagContrastError,
-        wcagScore: dayData.wcagSummary.score,
-        wcagGrade: dayData.wcagSummary.grade
+        wcagScore: dayData.logs.map(log => log.wcagSummary.score),
+        wcagGrade: dayData.logs.map(log => log.wcagSummary.grade),
+        wcagResults: dayData.logs.map(log => log.wcagSummary.results)
       });
     }
   }
