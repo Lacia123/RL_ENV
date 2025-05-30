@@ -449,10 +449,7 @@ export const DEFAULT_STYLE_CONFIG = {
       "margin-bottom": DIMENSION_CONSTANTS.MARGIN.base,
       "margin-left": DIMENSION_CONSTANTS.MARGIN.base,
       "margin-right": DIMENSION_CONSTANTS.MARGIN.base,
-      "border-width": DIMENSION_CONSTANTS.BORDER_WIDTH.base,
-      "border-color": COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
       "background": COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
-      "border-style": "solid",
       "border-radius": DIMENSION_CONSTANTS.BORDER_RADIUS.large,
       // "gap": DIMENSION_CONSTANTS.GAP.tight
     },
