@@ -348,6 +348,96 @@ if (layoutType === 'standard') {
 
 
 
+
 ```
-id 为 root 的子元素下第一个 data-element-type="layout" 的 background，任意取 data-element-type="text 的 color，data-element-type="button" 的 background color，以及 data-element-type="button" 的 color
+ "m18": {
+                "success": true,
+                "execution_time": 0.0848,
+                "error": null,
+                "results": [
+                    4.534895420074463,
+                    2.0326223373413086
+                ]
+            },
+            "m10": {
+                "success": true,
+                "execution_time": 2.3412,
+                "error": null,
+                "results": [
+                    0.4680095197019852
+                ]
+            },
+            "m11": {
+                "success": true,
+                "execution_time": 0.0265,
+                "error": null,
+                "results": [
+                    123
+                ]
+            },
+            "m13": {
+                "success": true,
+                "execution_time": 0.0442,
+                "error": null,
+                "results": [
+                    26.382115814189724
+                ]
+            },
+            "m15": {
+                "success": true,
+                "execution_time": 0.0578,
+                "error": null,
+                "results": [
+                    15.319702985129881
+                ]
+            },
+            "m4": {
+                "success": true,
+                "execution_time": 0.0175,
+                "error": null,
+                "results": [
+                    0.023582358699572363
+                ]
+            },
+            "m5": {
+                "success": true,
+                "execution_time": 0.0382,
+                "error": null,
+                "results": [
+                    0.5037802192864205
+                ]
+            },
+            "m21": {
+                "success": true,
+                "execution_time": 0.0196,
+                "error": null,
+                "results": [
+                    12,
+                    12,
+                    32,
+                    32,
+                    10,
+                    10,
+                    0.007432119119995878,
+                    0.007432119119995878,
+                    5,
+                    5
+                ]
+            },
+            "m22": {
+                "success": true,
+                "execution_time": 0.0039,
+                "error": null,
+                "results": [
+                    0.8287243031583286
+                ]
+            },
+            "m24": {
+                "success": true,
+                "execution_time": 1.1748,
+                "error": null,
+                "results": [
+                    "4bd706b1c0154832a8654eb670337dc5-m24_0.png"
+                ]
+            }
 ```

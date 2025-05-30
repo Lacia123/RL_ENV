@@ -69,6 +69,7 @@ function prepareMarkdownForKatex(text) {
   // 确保换行在marked中被正确处理
   preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
 
+
   return preppedMarkdown;
 }
 
@@ -517,81 +518,81 @@ function createButtonElement(text, url, variant = 'primary') {
         resource: "",
         data: [],
         style: {
-          display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
-          layoutMode: LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL,
-          layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
-          primaryAxisSizingMode: LAYOUT_CONSTANTS.SIZING.AUTO,
-          counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.AUTO,
-          primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
-          counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER,
-          layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
-          layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
-          minWidth: {
-            element: "scale",
-            value: "min_width",
-            prop: "default",
-            token: "min_width"
-          },
-          minHeight: {
-            element: "scale",
-            value: "min_height",
-            prop: "default",
-            token: "min_height"
-          },
+          // display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+          // layoutMode: LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL,
+          // layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
+          // primaryAxisSizingMode: LAYOUT_CONSTANTS.SIZING.AUTO,
+          // counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.AUTO,
+          // primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
+          // counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER,
+          // layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
+          // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+          // minWidth: {
+          //   element: "scale",
+          //   value: "min_width",
+          //   prop: "default",
+          //   token: "min_width"
+          // },
+          // minHeight: {
+          //   element: "scale",
+          //   value: "min_height",
+          //   prop: "default",
+          //   token: "min_height"
+          // },
           // spacing: {
           //   element: "scale",
           //   value: "padding",
           //   prop: "default",
           //   token: "padding"
           // },
-          itemSpacing: {
-            element: "scale",
-            value: "gap",
-            prop: "default",
-            token: "gap"
-          },
-          fill: {
-            element: "color",
-            value: "bg",
-            prop: "default",
-            token: "bg"
-          },
-          fontColor: {
-            element: "color",
-            value: "text",
-            prop: "default",
-            token: "text"
-          },
-          fontSizes: {
-            element: "font",
-            value: "fontsize",
-            prop: "default",
-            token: "fontsize"
-          },
-          borderRadius: {
-            element: "shape",
-            value: "borderradius",
-            prop: "default",
-            token: "borderradius"
-          },
-          borderColor: {
-            element: "color",
-            value: "border",
-            prop: "default",
-            token: "border"
-          },
-          borderWidth: {
-            element: "shape",
-            value: "borderwidth",
-            prop: "default",
-            token: "borderwidth"
-          },
-          boxShadow: {
-            element: "material",
-            value: "elevation",
-            prop: "default",
-            token: "elevation"
-          }
+          // itemSpacing: {
+          //   element: "scale",
+          //   value: "gap",
+          //   prop: "default",
+          //   token: "gap"
+          // },
+          // fill: {
+          //   element: "color",
+          //   value: "bg",
+          //   prop: "default",
+          //   token: "bg"
+          // },
+          // fontColor: {
+          //   element: "color",
+          //   value: "text",
+          //   prop: "default",
+          //   token: "text"
+          // },
+          // fontSizes: {
+          //   element: "font",
+          //   value: "fontsize",
+          //   prop: "default",
+          //   token: "fontsize"
+          // },
+          // borderRadius: {
+          //   element: "shape",
+          //   value: "borderradius",
+          //   prop: "default",
+          //   token: "borderradius"
+          // },
+          // borderColor: {
+          //   element: "color",
+          //   value: "border",
+          //   prop: "default",
+          //   token: "border"
+          // },
+          // borderWidth: {
+          //   element: "shape",
+          //   value: "borderwidth",
+          //   prop: "default",
+          //   token: "borderwidth"
+          // },
+          // boxShadow: {
+          //   element: "material",
+          //   value: "elevation",
+          //   prop: "default",
+          //   token: "elevation"
+          // }
         },
         children: [
           {
@@ -1105,30 +1106,30 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
           counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
           layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
-          borderColor: {
-            element: "color",
-            value: "border",
-            prop: "default",
-            token: "border"
-          },
-          borderRadius: {
-            element: "shape",
-            value: "borderradius",
-            prop: "default",
-            token: "borderradius"
-          },
-          borderWidth: {
-            element: "shape",
-            value: "borderwidth",
-            prop: "default",
-            token: "borderwidth"
-          },
-          boxShadow: {
-            element: "material",
-            value: "elevation",
-            prop: "default",
-            token: "elevation"
-          },
+          // borderColor: {
+          //   element: "color",
+          //   value: "border",
+          //   prop: "default",
+          //   token: "border"
+          // },
+          // borderRadius: {
+          //   element: "shape",
+          //   value: "borderradius",
+          //   prop: "default",
+          //   token: "borderradius"
+          // },
+          // borderWidth: {
+          //   element: "shape",
+          //   value: "borderwidth",
+          //   prop: "default",
+          //   token: "borderwidth"
+          // },
+          // boxShadow: {
+          //   element: "material",
+          //   value: "elevation",
+          //   prop: "default",
+          //   token: "elevation"
+          // },
           asset: {
             element: "material",
             value: "image",
@@ -1149,7 +1150,9 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
               value: imageUrl,
               type: "asset",
               key: "material-image"
-            }
+            },
+            width: '100%',
+            height: '100%'
           },
           resource: imageUrl
         }

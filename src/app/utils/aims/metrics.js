@@ -1,0 +1,2775 @@
+export default {
+    "categories": [
+      {
+        "name": "Accessibility",
+        "icon": "universal-access",
+        "metrics": [
+          "m23"
+        ]
+      },
+      {
+        "name": "Aesthetics",
+        "icon": "gem",
+        "metrics": [
+          "m18"
+        ]
+      },
+      {
+        "name": "Color Perception",
+        "icon": "palette",
+        "metrics": [
+          "m1",
+          "m3",
+          "m10",
+          "m11",
+          "m12",
+          "m13",
+          "m14",
+          "m15",
+          "m16",
+          "m17",
+          "m19",
+          "m20"
+        ]
+      },
+      {
+        "name": "Perceptual Fluency",
+        "icon": "brain",
+        "metrics": [
+          "m2",
+          "m4",
+          "m5",
+          "m6",
+          "m7",
+          "m8",
+          "m9",
+          "m21",
+          "m22",
+          "m24",
+          "m25",
+          "m30"
+        ]
+      }
+    ],
+    "metrics": {
+      "m1": {
+        "id": "m1",
+        "name": "PNG file size",
+        "description": "The file size (in bytes) of an image, saved in the PNG format (24-bit per pixel).",
+        "evidence": 1,
+        "relevance": 2,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          }
+        ],
+        "results": [
+          {
+            "id": "m1_0",
+            "index": 0,
+            "type": "int",
+            "name": "PNG file size in bytes",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  355148
+                ],
+                "description": "Small",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  355149,
+                  855811
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  855812,
+                  null
+                ],
+                "description": "Large",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          }
+        ]
+      },
+      "m2": {
+        "id": "m2",
+        "name": "JPEG file size",
+        "description": "The file size (in bytes) of an image, saved in the JPEG format (image quality 70).",
+        "evidence": 2,
+        "relevance": 3,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          },
+          {
+            "title": "Tuch, A.N., Bargas-Avila, J.A., Opwis, K., and Wilhelm, F.H. (2009). Visual Complexity of Websites: Effects on Users' Experience, Physiology, Performance, and Memory. International Journal of Human-Computer Studies, 67(9), 703-715. doi: https://doi.org/10.1016/j.ijhcs.2009.04.002",
+            "url": "https://doi.org/10.1016/j.ijhcs.2009.04.002"
+          },
+          {
+            "title": "Rosenholtz, R., Li, Y., and Nakano, L. (2007). Measuring Visual Clutter. Journal of Vision, 7(2), 1-22. doi: https://doi.org/10.1167/7.2.17",
+            "url": "https://doi.org/10.1167/7.2.17"
+          }
+        ],
+        "results": [
+          {
+            "id": "m2_0",
+            "index": 0,
+            "type": "int",
+            "name": "JPEG file size in bytes",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  84198
+                ],
+                "description": "Small",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  84199,
+                  129989
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  129990,
+                  null
+                ],
+                "description": "Large",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          }
+        ]
+      },
+      "m3": {
+        "id": "m3",
+        "name": "Distinct RGB values",
+        "description": "The number of distinct values in the RGB color space after color reduction; only values covering more than five pixels (for desktop) or two pixels (for mobile) are counted.",
+        "evidence": 2,
+        "relevance": 2,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          }
+        ],
+        "results": [
+          {
+            "id": "m3_0",
+            "index": 0,
+            "type": "int",
+            "name": "Number of distinct RGB values",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  2713
+                ],
+                "description": "Colorless",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  2714,
+                  9763
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  9764,
+                  null
+                ],
+                "description": "Colorful",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          }
+        ]
+      },
+      "m4": {
+        "id": "m4",
+        "name": "Contour density",
+        "description": "The ratio of contour pixels to all pixels.",
+        "evidence": 4,
+        "relevance": 3,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          },
+          {
+            "title": "Rosenholtz, R., Li, Y., and Nakano, L. (2007). Measuring Visual Clutter. Journal of Vision, 7(2), 1-22. doi: https://doi.org/10.1167/7.2.17",
+            "url": "https://doi.org/10.1167/7.2.17"
+          }
+        ],
+        "results": [
+          {
+            "id": "m4_0",
+            "index": 0,
+            "type": "float",
+            "name": "Contour density",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  0.0296
+                ],
+                "description": "Sparse",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.0297,
+                  0.0494
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.0495,
+                  1.0
+                ],
+                "description": "Dense",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          }
+        ]
+      },
+      "m5": {
+        "id": "m5",
+        "name": "Figure-ground contrast",
+        "description": "The difference in color or luminance between two adjacent areas.",
+        "evidence": 3,
+        "relevance": 4,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          },
+          {
+            "title": "Reber, R., Wurtz, P., and Zimmermann, T.D. (2004). Exploring \"Fringe\" Consciousness: The Subjective Experience of Perceptual Fluency and its Objective Bases. Consciousness and Cognition, 13(1), 47-60. doi: https://doi.org/10.1016/S1053-8100(03)00049-7",
+            "url": "https://doi.org/10.1016/S1053-8100(03)00049-7"
+          },
+          {
+            "title": "Hall, R.H. and Hanna, P. (2004). The Impact of Web Page Text-Background Colour Combinations on Readability, Retention, Aesthetics and Behavioural Intention. Behaviour & Information Technology, 23(3), 183-195. doi: https://doi.org/10.1080/01449290410001669932",
+            "url": "https://doi.org/10.1080/01449290410001669932"
+          },
+          {
+            "title": "Reber, R., Winkielman, P., and Schwarz, N. (1998). Effects of Perceptual Fluency on Affective Judgments. Psychological Science, 9(1), 45-48. doi: https://doi.org/10.1111/1467-9280.00008",
+            "url": "https://doi.org/10.1111/1467-9280.00008"
+          }
+        ],
+        "results": [
+          {
+            "id": "m5_0",
+            "index": 0,
+            "type": "float",
+            "name": "Figure-ground contrast",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  0.5786
+                ],
+                "description": "Low",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.5787,
+                  0.6855
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.6856,
+                  1.0
+                ],
+                "description": "High",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              }
+            ]
+          }
+        ]
+      },
+      "m6": {
+        "id": "m6",
+        "name": "Contour congestion",
+        "description": "The mental effort needed to differentiate spatially proximal lines.",
+        "evidence": 3,
+        "relevance": 3,
+        "speed": 1,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          },
+          {
+            "title": "van den Berg, R., Cornelissen, F.W., and Roerdink, J.B.T.M. (2009). A Crowding Model of Visual Clutter. Journal of Vision, 9(4):24, 1-11. doi: https://doi.org/10.1167/9.4.24",
+            "url": "https://doi.org/10.1167/9.4.24"
+          },
+          {
+            "title": "Levi, D.M. (2008). Crowding—An Essential Bottleneck for Object Recognition: A Mini-Review. Vision Research, 48(5), 635-654. doi: https://doi.org/10.1016/j.visres.2007.12.009",
+            "url": "https://doi.org/10.1016/j.visres.2007.12.009"
+          },
+          {
+            "title": "Wong, N., carpendale, S., and Greenberg, S. (2003). EdgeLens: An Interactive Method for Managing Edge Congestion in Graphs. In Proceedings of IEEE Symposium on Information Visualization (INFOVIS '03), pp. 51-58. IEEE. doi: https://doi.org/10.1109/INFVIS.2003.1249008",
+            "url": "https://doi.org/10.1109/INFVIS.2003.1249008"
+          }
+        ],
+        "results": [
+          {
+            "id": "m6_0",
+            "index": 0,
+            "type": "float",
+            "name": "Contour congestion",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  0.6033
+                ],
+                "description": "Sparse",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.6034,
+                  0.7112
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.7113,
+                  1.0
+                ],
+                "description": "Congested",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          }
+        ]
+      },
+      "m7": {
+        "id": "m7",
+        "name": "Subband entropy",
+        "description": "Measure the efficiency with which the image can be encoded while maintaining perceptual image quality.",
+        "evidence": 3,
+        "relevance": 3,
+        "speed": 1,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          },
+          {
+            "title": "Rosenholtz, R., Li, Y., and Nakano, L. (2007). Measuring Visual Clutter. Journal of Vision, 7(2), 1-22. doi: https://doi.org/10.1167/7.2.17",
+            "url": "https://doi.org/10.1167/7.2.17"
+          }
+        ],
+        "results": [
+          {
+            "id": "m7_0",
+            "index": 0,
+            "type": "float",
+            "name": "Subband entropy",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  2.7153
+                ],
+                "description": "Good",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  2.7154,
+                  3.4693
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  3.4694,
+                  null
+                ],
+                "description": "Poor",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          }
+        ]
+      },
+      "m8": {
+        "id": "m8",
+        "name": "Feature congestion",
+        "description": "This feature congestion measure of clutter makes use of extensive modeling of what makes items in a display visually salient.",
+        "evidence": 3,
+        "relevance": 3,
+        "speed": 1,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          },
+          {
+            "title": "Rosenholtz, R., Li, Y., and Nakano, L. (2007). Measuring Visual Clutter. Journal of Vision, 7(2), 1-22. doi: https://doi.org/10.1167/7.2.17",
+            "url": "https://doi.org/10.1167/7.2.17"
+          },
+          {
+            "title": "Rosenholtz, R., Li, Y., Jin, Z., and Mansfield, J. (2006). Feature Congestion: A Measure of Visual Clutter. Journal of Vision, 6(6), 827. doi: https://doi.org/10.1167/6.6.827",
+            "url": "https://doi.org/10.1167/6.6.827"
+          }
+        ],
+        "results": [
+          {
+            "id": "m8_0",
+            "index": 0,
+            "type": "float",
+            "name": "Feature congestion",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  3.771
+                ],
+                "description": "Good",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  3.772,
+                  5.5113
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  5.5114,
+                  null
+                ],
+                "description": "Poor",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          },
+          {
+            "id": "m8_1",
+            "index": 1,
+            "type": "b64",
+            "name": "Feature congestion visualization",
+            "description": false
+          }
+        ]
+      },
+      "m9": {
+        "id": "m9",
+        "name": "UMSI (Unified Model of Saliency and Importance)",
+        "description": "The predicted human attention on different design classes and natural images, visualized as a heatmap and heatmap overlay.",
+        "evidence": 4,
+        "relevance": 5,
+        "speed": 1,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Fosco, C., Casser, V., Bedi, A.K., O'Donovan, P., Hertzmann, A., and Bylinskii, Z. (2020). Predicting Visual Importance Across Graphic Design Types. In Proceedings of the 33rd Annual ACM Symposium on User Interface Software and Technology (UIST '20), pp. 249-260. ACM. doi: https://doi.org/10.1145/3379337.3415825",
+            "url": "https://doi.org/10.1145/3379337.3415825"
+          }
+        ],
+        "results": [
+          {
+            "id": "m9_0",
+            "index": 0,
+            "type": "b64",
+            "name": "UMSI prediction heatmap",
+            "description": false
+          },
+          {
+            "id": "m9_1",
+            "index": 1,
+            "type": "b64",
+            "name": "UMSI prediction heatmap overlay",
+            "description": false
+          }
+        ]
+      },
+      "m10": {
+        "id": "m10",
+        "name": "WAVE (Weighted Affective Valence Estimates)",
+        "description": "The mean of a mapping of pixel colors to the color preference values.",
+        "evidence": 3,
+        "relevance": 2,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Palmer, S.E. and Schloss, K.B. (2010). An Ecological Valence Theory of Human Color Preference. Proceedings of the National Academy of Sciences, 107(19), 8877-8882. doi: https://doi.org/10.1073/pnas.0906172107",
+            "url": "https://doi.org/10.1073/pnas.0906172107"
+          }
+        ],
+        "results": [
+          {
+            "id": "m10_0",
+            "index": 0,
+            "type": "float",
+            "name": "Average WAVE score across pixels",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  0.5009
+                ],
+                "description": "Poor",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.5010,
+                  0.6126
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.6127,
+                  1.0
+                ],
+                "description": "Good",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              }
+            ]
+          }
+        ]
+      },
+      "m11": {
+        "id": "m11",
+        "name": "Static clusters",
+        "description": "The number of static 32-sized color clusters; only clusters with more than five values are counted.",
+        "evidence": 2,
+        "relevance": 3,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          }
+        ],
+        "results": [
+          {
+            "id": "m11_0",
+            "index": 0,
+            "type": "int",
+            "name": "Number of static color clusters",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  809
+                ],
+                "description": "Colorless",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  810,
+                  2550
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  2551,
+                  32768
+                ],
+                "description": "Colorful",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          }
+        ]
+      },
+      "m12": {
+        "id": "m12",
+        "name": "Dynamic clusters",
+        "description": "The number of dynamic color clusters after color reduction; only RGB values covering more than five pixels are counted. If a difference between two colors in a color cube is less than or equal to three, two colors are united in the same cluster, which continues recursively for all colors.",
+        "evidence": 3,
+        "relevance": 3,
+        "speed": 1,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          }
+        ],
+        "results": [
+          {
+            "id": "m12_0",
+            "index": 0,
+            "type": "int",
+            "name": "Number of dynamic color clusters",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  132
+                ],
+                "description": "Colorless",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  133,
+                  443
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  444,
+                  null
+                ],
+                "description": "Colorful",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          }
+        ]
+      },
+      "m13": {
+        "id": "m13",
+        "name": "Luminance standard deviation",
+        "description": "The standard deviation of pixel luminance.",
+        "evidence": 3,
+        "relevance": 3,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          }
+        ],
+        "results": [
+          {
+            "id": "m13_0",
+            "index": 0,
+            "type": "float",
+            "name": "Luminance standard deviation",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  56.4449
+                ],
+                "description": "Low",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  56.4450,
+                  85.9416
+                ],
+                "description": "Medium",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  85.9417,
+                  null
+                ],
+                "description": "High",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          }
+        ]
+      },
+      "m14": {
+        "id": "m14",
+        "name": "LAB average and standard deviation",
+        "description": "LAB color space average and standard deviation.",
+        "evidence": 3,
+        "relevance": 2,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Hasler, D. and Suesstrunk, S.E. (2003). Measuring Colorfulness in Natural Images. In Human Vision and Electronic Imaging VIII, 5007, 87-95. SPIE. doi: https://doi.org/10.1117/12.477378",
+            "url": "https://doi.org/10.1117/12.477378"
+          }
+        ],
+        "results": [
+          {
+            "id": "m14_0",
+            "index": 0,
+            "type": "float",
+            "name": "Lightness average",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  61.1937
+                ],
+                "description": "Dark",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  61.1938,
+                  85.945
+                ],
+                "description": "Medium",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  85.946,
+                  100.0
+                ],
+                "description": "Light",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m14_1",
+            "index": 1,
+            "type": "float",
+            "name": "Lightness standard deviation",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  21.203
+                ],
+                "description": "Low",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  21.204,
+                  32.748
+                ],
+                "description": "Medium",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  32.749,
+                  null
+                ],
+                "description": "High",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          },
+          {
+            "id": "m14_2",
+            "index": 2,
+            "type": "float",
+            "name": "A (green-red) average",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  -128.0,
+                  0.1141
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.1142,
+                  3.7987
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  3.7988,
+                  128.0
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m14_3",
+            "index": 3,
+            "type": "float",
+            "name": "A (green-red) standard deviation",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  5.3333
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  5.3334,
+                  12.1716
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  12.1717,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m14_4",
+            "index": 4,
+            "type": "float",
+            "name": "B (blue-yellow) average",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  -128.0,
+                  -2.4527
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  -2.4526,
+                  2.568
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  2.569,
+                  128.0
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m14_5",
+            "index": 5,
+            "type": "float",
+            "name": "B (blue-yellow) standard deviation",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  8.4718
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  8.4719,
+                  17.3737
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  17.3738,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          }
+        ]
+      },
+      "m15": {
+        "id": "m15",
+        "name": "Colorfulness (Hasler and Süsstrunk)",
+        "description": "The colorfulness in natural images.",
+        "evidence": 4,
+        "relevance": 3,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Hasler, D. and Suesstrunk, S.E. (2003). Measuring Colorfulness in Natural Images. In Human Vision and Electronic Imaging VIII, 5007, 87-95. SPIE. doi: https://doi.org/10.1117/12.477378",
+            "url": "https://doi.org/10.1117/12.477378"
+          }
+        ],
+        "results": [
+          {
+            "id": "m15_0",
+            "index": 0,
+            "type": "float",
+            "name": "Colorfulness",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  26.0989
+                ],
+                "description": "Less colorful",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  26.0990,
+                  54.1463
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  54.1464,
+                  null
+                ],
+                "description": "More colorful",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          }
+        ]
+      },
+      "m16": {
+        "id": "m16",
+        "name": "HSV average and standard deviation",
+        "description": "HSV color space average and standard deviation.",
+        "evidence": 3,
+        "relevance": 2,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Hasler, D. and Suesstrunk, S.E. (2003). Measuring Colorfulness in Natural Images. In Human Vision and Electronic Imaging VIII, 5007, 87-95. SPIE. doi: https://doi.org/10.1117/12.477378",
+            "url": "https://doi.org/10.1117/12.477378"
+          }
+        ],
+        "results": [
+          {
+            "id": "m16_0",
+            "index": 0,
+            "type": "float",
+            "name": "Hue average",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  17.4804
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  17.4805,
+                  352.5483
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  352.5484,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m16_1",
+            "index": 1,
+            "type": "float",
+            "name": "Saturation average",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  0.0738
+                ],
+                "description": "Low",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.0739,
+                  0.2468
+                ],
+                "description": "Medium",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.2469,
+                  null
+                ],
+                "description": "High",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          },
+          {
+            "id": "m16_2",
+            "index": 2,
+            "type": "float",
+            "name": "Saturation standard deviation",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  0.1652
+                ],
+                "description": "Low",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.1653,
+                  0.2777
+                ],
+                "description": "Medium",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.2778,
+                  null
+                ],
+                "description": "High",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          },
+          {
+            "id": "m16_3",
+            "index": 3,
+            "type": "float",
+            "name": "Value average",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  0.6448
+                ],
+                "description": "Dark",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.6449,
+                  0.8905
+                ],
+                "description": "Medium",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.8906,
+                  null
+                ],
+                "description": "Light",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m16_4",
+            "index": 4,
+            "type": "float",
+            "name": "Value standard deviation",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  0.1903
+                ],
+                "description": "Low",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.1904,
+                  0.3147
+                ],
+                "description": "Medium",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.3148,
+                  null
+                ],
+                "description": "High",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          }
+        ]
+      },
+      "m17": {
+        "id": "m17",
+        "name": "Distinct values of Hue, Saturation, and Value",
+        "description": "The number of distinct values of Hue, Saturation, and Value in the HSV color space after color reduction; only values covering more than 0.1% of image are counted.",
+        "evidence": 2,
+        "relevance": 2,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Quantification of Interface Visual Complexity. In Proceedings of the 2014 International Working Conference on Advanced Visual Interfaces (AVI '14), pp. 153-160. ACM. doi: https://doi.org/10.1145/2598153.2598173",
+            "url": "https://doi.org/10.1145/2598153.2598173"
+          },
+          {
+            "title": "Hasler, D. and Suesstrunk, S.E. (2003). Measuring Colorfulness in Natural Images. In Human Vision and Electronic Imaging VIII, 5007, 87-95. SPIE. doi: https://doi.org/10.1117/12.477378",
+            "url": "https://doi.org/10.1117/12.477378"
+          }
+        ],
+        "results": [
+          {
+            "id": "m17_0",
+            "index": 0,
+            "type": "int",
+            "name": "Number of distinct Hue values",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  1,
+                  29
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  30,
+                  76
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  77,
+                  255
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m17_1",
+            "index": 1,
+            "type": "int",
+            "name": "Number of distinct Saturation values",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  1,
+                  34
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  35,
+                  131
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  132,
+                  255
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m17_2",
+            "index": 2,
+            "type": "int",
+            "name": "Number of distinct Value values",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  1,
+                  47
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  48,
+                  163
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  164,
+                  255
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          }
+        ]
+      },
+      "m18": {
+        "id": "m18",
+        "name": "NIMA (Neural IMage Assessment)",
+        "description": "The predicted technical and aesthetic qualities of images.",
+        "evidence": 2,
+        "relevance": 2,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Talebi, H. and Milanfar, P. (2018). NIMA: Neural Image Assessment. IEEE Transactions on Image Processing, 27(8), 3998-4011. doi: https://doi.org/10.1109/TIP.2018.2831899",
+            "url": "https://doi.org/10.1109/TIP.2018.2831899"
+          }
+        ],
+        "results": [
+          {
+            "id": "m18_0",
+            "index": 0,
+            "type": "float",
+            "name": "NIMA mean score",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  4.728
+                ],
+                "description": "Poor",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  4.729,
+                  5.8193
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  5.8194,
+                  10.0
+                ],
+                "description": "Good",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              }
+            ]
+          },
+          {
+            "id": "m18_1",
+            "index": 1,
+            "type": "float",
+            "name": "NIMA standard deviation score",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  1.7074
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  1.7075,
+                  1.8683
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  1.8684,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          }
+        ]
+      },
+      "m19": {
+        "id": "m19",
+        "name": "Distinct RGB values per dynamic cluster",
+        "description": "The ratio of distinct RGB values to the number of dynamic clusters.",
+        "evidence": 3,
+        "relevance": 3,
+        "speed": 1,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2014). Visual Impressions of Mobile App Interfaces. In Proceedings of the 8th Nordic Conference on Human-Computer Interaction (NordiCHI '14), pp. 31-40. ACM. doi: https://doi.org/10.1145/2639189.2641219",
+            "url": "https://doi.org/10.1145/2639189.2641219"
+          }
+        ],
+        "results": [
+          {
+            "id": "m19_0",
+            "index": 0,
+            "type": "float",
+            "name": "Ratio of distinct RGB values to the number of dynamic clusters",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  12.2146
+                ],
+                "description": "Low color depth",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  12.2147,
+                  18.5563
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  18.5564,
+                  null
+                ],
+                "description": "High color depth",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          }
+        ]
+      },
+      "m20": {
+        "id": "m20",
+        "name": "Color harmony",
+        "description": "The closest harmonic color scheme and distance to it.",
+        "evidence": 3,
+        "relevance": 3,
+        "speed": 0,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Cohen-Or, D., Sorkine, O., Gal, R., Leyvand, T., and Xu, Y.Q. (2006). Color Harmonization. ACM Transactions on Graphics, 25(3), 624-630. doi: https://doi.org/10.1145/1141911.1141933",
+            "url": "https://doi.org/10.1145/1141911.1141933"
+          }
+        ],
+        "results": [
+          {
+            "id": "m20_0",
+            "index": 0,
+            "type": "float",
+            "name": "Distance to the closest harmonic template",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0.0,
+                  259.2499
+                ],
+                "description": "Good",
+                "icon": [
+                  "far",
+                  "check-circle"
+                ],
+                "judgment": "good"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  259.2500,
+                  3113.7350
+                ],
+                "description": "Fair",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  3113.7351,
+                  null
+                ],
+                "description": "Poor",
+                "icon": [
+                  "fas",
+                  "exclamation-triangle"
+                ],
+                "judgment": "bad"
+              }
+            ]
+          },
+          {
+            "id": "m20_1",
+            "index": 1,
+            "type": "b64",
+            "name": "Harmonized image",
+            "description": "Harmonized image based on the closest harmonic template with minimal changes."
+          },
+          {
+            "id": "m20_2",
+            "index": 2,
+            "type": "b64",
+            "name": "Source and target hues",
+            "description": "The hue histogram of the image before and after harmonization."
+          }
+        ]
+      },
+      "m21": {
+        "id": "m21",
+        "name": "Grid quality",
+        "description": "Grid quality indicates the internal alignment of the various components or identifiable regions of the GUI with respect to each other.",
+        "evidence": 4,
+        "relevance": 4,
+        "speed": 2,
+        "segmentation_required": true,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          },
+          {
+            "title": "Balinsky, H. (2006). Evaluating Interface Aesthetics: Measure of Symmetry. In Digital publishing (Vol. 6076, pp. 52-63). SPIE. doi: https://doi.org/10.1117/12.642120",
+            "url": "https://doi.org/10.1117/12.642120"
+          }
+        ],
+        "results": [
+          {
+            "id": "m21_0",
+            "index": 0,
+            "type": "int",
+            "name": "Number of visual GUI blocks",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  18
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  19,
+                  34
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  35,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m21_1",
+            "index": 1,
+            "type": "int",
+            "name": "Number of visual GUI blocks - without children",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  14
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  15,
+                  28
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  29,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m21_2",
+            "index": 2,
+            "type": "int",
+            "name": "Number of alignment points",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  52
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  53,
+                  87
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  88,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m21_3",
+            "index": 3,
+            "type": "int",
+            "name": "Number of alignment points - without children",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  43
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  44,
+                  77
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  78,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m21_4",
+            "index": 4,
+            "type": "int",
+            "name": "Number of block sizes",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  14
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  15,
+                  22
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  23,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m21_5",
+            "index": 5,
+            "type": "int",
+            "name": "Number of block sizes - without children",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  12
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  13,
+                  19
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  20,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m21_6",
+            "index": 6,
+            "type": "float",
+            "name": "GUI coverage",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  0.0084
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.0085,
+                  0.1366
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.1367,
+                  1
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m21_7",
+            "index": 7,
+            "type": "float",
+            "name": "GUI coverage - without children",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  0.0044
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.0045,
+                  0.1155
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.1156,
+                  1
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m21_8",
+            "index": 8,
+            "type": "int",
+            "name": "Number of vertical block sizes",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  9
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  10,
+                  14
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  15,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          },
+          {
+            "id": "m21_9",
+            "index": 9,
+            "type": "int",
+            "name": "Number of vertical block sizes - without children",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  7
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  8,
+                  11
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  12,
+                  null
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          }
+        ]
+      },
+      "m22": {
+        "id": "m22",
+        "name": "White space",
+        "description": "The proportion of white space.",
+        "evidence": 2,
+        "relevance": 4,
+        "speed": 2,
+        "segmentation_required": true,
+        "references": [
+          {
+            "title": "Miniukovich, A. and De Angeli, A. (2015). Computation of Interface Aesthetics. In Proceedings of the 33rd Annual ACM Conference on Human Factors in Computing Systems (CHI '15), pp. 1163-1172. ACM. doi: https://doi.org/10.1145/2702123.2702575",
+            "url": "https://doi.org/10.1145/2702123.2702575"
+          }
+        ],
+        "results": [
+          {
+            "id": "m22_0",
+            "index": 0,
+            "type": "float",
+            "name": "White space",
+            "description": false,
+            "scores": [
+              {
+                "id": "r1",
+                "range": [
+                  0,
+                  0.3402
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r2",
+                "range": [
+                  0.3403,
+                  0.6366
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              },
+              {
+                "id": "r3",
+                "range": [
+                  0.6367,
+                  1
+                ],
+                "description": "Meaningless",
+                "icon": [
+                  null,
+                  null
+                ],
+                "judgment": "normal"
+              }
+            ]
+          }
+        ]
+      },
+      "m23": {
+        "id": "m23",
+        "name": "Color blindness",
+        "description": "A physiologically-based model for simulation of color vision deficiency.",
+        "evidence": 4,
+        "relevance": 5,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Machado, G.M., Oliveira, M.M., and Fernandes, L.A.F. (2009). A Physiologically-based Model for Simulation of Color Vision Deficiency. IEEE Transactions on Visualization and Computer Graphics, 15(6), 1291-1298. doi: https://doi.org/10.1109/TVCG.2009.113",
+            "url": "https://doi.org/10.1109/TVCG.2009.113"
+          }
+        ],
+        "results": [
+          {
+            "id": "m23_0",
+            "index": 0,
+            "type": "b64",
+            "name": "Protanopia",
+            "description": "Red-green color blindness, lack of Long-wavelength (L, ~red) cone cells in the retina"
+          },
+          {
+            "id": "m23_1",
+            "index": 1,
+            "type": "b64",
+            "name": "Deuteranopia",
+            "description": "Red-green color blindness, lack of Medium-wavelength (M, ~green) cone cells in the retina"
+          },
+          {
+            "id": "m23_2",
+            "index": 2,
+            "type": "b64",
+            "name": "Tritanopia",
+            "description": "Blue-yellow color blindness, lack of Short-wavelength (S, ~blue) cone cells in the retina"
+          }
+        ]
+      },
+      "m24": {
+        "id": "m24",
+        "name": "AIM legacy segmentation",
+        "description": "A GUI element detection tool based on computer vision.",
+        "evidence": 3,
+        "relevance": 3,
+        "speed": 2,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Oulasvirta, A., De Pascale, S., Koch, J., Langerak, T., Jokinen, J.P.P., Todi, K., Laine, M., Kristhombuge, M., Zhu, Y., Miniukovich, A., Palmas, G., and Weinkauf, T. (2018). Aalto Interface Metrics (AIM): A Service and Codebase for Computational GUI Evaluation. In Proceedings of the 31st Annual ACM Symposium on User Interface Software and Technology (UIST'18 Adjunct), pp. 16-19. ACM. doi: https://doi.org/10.1145/3266037.3266087",
+            "url": "https://doi.org/10.1145/3266037.3266087"
+          }
+        ],
+        "results": [
+          {
+            "id": "m24_0",
+            "index": 0,
+            "type": "b64",
+            "name": "AIM legacy segmented image",
+            "description": false
+          }
+        ]
+      },
+      "m25": {
+        "id": "m25",
+        "name": "UIED segmentation",
+        "description": "A GUI element detection toolkit that leverages old-fashioned computer vision algorithms for non-text region extraction, and deep learning models to perform classifications and text detection.",
+        "evidence": 3,
+        "relevance": 3,
+        "speed": 2,
+        "segmentation_required": true,
+        "references": [
+          {
+            "title": "Xie, M., Feng, S., Xing, Z., Chen, J., and Chen, C. (2020). UIED: A Hybrid Tool for GUI Element Detection. In Proceedings of the 28th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE '20), pp. 1655-1659. ACM. doi: https://doi.org/10.1145/3368089.3417940",
+            "url": "https://doi.org/10.1145/3368089.3417940"
+          },
+          {
+            "title": "Chen, J., Xie, M., Xing, Z., Chen, C., Xu, X., Zhu, L., and Li, G. (2020). Object Detection for Graphical User Interface: Old Fashioned or Deep Learning or a Combination? In Proceedings of the 28th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE '20), pp. 1202-1214. ACM. doi: https://doi.org/10.1145/3368089.3409691",
+            "url": "https://doi.org/10.1145/3368089.3409691"
+          }
+        ],
+        "results": [
+          {
+            "id": "m25_0",
+            "index": 0,
+            "type": "b64",
+            "name": "UIED segmented image",
+            "description": false
+          }
+        ]
+      },
+      "m30": {
+        "id": "m30",
+        "name": "MD-EAM (Multi-Duration Element Attention Model)",
+        "description": "The predicted human attention at three viewing durations (0.5, 3, and 5 seconds), visualized as heatmaps and heatmap overlays.",
+        "evidence": 4,
+        "relevance": 5,
+        "speed": 1,
+        "segmentation_required": false,
+        "references": [
+          {
+            "title": "Wang, Y., Bâce, M., and Bulling, A. (2023). Scanpath Prediction on Information Visualisations. IEEE Transactions on Visualization and Computer Graphics, 1-15. doi: https://doi.org/10.1109/TVCG.2023.3242293",
+            "url": "https://doi.org/10.1109/TVCG.2023.3242293"
+          }
+        ],
+        "results": [
+          {
+            "id": "m30_0",
+            "index": 0,
+            "type": "b64",
+            "name": "MD-EAM prediction heatmap at 0.5 seconds",
+            "description": false
+          },
+          {
+            "id": "m30_2",
+            "index": 1,
+            "type": "b64",
+            "name": "MD-EAM prediction heatmap at 3 seconds",
+            "description": false
+          },
+          {
+            "id": "m30_3",
+            "index": 2,
+            "type": "b64",
+            "name": "MD-EAM prediction heatmap at 5 seconds",
+            "description": false
+          },
+          {
+            "id": "m30_4",
+            "index": 3,
+            "type": "b64",
+            "name": "MD-EAM prediction heatmap overlay at 0.5 seconds",
+            "description": false
+          },
+          {
+            "id": "m30_5",
+            "index": 4,
+            "type": "b64",
+            "name": "MD-EAM prediction heatmap overlay at 3 seconds",
+            "description": false
+          },
+          {
+            "id": "m30_6",
+            "index": 5,
+            "type": "b64",
+            "name": "MD-EAM prediction heatmap overlay at 5 seconds",
+            "description": false
+          }
+        ]
+      }
+    }
+  }
+  

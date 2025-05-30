@@ -15,8 +15,8 @@ export async function POST(request) {
       success: true,
       stats: {
         totalErrors: stats.totalErrors,
-        buttonErrors: stats.buttonErrors,
-        textWrapErrors: stats.textWrapErrors,
+        // buttonErrors: stats.buttonErrors,
+        // textWrapErrors: stats.textWrapErrors,
         buttonBorderErrors: stats.buttonBorderErrors,
         wcagErrors: stats.wcagErrors,
         dailyStats: stats.dailyStats

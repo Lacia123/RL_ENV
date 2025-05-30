@@ -6,6 +6,7 @@
 
 import { chromium } from 'playwright-chromium';
 import { renderEightElementToHtml } from './renderEightElementHtml.js';
+import metrics from '../aims/metrics.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -28,9 +29,12 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
     height = 768,
     outputDir = 'output',
     saveHtml = false,
-    takeScreenshot = true,
+    useAims = false,
+    takeScreenshot = false,
     outputPrefix = 'eight-element'
   } = options;
+
+  let score = null;
 
   // 确保输出目录存在
   if ((saveHtml || takeScreenshot) && !fs.existsSync(outputDir)) {
@@ -52,7 +56,7 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
   const layout = convertEightElementToLayout(processedEightElement);
 
   // 使用Playwright进行测量和截图
-  const { measurements, screenshotPath } = await measureWithPlaywright(
+  const { measurements, screenshotPath, aims } = await measureWithPlaywright(
     html,
     processedEightElement,
     {
@@ -60,24 +64,29 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
       height,
       takeScreenshot,
       outputDir,
-      outputPrefix
+      outputPrefix,
+      useAims
     }
   );
 
-  // 仅使用visualSpaceScore模块进行评分
-  const visualSpaceScore = evaluateVisualSpace(measurements, layout);
+  console.log('measurements', measurements);
 
-  // 将visualSpaceScore转换为统一格式
-  const score = {
-    score: visualSpaceScore.score,
-    categories: visualSpaceScore.categories,
-    visualization: visualSpaceScore.visualization,
-    overallRecommendation: visualSpaceScore.overallRecommendation
-  };
+  if (measurements && Object.keys(measurements).length > 0) {
+    // 仅使用visualSpaceScore模块进行评分
+    const visualSpaceScore = evaluateVisualSpace(measurements, layout);
+    // 将visualSpaceScore转换为统一格式
+    score = {
+      score: visualSpaceScore.score,
+      categories: visualSpaceScore.categories,
+      visualization: visualSpaceScore.visualization,
+      overallRecommendation: visualSpaceScore.overallRecommendation
+    };
+  }
 
   return {
     measurements,
     score,
+    aims,
     html,
     processedEightElement,
     outputFiles: {
@@ -98,10 +107,14 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
   const {
     width = 1024,
     height = 768,
-    takeScreenshot = false,
+    useAims = false,
     outputDir = 'output',
-    outputPrefix = 'eight-element'
+    outputPrefix = 'eight-element',
+    takeScreenshot = false
   } = options;
+
+  // 如果需要截图
+  let screenshotPath = null;
 
   // 尝试使用安全选项启动浏览器
   const browser = await chromium.launch({
@@ -124,10 +137,14 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
   // 设置页面内容
   await page.setContent(htmlContent);
 
-  // 注入统一的collectEightElementMeasurements模块到页面上下文
-  // 首先注入辅助函数
-  await page.addScriptTag({
-    content: `
+  let measurements = {}
+  let aims = null;
+
+  if (!useAims) {
+    // 注入统一的collectEightElementMeasurements模块到页面上下文
+    // 首先注入辅助函数
+    await page.addScriptTag({
+      content: `
       function parseStyleValue(value, defaultValue = 0) {
         if (!value || value === 'normal' || value === 'none' || value === 'auto') {
           return defaultValue;
@@ -288,28 +305,23 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
         return measurements;
       };
     `
-  });
-
-  // 使用注入的collectEightElementMeasurements函数收集测量数据
-  const measurements = await page.evaluate(({ processedEightElement, containerDimensions }) => {
-    // 使用注入的全局函数进行测量
-    const measurements = window.collectEightElementMeasurements(processedEightElement, {
-      document: document,
-      dimensions: containerDimensions,
-      getElementById: (id) => document.getElementById(id),
-      getComputedStyle: (el) => window.getComputedStyle(el)
     });
 
-    console.log(`收集了 ${measurements.elements.length} 个元素的测量数据`);
-    return measurements;
-  }, { processedEightElement, containerDimensions: { width, height } });
+    // 使用注入的collectEightElementMeasurements函数收集测量数据
+    measurements = await page.evaluate(({ processedEightElement, containerDimensions }) => {
+      // 使用注入的全局函数进行测量
+      const measurements = window.collectEightElementMeasurements(processedEightElement, {
+        document: document,
+        dimensions: containerDimensions,
+        getElementById: (id) => document.getElementById(id),
+        getComputedStyle: (el) => window.getComputedStyle(el)
+      });
 
-  // 如果需要截图
-  let screenshotPath = null;
-  let aims = null;
-  if (takeScreenshot) {
-    // 确保页面完全渲染
-    await page.waitForTimeout(500);
+      console.log(`收集了 ${measurements.elements.length} 个元素的测量数据`);
+      return measurements;
+    }, { processedEightElement, containerDimensions: { width, height } });
+
+  } else {
 
     // 生成截图路径
     const timestamp = Date.now();
@@ -327,17 +339,10 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
 
     // 调整视口以捕获完整内容
     await page.setViewportSize({
-      // width: width,
-      width: 1300,
+      // aims 审核图片要求宽度必须大于 1300px
+      width: width > 1300 ? width : 1300,
       height: Math.min(pageHeight, 16384) // 设置一个合理的最大高度，避免过大
     });
-
-    // 保存截图
-    // await page.screenshot({
-    //   path: screenshotPath,
-    //   fullPage: true,
-    //   type: 'png'
-    // });
 
     const screenshotBuffer = await page.screenshot({
       fullPage: true,
@@ -347,22 +352,52 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
     // 转换为Base64
     const base64Image = screenshotBuffer.toString('base64');
 
-    const buffer = Buffer.from(base64Image, 'base64');
+    if (takeScreenshot) {
+      const buffer = Buffer.from(base64Image, 'base64');
+      fs.writeFileSync(screenshotPath, buffer);
+      console.log(`截图已保存至: ${screenshotPath}`);
+    }
 
-    // fs.writeFileSync(screenshotPath, buffer);
+    aims = await evaluateImage(base64Image, ["m18", "m10", "m11", "m13", "m15", "m4", "m5", "m21", "m22"], { save_results: false });
 
-    // aims = await evaluateImage(base64Image, ["m1"], { save_results: true });
-
-    console.log(`截图已保存至: ${screenshotPath}`);
+    aims = resolveMetrics(aims);
 
   }
-
-
-  console.log('收集到的元素数量:', measurements.elements.length);
 
   await browser.close();
 
   return { measurements, screenshotPath, aims };
+}
+
+function resolveMetrics(aims) {
+  Object.entries(aims.metrics).forEach(([key, value]) => {
+    if (value.results && value.results.length > 0) {
+      const resultJudgement = [];
+      for (let i = 0; i < value.results.length; i++) {
+        const currentResult = value.results[i];
+        const currentMetric = metrics.metrics[key];
+        const currentMetricResult = currentMetric.results[i];
+        if (currentMetricResult && currentMetricResult.scores && currentMetricResult.scores.length > 0) {
+          for (let j = 0; j < currentMetricResult.scores.length; j++) {
+            const currentScore = currentMetricResult.scores[j];
+            const scoreMin = currentScore.range[0];
+            const scoreMax = currentScore.range[1];
+            if (currentResult >= scoreMin && currentResult <= scoreMax) {
+              resultJudgement.push({
+                score: currentResult,
+                name: currentMetricResult.name,
+                description: currentMetricResult.description,
+                judgment: currentScore.judgment,
+              })
+              break;
+            }
+          }
+        }
+      }
+      value.results = resultJudgement;
+    }
+  })
+  return aims;
 }
 
 export default renderAndEvaluateEightElement;

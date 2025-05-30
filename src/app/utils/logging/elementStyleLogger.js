@@ -89,7 +89,7 @@ async function detectElementStyleIssues(html, dimensions) {
     await page.setContent(html);
 
     // 等待页面渲染完成
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(100);
 
 
     page.on('console', (message) => {
@@ -154,6 +154,31 @@ async function detectElementStyleIssues(html, dimensions) {
         const luminance = 0.2126 * R + 0.7152 * G + 0.0722 * B;
 
         return luminance;
+      }
+      
+
+      function parseGradientColors(cssValue) {
+        // 提取rgb color
+        const colorMatches = cssValue.match(/rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/g);
+  
+        if (!colorMatches) return null;
+                
+        // 解析颜色
+        const colors = colorMatches.map(color => {
+          const values = color.match(/\d+/g).map(Number);
+          return { r: values[0], g: values[1], b: values[2] };
+        });
+
+        if (colors) {
+          // 计算平均颜色
+          return {
+            r: Math.round(colors.reduce((sum, c) => sum + c.r, 0) / colors.length),
+            g: Math.round(colors.reduce((sum, c) => sum + c.g, 0) / colors.length),
+            b: Math.round(colors.reduce((sum, c) => sum + c.b, 0) / colors.length)
+          };
+        }
+        // 没有取到默认黑色
+        return { r: 0, g: 0, b: 0 };
       }
 
       /**
@@ -410,7 +435,6 @@ async function detectElementStyleIssues(html, dimensions) {
         if (firstLayoutChild) {
           const layoutStyle = window.getComputedStyle(firstLayoutChild);
           pageBackgroundColor = parseColor(layoutStyle.backgroundColor);
-          console.log('layoutStyle.backgroundColor', layoutStyle.backgroundColor)
         }
       }
 
@@ -456,10 +480,12 @@ async function detectElementStyleIssues(html, dimensions) {
       buttonElements.forEach((buttonElement, index) => {
         const buttonStyle = window.getComputedStyle(buttonElement);
         const buttonTextColor = parseColor(buttonStyle.color);
-        const buttonBackgroundColor = parseColor(buttonStyle.backgroundColor);
+        const buttonBackgroundColor = parseGradientColors(buttonStyle.background);
 
         const contrastRatio = calculateContrastRatio(buttonTextColor, buttonBackgroundColor);
+
         const evaluation = evaluateWCAGCompliance(contrastRatio, 'text');
+
 
         wcagResults.push({
           type: 'button-text-background',

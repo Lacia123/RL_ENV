@@ -4,7 +4,7 @@ class AIMClient {
     constructor(baseURL = 'http://localhost:8888') {
         this.client = axios.create({
             baseURL: baseURL,
-            timeout: 30000, // 30秒超时
+            timeout: 30000000,
             headers: {
                 'Content-Type': 'application/json'
             }
