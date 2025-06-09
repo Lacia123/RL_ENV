@@ -432,6 +432,7 @@ export const FONT_CONSTANTS = {
   }
 };
 
+
 /**
  * 默认样式配置
  * 配置所有元素类型的样式引用和值
@@ -493,7 +494,7 @@ export const DEFAULT_STYLE_CONFIG = {
       backgroundClip: 'text',
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
-      marginTop: "{dimension.margin.superloose}",
+      // marginTop: "{dimension.margin.superloose}",
       marginBottom: "{dimension.margin.loose}",
       marginLeft: "auto",
       marginRight: "auto",
