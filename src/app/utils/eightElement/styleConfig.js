@@ -539,12 +539,12 @@ export const DEFAULT_STYLE_CONFIG = {
       marginTop: "{dimension.margin.loose}",
       marginBottom: "{dimension.margin.base}",
       position: 'relative',
-      '&::before': {
-        content: "'#'",
-        color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
-        marginRight: "{dimension.gap.tight}",
-        fontWeight: "{font.fontweight.bold}"
-      }
+      // '&::before': {
+      //   content: "'#'",
+      //   color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
+      //   marginRight: "{dimension.gap.tight}",
+      //   fontWeight: "{font.fontweight.bold}"
+      // }
     },
     h4: {
       width: "auto",
