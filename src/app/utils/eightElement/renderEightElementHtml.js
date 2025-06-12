@@ -472,7 +472,7 @@ function processTextElement(processedElement, originalElement) {
 
             // Ensure newlines in original text are treated as <br> or new paragraphs by marked
             preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
-
+            
             processedElement.katexProcessedContent = markedInstance.parse(preppedMarkdown);
         } catch (error) {
             console.error("KaTeX or Marked parsing error for text:", error);

@@ -106,6 +106,39 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
 - **FSV** (FSV = 用户满意度评分 / 每日心流空间交互次数): 衡量美学交互的心流满意度，数值越高表示每次交互带来的用户满意度越高。
 - **FFV** (FFV = 每日心流空间服务总时长 / 每日心流空间交互次数): 衡量意图协同的心流专注值，数值越高表示用户在每次互动时保持的专注度越长。
 - **FEV** (FEV = 每日心流空间服务总次数 / 每日心流空间总时长): 衡量效能跃迁的心流效能值，数值越高表示服务使用效率越高。
+
+1. **高斯定律（Integral Form）**  
+   - 磁场的通量：  
+     $$ \\oint \\mathbf{B} \\cdot d\\mathbf{l} = \\frac{Q_{enc}}{\\varepsilon_0} $$
+
+2. **法拉第电磁感应定律（Integral Form）**  
+   - 电场的旋度等于变化磁场：  
+     $$ \\nabla \\times \\mathbf{E} = -\\frac{\\partial \\mathbf{B}}{\\partial t} $$
+
+3. **安培- Maxwell 恒等式（Integral Form）**  
+   - 磁通量的变化：  
+     $$ \\oint \\mathbf{B} \\cdot d\\mathbf{l} = \\mu_0 I_{enc} + \\mu_0 \\varepsilon_0 \\frac{\\partial \\Phi_E}{\\partial t} $$
+
+4. **高斯率（Divergence Form）**  
+   - 电场的散度等于电荷密度：  
+     $$ \\nabla \\cdot \\mathbf{E} = \\rho_\\text{enc} / \\varepsilon_0 $$
+
+5. **高斯率（Ampère 法则）**  
+   - 磁感应线的旋度等于电流密度加上变化磁场：  
+     $$ \\nabla \\times \\mathbf{B} = \\mu_0 I_{enc} + \\mu_0 \\varepsilon_0 \\frac{\\partial \\mathbf{B}}{\\partial t} $$
+
+6. **高斯率（Divergence Form）**  
+   - 位移场的散度等于自由电荷密度：  
+     $$ \\nabla \\cdot \\mathbf{D} = \\rho_\\text{free} $$
+
+7. **高斯率（Divergence Form）**  
+   - 磁通密度的散度等于变化磁场：  
+     $$ \\nabla \\cdot \\mathbf{B} = 0 $$
+
+8. **高斯率（Integral Form）**  
+   - 电场的环流量等于包围的净电荷量：  
+     $$ \\oint \\mathbf{E} \\cdot d\\mathbf{l} = 4\\pi k_e Q_{enc} $$
+
 `);
   const [seedText, setSeedText] = useState(''); // 用于存储JSON文本
   const [seed, setSeed] = useState({

@@ -499,16 +499,16 @@ export const DEFAULT_STYLE_CONFIG = {
       marginLeft: "auto",
       marginRight: "auto",
       position: 'relative',
-      '&::after': {
-        content: "''",
-        position: 'absolute',
-        bottom: '0',
-        left: '0',
-        width: '60px',
-        height: '4px',
-        background: CSS_VARIABLE_SYSTEM.GRADIENT.PRIMARY,
-        borderRadius: "{dimension.borderradius.large}"
-      }
+      // '&::after': {
+      //   content: "''",
+      //   position: 'absolute',
+      //   bottom: '0',
+      //   left: '0',
+      //   width: '60px',
+      //   height: '4px',
+      //   background: CSS_VARIABLE_SYSTEM.GRADIENT.PRIMARY,
+      //   borderRadius: "{dimension.borderradius.large}"
+      // }
     },
     h2: {
       width: "100%",

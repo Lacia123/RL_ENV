@@ -82,12 +82,24 @@ function processText(text) {
     const preparedText = prepareMarkdownForKatex(text);
 
     // 使用markedInstance处理Markdown和KaTeX
-    return markedInstance.parse(preparedText);
+
+    const parseResult = markedInstance.parse(preparedText)
+
+    if (parseResult.includes('class="katex-error"')) {
+
+      const titleMatch = parseResult.match(/title="([^"]*)"/);
+      const errorMessage = titleMatch ? titleMatch[1] : null;
+      console.error('KaTeX解析错误:', errorMessage);
+      
+    } else {
+      return parseResult
+    }
+  
   } catch (error) {
     console.error("处理文本时出错:", error);
     // 出错时提供友好消息并转义原文本
-    const errorMessage = `<span style="color:red;">公式或Markdown解析错误: ${escapeHtml(error.message)}</span>`;
-    return errorMessage + escapeHtml(text).replace(/\\n/g, '<br>');
+    // const errorMessage = `<span style="color:red;">公式或Markdown解析错误: ${escapeHtml(error.message)}</span>`;
+    // return errorMessage + escapeHtml(text).replace(/\\n/g, '<br>');
   }
 }
 
@@ -1880,18 +1892,53 @@ function isMarkdownTable(lines) {
   return isData && !isChart;
 }
 
+function processMarkdownWithMathProtection(markdown) {
+  // 第一步：提取并保护数学公式
+  const mathBlocks = [];
+  let mathIndex = 0;
+  
+  // 提取行内数学公式 $...$（非贪婪匹配，避免跨行）
+  let processedMarkdown = markdown.replace(/\$([^$\n]+?)\$/g, (match) => {
+      const placeholder = `§MATH_INLINE_${mathIndex}§`;
+      mathBlocks[mathIndex] = match;
+      mathIndex++;
+      return placeholder;
+  });
+  
+  // 提取块级数学公式 $$...$$（可以跨行）
+  processedMarkdown = processedMarkdown.replace(/\$\$([\s\S]*?)\$\$/g, (match) => {
+      const placeholder = `§MATH_BLOCK_${mathIndex}§`;
+      mathBlocks[mathIndex] = match;
+      mathIndex++;
+      return placeholder;
+  });
+  
+  // 第二步：规范化换行符
+  const normalizedMarkdown = processedMarkdown.replace(/\r\n/g, '\n');
+  
+  // 第三步：处理段落分隔符（现在数学公式已经被保护了）
+  const paragraphProcessed = normalizedMarkdown
+      .replace(/\n\n+/g, '\n§PARAGRAPH§\n')  // 标记段落分隔符
+      .replace(/\\n\\n+/g, '\n§PARAGRAPH§\n')
+      .replace(/\\n/g, '\n');
+  
+  // 第四步：还原数学公式
+  let result = paragraphProcessed;
+  for (let i = 0; i < mathBlocks.length; i++) {
+      result = result.replace(`§MATH_INLINE_${i}§`, mathBlocks[i]);
+      result = result.replace(`§MATH_BLOCK_${i}§`, mathBlocks[i]);
+  }
+  
+  return result;
+}
+
 // 改进Markdown解析功能，支持列表和富文本
 function parseMarkdown(markdown) {
   // 首先规范化换行符处理
   // 把所有的\r\n转换为\n
   const normalizedMarkdown = markdown.replace(/\r\n/g, '\n');
 
-  // 在分割之前，在Markdown中保留空行标记，以便在解析时使用
-  // 用特殊标记替换连续的空行
-  const processedMarkdown = normalizedMarkdown
-    .replace(/\n\n+/g, '\n§PARAGRAPH§\n')  // 标记段落分隔符
-    .replace(/\\n\\n+/g, '\n§PARAGRAPH§\n')
-    .replace(/\\n/g, '\n');
+  const processedMarkdown = processMarkdownWithMathProtection(normalizedMarkdown);
 
   // 分割Markdown文本为行（保留空行标记）
   const lines = processedMarkdown.split('\n');
