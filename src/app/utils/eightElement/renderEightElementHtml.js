@@ -213,6 +213,7 @@ function generateCSSFromClassStyles(classStyles) {
 }
 
 function generateStyleProperties(styleObj) {
+    console.log('styleObj', styleObj);
     let css = '';
     Object.entries(styleObj).forEach(([property, value]) => {
         if (value === null || value === undefined) return;
@@ -292,7 +293,6 @@ function preProcessEightElement(element) {
 
     // 处理表格元素
     else if (element.name === 'table') {
-        console.log('processTable')
         processTableElement(processedElement, element);
     }
 
@@ -325,6 +325,8 @@ function processStyleReferences(processedElement, originalElement, styleConfig) 
 
     // 遍历所有样式属性，处理引用关系
     Object.entries(styleConfig).forEach(([key, value]) => {
+
+
         // 处理对象引用格式
         if (value && typeof value === 'object' && value.element) {
             const { element, value: refValue, prop, token } = value;
@@ -352,6 +354,8 @@ function processStyleReferences(processedElement, originalElement, styleConfig) 
                         styleValue = refData.content;
                     }
 
+                    
+                    // FOCUS: 这里没有 background 的解析
                     // 应用样式值
                     if (styleValue) {
                         styleValue = resolveToken(styleValue) || styleValue;
@@ -567,7 +571,6 @@ function processImageElement(processedElement, originalElement) {
  * @param {Object} originalElement - 原始元素
  */
 function processTableElement(processedElement, originalElement) {
-    console.log('processTableElement', processedElement, originalElement);
     // 保留原始的Markdown表格内容
     processedElement.rawData = originalElement.rawData || '';
 

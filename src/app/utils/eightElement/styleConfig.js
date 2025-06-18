@@ -324,7 +324,6 @@ export const LAYOUT_CONSTANTS = {
 // 颜色常量定义
 export const COLOR_CONSTANTS = {
   PRIMARY: {
-    // SECONDARY1: "" // tODO, 
     BRAND3: "{color.primary.brand3}",
     BRAND4: "{color.primary.brand4}",
     BRAND5: "{color.primary.brand5}", // 按钮
@@ -474,141 +473,171 @@ export const DEFAULT_STYLE_CONFIG = {
   text: {
     // 正文文本
     normal: {
-      fontSizes: "{font.size.medium}",
+      fontSize: "{font.size.medium}",
       fontWeight: "400",
       lineHeight: "1.7",
       letterSpacing: "{font.letterspacing.base}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76,
+      color: "{color.onsurface.black76}",
       marginBottom: "{dimension.margin.base}",
       textAlign: "justify",
-      textJustify: "inter-word",
+      textJustify: "inter-word"
     },
     // 标题文本（h1 - h6）
     h1: {
       width: "auto",
-      fontSizes: "{font.size.xxxl}",
+      fontSize: "{font.size.xxxl}",
       fontWeight: "{font.fontweight.bold}",
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
-      background: CSS_VARIABLE_SYSTEM.GRADIENT.TEXT_HERO,
-      backgroundClip: 'text',
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
+      color: "{color.onsurface.black88}",
       // marginTop: "{dimension.margin.superloose}",
       marginBottom: "{dimension.margin.loose}",
       marginLeft: "auto",
       marginRight: "auto",
       position: 'relative',
-      // '&::after': {
-      //   content: "''",
-      //   position: 'absolute',
-      //   bottom: '0',
-      //   left: '0',
-      //   width: '60px',
-      //   height: '4px',
-      //   background: CSS_VARIABLE_SYSTEM.GRADIENT.PRIMARY,
-      //   borderRadius: "{dimension.borderradius.large}"
-      // }
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      '&::after': {
+        content: "''",
+        position: 'absolute',
+        bottom: '-8px',
+        left: '0',
+        width: '60px',
+        height: '4px',
+        background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.secondary.violet5} 100%)`,
+        borderRadius: "{dimension.borderradius.large}"
+      }
     },
     h2: {
       width: "100%",
-      fontSizes: "{font.size.xxl}",
+      fontSize: "{font.size.xxl}",
       fontWeight: "{font.fontweight.bold}",
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK88,
+      color: "{color.onsurface.black88}",
       marginTop: "{dimension.margin.extraloose}",
       marginBottom: "{dimension.margin.base}",
-      paddingTop: "{dimension.padding.base}",
-      paddingBottom: "{dimension.padding.base}",
-      paddingLeft: "{dimension.padding.semiloose}",
-      paddingRight: "{dimension.padding.semiloose}",
-      borderLeft: `4px solid ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5}`,
-      background: `linear-gradient(90deg, ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_CONTAINER_BRAND1} 0%, transparent 100%)`,
+      padding: "{dimension.padding.base} {dimension.padding.semiloose}",
+      borderLeft: `4px solid {color.primary.brand5}`,
+      background: `linear-gradient(90deg, {color.primarycontainer.brand1} 0%, transparent 100%)`,
       borderRadius: "{dimension.borderradius.small}",
       boxShadow: "{material.hierarchy.main}"
     },
     h3: {
       width: "auto",
       display: "flex",
-      fontSizes: "{font.size.xl}",
+      fontSize: "{font.size.xl}",
       fontWeight: "{font.fontweight.semibold}",
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76,
+      color: "{color.onsurface.black76}",
       marginTop: "{dimension.margin.loose}",
       marginBottom: "{dimension.margin.base}",
       position: 'relative',
-      // '&::before': {
-      //   content: "'#'",
-      //   color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
-      //   marginRight: "{dimension.gap.tight}",
-      //   fontWeight: "{font.fontweight.bold}"
-      // }
+      '&::before': {
+        content: "'#'",
+        color: "{color.primary.brand5}",
+        marginRight: "{dimension.gap.tight}",
+        fontWeight: "{font.fontweight.bold}"
+      }
     },
     h4: {
       width: "auto",
-      fontSizes: "{font.size.large}",
+      fontSize: "{font.size.large}",
       fontWeight: "{font.fontweight.semibold}",
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76,
+      color: "{color.onsurface.black76}",
       marginTop: "{dimension.margin.semiloose}",
       marginBottom: "{dimension.margin.tight}",
       textTransform: "capitalize",
       paddingBottom: "{dimension.padding.extratight}",
-      borderBottom: `2px solid ${CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK12}`
+      borderBottom: `2px solid {color.surfacecontainer.black12}`
     },
     h5: {
       width: "auto",
-      fontSizes: "{font.size.medium}",
+      fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.semibold}",
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK64,
+      color: "{color.onsurface.black64}",
       marginTop: "{dimension.margin.base}",
       marginBottom: "{dimension.margin.tight}",
       textDecoration: "underline",
-      textDecorationColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_CONTAINER_BRAND2,
+      textDecorationColor: "{color.primarycontainer.brand2}",
       textUnderlineOffset: "4px"
     },
     h6: {
       width: "auto",
-      fontSizes: "{font.size.small}",
+      display: "inline-block",
+      fontSize: "{font.size.small}",
       fontWeight: "{font.fontweight.medium}",
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK48,
+      color: "{color.onsurface.black48}",
       marginTop: "{dimension.margin.base}",
       marginBottom: "{dimension.margin.tight}",
       textTransform: "uppercase",
       letterSpacing: "1px",
-      background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK4,
-      paddingTop: "{dimension.padding.supertight}",
-      paddingBottom: "{dimension.padding.supertight}",
-      paddingLeft: "{dimension.padding.tight}",
-      paddingRight: "{dimension.padding.tight}",
-      borderRadius: "{dimension.borderradius.xs}",
-      display: "inline-block"
+      background: "{color.surfacecontainer.black4}",
+      padding: "{dimension.padding.supertight} {dimension.padding.tight}",
+      borderRadius: "{dimension.borderradius.xs}"
+    },
+
+    // 小字说明，TODO: 需要确定解析关系
+    caption: {
+      fontSize: "{font.size.small}",
+      fontWeight: "400",
+      lineHeight: "{font.lineheight.base}",
+      letterSpacing: "{font.letterspacing.base}",
+      color: "{color.onsurface.black48}",
+      fontStyle: "italic",
+      textAlign: "center",
+      marginTop: "{dimension.margin.tight}",
+      marginBottom: "{dimension.margin.base}",
+      background: "{color.surfacecontainer.black4}",
+      padding: "{dimension.padding.tight} {dimension.padding.base}",
+      borderRadius: "{dimension.borderradius.small}"
+    },
+
+    // 引用文本，TODO: 需要确定解析关系
+    quote: {
+      fontSize: "{font.size.large}",
+      fontWeight: "400",
+      lineHeight: "1.6",
+      letterSpacing: "{font.letterspacing.base}",
+      color: "{color.onsurface.black76}",
+      fontStyle: 'italic',
+      padding: "{dimension.padding.loose} {dimension.padding.extraloose}",
+      margin: "{dimension.margin.loose} 0",
+      background: "{color.surface.grey1}",
+      borderLeft: `6px solid {color.primary.brand4}`,
+      borderRadius: "{dimension.borderradius.medium}",
+      boxShadow: "{material.hierarchy.1f}",
+      position: 'relative',
+      '&::before': {
+        content: '"""',
+        fontSize: '3rem',
+        color: "{color.primarycontainer.brand2}",
+        position: 'absolute',
+        top: '-10px',
+        left: '20px',
+        fontFamily: 'serif'
+      }
     },
 
     // 代码块  
     codeBlock: {
-      fontSizes: "{font.size.small}",
+      fontSize: "{font.size.small}",
       fontWeight: "400",
       fontFamily: "'Fira Code', 'Monaco', 'Cascadia Code', monospace",
       lineHeight: "1.5",
-      backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_WHITE88,
-      paddingTop: "{dimension.padding.loose}",
-      paddingBottom: "{dimension.padding.loose}",
-      paddingLeft: "{dimension.padding.extraloose}",
-      paddingRight: "{dimension.padding.extraloose}",
+      color: "{color.onsurface.white88}",
+      backgroundColor: "#FFF",
+      padding: "{dimension.padding.loose} {dimension.padding.extraloose}",
       marginTop: "{dimension.margin.base}",
       marginBottom: "{dimension.margin.base}",
       borderRadius: "{dimension.borderradius.large}",
-      borderWidth: "{dimension.borderwidth.narrow}",
-      borderStyle: "solid",
-      borderColor: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_CONTAINER_GREY7,
+      border: `{dimension.borderwidth.narrow} solid {color.onsurfacecontainer.grey7}`,
       boxShadow: "{material.hierarchy.2f}",
       overflow: 'auto',
       position: 'relative',
@@ -620,60 +649,74 @@ export const DEFAULT_STYLE_CONFIG = {
         width: '12px',
         height: '12px',
         borderRadius: '50%',
-        backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.WARNING_ORANGE5,
-        boxShadow: `24px 0 0 ${CSS_VARIABLE_SYSTEM.COLOR.WARNING_ORANGE6}, 48px 0 0 ${CSS_VARIABLE_SYSTEM.COLOR.SUCCESS_GREEN5}`
+        backgroundColor: "{color.warning.orange5}",
+        boxShadow: `24px 0 0 {color.warning.orange6}, 48px 0 0 {color.success.green5}`
       }
     },
 
-    // 超链接文本
+    // 超链接文本 TODO: 超链接样式暂不支持，因为超链接会被解析成按钮
     hyperlink: {
-      "textColor": COLOR_CONSTANTS.BASIC.LIGHT_BLUE[5],
-      "fill": "none",
-      "fontSizes": FONT_CONSTANTS.SIZE.LARGE
+      fontSize: "inherit",
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.primary.brand5}",
+      textDecoration: 'none',
+      borderBottom: '2px solid transparent',
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      '&:hover': {
+        color: "{color.primary.brand6}",
+        borderBottomColor: "{color.primarycontainer.brand2}",
+        textDecoration: "none"
+      },
+      '&:active': {
+        color: "{color.onprimarycontainer.brand8}"
+      }
+    },
+
+    // 强调文本, TODO：需要确定解析关系 
+    emphasis: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onsurface.black88}",
+      background: "{color.primarycontainer.brand1}",
+      padding: "{dimension.padding.supertight} {dimension.padding.extratight}",
+      borderRadius: "{dimension.borderradius.xs}",
+      boxShadow: "{material.hierarchy.B1}"
     }
   },
 
-  // 数学公式元素配置
+  // ==================== 数学公式元件 ==================== (新增)
   math: {
     // 行内公式
     inline: {
-      fontSizes: "1.1em"
+      fontSizes: "1.1em",
+      color: "{color.onsurface.black88}",
+      verticalAlign: "baseline"
     },
     // 块级公式
     display: {
-      marginTop: "{dimension.margin.loose}",
-      marginBottom: "{dimension.margin.loose}",
-      marginLeft: 0,
-      marginRight: 0,
+      margin: "{dimension.margin.loose} 0",
       padding: "{dimension.padding.base}",
-      background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_GREY1,
+      background: "{color.surface.grey1}",
       borderRadius: "{dimension.borderradius.medium}",
-      borderLeftWidth: "{dimension.borderwidth.wide}",
-      borderLeftColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
-      borderLeftStyle: "solid",
-      boxShadow: "{material.hierarchy.main}"
+      borderLeft: `{dimension.borderwidth.wide} solid {color.secondary.violet4}`,
+      boxShadow: "{material.hierarchy.main}",
+      textAlign: "center"
     }
   },
   chart: {
     // 图表容器  
     container: {
-      marginTop: "{dimension.margin.loose}",
-      marginBottom: "{dimension.margin.loose}",
-      marginLeft: "0",
-      marginRight: "0",
+      margin: "{dimension.margin.loose} 0",
       padding: "{dimension.padding.extraloose}",
-      background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_WHITE100,
+      background: "{color.surfacecontainer.white100}",
       borderRadius: "{dimension.borderradius.xl}",
       boxShadow: "{material.hierarchy.2f}",
-      borderWidth: "{dimension.borderwidth.narrow}",
-      borderStyle: "solid",
-      borderColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK12,
+      border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`
     },
     // 图表标题
     title: {
       fontSize: "{font.size.large}",
       fontWeight: "{font.fontweight.semibold}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK88,
+      color: "{color.onsurface.black88}",
       marginBottom: "{dimension.margin.base}",
       textAlign: 'center'
     },
@@ -681,7 +724,7 @@ export const DEFAULT_STYLE_CONFIG = {
     legend: {
       fontSize: "{font.size.small}",
       fontWeight: "400",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK64,
+      color: "{color.onsurface.black64}",
       display: 'flex',
       justifyContent: 'center',
       gap: "{dimension.gap.loose}",
@@ -691,7 +734,7 @@ export const DEFAULT_STYLE_CONFIG = {
     axis: {
       fontSize: "{font.size.tiny}",
       fontWeight: "400",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK48
+      color: "{color.onsurface.black48}"
     },
   },
   // 表格元素配置
@@ -700,52 +743,40 @@ export const DEFAULT_STYLE_CONFIG = {
     container: {
       width: '100%',
       borderCollapse: 'collapse',
-      marginTop: "{dimension.margin.loose}",
-      marginBottom: "{dimension.margin.loose}",
-      marginLeft: "0",
-      marginRight: "0",
-      background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_WHITE100,
+      margin: "{dimension.margin.loose} 0",
+      background: "{color.surfacecontainer.white100}",
       borderRadius: "{dimension.borderradius.large}",
       overflow: 'hidden',
-      boxShadow: "{material.hierarchy.1f}"
+      boxShadow: "{material.hierarchy.1f}",
+      border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`
     },
     th: {
-      background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_GREY1,
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK88,
+      background: "{color.surface.grey1}",
+      color: "{color.onsurface.black88}",
       fontWeight: "{font.fontweight.semibold}",
       fontSize: "{font.size.small}",
-      paddingTop: "{dimension.padding.base}",
-      paddingBottom: "{dimension.padding.base}",
-      paddingLeft: "{dimension.padding.semiloose}",
-      paddingRight: "{dimension.padding.semiloose}",
+      padding: "{dimension.padding.base} {dimension.padding.semiloose}",
       textAlign: 'left',
-      borderBottomWidth: "{dimension.borderwidth.base}",
-      borderBottomStyle: "solid",
-      borderBottomColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK20
+      borderBottom: `{dimension.borderwidth.base} solid {color.surfacecontainer.black20}`,
+      textTransform: 'uppercase',
+      letterSpacing: '0.5px'
     },
     td: {
       fontSize: "{font.size.medium}",
-      paddingTop: "{dimension.padding.base}",
-      paddingBottom: "{dimension.padding.base}",
-      paddingLeft: "{dimension.padding.semiloose}",
-      paddingRight: "{dimension.padding.semiloose}",
-      borderBottomWidth: "{dimension.borderwidth.narrow}",
-      borderBottomStyle: "solid",
-      borderBottomColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK12,
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76
+      padding: "{dimension.padding.base} {dimension.padding.semiloose}",
+      color: "{color.onsurface.black76}",
+      verticalAlign: 'top'
     },
     // 表格行  
     tr: {
-      borderBottomWidth: "{dimension.borderwidth.narrow}",
-      borderBottomStyle: "solid",
-      borderBottomColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK12,
+      borderBottom: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
       '&:hover': {
-        background: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_GREY0
+        background: "{color.surface.grey0}"
       },
       '&:last-child': {
         borderBottom: "{dimension.borderwidth.none}"
-      }
+      },
     }
   },
 
@@ -753,16 +784,13 @@ export const DEFAULT_STYLE_CONFIG = {
   button: {
     // 主要按钮  
     primary: {
-      fontSizes: "{font.size.medium}",
+      fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.semibold}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_PRIMARY_WHITE100,
-      background: CSS_VARIABLE_SYSTEM.GRADIENT.PRIMARY,
+      color: "{color.onprimary.white100}",
+      background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.primary.brand6} 100%)`,
       border: "{dimension.borderwidth.none}",
       borderRadius: "{dimension.borderradius.large}",
-      paddingLeft: "{dimension.padding.base}",
-      paddingRight: "{dimension.padding.base}",
-      paddingTop: "{dimension.padding.base}",
-      paddingBottom: "{dimension.padding.base}",
+      padding: "{dimension.padding.base} {dimension.padding.extraloose}",
       cursor: 'pointer',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       boxShadow: "{material.hierarchy.2f}",
@@ -774,24 +802,21 @@ export const DEFAULT_STYLE_CONFIG = {
       margin: "{dimension.margin.tight}",
       '&:hover': {
         transform: 'translateY(-2px)',
-        boxShadow: "{material.hierarchy.4f}"
+        boxShadow: "{material.hierarchy.4f}",
+        background: `linear-gradient(135deg, {color.primary.brand5} 0%, {color.onprimarycontainer.brand7} 100%)`
       }
     },
-    // 次要按钮  
+
+    // 次要按钮  TODO: 需要确定解析的权重
     secondary: {
-      fontSizes: "{font.size.medium}",
+      fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.semibold}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.SECONDARY_VIOLET6,
-      backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.SECONDARY_CONTAINER_VIOLET1,
+      color: "{color.secondary.violet6}",
+      backgroundColor: "{color.secondarycontainer.violet1}",
       background: 'none',
-      borderWidth: "{dimension.borderwidth.base}",
-      borderStyle: "solid",
-      borderColor: CSS_VARIABLE_SYSTEM.COLOR.SECONDARY_VIOLET4,
+      border: `{dimension.borderwidth.base} solid {color.secondary.violet4}`,
       borderRadius: "{dimension.borderradius.large}",
-      paddingTop: "{dimension.padding.base}",
-      paddingBottom: "{dimension.padding.base}",
-      paddingLeft: "{dimension.padding.extraloose}",
-      paddingRight: "{dimension.padding.extraloose}",
+      padding: "{dimension.padding.base} {dimension.padding.extraloose}",
       cursor: 'pointer',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       boxShadow: "{material.hierarchy.main}",
@@ -802,24 +827,22 @@ export const DEFAULT_STYLE_CONFIG = {
       gap: "{dimension.gap.tight}",
       margin: "{dimension.margin.tight}",
       '&:hover': {
-        backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.SECONDARY_CONTAINER_VIOLET2,
-        color: CSS_VARIABLE_SYSTEM.COLOR.ON_SECONDARY_CONTAINER_VIOLET8,
+        backgroundColor: "{color.secondarycontainer.violet2}",
+        color: "{color.onsecondarycontainer.violet8}",
         transform: 'translateY(-1px)',
         boxShadow: "{material.hierarchy.2f}"
       }
     },
-    // 成功按钮  
+
+    // 成功按钮 TODO：需要确定解析的规则
     success: {
-      fontSizes: "{font.size.medium}",
+      fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.semibold}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_PRIMARY_WHITE100,
-      background: CSS_VARIABLE_SYSTEM.GRADIENT.SUCCESS,
+      color: "{color.onprimary.white100}",
+      background: `linear-gradient(135deg, {color.success.green4} 0%, {color.success.green6} 100%)`,
       border: "{dimension.borderwidth.none}",
       borderRadius: "{dimension.borderradius.large}",
-      paddingTop: "{dimension.padding.base}",
-      paddingBottom: "{dimension.padding.base}",
-      paddingLeft: "{dimension.padding.extraloose}",
-      paddingRight: "{dimension.padding.extraloose}",
+      padding: "{dimension.padding.base} {dimension.padding.extraloose}",
       cursor: 'pointer',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       boxShadow: "{material.hierarchy.1f}",
@@ -831,22 +854,20 @@ export const DEFAULT_STYLE_CONFIG = {
       margin: "{dimension.margin.tight}",
       '&:hover': {
         transform: 'translateY(-1px)',
-        boxShadow: "{material.hierarchy.3f}"
+        boxShadow: "{material.hierarchy.3f}",
+        background: `linear-gradient(135deg, {color.success.green5} 0%, {color.success.green7} 100%)`
       }
     },
 
-    // 警告按钮  
+    // 警告按钮 TODO: 需要确定解析的规则
     warning: {
-      fontSizes: "{font.size.medium}",
+      fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.semibold}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_PRIMARY_WHITE100,
-      background: CSS_VARIABLE_SYSTEM.GRADIENT.WARNING,
+      color: "{color.onprimary.white100}",
+      background: `linear-gradient(135deg, {color.warning.orange4} 0%, {color.warning.orange6} 100%)`,
       border: "{dimension.borderwidth.none}",
       borderRadius: "{dimension.borderradius.large}",
-      paddingTop: "{dimension.padding.base}",
-      paddingBottom: "{dimension.padding.base}",
-      paddingLeft: "{dimension.padding.extraloose}",
-      paddingRight: "{dimension.padding.extraloose}",
+      padding: "{dimension.padding.base} {dimension.padding.extraloose}",
       cursor: 'pointer',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       boxShadow: "{material.hierarchy.1f}",
@@ -858,22 +879,45 @@ export const DEFAULT_STYLE_CONFIG = {
       margin: "{dimension.margin.tight}",
       '&:hover': {
         transform: 'translateY(-1px)',
-        boxShadow: "{material.hierarchy.3f}"
+        boxShadow: "{material.hierarchy.3f}",
+        background: `linear-gradient(135deg, {color.warning.orange5} 0%, {color.warning.orange7} 100%)`
       }
     },
 
-    // 透明按钮  
+    // 错误按钮 TODO: 需要确定解析的规则
+    error: {
+      fontSize: "{font.size.medium}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onprimary.white100}",
+      background: `linear-gradient(135deg, {color.error.red4} 0%, {color.error.red6} 100%)`,
+      border: "{dimension.borderwidth.none}",
+      borderRadius: "{dimension.borderradius.large}",
+      padding: "{dimension.padding.base} {dimension.padding.extraloose}",
+      cursor: 'pointer',
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      boxShadow: "{material.hierarchy.1f}",
+      textDecoration: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: "{dimension.gap.tight}",
+      margin: "{dimension.margin.tight}",
+      '&:hover': {
+        transform: 'translateY(-1px)',
+        boxShadow: "{material.hierarchy.3f}",
+        background: `linear-gradient(135deg, {color.error.red5} 0%, {color.error.red7} 100%)`
+      }
+    },
+
+    // 透明按钮 TODO: 需要确定解析的规则
     ghost: {
-      fontSizes: "{font.size.medium}",
+      fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.medium}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
+      color: "{color.primary.brand5}",
       backgroundColor: "transparent",
       border: "{dimension.borderwidth.none}",
       borderRadius: "{dimension.borderradius.medium}",
-      paddingTop: "{dimension.padding.tight}",
-      paddingBottom: "{dimension.padding.tight}",
-      paddingLeft: "{dimension.padding.base}",
-      paddingRight: "{dimension.padding.base}",
+      padding: "{dimension.padding.tight} {dimension.padding.base}",
       cursor: 'pointer',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
       textDecoration: 'none',
@@ -882,23 +926,20 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyContent: 'center',
       gap: "{dimension.gap.tight}",
       '&:hover': {
-        backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_CONTAINER_BRAND1,
-        color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6,
+        backgroundColor: "{color.primarycontainer.brand1}",
+        color: "{color.primary.brand6}",
         boxShadow: "{material.hierarchy.B1}"
       }
     },
 
-    // 链接按钮  
+    // 链接按钮  TODO: 需要确定解析的规则
     link: {
-      fontSizes: "{font.size.medium}",
+      fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.medium}",
-      color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
+      color: "{color.primary.brand5}",
       backgroundColor: "transparent",
       border: "{dimension.borderwidth.none}",
-      paddingTop: "{dimension.padding.extratight}",
-      paddingBottom: "{dimension.padding.extratight}",
-      paddingLeft: "{dimension.padding.tight}",
-      paddingRight: "{dimension.padding.tight}",
+      padding: "{dimension.padding.extratight} {dimension.padding.tight}",
       cursor: 'pointer',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
       textDecoration: "underline",
@@ -908,8 +949,8 @@ export const DEFAULT_STYLE_CONFIG = {
       alignItems: 'center',
       gap: "{dimension.gap.tight}",
       '&:hover': {
-        color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6,
-        textDecorationColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_CONTAINER_BRAND2
+        color: "{color.primary.brand6}",
+        textDecorationColor: "{color.primarycontainer.brand2}"
       }
     },
   },
@@ -920,46 +961,46 @@ export const DEFAULT_STYLE_CONFIG = {
     unordered: {
       paddingLeft: "{dimension.padding.loose}",
       marginBottom: "{dimension.margin.base}",
-      fontSizes: "{font.size.medium}",
+      fontSize: "{font.size.medium}",
       lineHeight: "1.6",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76,
+      color: "{color.onsurface.black76}",
       marginBottom: "{dimension.margin.tight}",
       position: 'relative',
       '&::before': {
         content: "'•'",
-        color: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
+        color: "{color.primary.brand5}",
         fontSize: '1.2em',
         position: 'absolute',
-        top: '-4px',
+        top: '-3px',
         left: '0px'
       }
     },
 
-    // 有序列表 
+    // 有序列表 TODO: 目前无法应用有序列表样式，因为八要素解析成 html，不是标准的 <ol> 标签
     ordered: {
       paddingLeft: "{dimension.padding.loose}",
       marginBottom: "{dimension.margin.base}",
       counterReset: 'list-counter',
-      fontSizes: "{font.size.medium}",
+      fontSize: "{font.size.medium}",
       lineHeight: "1.6",
-      color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76,
+      color: "{color.onsurface.black76}",
       marginBottom: "{dimension.margin.tight}",
       position: 'relative',
       counterIncrement: 'list-counter',
       '&::before': {
         content: 'counter(list-counter)',
-        color: CSS_VARIABLE_SYSTEM.COLOR.ON_PRIMARY_WHITE100,
+        color: "{color.onprimary.white100}",
         fontWeight: "{font.fontweight.semibold}",
         fontSize: "{font.size.small}",
-        backgroundColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5,
-        borderRadius: "{dimension.borderradius.full}",
+        backgroundColor: "{color.primary.brand5}",
+        borderRadius: "50%",
         width: '20px',
         height: '20px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         position: 'absolute',
-        left: '0px',
+        left: '-30px',
         top: '2px',
         boxShadow: "{material.hierarchy.main}"
       }
@@ -985,15 +1026,123 @@ export const DEFAULT_STYLE_CONFIG = {
     }
   },
 
-  // 背景/图片元素配置
-  image: {
+  // ==================== 通知/警告元件 ====================
+  alert: {
+    // 成功提示  
+    success: {
+      padding: "{dimension.padding.base} {dimension.padding.loose}",
+      margin: "{dimension.margin.base} 0",
+      borderRadius: "{dimension.borderradius.medium}",
+      boxShadow: "{material.hierarchy.main}",
+      display: 'flex',
+      alignItems: 'center',
+      gap: "{dimension.gap.tight}",
+      backgroundColor: "{color.success.green1}",
+      border: `{dimension.borderwidth.narrow} solid {color.success.green3}`,
+      color: "{color.success.green8}",
+      borderLeft: `{dimension.borderwidth.wide} solid {color.success.green5}`
+    },
 
+    // 警告提示  
+    warning: {
+      padding: "{dimension.padding.base} {dimension.padding.loose}",
+      margin: "{dimension.margin.base} 0",
+      borderRadius: "{dimension.borderradius.medium}",
+      boxShadow: "{material.hierarchy.main}",
+      display: 'flex',
+      alignItems: 'center',
+      gap: "{dimension.gap.tight}",
+      backgroundColor: "{color.warning.orange1}",
+      border: `{dimension.borderwidth.narrow} solid {color.warning.orange3}`,
+      color: "{color.warning.orange8}",
+      borderLeft: `{dimension.borderwidth.wide} solid {color.warning.orange5}`
+    },
+
+    // 错误提示  
+    error: {
+      padding: "{dimension.padding.base} {dimension.padding.loose}",
+      margin: "{dimension.margin.base} 0",
+      borderRadius: "{dimension.borderradius.medium}",
+      boxShadow: "{material.hierarchy.main}",
+      display: 'flex',
+      alignItems: 'center',
+      gap: "{dimension.gap.tight}",
+      backgroundColor: "{color.error.red1}",
+      border: `{dimension.borderwidth.narrow} solid {color.error.red3}`,
+      color: "{color.error.red8}",
+      borderLeft: `{dimension.borderwidth.wide} solid {color.error.red5}`
+    },
+
+    // 信息提示  
+    info: {
+      padding: "{dimension.padding.base} {dimension.padding.loose}",
+      margin: "{dimension.margin.base} 0",
+      borderRadius: "{dimension.borderradius.medium}",
+      boxShadow: "{material.hierarchy.main}",
+      display: 'flex',
+      alignItems: 'center',
+      gap: "{dimension.gap.tight}",
+      backgroundColor: "{color.primarycontainer.brand1}",
+      border: `{dimension.borderwidth.narrow} solid {color.primarycontainer.brand2}`,
+      color: "{color.onprimarycontainer.brand8}",
+      borderLeft: `{dimension.borderwidth.wide} solid {color.primary.brand5}`
+    }
+  },
+
+  // ==================== 卡片元件 ====================
+  card: {
+    // 标准卡片  
+    standard: {
+      backgroundColor: "{color.surfacecontainer.white100}",
+      borderRadius: "{dimension.borderradius.xl}",
+      border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+      boxShadow: "{material.hierarchy.1f}",
+      padding: "{dimension.padding.extraloose}",
+      margin: "{dimension.margin.loose} 0",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      '&:hover': {
+        boxShadow: "{material.hierarchy.2f}",
+        transform: 'translateY(-2px)'
+      }
+    },
+
+    // 高级卡片  
+    elevated: {
+      backgroundColor: "{color.surfacecontainer.white100}",
+      borderRadius: "{dimension.borderradius.xxl}",
+      border: "{dimension.borderwidth.none}",
+      boxShadow: "{material.hierarchy.3f}",
+      padding: "{dimension.padding.extraloose}",
+      margin: "{dimension.margin.loose} 0",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      '&:hover': {
+        boxShadow: "{material.hierarchy.4f}",
+        transform: 'translateY(-4px)'
+      }
+    },
+
+    // 轮廓卡片  
+    outlined: {
+      backgroundColor: "transparent",
+      borderRadius: "{dimension.borderradius.large}",
+      border: `{dimension.borderwidth.base} solid {color.surfacecontainer.black20}`,
+      boxShadow: "{material.hierarchy.ground}",
+      padding: "{dimension.padding.loose}",
+      margin: "{dimension.margin.base} 0",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      '&:hover': {
+        borderColor: "{color.primarycontainer.brand2}",
+        backgroundColor: "{color.surface.grey0}"
+      }
+    }
+  },
+
+  // ==================== 图像元件 ====================
+  image: {
     // 普通图片  
     normal: {
       borderRadius: "{dimension.borderradius.medium}",
-      borderWidth: "{dimension.borderwidth.narrow}",
-      borderStyle: "solid",
-      borderColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK16,
+      border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black16}`,
       boxShadow: "{material.hierarchy.main}",
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       maxWidth: "100%",
@@ -1004,43 +1153,39 @@ export const DEFAULT_STYLE_CONFIG = {
       }
     },
 
-    // 圆角图片  
+    // 圆角图片 TODO: 需要确定解析的规则
     rounded: {
       borderRadius: "{dimension.borderradius.xl}",
-      borderWidth: "{dimension.borderwidth.base}",
-      borderStyle: "solid",
-      borderColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK12,
+      border: `{dimension.borderwidth.base} solid {color.surfacecontainer.black12}`,
       boxShadow: "{material.hierarchy.1f}",
       maxWidth: "100%",
       height: "auto",
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       '&:hover': {
-        borderColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_CONTAINER_BRAND2,
+        borderColor: "{color.primarycontainer.brand2}",
         boxShadow: "{material.hierarchy.3f}"
       }
     },
 
-    // 圆形图片（头像）  
+    // 圆形图片（头像） TODO: 需要确定解析的规则
     circle: {
-      borderRadius: "{dimension.borderradius.full}",
-      border: `3px solid ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_CONTAINER_BRAND2}`,
+      borderRadius: "50%",
+      border: `3px solid {color.primarycontainer.brand2}`,
       boxShadow: "{material.hierarchy.2f}",
       aspectRatio: "1",
       objectFit: "cover",
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       '&:hover': {
-        borderColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND4,
+        borderColor: "{color.primary.brand4}",
         boxShadow: "{material.hierarchy.4f}",
         transform: "scale(1.05)"
       }
     },
 
-    // 带边框图片  
+    // 带边框图片 TODO: 需要确定解析的规则
     framed: {
       borderRadius: "{dimension.borderradius.large}",
-      borderWidth: "{dimension.borderwidth.wide}",
-      borderStyle: "solid",
-      borderColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_WHITE100,
+      border: `{dimension.borderwidth.wide} solid {color.surfacecontainer.white100}`,
       boxShadow: "{material.hierarchy.3f}",
       maxWidth: "100%",
       height: "auto",
@@ -1052,22 +1197,20 @@ export const DEFAULT_STYLE_CONFIG = {
         left: "-4px",
         right: "-4px",
         bottom: "-4px",
-        borderWidth: "{dimension.borderwidth.narrow}",
-        borderStyle: "solid",
-        borderColor: CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK20,
+        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black20}`,
         borderRadius: "{dimension.borderradius.xl}",
         pointerEvents: "none"
       }
     },
 
-    // 英雄图片  
+    // 英雄图片 TODO: 需要确定解析的规则
     hero: {
       borderRadius: "{dimension.borderradius.xxl}",
       boxShadow: "{material.hierarchy.5f}",
       width: "100%",
       height: "400px",
       objectFit: "cover",
-      background: CSS_VARIABLE_SYSTEM.GRADIENT.SURFACE,
+      background: `linear-gradient(135deg, {color.surface.grey1} 0%, {color.surface.grey2} 100%)`,
       position: "relative",
       '&::after': {
         content: "''",
@@ -1076,8 +1219,160 @@ export const DEFAULT_STYLE_CONFIG = {
         left: "0",
         right: "0",
         bottom: "0",
-        background: `linear-gradient(45deg, ${CSS_VARIABLE_SYSTEM.COLOR.SURFACE_CONTAINER_BLACK16} 0%, transparent 50%)`,
+        background: `linear-gradient(45deg, {color.surfacecontainer.black16} 0%, transparent 50%)`,
         borderRadius: "{dimension.borderradius.xxl}"
+      }
+    }
+  },
+
+  // ==================== 图标元件 ====================
+  // TODO: 暂无应用
+  icon: {
+    // 小图标  
+    small: {
+      width: "16px",
+      height: "16px",
+      color: "{color.onsurface.black48}",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+    },
+
+    // 中等图标  
+    medium: {
+      width: "24px",
+      height: "24px",
+      color: "{color.onsurface.black64}",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+    },
+
+    // 大图标  
+    large: {
+      width: "32px",
+      height: "32px",
+      color: "{color.onsurface.black76}",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+    },
+
+    // 可交互图标  
+    interactive: {
+      width: "24px",
+      height: "24px",
+      color: "{color.primary.brand5}",
+      cursor: "pointer",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SPRING,
+      '&:hover': {
+        color: "{color.primary.brand6}",
+        transform: "scale(1.1)"
+      }
+    },
+
+    // 状态图标  
+    status: {
+      success: {
+        width: "20px",
+        height: "20px",
+        color: "{color.success.green6}",
+        transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+      },
+      warning: {
+        width: "20px",
+        height: "20px",
+        color: "{color.warning.orange6}",
+        transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+      },
+      error: {
+        width: "20px",
+        height: "20px",
+        color: "{color.error.red6}",
+        transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+      }
+    }
+  },
+
+  // ==================== 功能性元件 ==================== (新增)
+  // TODO: 暂无应用
+  utility: {
+    // 复制按钮  
+    copyButton: {
+      position: 'absolute',
+      top: '12px',
+      right: '12px',
+      background: "{color.surfacecontainer.black20}",
+      border: "{dimension.borderwidth.none}",
+      borderRadius: "{dimension.borderradius.small}",
+      padding: "{dimension.padding.tight}",
+      color: "{color.onsurface.white88}",
+      cursor: 'pointer',
+      opacity: '0',
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
+      '&:hover': {
+        background: "{color.primary.brand5}"
+      }
+    },
+
+    // 波纹效果动画  
+    ripple: {
+      position: 'absolute',
+      borderRadius: "50%",
+      background: 'rgba(255, 255, 255, 0.3)',
+      transform: 'scale(0)',
+      animation: 'ripple 0.6s ease-out',
+      pointerEvents: 'none'
+    }
+  },
+
+  // ==================== 响应式断点 ==================== (新增)
+  // TODO: 暂无应用
+  responsive: {
+    // 移动端断点
+    mobile: {
+      '@media (max-width: 768px)': {
+        '.markdown-container': {
+          fontSize: "{font.size.small}"
+        },
+        '.markdown-h1': {
+          fontSize: '28px !important'
+        },
+        '.markdown-h2': {
+          fontSize: '24px !important'
+        }
+      }
+    },
+
+    // 平板端断点
+    tablet: {
+      '@media (max-width: 1024px)': {
+        '.app-container': {
+          gridTemplateColumns: '1fr',
+          gap: "{dimension.gap.loose}"
+        }
+      }
+    }
+  },
+
+  // ==================== 动画关键帧 ==================== (新增)
+  // TODO: 暂无应用
+  animations: {
+    // 波纹动画
+    ripple: {
+      '@keyframes ripple': {
+        'to': {
+          transform: 'scale(2)',
+          opacity: '0'
+        }
+      }
+    },
+
+    // 淡入动画
+    fadeIn: {
+      '@keyframes fadeIn': {
+        'from': {
+          opacity: '0',
+          transform: 'translateY(20px)'
+        },
+        'to': {
+          opacity: '1',
+          transform: 'translateY(0)'
+        }
       }
     }
   }

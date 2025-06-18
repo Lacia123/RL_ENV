@@ -364,12 +364,12 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
           content: htmlContent, // 保存处理后的HTML内容，包含Markdown和KaTeX
           style: {
             fontsize: {
-              value: textStyleConfig.fontSizes || FONT_CONSTANTS.SIZE.LARGE,
+              value: textStyleConfig.fontSize || FONT_CONSTANTS.SIZE.LARGE,
               type: "fontSizes",
               key: "font-fontsize"
             }
           },
-          resource: textStyleConfig.fontSizes || FONT_CONSTANTS.SIZE.LARGE
+          resource: textStyleConfig.fontSize || FONT_CONSTANTS.SIZE.LARGE
         }
       },
       fontweight: textStyleConfig.fontWeight || (richTextOptions.isBold ? {

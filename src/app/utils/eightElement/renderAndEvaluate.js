@@ -28,9 +28,9 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
     width = 1024,
     height = 768,
     outputDir = 'output',
-    saveHtml = false,
+    saveHtml = true,
     useAims = false,
-    takeScreenshot = false,
+    takeScreenshot = true,
     outputPrefix = 'eight-element'
   } = options;
 

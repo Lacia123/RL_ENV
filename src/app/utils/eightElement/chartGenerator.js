@@ -7,7 +7,7 @@
  */
 
 import * as d3 from 'd3';
-import { COLOR_CONSTANTS, DEFAULT_STYLE_CONFIG, CSS_VARIABLE_SYSTEM } from './styleConfig.js';
+import { COLOR_CONSTANTS, DEFAULT_STYLE_CONFIG } from './styleConfig.js';
 import resolveToken from '../tokens/resolveToken.js';
 import { JSDOM } from 'jsdom';
 
@@ -29,6 +29,11 @@ function createJsdomEnv(width = 800, height = 500) {
     .attr('height', height)
     .attr('viewBox', `0 0 ${width} ${height}`)
     .attr('xmlns', 'http://www.w3.org/2000/svg');
+  
+  // 解析颜色tokens
+  const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
+  const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
+  const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
   
   // 添加样式
   const defs = svg.append('defs');
@@ -58,31 +63,31 @@ function createJsdomEnv(width = 800, height = 500) {
       stroke-width: 1;
     }
     .dot-color-brand6 {
-      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6}; 
+      fill: ${colorBrand6}; 
     }
     .dot-color-brand5 {
-      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5}; 
+      fill: ${colorBrand5}; 
     }
     .dot-color-brand4 {
-      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND4}; 
+      fill: ${colorBrand4}; 
     }
     .line-color-brand6 {
-      stroke: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6}; 
+      stroke: ${colorBrand6}; 
     }
     .line-color-brand5 {
-      stroke: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5}; 
+      stroke: ${colorBrand5}; 
     }
     .line-color-brand4 {
-      stroke: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND4}; 
+      stroke: ${colorBrand4}; 
     }
     .data-label-color-brand6 {
-      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6}; 
+      fill: ${colorBrand6}; 
     }
     .data-label-color-brand5 {
-      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5}; 
+      fill: ${colorBrand5}; 
     }
     .data-label-color-brand4 {
-      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND4}; 
+      fill: ${colorBrand4}; 
     }
     .bar {
       fill-opacity: 0.8;
@@ -91,13 +96,13 @@ function createJsdomEnv(width = 800, height = 500) {
       fill-opacity: 1;
     }
     .bar-color-brand6 {
-      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND6}; 
+      fill: ${colorBrand6}; 
     }
     .bar-color-brand5 {
-      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5}; 
+      fill: ${colorBrand5}; 
     }
     .bar-color-brand4 {
-      fill: ${CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND4}; 
+      fill: ${colorBrand4}; 
     }
   `);
   
@@ -204,6 +209,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     
     const { svg, document } = createJsdomEnv(width, height);
     
+    const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
     const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
     const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
     const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);

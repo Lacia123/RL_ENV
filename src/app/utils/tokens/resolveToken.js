@@ -10,8 +10,10 @@
 import colorBasic from './color/basic.js';
 import colorBorder from './color/border.js';
 import colorSurface from './color/surface.js';
+import colorSurfaceContainer from './color/surfacecontainer.js';
 import colorPrimary from './color/primary.js';
 import colorSecondary from './color/secondary.js';
+import colorSecondaryContainer from './color/secondarycontainer.js';
 import colorTertiary from './color/tertiary.js';
 import colorTertiaryContainer from './color/tertiarycontainer.js';
 import colorError from './color/error.js';
@@ -20,6 +22,7 @@ import colorWarning from './color/warning.js';
 import colorLink from './color/link.js';
 import colorDisable from './color/disable.js';
 import colorOnPrimary from './color/onprimary.js';
+import colorPrimaryContainer from './color/primarycontainer.js';
 import colorOnPrimaryContainer from './color/onprimarycontainer.js';
 import colorOnSurface from './color/onsurface.js';
 import colorOnSurfaceContainer from './color/onsurfacecontainer.js';
@@ -89,8 +92,11 @@ const tokenCollections = deepMerge(
   colorBasic,
   colorBorder,
   colorSurface,
+  colorSurfaceContainer,
   colorPrimary,
+  colorPrimaryContainer,
   colorSecondary,
+  colorSecondaryContainer,
   colorTertiary,
   colorError,
   colorSuccess,
@@ -261,12 +267,21 @@ function getTokenByPath(path, customTokenSystem = null) {
 }
 
 /**
- * 判断是否是 token 引用字符串
+ * 判断是否是 token 引用字符串（单个token）
  * @param {string} value - 输入字符串
  * @returns {boolean} - 是否是 token 引用
  */
 function isTokenReference(value) {
-  return typeof value === 'string' && value.startsWith('{') && value.endsWith('}');
+  if (typeof value !== 'string') return false;
+  
+  // 检查基本格式：以 { 开头，以 } 结尾
+  if (!value.startsWith('{') || !value.endsWith('}')) return false;
+  
+  // 检查是否只包含一个 { 和一个 }（即单个token）
+  const openBraces = (value.match(/\{/g) || []).length;
+  const closeBraces = (value.match(/\}/g) || []).length;
+  
+  return openBraces === 1 && closeBraces === 1;
 }
 
 /**
@@ -301,9 +316,15 @@ function resolveToken(tokenReference, maxDepth = 20, customTokenSystem = null) {
     return tokenReference;
   }
 
-  // 处理包含多个 token 的情况，委托给 resolveTokensInText 处理
-  if (!isTokenReference(tokenReference) && containsTokenReferences(tokenReference)) {
-    return resolveTokensInText(tokenReference, maxDepth, customTokenSystem);
+  // 优先检查是否包含多个token，无论格式如何
+  if (containsTokenReferences(tokenReference)) {
+    // 如果是单个token引用，继续单token处理逻辑
+    if (isTokenReference(tokenReference)) {
+      // 单token处理逻辑将在下面执行
+    } else {
+      // 多token情况，委托给 resolveTokensInText 处理
+      return resolveTokensInText(tokenReference, maxDepth, customTokenSystem);
+    }
   }
 
   // 非 token 引用格式，直接返回
