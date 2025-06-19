@@ -4,7 +4,7 @@ class AIMClient {
     constructor(baseURL = 'http://localhost:8888') {
         this.client = axios.create({
             baseURL: baseURL,
-            timeout: 30000000,
+            timeout: 300000000,
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -28,6 +28,7 @@ class AIMClient {
 
             return response.data;
         } catch (error) {
+            console.log('error', error);
             if (error.response) {
                 // 服务器响应了错误状态码
                 console.error('API 错误:', error.response.status, error.response.data);

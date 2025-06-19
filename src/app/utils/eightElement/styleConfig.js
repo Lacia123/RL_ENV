@@ -533,12 +533,12 @@ export const DEFAULT_STYLE_CONFIG = {
       marginTop: "{dimension.margin.loose}",
       marginBottom: "{dimension.margin.base}",
       position: 'relative',
-      '&::before': {
-        content: "'#'",
-        color: "{color.primary.brand5}",
-        marginRight: "{dimension.gap.tight}",
-        fontWeight: "{font.fontweight.bold}"
-      }
+      // '&::before': {
+      //   content: "'#'",
+      //   color: "{color.primary.brand5}",
+      //   marginRight: "{dimension.gap.tight}",
+      //   fontWeight: "{font.fontweight.bold}"
+      // }
     },
     h4: {
       width: "auto",
@@ -697,7 +697,7 @@ export const DEFAULT_STYLE_CONFIG = {
       padding: "{dimension.padding.base}",
       background: "{color.surface.grey1}",
       borderRadius: "{dimension.borderradius.medium}",
-      borderLeft: `{dimension.borderwidth.wide} solid {color.secondary.violet4}`,
+      borderLeft: `{dimension.borderwidth.wide} solid {color.basic.brand.4}`,
       boxShadow: "{material.hierarchy.main}",
       textAlign: "center"
     }

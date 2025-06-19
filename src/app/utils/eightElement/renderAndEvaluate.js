@@ -30,7 +30,7 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
     outputDir = 'output',
     saveHtml = true,
     useAims = false,
-    takeScreenshot = true,
+    takeScreenshot = false,
     outputPrefix = 'eight-element'
   } = options;
 
@@ -358,7 +358,8 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
       console.log(`截图已保存至: ${screenshotPath}`);
     }
 
-    aims = await evaluateImage(base64Image, ["m18", "m10", "m11", "m13", "m15", "m4", "m5", "m21", "m22"], { save_results: false });
+
+    aims = await evaluateImage(base64Image, ["m18", "m11", "m13", "m15", "m4", "m5", "m21", "m22"], { save_results: false });
 
     aims = resolveMetrics(aims);
 

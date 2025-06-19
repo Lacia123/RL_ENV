@@ -449,6 +449,51 @@ function isListItem(line) {
   return { isList: false };
 }
 
+// 检测是否为引用文本
+function isQuoteText(line) {
+  return line.trim().match(/^>\s*(.*)$/);
+}
+
+// 提取完整的引用块
+function extractQuoteBlock(lines, startIndex) {
+  console.log(`开始提取引用块，从第${startIndex}行开始`);
+  
+  const quoteLines = [];
+  let i = startIndex;
+  
+  // 收集所有连续的引用行
+  while (i < lines.length) {
+    const line = lines[i];
+    const quoteMatch = line.trim().match(/^>\s*(.*)$/);
+    
+    if (quoteMatch) {
+      // 提取引用内容（去除 > 符号）
+      quoteLines.push(quoteMatch[1]);
+      i++;
+    } else if (line.trim() === '') {
+      // 空行继续检查下一行是否还是引用
+      i++;
+      if (i < lines.length && isQuoteText(lines[i])) {
+        quoteLines.push(''); // 在引用内容中保留空行
+        continue;
+      } else {
+        // 如果下一行不是引用，则引用块结束
+        break;
+      }
+    } else {
+      // 非引用行，引用块结束
+      break;
+    }
+  }
+  
+  console.log(`引用块提取完成，共${quoteLines.length}行，结束索引: ${i - 1}`);
+  
+  return {
+    quoteContent: quoteLines.join('\n').trim(),
+    endIndex: i - 1
+  };
+}
+
 // 处理列表项和富文本 - 简化版本，避免拆分文本
 function processListItemAndRichText(line) {
   // 首先检查是否为列表项
@@ -2099,6 +2144,44 @@ function parseMarkdown(markdown) {
       continue;
     }
 
+    // 处理引用文本
+    if (isQuoteText(trimmedLine)) {
+      console.log(`发现引用文本，行号: ${i}`);
+      
+      // 处理之前累积的内容
+      flushTextBlock();
+      flushConsecutiveButtons();
+
+      // 如果正在处理列表，先结束列表
+      if (inList && listItems.length > 0) {
+        const listLayout = createLayoutElement(
+          LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+          listItems,
+          {
+            alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+            counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+          }
+        );
+        stack[stack.length - 1].elements.push(listLayout);
+        inList = false;
+        listItems = [];
+      }
+
+      // 提取引用块内容
+      const { quoteContent, endIndex } = extractQuoteBlock(
+        markedLines.map(item => item.line),
+        i
+      );
+
+      // 创建引用文本元素，使用 'quote' 样式变体
+      const quoteElement = createTextElement(quoteContent, 'quote');
+      stack[stack.length - 1].elements.push(quoteElement);
+
+      // 跳过已处理的引用块行
+      i = endIndex;
+      continue;
+    }
+
     // 解析标题
     const headingMatch = trimmedLine.match(/^(#{1,6})\s+(.*?)$/);
     if (headingMatch) {
@@ -2695,6 +2778,8 @@ export {
   isMarkdownCodeBlock,
   isTableOrChartData,   // 导出表格/图表检测函数
   extractTableOrChartData, // 导出表格/图表提取函数
+  isQuoteText,          // 导出引用文本检测函数
+  extractQuoteBlock,    // 导出引用文本提取函数
   generateChartSvg,
   printEightElementStructure,
   exampleMarkdownToEightElement,
