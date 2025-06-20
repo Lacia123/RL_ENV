@@ -481,11 +481,10 @@ export const RL_ACTIONS = {
       borderColor: 'enhance'
     },
     styleMapping: {
-      borderWidth: (current, delta) => {
+      borderWidth: (baseValue, delta) => {
         const levels = ['none', 'narrow', 'base', 'wide'];
-        const currentIndex = levels.indexOf(current) || 0;
-        const newIndex = Math.min(levels.length - 1, currentIndex + Math.ceil(delta * 2));
-        return DESIGN_TOKEN_MAPPING.dimension.borderWidth[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'borderwidth', 'narrow', true);
+        return DESIGN_TOKEN_MAPPING.dimension.borderWidth[newLevel];
       }
     },
     conflicts: ['weakenOutline']
@@ -501,11 +500,10 @@ export const RL_ACTIONS = {
       borderColor: 'soften'
     },
     styleMapping: {
-      borderWidth: (current, delta) => {
+      borderWidth: (baseValue, delta) => {
         const levels = ['none', 'narrow', 'base', 'wide'];
-        const currentIndex = levels.indexOf(current) || 1;
-        const newIndex = Math.max(0, currentIndex - Math.ceil(delta * 2));
-        return DESIGN_TOKEN_MAPPING.dimension.borderWidth[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'borderwidth', 'narrow', false);
+        return DESIGN_TOKEN_MAPPING.dimension.borderWidth[newLevel];
       }
     },
     conflicts: ['strengthenOutline']
@@ -671,11 +669,10 @@ export const RL_ACTIONS = {
       contrast: 'enhance'
     },
     styleMapping: {
-      fontWeight: (current, delta) => {
+      fontWeight: (baseValue, delta) => {
         const levels = ['light', 'medium', 'semibold', 'bold'];
-        const currentIndex = levels.indexOf(current) || 1;
-        const newIndex = Math.min(levels.length - 1, currentIndex + Math.ceil(delta * 2));
-        return DESIGN_TOKEN_MAPPING.font.weight[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'fontweight', 'medium', true);
+        return DESIGN_TOKEN_MAPPING.font.weight[newLevel];
       },
       color: (current, delta) => {
         if (delta > 0.5) return DESIGN_TOKEN_MAPPING.color.onSurface.black100;
@@ -696,11 +693,10 @@ export const RL_ACTIONS = {
       contrast: 'soften'
     },
     styleMapping: {
-      fontWeight: (current, delta) => {
+      fontWeight: (baseValue, delta) => {
         const levels = ['light', 'medium', 'semibold', 'bold'];
-        const currentIndex = levels.indexOf(current) || 1;
-        const newIndex = Math.max(0, currentIndex - Math.ceil(delta * 2));
-        return DESIGN_TOKEN_MAPPING.font.weight[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'fontweight', 'medium', false);
+        return DESIGN_TOKEN_MAPPING.font.weight[newLevel];
       },
       color: (current, delta) => {
         if (delta > 0.5) return DESIGN_TOKEN_MAPPING.color.onSurface.black48;
@@ -773,11 +769,10 @@ export const RL_ACTIONS = {
       elevation: 'increase'
     },
     styleMapping: {
-      boxShadow: (current, delta) => {
+      boxShadow: (baseValue, delta) => {
         const levels = ['ground', 'main', 'B1', '1f', '2f', '3f', '4f', '5f'];
-        const currentIndex = levels.indexOf(current) || 0;
-        const newIndex = Math.min(levels.length - 1, currentIndex + Math.ceil(delta * 3));
-        return DESIGN_TOKEN_MAPPING.material.hierarchy[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'hierarchy', 'main', true);
+        return DESIGN_TOKEN_MAPPING.material.hierarchy[newLevel];
       }
     },
     conflicts: ['decreaseShadowDepth']
@@ -793,11 +788,10 @@ export const RL_ACTIONS = {
       elevation: 'decrease'
     },
     styleMapping: {
-      boxShadow: (current, delta) => {
+      boxShadow: (baseValue, delta) => {
         const levels = ['ground', 'main', 'B1', '1f', '2f', '3f', '4f', '5f'];
-        const currentIndex = levels.indexOf(current) || 2;
-        const newIndex = Math.max(0, currentIndex - Math.ceil(delta * 3));
-        return DESIGN_TOKEN_MAPPING.material.hierarchy[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'hierarchy', 'main', false);
+        return DESIGN_TOKEN_MAPPING.material.hierarchy[newLevel];
       }
     },
     conflicts: ['increaseShadowDepth']
@@ -899,23 +893,20 @@ export const RL_ACTIONS = {
       gap: 'increase'
     },
     styleMapping: {
-      padding: (current, delta) => {
+      padding: (baseValue, delta) => {
         const levels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-        const currentIndex = levels.indexOf(current) || 5;
-        const newIndex = Math.min(levels.length - 1, currentIndex + Math.ceil(delta * 3));
-        return DESIGN_TOKEN_MAPPING.dimension.padding[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'padding', 'base', true);
+        return DESIGN_TOKEN_MAPPING.dimension.padding[newLevel];
       },
-      margin: (current, delta) => {
+      margin: (baseValue, delta) => {
         const levels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-        const currentIndex = levels.indexOf(current) || 5;
-        const newIndex = Math.min(levels.length - 1, currentIndex + Math.ceil(delta * 3));
-        return DESIGN_TOKEN_MAPPING.dimension.margin[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'margin', 'base', true);
+        return DESIGN_TOKEN_MAPPING.dimension.margin[newLevel];
       },
-      gap: (current, delta) => {
+      gap: (baseValue, delta) => {
         const levels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-        const currentIndex = levels.indexOf(current) || 5;
-        const newIndex = Math.min(levels.length - 1, currentIndex + Math.ceil(delta * 3));
-        return DESIGN_TOKEN_MAPPING.dimension.gap[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'gap', 'base', true);
+        return DESIGN_TOKEN_MAPPING.dimension.gap[newLevel];
       }
     },
     conflicts: ['decreaseSpacing']
@@ -932,23 +923,20 @@ export const RL_ACTIONS = {
       gap: 'decrease'
     },
     styleMapping: {
-      padding: (current, delta) => {
+      padding: (baseValue, delta) => {
         const levels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-        const currentIndex = levels.indexOf(current) || 5;
-        const newIndex = Math.max(0, currentIndex - Math.ceil(delta * 3));
-        return DESIGN_TOKEN_MAPPING.dimension.padding[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'padding', 'base', false);
+        return DESIGN_TOKEN_MAPPING.dimension.padding[newLevel];
       },
-      margin: (current, delta) => {
+      margin: (baseValue, delta) => {
         const levels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-        const currentIndex = levels.indexOf(current) || 5;
-        const newIndex = Math.max(0, currentIndex - Math.ceil(delta * 3));
-        return DESIGN_TOKEN_MAPPING.dimension.margin[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'margin', 'base', false);
+        return DESIGN_TOKEN_MAPPING.dimension.margin[newLevel];
       },
-      gap: (current, delta) => {
+      gap: (baseValue, delta) => {
         const levels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-        const currentIndex = levels.indexOf(current) || 5;
-        const newIndex = Math.max(0, currentIndex - Math.ceil(delta * 3));
-        return DESIGN_TOKEN_MAPPING.dimension.gap[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'gap', 'base', false);
+        return DESIGN_TOKEN_MAPPING.dimension.gap[newLevel];
       }
     },
     conflicts: ['increaseSpacing']
@@ -965,17 +953,15 @@ export const RL_ACTIONS = {
       separation: 'enhance'
     },
     styleMapping: {
-      borderWidth: (current, delta) => {
+      borderWidth: (baseValue, delta) => {
         const levels = ['none', 'narrow', 'base', 'wide'];
-        const currentIndex = levels.indexOf(current) || 0;
-        const newIndex = Math.min(levels.length - 1, currentIndex + Math.ceil(delta * 2));
-        return DESIGN_TOKEN_MAPPING.dimension.borderWidth[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'borderwidth', 'narrow', true);
+        return DESIGN_TOKEN_MAPPING.dimension.borderWidth[newLevel];
       },
-      gap: (current, delta) => {
+      gap: (baseValue, delta) => {
         const levels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-        const currentIndex = levels.indexOf(current) || 5;
-        const newIndex = Math.max(0, currentIndex - Math.ceil(delta * 2));
-        return DESIGN_TOKEN_MAPPING.dimension.gap[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'gap', 'base', false);
+        return DESIGN_TOKEN_MAPPING.dimension.gap[newLevel];
       }
     },
     conflicts: ['decreaseEdgeTension']
@@ -992,17 +978,15 @@ export const RL_ACTIONS = {
       separation: 'soften'
     },
     styleMapping: {
-      borderWidth: (current, delta) => {
+      borderWidth: (baseValue, delta) => {
         const levels = ['none', 'narrow', 'base', 'wide'];
-        const currentIndex = levels.indexOf(current) || 1;
-        const newIndex = Math.max(0, currentIndex - Math.ceil(delta * 2));
-        return DESIGN_TOKEN_MAPPING.dimension.borderWidth[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'borderwidth', 'narrow', false);
+        return DESIGN_TOKEN_MAPPING.dimension.borderWidth[newLevel];
       },
-      gap: (current, delta) => {
+      gap: (baseValue, delta) => {
         const levels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-        const currentIndex = levels.indexOf(current) || 5;
-        const newIndex = Math.min(levels.length - 1, currentIndex + Math.ceil(delta * 2));
-        return DESIGN_TOKEN_MAPPING.dimension.gap[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'gap', 'base', true);
+        return DESIGN_TOKEN_MAPPING.dimension.gap[newLevel];
       }
     },
     conflicts: ['increaseEdgeTension']
@@ -1023,11 +1007,10 @@ export const RL_ACTIONS = {
         const scale = 1 + delta * 0.3;
         return `scale(${scale})`;
       },
-      fontWeight: (current, delta) => {
+      fontWeight: (baseValue, delta) => {
         const levels = ['light', 'medium', 'semibold', 'bold'];
-        const currentIndex = levels.indexOf(current) || 1;
-        const newIndex = Math.min(levels.length - 1, currentIndex + Math.ceil(delta * 2));
-        return DESIGN_TOKEN_MAPPING.font.weight[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'fontweight', 'medium', true);
+        return DESIGN_TOKEN_MAPPING.font.weight[newLevel];
       }
     },
     conflicts: ['decreaseVisualWeight']
@@ -1048,11 +1031,10 @@ export const RL_ACTIONS = {
         const scale = Math.max(0.7, 1 - delta * 0.3);
         return `scale(${scale})`;
       },
-      fontWeight: (current, delta) => {
+      fontWeight: (baseValue, delta) => {
         const levels = ['light', 'medium', 'semibold', 'bold'];
-        const currentIndex = levels.indexOf(current) || 1;
-        const newIndex = Math.max(0, currentIndex - Math.ceil(delta * 2));
-        return DESIGN_TOKEN_MAPPING.font.weight[levels[newIndex]];
+        const newLevel = calculateLevelChange(baseValue, delta, levels, 'fontweight', 'medium', false);
+        return DESIGN_TOKEN_MAPPING.font.weight[newLevel];
       }
     },
     conflicts: ['increaseVisualWeight']
@@ -1480,14 +1462,13 @@ export const RL_ACTIONS = {
         outlineOffset: () => '2px'
       },
       // 优化字体大小
-      fontSize: (current, delta) => {
+      fontSize: (baseValue, delta) => {
         if (delta > 0.7) {
           const levels = ['medium', 'large', 'xl'];
-          const currentIndex = levels.indexOf(current) || 0;
-          const newIndex = Math.min(levels.length - 1, currentIndex + 1);
-          return DESIGN_TOKEN_MAPPING.font.size[levels[newIndex]];
+          const newLevel = calculateLevelChange(baseValue, delta, levels, 'size', 'medium', true);
+          return DESIGN_TOKEN_MAPPING.font.size[newLevel];
         }
-        return current;
+        return baseValue;
       }
     },
     conflicts: []
@@ -1599,28 +1580,32 @@ export class ActionConflictResolver {
    * @returns {Object} 更新后的样式对象
    */
   applyAction(actionName, intensity, currentStyles, baseStyles = null) {
+    console.log(`\n🔍 [DEBUG] 开始执行动作: ${actionName}, 强度: ${intensity}`);
+    
     // 安全检查
     if (!currentStyles || typeof currentStyles !== 'object') {
-      console.error('当前样式对象无效:', currentStyles);
+      console.error('❌ [ERROR] 当前样式对象无效:', currentStyles);
       return {};
     }
     
     // 使用传入的基准样式或者实例的基准样式
     const effectiveBaseStyles = baseStyles || this.baseStyles || {};
     if (!effectiveBaseStyles || typeof effectiveBaseStyles !== 'object') {
-      console.warn('基准样式对象无效，将使用当前样式作为基准:', effectiveBaseStyles);
+      console.warn('⚠️ [WARN] 基准样式对象无效，将使用当前样式作为基准:', effectiveBaseStyles);
     }
     
     const action = RL_ACTIONS[actionName];
     if (!action) {
-      console.warn(`未找到动作: ${actionName}`);
+      console.error(`❌ [ERROR] 未找到动作: ${actionName}`);
       return currentStyles;
     }
     
     // 检查动作是否适用于当前元件类型
     const elementType = currentStyles.elementType || 'general';
+    console.log(`🔍 [DEBUG] 元件类型: ${elementType}, 动作类别: ${action.category}`);
+    
     if (!this.isActionApplicableToElement(action, elementType)) {
-      console.warn(`动作 ${actionName} 不适用于元件类型 ${elementType}`);
+      console.warn(`❌ [WARN] 动作 ${actionName} 不适用于元件类型 ${elementType}`);
       return currentStyles;
     }
     
@@ -1635,10 +1620,15 @@ export class ActionConflictResolver {
     
     // 🎯 动作执行开始
     const variant = currentStyles.variant || 'default';
-    console.log(`\n🎯 执行动作: ${action.name} (用户强度: ${intensity.toFixed(1)} → 系统强度: ${normalizedIntensity.toFixed(2)}) - ${elementType}.${variant}`);
+    console.log(`\n${'='.repeat(60)}`);
+    console.log(`🎯 执行动作: ${action.name}`);
+    console.log(`   📊 强度: ${intensity.toFixed(1)} (用户) → ${normalizedIntensity.toFixed(2)} (系统)`);
+    console.log(`   🎯 目标: ${elementType}.${variant}`);
+    console.log(`   📋 分类: ${action.category} | 强度类型: ${action.intensity}`);
     if (conflicts.length > 0) {
-      console.log(`⚠️ 检测到冲突: ${conflicts.join(', ')}`);
+      console.log(`   ⚠️ 冲突: ${conflicts.join(', ')}`);
     }
+    console.log(`${'='.repeat(60)}`);
     
     // 应用样式映射
     const updatedStyles = { ...currentStyles };
@@ -1711,22 +1701,24 @@ export class ActionConflictResolver {
     
     // 📊 总结token变化情况
     const changedTokens = tokenChanges.filter(change => change.changed);
+    console.log(`\n${'='.repeat(60)}`);
     if (changedTokens.length > 0) {
-      console.log(`\n✅ 动作完成，变更了 ${changedTokens.length} 个token:`);
+      console.log(`✅ 动作完成 - 变更了 ${changedTokens.length} 个token:`);
+      console.log(`${'─'.repeat(40)}`);
       changedTokens.forEach(change => {
         // 🔍 只显示变化的token，格式简洁明了
         if (typeof change.newValue === 'string' && change.newValue.startsWith('{') && change.newValue.endsWith('}')) {
           // Token引用，显示简化的token路径
           const tokenPath = change.newValue.slice(1, -1);
           const [category, subcategory, level] = tokenPath.split('.');
-          console.log(`📝 ${change.property}: ${change.currentValue || '默认'} → ${level} (${category}.${subcategory})`);
+          console.log(`   📝 ${change.property}: ${change.currentValue || '默认'} → ${level} (${category}.${subcategory})`);
         } else {
           // 直接值，显示完整值
-          console.log(`📝 ${change.property}: ${change.currentValue || '默认'} → ${change.newValue}`);
+          console.log(`   📝 ${change.property}: ${change.currentValue || '默认'} → ${change.newValue}`);
         }
       });
     } else {
-      console.log(`\n⚪ 动作完成，但没有token发生变化`);
+      console.log(`⚪ 动作完成 - 但没有token发生变化`);
       
       // 显示哪些属性被处理了但未变化
       const processedTokens = tokenChanges.filter(change => !change.changed);
@@ -1734,6 +1726,7 @@ export class ActionConflictResolver {
         console.log(`   📋 已处理的属性: ${processedTokens.map(t => t.property).join(', ')}`);
       }
     }
+    console.log(`${'='.repeat(60)}\n`);
     
     // 记录应用的动作
     this.appliedActions.set(actionName, {

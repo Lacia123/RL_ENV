@@ -704,7 +704,9 @@ export const DEFAULT_STYLE_CONFIG = {
       background: "{color.surfacecontainer.white100}",
       borderRadius: "{dimension.borderradius.xl}",
       boxShadow: "{material.hierarchy.2f}",
-      border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.surfacecontainer.black12}",
+      borderStyle: "solid"
     },
     // 图表标题
     title: {
