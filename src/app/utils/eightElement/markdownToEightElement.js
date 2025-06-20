@@ -82,24 +82,24 @@ function processText(text) {
     const preparedText = prepareMarkdownForKatex(text);
 
     // 使用markedInstance处理Markdown和KaTeX
-
-    const parseResult = markedInstance.parse(preparedText)
+    const parseResult = markedInstance.parse(preparedText);
 
     if (parseResult.includes('class="katex-error"')) {
-
       const titleMatch = parseResult.match(/title="([^"]*)"/);
       const errorMessage = titleMatch ? titleMatch[1] : null;
       console.error('KaTeX解析错误:', errorMessage);
       
+      // 🔧 修复：即使有KaTeX错误，也要返回解析结果
+      return parseResult;
     } else {
-      return parseResult
+      return parseResult;
     }
   
   } catch (error) {
     console.error("处理文本时出错:", error);
-    // 出错时提供友好消息并转义原文本
-    // const errorMessage = `<span style="color:red;">公式或Markdown解析错误: ${escapeHtml(error.message)}</span>`;
-    // return errorMessage + escapeHtml(text).replace(/\\n/g, '<br>');
+    // 🔧 修复：出错时返回转义后的原文本，而不是undefined
+    const errorMessage = `<span style="color:red;">公式或Markdown解析错误: ${escapeHtml(error.message)}</span>`;
+    return errorMessage + escapeHtml(text).replace(/\\n/g, '<br>');
   }
 }
 
@@ -158,12 +158,13 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
   const id = generateUUID();
   // 获取文本元素的样式配置
   let textStyleConfig = getElementStyleConfig('text', variant);
-  // const textLayoutStyleConfig = getElementStyleConfig('layout', 'inner');
-
+  
   // 判断是否有富文本选项
   const hasRichText = Object.keys(richTextOptions).length > 0;
 
   let elementWidth = ""; // 默认宽度
+  let elementType = 'text'; // 默认元素类型
+  let elementVariant = variant; // 保存原始variant
 
   // 处理文本内容 - 包括Markdown和KaTeX
   let processedContent = text;
@@ -186,14 +187,17 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
   if (containsMath) {
     elementWidth = "100%";
     const mathVariant = hasInlineMath ? 'inline' : 'display';
-    textStyleConfig = getElementStyleConfig('math', mathVariant)
+    textStyleConfig = getElementStyleConfig('math', mathVariant);
+    elementType = 'math'; // 更新元素类型
+    elementVariant = mathVariant; // 更新变体
   }
 
     // 有序或无须列表样式
     if (hasRichText && richTextOptions.isList) {
-
       // 当前的渲染方法不支持有序列表
       textStyleConfig = getElementStyleConfig('list', 'unordered');
+      elementType = 'list'; // 更新元素类型
+      elementVariant = 'unordered'; // 更新变体
     }
 
   // 生成唯一的className
@@ -202,9 +206,23 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
   // 基础文本元素结构
   const textElement = {
     id,
-    name: "text",
-    "name-zh": "文本",
+    name: elementType === 'text' ? "text" : elementType, // 使用实际的元素类型
+    "name-zh": elementType === 'text' ? "文本" : 
+               elementType === 'math' ? "数学公式" : 
+               elementType === 'list' ? "列表" : "文本",
     "file-type": "cell-element",
+    // 🔍 保存元数据用于分析
+    _metadata: {
+      originalType: 'text',
+      actualType: elementType,
+      variant: elementVariant,
+      originalVariant: variant,
+      containsMath: containsMath,
+      mathType: containsMath ? (hasInlineMath ? 'inline' : 'display') : null,
+      isList: hasRichText && richTextOptions.isList,
+      listType: hasRichText && richTextOptions.isList ? 'unordered' : null,
+      hasRichText: hasRichText
+    },
     layout: {
       classStyle: {
         ...textStyleConfig
@@ -549,6 +567,14 @@ function createButtonElement(text, url, variant = 'primary') {
     name: "button", // 确保按钮名称为"button"
     "name-zh": "按钮",
     "file-type": "cell-element",
+    // 🔍 保存元数据用于分析
+    _metadata: {
+      actualType: 'button',
+      variant: variant,
+      isButton: true,
+      buttonText: text,
+      buttonUrl: url
+    },
     layout: {
       classStyle: {
         ...buttonStyleConfig
@@ -1125,6 +1151,13 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
     name: "background",
     "name-zh": "背景",
     "file-type": "cell-element",
+    // 🔍 保存元数据用于分析
+    _metadata: {
+      actualType: 'image',
+      variant: variant,
+      isImage: true,
+      imageUrl: imageUrl
+    },
     layout: {
       classStyle: {
         ...imageStyleConfig
@@ -1323,6 +1356,13 @@ function createLayoutElement(direction, children = [], options = {}) {
     "name-zh": "布局",
     "file-type": "template",
     theme: "default",
+    // 🔍 保存元数据用于分析
+    _metadata: {
+      actualType: 'layout',
+      variant: isRoot ? 'root' : variant,
+      isLayout: true,
+      isRoot: isRoot
+    },
     layout: {
       ...baseLayout,
       classStyle: {
@@ -1643,6 +1683,12 @@ function createTableElement(markdownTableContent) {
     "name-zh": "表格",
     "file-type": "cell-element",
     type: "table",
+    // 🔍 保存元数据用于分析
+    _metadata: {
+      actualType: 'table',
+      variant: 'container',
+      isTable: true
+    },
     rawData: markdownTableContent,
     layout: {
       // classStyle: {
@@ -1738,6 +1784,13 @@ function createCodeElement(codeContent, language = '') {
     "name-zh": "代码",
     "file-type": "cell-element",
     type: "code",
+    // 🔍 保存元数据用于分析 - 与styleConfig的text.codeBlock配置匹配
+    _metadata: {
+      actualType: 'text',  // 在styleConfig中code实际是text类型的一个变体
+      variant: 'codeBlock', // 对应styleConfig中的text.codeBlock
+      language: language || 'plaintext',
+      isCodeBlock: true
+    },
     rawData: codeContent,       // 保存原始代码内容
     highlightedCode: highlightedCode, // 保存高亮后的HTML
     language: language || 'plaintext', // 保存代码语言
@@ -1863,6 +1916,12 @@ function createChartElement(chartType, svgContent, tableData, rawData) {
     "file-type": "cell-element",
     type: "chart",
     chartType: chartType,
+    // 🔍 保存元数据用于分析
+    _metadata: {
+      actualType: 'chart',
+      variant: chartType || 'line',
+      isChart: true
+    },
     svgContent: svgContent,
     tableData: tableData, // 保存解析后的表格数据
     rawData: rawData,     // 保存原始Markdown表格内容
@@ -2621,6 +2680,13 @@ function createEightElementRoot(markdownElements) {
     "name-zh": "布局",
     "file-type": "template",
     theme: "default",
+    // 🔍 保存根布局元数据用于分析
+    _metadata: {
+      actualType: 'layout',
+      variant: 'root',
+      isLayout: true,
+      isRoot: true
+    },
     layout: {
       style: {
         display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
@@ -2758,6 +2824,388 @@ function exampleMarkdownToEightElement(styleConfig) {
 // 示例调用
 // const example = exampleMarkdownToEightElement();
 // console.log(JSON.stringify(example, null, 2));
+
+/**
+ * 分析八要素结构中包含的所有元件类型和形态
+ * @param {Object} eightElement - 八要素结构对象
+ * @returns {Array} 页面元件列表 [{type, variant, count, elements}]
+ */
+export function analyzeElementsInEightElement(eightElement) {
+  if (!eightElement || !eightElement.layout) {
+    return [];
+  }
+
+  const elementMap = new Map();
+  
+  const analyzeElement = (element, path = '', depth = 0) => {
+    if (!element || !element.name) return;
+    
+    // 🔍 优先使用保存的元数据来确定元件类型和形态
+    let elementType = element.name;
+    let variant = 'normal';
+    let sampleContent = '';
+    
+    // 1. 优先检查是否有元数据
+    if (element._metadata) {
+      const metadata = element._metadata;
+      elementType = metadata.actualType || element.name;
+      variant = metadata.variant || 'normal';
+      
+      // 对于layout元素，特别检查isRoot标志
+      if (elementType === 'layout' && metadata.isRoot !== undefined) {
+        variant = metadata.isRoot ? 'root' : 'inner';
+      }
+      
+      // 根据元数据设置示例内容
+      if (metadata.actualType === 'math') {
+        sampleContent = `数学公式(${metadata.mathType})`;
+      } else if (metadata.actualType === 'list') {
+        sampleContent = `列表(${metadata.listType})`;
+      } else if (metadata.isCodeBlock) {
+        sampleContent = `代码块(${metadata.language})`;
+      } else if (metadata.actualType === 'chart') {
+        sampleContent = `图表(${metadata.variant})`;
+      } else if (metadata.actualType === 'table') {
+        sampleContent = '表格';
+      } else if (metadata.actualType === 'button') {
+        sampleContent = metadata.buttonText || '按钮';
+      } else if (metadata.actualType === 'image') {
+        sampleContent = '图片';
+      } else if (metadata.actualType === 'layout') {
+        sampleContent = metadata.isRoot ? '根布局' : '内部布局';
+      }
+    }
+    
+    // 2. 回退到基于元素类型的判断（兼容没有元数据的旧元素）
+    if (!element._metadata) {
+      console.log(`⚠️ 元素 ${element.id} 没有元数据，使用回退分析方法`);
+      
+      if (elementType === 'text') {
+        // 从样式配置反推文本类型
+        if (element.layout && element.layout.classStyle) {
+          const classStyle = element.layout.classStyle;
+          // 检查fontSize来判断是否为标题
+          if (classStyle.fontSize) {
+            if (typeof classStyle.fontSize === 'string' && classStyle.fontSize.includes('xxxl')) {
+              variant = 'h1';
+            } else if (typeof classStyle.fontSize === 'string' && classStyle.fontSize.includes('xxl')) {
+              variant = 'h2';
+            } else if (typeof classStyle.fontSize === 'string' && classStyle.fontSize.includes('xl')) {
+              variant = 'h3';
+            } else if (typeof classStyle.fontSize === 'string' && classStyle.fontSize.includes('large')) {
+              variant = 'h4';
+            }
+          }
+        }
+        
+        // 尝试从content获取示例文本
+        if (element.font && element.font.fontsize && element.font.fontsize.default) {
+          const content = element.font.fontsize.default.content || '';
+          // 移除HTML标签来获取纯文本示例
+          sampleContent = content.replace(/<[^>]*>/g, '').slice(0, 20);
+        }
+      } else if (elementType === 'button') {
+        // 根据按钮文本判断形态
+        if (element.font && element.font.fontsize && element.font.fontsize.default) {
+          const buttonText = element.font.fontsize.default.content || '';
+          sampleContent = buttonText;
+          if (buttonText.includes('确认') || buttonText.includes('提交')) {
+            variant = 'primary';
+          } else if (buttonText.includes('取消') || buttonText.includes('重置')) {
+            variant = 'secondary';
+          }
+        }
+      } else if (elementType === 'background') {
+        elementType = 'image'; // 统一为image类型
+        variant = 'normal';
+        sampleContent = '图片';
+      } else if (elementType === 'layout') {
+        // 🔧 关键修复：根据深度确定layout的变体
+        variant = depth === 0 ? 'root' : 'inner';
+        sampleContent = depth === 0 ? '根布局' : '内部布局';
+      } else if (elementType === 'table') {
+        variant = 'container';
+        sampleContent = '表格';
+      } else if (elementType === 'code') {
+        // code元素实际对应styleConfig中的text.codeBlock
+        elementType = 'text';
+        variant = 'codeBlock';
+        sampleContent = '代码块';
+      } else if (elementType === 'chart') {
+        variant = element.chartType || 'line';
+        sampleContent = `图表(${variant})`;
+      } else if (elementType === 'math') {
+        variant = 'display';
+        sampleContent = '数学公式';
+      } else if (elementType === 'list') {
+        variant = 'unordered';
+        sampleContent = '列表';
+      }
+    }
+    
+    const key = `${elementType}.${variant}`;
+    
+    // 🔧 调试信息：显示layout层级识别结果
+    if (elementType === 'layout') {
+      console.log(`🔍 识别到Layout元素 ID:${element.id}, 层级:${variant}, 深度:${depth}, 路径:${path}`);
+    }
+    
+    if (!elementMap.has(key)) {
+      elementMap.set(key, {
+        type: elementType,
+        variant: variant,
+        count: 0,
+        elements: [],
+        sampleContent: ''
+      });
+    }
+    
+    const elementInfo = elementMap.get(key);
+    elementInfo.count++;
+    elementInfo.elements.push({
+      id: element.id,
+      element: element, // 保存元素引用
+      path: path
+    });
+    
+    // 设置示例内容
+    if (!elementInfo.sampleContent) {
+      if (sampleContent) {
+        elementInfo.sampleContent = sampleContent.length > 20 ? sampleContent.slice(0, 20) + '...' : sampleContent;
+      } else if (element.font && element.font.fontsize && element.font.fontsize.default) {
+        const content = element.font.fontsize.default.content || '';
+        // 移除HTML标签来获取纯文本示例
+        const cleanContent = content.replace(/<[^>]*>/g, '');
+        elementInfo.sampleContent = cleanContent.slice(0, 20) + (cleanContent.length > 20 ? '...' : '');
+      } else if (element.rawData) {
+        elementInfo.sampleContent = element.rawData.slice(0, 20) + (element.rawData.length > 20 ? '...' : '');
+      }
+    }
+    
+    // 递归分析子元素
+    if (element.layout && element.layout.children && element.layout.children.length > 0) {
+      element.layout.children.forEach((child, index) => {
+        analyzeElement(child, `${path}/${index}`, depth + 1);
+      });
+    }
+  };
+  
+  // 先分析根布局本身
+  analyzeElement(eightElement, 'root', 0); // 根布局本身是depth=0
+  
+  // 然后分析根布局的子元素
+  if (eightElement.layout.children) {
+    eightElement.layout.children.forEach((child, index) => {
+      analyzeElement(child, `root/${index}`, 1); // 根布局的子元素从depth=1开始
+    });
+  }
+  
+  const result = Array.from(elementMap.values());
+  console.log('📊 八要素中的元件分析结果:', result);
+  
+  return result;
+}
+
+/**
+ * 将动作系统的执行结果应用到八要素结构上
+ * @param {Object} eightElement - 八要素结构对象 
+ * @param {Array} pageElements - 页面元件列表
+ * @param {Object} actionManager - 动作系统管理器
+ * @param {Array} selectedActions - 选中的动作列表
+ * @param {Object} actionIntensities - 动作强度映射
+ * @returns {Object} 应用了动作结果的八要素结构
+ */
+export function applyActionsToEightElement(eightElement, pageElements, actionManager, selectedActions, actionIntensities) {
+  if (!eightElement || !actionManager || !selectedActions.length || !pageElements.length) {
+    return eightElement;
+  }
+
+  console.log(`🎯 开始将动作应用到八要素结构上`);
+  console.log(`页面包含 ${pageElements.length} 种元件类型，选择了 ${selectedActions.length} 个动作`);
+
+  // 深拷贝八要素结构以避免修改原对象
+  const updatedEightElement = JSON.parse(JSON.stringify(eightElement));
+  
+  // 为每种元件类型执行动作并收集结果
+  const elementStyleUpdates = new Map();
+  
+  console.log(`\n🎬 开始批量动作执行 - 目标: ${pageElements.length} 种元件类型`);
+  console.log(`📋 选中的动作: ${selectedActions.join(', ')}`);
+  
+  for (const pageElement of pageElements) {
+    const { type, variant, elements } = pageElement;
+    
+    try {     
+      // 重置特定元件的环境
+      actionManager.resetEnvironment(type, variant);
+      
+      // 批量执行动作
+      const actionList = selectedActions.map(actionName => ({
+        name: actionName,
+        intensity: actionIntensities[actionName] || 0.5
+      }));
+      
+      console.log(`🎯 执行动作列表:`);
+      actionList.forEach(action => {
+        const actionInfo = actionManager.getActionInfo(action.name);
+        console.log(`   • ${actionInfo?.name || action.name}: 强度 ${action.intensity.toFixed(1)}`);
+      });
+      
+      const result = actionManager.executeActions(actionList, type, variant);
+      
+      if (result.success && result.styles) {   
+        elementStyleUpdates.set(`${type}.${variant}`, result.styles);
+      } else {
+        console.warn(`⚠️ ${type}.${variant} 动作执行失败:`, result.error);
+      }
+    } catch (error) {
+      console.error(`❌ ${type}.${variant} 动作执行出错:`, error);
+    }
+  }
+  
+  // 将样式更新应用到具体的元素实例上
+  let updatedCount = 0;
+  let updatedElementsCount = 0;
+  
+  const applyStylesToElement = (element, elementType, variant, updates) => {
+    if (!element || !updates) return;
+    
+    // 确保元素有layout.classStyle
+    if (!element.layout) element.layout = {};
+    if (!element.layout.classStyle) element.layout.classStyle = {};
+    
+    const originalValues = {};
+    const appliedChanges = [];
+    
+    // 记录原始值并应用样式更新
+    Object.entries(updates).forEach(([property, value]) => {
+      if (value !== undefined && value !== null) {
+        originalValues[property] = element.layout.classStyle[property];
+        element.layout.classStyle[property] = value;
+        updatedCount++;
+        
+        appliedChanges.push({
+          property,
+          oldValue: originalValues[property],
+          newValue: value
+        });
+      }
+    });
+    
+    if (appliedChanges.length > 0) {
+      updatedElementsCount++;
+  
+    }
+  };
+  
+  // 递归查找并更新匹配的元素
+  const findAndUpdateElements = (element, path = '', depth = 0) => {
+    if (!element || !element.name) return;
+    
+    // 🔍 使用与analyzeElementsInEightElement相同的逻辑确定元素类型和形态
+    let elementType = element.name;
+    let variant = 'normal';
+    
+    // 1. 优先使用元数据
+    if (element._metadata) {
+      const metadata = element._metadata;
+      elementType = metadata.actualType || element.name;
+      variant = metadata.variant || 'normal';
+      
+      // 对于layout元素，特别检查isRoot标志
+      if (elementType === 'layout' && metadata.isRoot !== undefined) {
+        variant = metadata.isRoot ? 'root' : 'inner';
+      }
+    }
+    // 2. 回退到传统判断方法
+    else {
+      if (elementType === 'text') {
+        // 从样式配置反推文本类型
+        if (element.layout && element.layout.classStyle) {
+          const classStyle = element.layout.classStyle;
+          if (classStyle.fontSize) {
+            if (typeof classStyle.fontSize === 'string' && classStyle.fontSize.includes('xxxl')) {
+              variant = 'h1';
+            } else if (typeof classStyle.fontSize === 'string' && classStyle.fontSize.includes('xxl')) {
+              variant = 'h2';
+            } else if (typeof classStyle.fontSize === 'string' && classStyle.fontSize.includes('xl')) {
+              variant = 'h3';
+            } else if (typeof classStyle.fontSize === 'string' && classStyle.fontSize.includes('large')) {
+              variant = 'h4';
+            }
+          }
+        }
+      } else if (elementType === 'button') {
+        if (element.font && element.font.fontsize && element.font.fontsize.default) {
+          const buttonText = element.font.fontsize.default.content || '';
+          if (buttonText.includes('确认') || buttonText.includes('提交')) variant = 'primary';
+          else if (buttonText.includes('取消') || buttonText.includes('重置')) variant = 'secondary';
+        }
+      } else if (elementType === 'background') {
+        elementType = 'image';
+        variant = 'normal';
+      } else if (elementType === 'layout') {
+        // 🔧 关键修复：根据深度确定layout的变体
+        variant = depth === 0 ? 'root' : 'inner';
+      } else if (elementType === 'table') {
+        variant = 'container';
+      } else if (elementType === 'code') {
+        // code元素实际对应styleConfig中的text.codeBlock
+        elementType = 'text';
+        variant = 'codeBlock';
+      } else if (elementType === 'chart') {
+        variant = element.chartType || 'line';
+      } else if (elementType === 'math') {
+        variant = 'display';
+      } else if (elementType === 'list') {
+        variant = 'unordered';
+      }
+    }
+        
+    // 检查是否有对应的样式更新
+    const updateKey = `${elementType}.${variant}`;
+    const styleUpdates = elementStyleUpdates.get(updateKey);
+    
+    if (styleUpdates) {
+      applyStylesToElement(element, elementType, variant, styleUpdates);
+    }
+    
+    // 递归处理子元素
+    if (element.layout && element.layout.children && element.layout.children.length > 0) {
+      element.layout.children.forEach((child, index) => {
+        findAndUpdateElements(child, `${path}/${index}`, depth + 1);
+      });
+    }
+  };
+  
+  // 先处理根布局本身
+  findAndUpdateElements(updatedEightElement, 'root', 0); // 根布局本身是depth=0
+  
+  // 然后处理根布局的子元素
+  if (updatedEightElement.layout.children) {
+    updatedEightElement.layout.children.forEach((child, index) => {
+      findAndUpdateElements(child, `root/${index}`, 1); // 根布局的子元素从depth=1开始
+    });
+  }
+  
+  console.log(`\n🎨 八要素动作应用完成！`);
+  console.log(`   📊 统计信息:`);
+  console.log(`      • 更新的八要素实例: ${updatedElementsCount} 个`);
+  console.log(`      • 更新的样式属性总数: ${updatedCount} 个`);
+  console.log(`      • 成功处理的元件类型: ${elementStyleUpdates.size} 种`);
+  
+  if (updatedElementsCount > 0) {
+    console.log(`   🔄 所有token变化已应用到八要素结构的 layout.classStyle 中`);
+    console.log(`   ✅ 更新后的八要素结构已准备好进行HTML渲染`);
+  } else {
+    console.log(`   ⚪ 没有八要素实例被更新，可能是因为:`);
+    console.log(`      - 动作不适用于当前页面的元件类型`);
+    console.log(`      - 元件配置中缺少相应的token设置`);
+    console.log(`      - 动作执行过程中出现错误`);
+  }
+  
+  return updatedEightElement;
+}
 
 // 命名导出
 export {

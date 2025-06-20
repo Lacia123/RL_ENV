@@ -441,30 +441,22 @@ export const DEFAULT_STYLE_CONFIG = {
   layout: {
     // 根布局元素
     root: {
-      "padding-top": DIMENSION_CONSTANTS.PADDING.base,
-      "padding-bottom": DIMENSION_CONSTANTS.PADDING.base,
-      "padding-left": DIMENSION_CONSTANTS.PADDING.loose,
-      "padding-right": DIMENSION_CONSTANTS.PADDING.base,
-      "margin-top": DIMENSION_CONSTANTS.MARGIN.base,
-      "margin-bottom": DIMENSION_CONSTANTS.MARGIN.base,
-      "margin-left": DIMENSION_CONSTANTS.MARGIN.base,
-      "margin-right": DIMENSION_CONSTANTS.MARGIN.base,
-      "background": COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
-      "border-radius": DIMENSION_CONSTANTS.BORDER_RADIUS.large,
-      // "gap": DIMENSION_CONSTANTS.GAP.tight
+      padding: `${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.loose}`,
+      margin: DIMENSION_CONSTANTS.MARGIN.base,
+      backgroundColor: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
+      borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.large,
+      // gap: DIMENSION_CONSTANTS.GAP.tight
     },
     // 内部布局元素
     inner: {
-      "padding-top": DIMENSION_CONSTANTS.PADDING.tight,
-      "padding-bottom": DIMENSION_CONSTANTS.PADDING.tight,
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
       // "padding-left": DIMENSION_CONSTANTS.PADDING.tight,
       // "padding-right": DIMENSION_CONSTANTS.PADDING.tight,
-      "margin-top": DIMENSION_CONSTANTS.MARGIN.tight,
-      "margin-bottom": DIMENSION_CONSTANTS.MARGIN.tight,
       // "margin-left": DIMENSION_CONSTANTS.MARGIN.tight,
       // "margin-right": DIMENSION_CONSTANTS.MARGIN.tight,
       // "border-width": DIMENSION_CONSTANTS.BORDER_WIDTH.none,
-      "background-color": "none",
       // "gap": DIMENSION_CONSTANTS.GAP.tight
     }
   },
@@ -637,7 +629,9 @@ export const DEFAULT_STYLE_CONFIG = {
       marginTop: "{dimension.margin.base}",
       marginBottom: "{dimension.margin.base}",
       borderRadius: "{dimension.borderradius.large}",
-      border: `{dimension.borderwidth.narrow} solid {color.onsurfacecontainer.grey7}`,
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.onsurfacecontainer.grey7}",
+      borderStyle: "solid",
       boxShadow: "{material.hierarchy.2f}",
       overflow: 'auto',
       position: 'relative',
@@ -748,7 +742,9 @@ export const DEFAULT_STYLE_CONFIG = {
       borderRadius: "{dimension.borderradius.large}",
       overflow: 'hidden',
       boxShadow: "{material.hierarchy.1f}",
-      border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.surfacecontainer.black12}",
+      borderStyle: "solid",
     },
     th: {
       background: "{color.surface.grey1}",
@@ -788,7 +784,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.white100}",
       background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.primary.brand6} 100%)`,
-      border: "{dimension.borderwidth.none}",
+      // borderWidth: "{dimension.borderwidth.none}",
       borderRadius: "{dimension.borderradius.large}",
       padding: "{dimension.padding.base} {dimension.padding.extraloose}",
       cursor: 'pointer',
@@ -814,7 +810,9 @@ export const DEFAULT_STYLE_CONFIG = {
       color: "{color.secondary.violet6}",
       backgroundColor: "{color.secondarycontainer.violet1}",
       background: 'none',
-      border: `{dimension.borderwidth.base} solid {color.secondary.violet4}`,
+      borderWidth: "{dimension.borderwidth.base}",
+      borderColor: "{color.secondary.violet4}",
+      borderStyle: "solid",
       borderRadius: "{dimension.borderradius.large}",
       padding: "{dimension.padding.base} {dimension.padding.extraloose}",
       cursor: 'pointer',
@@ -840,7 +838,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.white100}",
       background: `linear-gradient(135deg, {color.success.green4} 0%, {color.success.green6} 100%)`,
-      border: "{dimension.borderwidth.none}",
+      borderWidth: "{dimension.borderwidth.none}",
       borderRadius: "{dimension.borderradius.large}",
       padding: "{dimension.padding.base} {dimension.padding.extraloose}",
       cursor: 'pointer',
@@ -865,7 +863,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.white100}",
       background: `linear-gradient(135deg, {color.warning.orange4} 0%, {color.warning.orange6} 100%)`,
-      border: "{dimension.borderwidth.none}",
+      borderWidth: "{dimension.borderwidth.none}",
       borderRadius: "{dimension.borderradius.large}",
       padding: "{dimension.padding.base} {dimension.padding.extraloose}",
       cursor: 'pointer',
@@ -890,7 +888,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.white100}",
       background: `linear-gradient(135deg, {color.error.red4} 0%, {color.error.red6} 100%)`,
-      border: "{dimension.borderwidth.none}",
+      borderWidth: "{dimension.borderwidth.none}",
       borderRadius: "{dimension.borderradius.large}",
       padding: "{dimension.padding.base} {dimension.padding.extraloose}",
       cursor: 'pointer',
@@ -915,7 +913,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.medium}",
       color: "{color.primary.brand5}",
       backgroundColor: "transparent",
-      border: "{dimension.borderwidth.none}",
+      borderWidth: "{dimension.borderwidth.none}",
       borderRadius: "{dimension.borderradius.medium}",
       padding: "{dimension.padding.tight} {dimension.padding.base}",
       cursor: 'pointer',
@@ -938,7 +936,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.medium}",
       color: "{color.primary.brand5}",
       backgroundColor: "transparent",
-      border: "{dimension.borderwidth.none}",
+      borderWidth: "{dimension.borderwidth.none}",
       padding: "{dimension.padding.extratight} {dimension.padding.tight}",
       cursor: 'pointer',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
@@ -1038,7 +1036,9 @@ export const DEFAULT_STYLE_CONFIG = {
       alignItems: 'center',
       gap: "{dimension.gap.tight}",
       backgroundColor: "{color.success.green1}",
-      border: `{dimension.borderwidth.narrow} solid {color.success.green3}`,
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.success.green3}",
+      borderStyle: "solid",
       color: "{color.success.green8}",
       borderLeft: `{dimension.borderwidth.wide} solid {color.success.green5}`
     },
@@ -1053,9 +1053,13 @@ export const DEFAULT_STYLE_CONFIG = {
       alignItems: 'center',
       gap: "{dimension.gap.tight}",
       backgroundColor: "{color.warning.orange1}",
-      border: `{dimension.borderwidth.narrow} solid {color.warning.orange3}`,
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.warning.orange3}",
+      borderStyle: "solid",
       color: "{color.warning.orange8}",
-      borderLeft: `{dimension.borderwidth.wide} solid {color.warning.orange5}`
+      borderLeftWidth: "{dimension.borderwidth.wide}",
+      borderLeftColor: "{color.warning.orange5}",
+      borderLeftStyle: "solid"
     },
 
     // 错误提示  
@@ -1068,9 +1072,13 @@ export const DEFAULT_STYLE_CONFIG = {
       alignItems: 'center',
       gap: "{dimension.gap.tight}",
       backgroundColor: "{color.error.red1}",
-      border: `{dimension.borderwidth.narrow} solid {color.error.red3}`,
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.error.red3}",
+      borderStyle: "solid",
       color: "{color.error.red8}",
-      borderLeft: `{dimension.borderwidth.wide} solid {color.error.red5}`
+      borderLeftWidth: "{dimension.borderwidth.wide}",
+      borderLeftColor: "{color.error.red5}",
+      borderLeftStyle: "solid"
     },
 
     // 信息提示  
@@ -1083,9 +1091,13 @@ export const DEFAULT_STYLE_CONFIG = {
       alignItems: 'center',
       gap: "{dimension.gap.tight}",
       backgroundColor: "{color.primarycontainer.brand1}",
-      border: `{dimension.borderwidth.narrow} solid {color.primarycontainer.brand2}`,
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.primarycontainer.brand2}",
+      borderStyle: "solid",
       color: "{color.onprimarycontainer.brand8}",
-      borderLeft: `{dimension.borderwidth.wide} solid {color.primary.brand5}`
+      borderLeftWidth: "{dimension.borderwidth.wide}",
+      borderLeftColor: "{color.primary.brand5}",
+      borderLeftStyle: "solid"
     }
   },
 
@@ -1095,7 +1107,9 @@ export const DEFAULT_STYLE_CONFIG = {
     standard: {
       backgroundColor: "{color.surfacecontainer.white100}",
       borderRadius: "{dimension.borderradius.xl}",
-      border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.surfacecontainer.black12}",
+      borderStyle: "solid",
       boxShadow: "{material.hierarchy.1f}",
       padding: "{dimension.padding.extraloose}",
       margin: "{dimension.margin.loose} 0",
@@ -1110,7 +1124,7 @@ export const DEFAULT_STYLE_CONFIG = {
     elevated: {
       backgroundColor: "{color.surfacecontainer.white100}",
       borderRadius: "{dimension.borderradius.xxl}",
-      border: "{dimension.borderwidth.none}",
+      borderWidth: "{dimension.borderwidth.none}",
       boxShadow: "{material.hierarchy.3f}",
       padding: "{dimension.padding.extraloose}",
       margin: "{dimension.margin.loose} 0",
@@ -1125,7 +1139,9 @@ export const DEFAULT_STYLE_CONFIG = {
     outlined: {
       backgroundColor: "transparent",
       borderRadius: "{dimension.borderradius.large}",
-      border: `{dimension.borderwidth.base} solid {color.surfacecontainer.black20}`,
+      borderWidth: "{dimension.borderwidth.base}",
+      borderColor: "{color.surfacecontainer.black20}",
+      borderStyle: "solid",
       boxShadow: "{material.hierarchy.ground}",
       padding: "{dimension.padding.loose}",
       margin: "{dimension.margin.base} 0",
@@ -1142,7 +1158,9 @@ export const DEFAULT_STYLE_CONFIG = {
     // 普通图片  
     normal: {
       borderRadius: "{dimension.borderradius.medium}",
-      border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black16}`,
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.surfacecontainer.black16}",
+      borderStyle: "solid",
       boxShadow: "{material.hierarchy.main}",
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       maxWidth: "100%",
@@ -1156,7 +1174,9 @@ export const DEFAULT_STYLE_CONFIG = {
     // 圆角图片 TODO: 需要确定解析的规则
     rounded: {
       borderRadius: "{dimension.borderradius.xl}",
-      border: `{dimension.borderwidth.base} solid {color.surfacecontainer.black12}`,
+      borderWidth: "{dimension.borderwidth.base}",
+      borderColor: "{color.surfacecontainer.black12}",
+      borderStyle: "solid",
       boxShadow: "{material.hierarchy.1f}",
       maxWidth: "100%",
       height: "auto",
@@ -1170,7 +1190,9 @@ export const DEFAULT_STYLE_CONFIG = {
     // 圆形图片（头像） TODO: 需要确定解析的规则
     circle: {
       borderRadius: "50%",
-      border: `3px solid {color.primarycontainer.brand2}`,
+      borderWidth: "{dimension.borderwidth.base}",
+      borderColor: "{color.primarycontainer.brand2}",
+      borderStyle: "solid",
       boxShadow: "{material.hierarchy.2f}",
       aspectRatio: "1",
       objectFit: "cover",
@@ -1185,7 +1207,9 @@ export const DEFAULT_STYLE_CONFIG = {
     // 带边框图片 TODO: 需要确定解析的规则
     framed: {
       borderRadius: "{dimension.borderradius.large}",
-      border: `{dimension.borderwidth.wide} solid {color.surfacecontainer.white100}`,
+      borderWidth: "{dimension.borderwidth.wide}",
+      borderColor: "{color.surfacecontainer.white100}",
+      borderStyle: "solid",
       boxShadow: "{material.hierarchy.3f}",
       maxWidth: "100%",
       height: "auto",
@@ -1197,7 +1221,9 @@ export const DEFAULT_STYLE_CONFIG = {
         left: "-4px",
         right: "-4px",
         bottom: "-4px",
-        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black20}`,
+        borderWidth: "{dimension.borderwidth.narrow}",
+        borderColor: "{color.surfacecontainer.black20}",
+        borderStyle: "solid",
         borderRadius: "{dimension.borderradius.xl}",
         pointerEvents: "none"
       }
@@ -1297,7 +1323,7 @@ export const DEFAULT_STYLE_CONFIG = {
       top: '12px',
       right: '12px',
       background: "{color.surfacecontainer.black20}",
-      border: "{dimension.borderwidth.none}",
+      borderWidth: "{dimension.borderwidth.none}",
       borderRadius: "{dimension.borderradius.small}",
       padding: "{dimension.padding.tight}",
       color: "{color.onsurface.white88}",

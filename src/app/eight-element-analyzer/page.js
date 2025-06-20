@@ -3,8 +3,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { renderEightElementToHtml } from '../utils/eightElement/renderEightElementHtml';
 import { convertEightElementToLayout } from '../utils/layoutAnalysis/eightElementAnalysis';
 import { markdownToEightElement } from '../utils/eightElement/markdownToEightElement';
-import { setDynamicTokenSystem, clearDynamicTokenSystem } from '../utils/tokens/resolveToken';
-import { calculateTokens } from '../utils/seeds/generateTokenBySeed';
+
+import { RL_ACTIONS, ActionSystemManager, createActionSystemManager, convertActionResultsToTokens } from '../utils/seeds/rl_action_engines';
+import { DEFAULT_STYLE_CONFIG } from '../utils/eightElement/styleConfig';
+import { analyzeElementsInEightElement, applyActionsToEightElement } from '../utils/eightElement/markdownToEightElement';
 import VisualSpaceEvaluator from '../components/VisualSpaceEvaluator';
 import collectEightElementMeasurements from '../utils/eightElement/collectElementMeasurements.js';
 
@@ -51,9 +53,12 @@ console.log(message);  // 输出: Hello, World!
 行内公式：$E = mc^2$
 
 块级公式：
-$$ \\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi} $$\n
+$$ \\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi} $$
+
 我们还可以有更复杂的公式，例如：
-$$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行内也可以混合：例如 $\\alpha + \\beta = \\gamma$。
+$$ L = \\frac{1}{2} \\rho v^2 S C_L $$
+
+这是一个关于升力的公式。行内也可以混合：例如 $\\alpha + \\beta = \\gamma$。
 
 ### 表格示例
 下面是一个简单的表格示例：
@@ -123,7 +128,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
 
 4. **高斯率（Divergence Form）**  
    - 电场的散度等于电荷密度：  
-     $$ \\nabla \\cdot \\mathbf{E} = \\rho_\\text{enc} / \\varepsilon_0 $$
+     $$ \\nabla \\cdot \\mathbf{E} = \\rho_{enc} / \\varepsilon_0 $$
 
 5. **高斯率（Ampère 法则）**  
    - 磁感应线的旋度等于电流密度加上变化磁场：  
@@ -131,7 +136,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
 
 6. **高斯率（Divergence Form）**  
    - 位移场的散度等于自由电荷密度：  
-     $$ \\nabla \\cdot \\mathbf{D} = \\rho_\\text{free} $$
+     $$ \\nabla \\cdot \\mathbf{D} = \\rho_{free} $$
 
 7. **高斯率（Divergence Form）**  
    - 磁通密度的散度等于变化磁场：  
@@ -142,21 +147,24 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
      $$ \\oint \\mathbf{E} \\cdot d\\mathbf{l} = 4\\pi k_e Q_{enc} $$
 
 `);
-  const [seedText, setSeedText] = useState(''); // 用于存储JSON文本
-  const [seed, setSeed] = useState({
-    shape: 7,      // 较大圆角
-    degree: 3,     // 紧凑间距
-    font: 6,       // 较大字体
-    material: 7,   // 较重阴影
-    color: "#FF5757" // 主题色
-  });
+  // 动作系统状态
+  const [actionManager, setActionManager] = useState(null);
+  const [selectedActions, setSelectedActions] = useState([]); // 已选择的动作
+  const [actionIntensities, setActionIntensities] = useState({}); // 动作强度
+  const [actionInputMode, setActionInputMode] = useState('categories'); // 'categories' 或 'list'
+  const [availableActions, setAvailableActions] = useState(Object.keys(RL_ACTIONS));
+  
+  // 页面元件分析状态
+  const [pageElements, setPageElements] = useState([]); // 当前页面包含的所有元件 [{type, variant, count, elements}]
+  const [affectedElements, setAffectedElements] = useState([]); // 当前动作会影响的元件列表
+  const [isElementsCollapsed, setIsElementsCollapsed] = useState(false); // 页面元件分析折叠状态
+  const [isAffectedCollapsed, setIsAffectedCollapsed] = useState(false); // 动作影响范围折叠状态
   const [eightElement, setEightElement] = useState(null);
   const [processedEightElement, setProcessedEightElement] = useState(null);
   const [renderedHtml, setRenderedHtml] = useState('');
   const [domMeasurements, setDomMeasurements] = useState(null);
   const [scoreResult, setScoreResult] = useState(null);
   const [visibleTab, setVisibleTab] = useState('html'); // 'html', 'json', 'score'
-  const [seedInputMode, setSeedInputMode] = useState('sliders'); // 'sliders' 或 'json'
   const iframeRef = useRef(null);
   const [layout, setLayout] = useState(null);
   const [iframeKey, setIframeKey] = useState(0);  // 添加 iframe key 状态
@@ -175,17 +183,128 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
     height: commonDimensions[2].height
   });
 
-  // 初始化seedText
+  // 初始化动作系统
   useEffect(() => {
-    setSeedText(JSON.stringify(seed, null, 2));
+    try {
+      // 使用ActionSystemManager，它会自动从styleConfig中提取基准token
+      const manager = createActionSystemManager(DEFAULT_STYLE_CONFIG);
+      setActionManager(manager);
+      
+      console.log('动作系统管理器初始化完成');
+      console.log('可用动作数量:', manager.getAvailableActions().length);
+    } catch (error) {
+      console.error('动作系统初始化失败:', error);
+    }
   }, []);
+
+  // 计算当前动作会影响的元件
+  const calculateAffectedElements = (selectedActionsList, pageElementsList) => {
+    if (!actionManager || selectedActionsList.length === 0 || pageElementsList.length === 0) {
+      setAffectedElements([]);
+      return [];
+    }
+
+    const affected = [];
+    
+    // 对每种元件类型和形态，检查是否会被当前动作影响
+    for (const pageElement of pageElementsList) {
+      const { type, variant, count, elements, sampleContent } = pageElement;
+      
+      try {
+        // 获取该元件的基准tokens
+        const baseTokens = actionManager.getBaseTokens(type, variant);
+        
+        if (baseTokens._configFound) {
+          // 检查任一选中的动作是否会影响该元件的tokens
+          const willBeAffected = selectedActionsList.some(actionName => {
+            const actionInfo = actionManager.getActionInfo(actionName);
+            if (!actionInfo) return false;
+            
+            // 检查动作影响的CSS属性是否在该元件的基准tokens中
+            const affectedProperties = Object.keys(baseTokens).filter(prop => !prop.startsWith('_'));
+            
+            // 🔧 改进的检测逻辑：基于动作的styleMapping检测实际影响的属性
+            if (actionInfo.styleMapping) {
+              // 获取动作实际会影响的CSS属性
+              const actionTargetProperties = Object.keys(actionInfo.styleMapping);
+              
+              // 🔍 调试日志：显示动作目标属性和元件属性的匹配情况
+              const hasMatch = actionTargetProperties.some(targetProp => {
+                const matches = affectedProperties.includes(targetProp);
+                if (matches) {
+                  console.log(`✅ 动作 ${actionName} 的属性 ${targetProp} 匹配元件 ${type}.${variant}`);
+                }
+                return matches;
+              });
+              
+              if (!hasMatch) {
+                console.log(`⚪ 动作 ${actionName} 目标属性 [${actionTargetProperties.join(', ')}] 与元件 ${type}.${variant} 属性 [${affectedProperties.join(', ')}] 无匹配`);
+              }
+              
+              return hasMatch;
+            }
+            
+            // 🔧 兼容性回退：更完整的启发式判断
+            return affectedProperties.some(prop => {
+              return (
+                // 圆润度相关动作
+                (actionName.includes('Roundness') && prop.includes('border')) ||
+                // 轮廓相关动作  
+                (actionName.includes('Outline') && (prop.includes('border') || prop.includes('Border'))) ||
+                // 字体相关动作
+                (actionName.includes('Font') && prop.includes('font')) ||
+                // 颜色相关动作
+                (actionName.includes('Color') && prop.includes('color')) ||
+                // 阴影相关动作
+                (actionName.includes('Shadow') && prop.includes('shadow')) ||
+                // 间距相关动作
+                (actionName.includes('Spacing') && (prop.includes('padding') || prop.includes('margin'))) ||
+                // 尺寸相关动作
+                (actionName.includes('Size') && prop.includes('font')) ||
+                // 张力相关动作
+                (actionName.includes('Tension') && (prop.includes('border') || prop.includes('gap'))) ||
+                // 密度相关动作
+                (actionName.includes('Density') && (prop.includes('font') || prop.includes('padding'))) ||
+                // 强度相关动作
+                (actionName.includes('Strength') && (prop.includes('font') || prop.includes('color'))) ||
+                // 透明度相关动作
+                (actionName.includes('Transparency') && (prop.includes('background') || prop.includes('opacity'))) ||
+                // 纹理相关动作
+                (actionName.includes('Texture') && prop.includes('background')) ||
+                // 状态相关动作
+                (actionName.includes('State') && (prop.includes('color') || prop.includes('background')))
+              );
+            });
+          });
+          
+          if (willBeAffected) {
+            affected.push({
+              type,
+              variant,
+              count,
+              elements,
+              sampleContent,
+              tokenCount: Object.keys(baseTokens).filter(k => !k.startsWith('_')).length
+            });
+          }
+        }
+      } catch (error) {
+        console.warn(`无法分析元件 ${type}.${variant}:`, error);
+      }
+    }
+    
+    setAffectedElements(affected);
+    console.log('🎯 受影响的元件:', affected);
+    
+    return affected;
+  };
 
   // 处理markdown变化
   useEffect(() => {
     if (markdown && !renderedHtml) {
       processMarkdown();
     }
-  }, [markdown, seed]);
+  }, [markdown, selectedActions, actionIntensities]);
 
   // 处理iframe加载完成后的测量
   useEffect(() => {
@@ -212,31 +331,32 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
     }
   }, [renderedHtml]);
 
-  // 处理Seed的更新（通过滑块）
-  const handleSeedChange = (key, value) => {
-    const newSeed = {
-      ...seed,
-      [key]: value
-    };
-    setSeed(newSeed);
-    setSeedText(JSON.stringify(newSeed, null, 2));
+  // 处理动作选择
+  const handleActionToggle = (actionName) => {
+    if (selectedActions.includes(actionName)) {
+      // 移除动作
+      setSelectedActions(prev => prev.filter(a => a !== actionName));
+      setActionIntensities(prev => {
+        const newIntensities = { ...prev };
+        delete newIntensities[actionName];
+        return newIntensities;
+      });
+    } else {
+      // 添加动作
+      setSelectedActions(prev => [...prev, actionName]);
+      setActionIntensities(prev => ({
+        ...prev,
+        [actionName]: 0.5 // 默认强度(0.1-1.0)
+      }));
+    }
   };
 
-  // 处理JSON文本的更新
-  const handleSeedTextChange = (e) => {
-    const text = e.target.value;
-    setSeedText(text);
-    
-    try {
-      const parsedSeed = JSON.parse(text);
-      // 验证必要的字段
-      if (typeof parsedSeed === 'object' && parsedSeed !== null) {
-        setSeed(parsedSeed);
-      }
-    } catch (error) {
-      // JSON解析错误，保持文本但不更新seed对象
-      console.error('解析JSON时出错:', error);
-    }
+  // 处理动作强度变化
+  const handleIntensityChange = (actionName, intensity) => {
+    setActionIntensities(prev => ({
+      ...prev,
+      [actionName]: intensity
+    }));
   };
 
   // 处理Markdown转换为八要素结构
@@ -246,21 +366,55 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
       const currentDimensions = customDimensions || dimensions;
       console.log('处理Markdown使用尺寸:', currentDimensions);
 
+
       
-      // 先清除之前可能存在的动态token系统
-      clearDynamicTokenSystem();
+      // 1. 转换Markdown为八要素结构
+      let eightElementObj = markdownToEightElement(markdown);
       
-      // 使用seed生成设计令牌并设置到动态token系统
-      const designTokens = calculateTokens(seed);
-      console.log('使用种子生成设计令牌:', seed);
-      setDynamicTokenSystem(designTokens);
-      console.log('已将设计令牌设置为动态token系统');
+      // 2. 分析八要素中的元件类型（使用八要素层面的函数）
+      const pageElementsList = analyzeElementsInEightElement(eightElementObj);
+      setPageElements(pageElementsList);
       
-      // 转换Markdown为八要素结构
-      const eightElementObj = markdownToEightElement(markdown);
+      // 3. 如果有选中的动作，应用到八要素结构上
+      if (actionManager && selectedActions.length > 0 && pageElementsList.length > 0) {
+        console.log(`\n🚀 开始应用动作到八要素结构`);
+        console.log(`   选中的动作: ${selectedActions.join(', ')}`);
+        console.log(`   目标页面元件: ${pageElementsList.map(p => `${p.type}.${p.variant}(${p.count}个)`).join(', ')}`);
+        console.log(`   动作强度设置:`);
+        selectedActions.forEach(actionName => {
+          const intensity = actionIntensities[actionName] || 0.5;
+          console.log(`      ${actionName}: ${intensity.toFixed(1)}`);
+        });
+        
+        try {
+          // 使用八要素层面的函数应用动作
+          eightElementObj = applyActionsToEightElement(
+            eightElementObj, 
+            pageElementsList, 
+            actionManager, 
+            selectedActions, 
+            actionIntensities
+          );
+          
+          console.log('\n🎉 动作应用到八要素结构完成！');
+          console.log('   八要素结构已更新，包含所有token变化');
+        } catch (error) {
+          console.error('\n❌ 动作应用出错:', error);
+          console.error('   将使用原始八要素结构继续渲染');
+        }
+      } else {
+        let reason = '';
+        if (!actionManager) reason = '动作管理器未初始化';
+        else if (selectedActions.length === 0) reason = '未选择任何动作';
+        else if (pageElementsList.length === 0) reason = '页面中没有检测到元件';
+        
+        console.log(`\n⚪ 跳过动作应用 - ${reason}`);
+      }
+      
+      // 4. 保存处理后的八要素结构
       setEightElement(eightElementObj);
       
-      // 渲染HTML，使用currentDimensions中的宽高
+      // 5. 渲染HTML（使用应用了动作的八要素结构）
       const { html, processedEightElement } = renderEightElementToHtml(eightElementObj, { 
         width: currentDimensions.width, 
         height: currentDimensions.height
@@ -284,20 +438,26 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
       
       setDomMeasurements(measurements);
       
+      console.log(`\n🏁 Markdown处理流程完成！`);
+      console.log(`   📄 生成的HTML长度: ${html.length} 字符`);
+      console.log(`   🎨 八要素结构: ${pageElementsList.length} 种元件类型`);
+      console.log(`   📐 渲染尺寸: ${currentDimensions.width}x${currentDimensions.height}`);
+      if (selectedActions.length > 0) {
+        console.log(`   ⚡ 应用的动作: ${selectedActions.length} 个`);
+      }
+      
       return html; // 返回生成的HTML，方便调用者使用
     } catch (error) {
-      console.error('处理Markdown时出错:', error);
-      // 确保出错时也清除动态token系统
-      clearDynamicTokenSystem();
+      console.error('\n❌ Markdown 处理出错:', error);
+      console.error('   错误详情:', error.message);
       return null;
     }
   };
 
-  // 处理seed变化时立即应用样式
+  // 当动作选择变化时，重新计算影响范围
   useEffect(() => {
-    // 确保seed变化后不会立即触发渲染，而是让用户手动点击应用按钮
-    // 这样可以避免用户调整过程中频繁渲染导致性能问题
-  }, [seed]);
+    calculateAffectedElements(selectedActions, pageElements);
+  }, [selectedActions, pageElements, actionManager]);
 
   // 显式添加应用样式的函数 - 与processMarkdown分开
   const applyStyleSettings = () => {
@@ -337,55 +497,38 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
     }
   };
 
-  // 获取数值对应的描述文本
-  const getValueDescription = (key, value) => {
-    const descriptions = {
-      shape: {
-        0: '无圆角',
-        3: '小圆角',
-        5: '中等圆角',
-        7: '较大圆角',
-        10: '最大圆角'
-      },
-      degree: {
-        0: '极宽间距',
-        3: '紧凑间距',
-        5: '中等间距',
-        7: '宽松间距',
-        10: '极宽间距'
-      },
-      font: {
-        0: '极小字体',
-        3: '小字体',
-        5: '中等字体',
-        7: '大字体',
-        10: '极大字体'
-      },
-      material: {
-        0: '无阴影',
-        3: '轻阴影',
-        5: '中等阴影',
-        7: '重阴影',
-        10: '极重阴影'
-      }
-    };
-    
-    // 找到最接近的描述
-    const values = Object.keys(descriptions[key]).map(Number);
-    const closestValue = values.reduce((prev, curr) => 
-      Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev
-    );
-    
-    return descriptions[key][closestValue];
+  // 获取动作分类
+  const getActionsByCategory = () => {
+    if (!actionManager) return {};
+    return actionManager.getActionCategories();
   };
 
-  // 在组件卸载时清除动态token系统
-  useEffect(() => {
-    return () => {
-      clearDynamicTokenSystem();
-      console.log('组件卸载，已清除动态token系统');
-    };
-  }, []);
+  // 获取动作的中文描述
+  const getActionDescription = (actionName) => {
+    if (!actionManager) {
+      const action = RL_ACTIONS[actionName];
+      return action ? action.name : actionName;
+    }
+    const actionInfo = actionManager.getActionInfo(actionName);
+    return actionInfo ? actionInfo.name : actionName;
+  };
+
+  // 获取动作的冲突信息
+  const getActionConflicts = (actionName) => {
+    if (!actionManager) {
+      const action = RL_ACTIONS[actionName];
+      return action?.conflicts || [];
+    }
+    return actionManager.checkActionConflicts(actionName, selectedActions);
+  };
+
+  // 检查动作是否可用（没有冲突）
+  const isActionAvailable = (actionName) => {
+    const conflicts = getActionConflicts(actionName);
+    return conflicts.length === 0;
+  };
+
+
 
   // 添加尺寸选择处理函数
   const handleDimensionChange = (dimension) => {
@@ -438,143 +581,254 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
             placeholder="输入Markdown文本..."
           />
           
+          {/* 页面元件分析 */}
           <div className="mb-6">
-            <h3 className="font-medium text-gray-700 mb-2">样式种子设置</h3>
-            
-            <div className="flex mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-medium text-gray-700">页面元件分析</h3>
               <button
-                className={`px-3 py-1 text-sm rounded-l ${seedInputMode === 'sliders' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                onClick={() => setSeedInputMode('sliders')}
+                onClick={() => setIsElementsCollapsed(!isElementsCollapsed)}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+                title={isElementsCollapsed ? "展开" : "折叠"}
               >
-                滑块控制
-              </button>
-              <button
-                className={`px-3 py-1 text-sm rounded-r ${seedInputMode === 'json' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                onClick={() => setSeedInputMode('json')}
-              >
-                JSON编辑
+                {isElementsCollapsed ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                )}
               </button>
             </div>
             
-            {seedInputMode === 'sliders' ? (
-              <div className="space-y-4">
-                {/* 形状控制 */}
-                <div>
-                  <div className="flex justify-between">
-                    <label className="block text-sm font-medium text-gray-700">
-                      形状 (Shape)
-                    </label>
-                    <span className="text-xs text-gray-500">
-                      {seed.shape} - {getValueDescription('shape', seed.shape)}
-                    </span>
+            {!isElementsCollapsed && (
+              <div className="mb-4 p-3 bg-gray-50 rounded border">
+                {pageElements.length > 0 ? (
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-gray-600 mb-2">
+                      当前页面包含 {pageElements.length} 种元件类型:
+                    </div>
+                    {pageElements.map(({ type, variant, count, sampleContent }) => (
+                      <div key={`${type}.${variant}`} className="flex items-center justify-between p-2 bg-white rounded border">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">
+                            {type}.{variant}
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            {sampleContent && `"${sampleContent}"`}
+                          </span>
+                        </div>
+                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                          {count}个
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="1"
-                    value={seed.shape || 0}
-                    onChange={(e) => handleSeedChange('shape', parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-full mt-1"
-                  />
-                </div>
-                
-                {/* 间距控制 */}
-                <div>
-                  <div className="flex justify-between">
-                    <label className="block text-sm font-medium text-gray-700">
-                      间距 (Degree)
-                    </label>
-                    <span className="text-xs text-gray-500">
-                      {seed.degree} - {getValueDescription('degree', seed.degree)}
-                    </span>
+                ) : (
+                  <div className="text-sm text-gray-500 text-center py-4">
+                    请先输入Markdown内容以分析页面元件
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="1"
-                    value={seed.degree || 0}
-                    onChange={(e) => handleSeedChange('degree', parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-full mt-1"
-                  />
+                )}
+              </div>
+            )}
+          </div>
+          
+          {/* 动作影响范围 */}
+          {selectedActions.length > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium text-gray-700">动作影响范围</h3>
+                <button
+                  onClick={() => setIsAffectedCollapsed(!isAffectedCollapsed)}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                  title={isAffectedCollapsed ? "展开" : "折叠"}
+                >
+                  {isAffectedCollapsed ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              
+              {!isAffectedCollapsed && (
+                <div className="mb-4 p-3 bg-yellow-50 rounded border border-yellow-200">
+                  {affectedElements.length > 0 ? (
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium text-yellow-800 mb-2">
+                        当前动作将影响 {affectedElements.length} 种元件:
+                      </div>
+                      {affectedElements.map(({ type, variant, count, sampleContent, tokenCount }) => (
+                        <div key={`${type}.${variant}`} className="flex items-center justify-between p-2 bg-yellow-100 rounded">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs px-2 py-1 bg-yellow-200 text-yellow-800 rounded font-mono">
+                              {type}.{variant}
+                            </span>
+                            <span className="text-sm text-yellow-700">
+                              {sampleContent && `"${sampleContent}"`}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs bg-yellow-200 px-2 py-1 rounded">
+                              {count}个元件
+                            </span>
+                            <span className="text-xs bg-yellow-200 px-2 py-1 rounded">
+                              {tokenCount}个tokens
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-yellow-700 text-center py-2">
+                      当前动作不会影响页面中的任何元件
+                    </div>
+                  )}
                 </div>
-                
-                {/* 字体控制 */}
-                <div>
-                  <div className="flex justify-between">
-                    <label className="block text-sm font-medium text-gray-700">
-                      字体 (Font)
-                    </label>
-                    <span className="text-xs text-gray-500">
-                      {seed.font} - {getValueDescription('font', seed.font)}
-                    </span>
+              )}
+            </div>
+          )}
+          
+          <div className="mb-6">
+            <h3 className="font-medium text-gray-700 mb-2">动作空间设置</h3>
+            
+            <div className="flex mb-3">
+              <button
+                className={`px-3 py-1 text-sm rounded-l ${actionInputMode === 'categories' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                onClick={() => setActionInputMode('categories')}
+              >
+                分类选择
+              </button>
+              <button
+                className={`px-3 py-1 text-sm rounded-r ${actionInputMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                onClick={() => setActionInputMode('list')}
+              >
+                列表模式
+              </button>
+            </div>
+            
+            {actionInputMode === 'categories' ? (
+              <div className="space-y-4 max-h-80 overflow-y-auto">
+                {Object.entries(getActionsByCategory()).map(([category, actions]) => (
+                  <div key={category} className="border border-gray-200 rounded p-3">
+                    <h4 className="font-medium text-gray-800 mb-2 capitalize">
+                      {category === 'form' && '🎨 形态动作'}
+                      {category === 'color' && '🌈 色彩动作'}
+                      {category === 'typography' && '📝 字体动作'}
+                      {category === 'material' && '🎭 质感动作'}
+                      {category === 'proportion' && '📏 比例动作'}
+                      {category === 'composition' && '🏗️ 构图动作'}
+                      {category === 'state' && '🚦 状态动作'}
+                      {category === 'adaptive' && '🤖 智能动作'}
+                      {category === 'animation' && '🎬 动画动作'}
+                      {category === 'accessibility' && '♿ 可访问性动作'}
+                    </h4>
+                    <div className="space-y-2">
+                      {actions.map(actionName => {
+                        const isSelected = selectedActions.includes(actionName);
+                        const isAvailable = isActionAvailable(actionName);
+                        const conflicts = getActionConflicts(actionName);
+                        
+                        return (
+                          <div key={actionName} className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                disabled={!isAvailable && !isSelected}
+                                onChange={() => handleActionToggle(actionName)}
+                                className="rounded"
+                              />
+                              <span className={`text-sm ${!isAvailable && !isSelected ? 'text-gray-400' : 'text-gray-700'}`}>
+                                {getActionDescription(actionName)}
+                              </span>
+                              {conflicts.length > 0 && (
+                                <span className="text-xs text-orange-500" title={`冲突动作: ${conflicts.join(', ')}`}>
+                                  ⚠️
+                                </span>
+                              )}
+                            </div>
+                            {isSelected && (
+                              <div className="flex items-center space-x-2">
+                                <span className="text-xs text-gray-500">强度:</span>
+                                <input
+                                  type="number"
+                                  min="0.1"
+                                  max="1.0"
+                                  step="0.1"
+                                  value={actionIntensities[actionName] || 0.5}
+                                  onChange={(e) => {
+                                    const value = parseFloat(e.target.value);
+                                    if (value >= 0.1 && value <= 1.0) {
+                                      handleIntensityChange(actionName, value);
+                                    }
+                                  }}
+                                  className="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="1"
-                    value={seed.font || 0}
-                    onChange={(e) => handleSeedChange('font', parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-full mt-1"
-                  />
-                </div>
-                
-                {/* 材质控制 */}
-                <div>
-                  <div className="flex justify-between">
-                    <label className="block text-sm font-medium text-gray-700">
-                      材质 (Material)
-                    </label>
-                    <span className="text-xs text-gray-500">
-                      {seed.material} - {getValueDescription('material', seed.material)}
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="1"
-                    value={seed.material || 0}
-                    onChange={(e) => handleSeedChange('material', parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-full mt-1"
-                  />
-                </div>
-                
-                {/* 颜色控制 */}
-                <div>
-                  <div className="flex justify-between">
-                    <label className="block text-sm font-medium text-gray-700">
-                      主题色 (Color)
-                    </label>
-                    <span className="text-xs text-gray-500 inline-flex items-center">
-                      <span className="w-4 h-4 inline-block mr-1 rounded-full" style={{backgroundColor: seed.color}}></span>
-                      {seed.color}
-                    </span>
-                  </div>
-                  <input
-                    type="color"
-                    value={seed.color || "#000000"}
-                    onChange={(e) => handleSeedChange('color', e.target.value)}
-                    className="w-full h-8 rounded mt-1"
-                  />
-                </div>
+                ))}
               </div>
             ) : (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Seed JSON配置
-                </label>
-                <textarea
-                  className="w-full h-48 border border-gray-300 rounded p-2 font-mono text-sm"
-                  value={seedText}
-                  onChange={handleSeedTextChange}
-                  placeholder='{"shape": 7, "degree": 3, "font": 6, "material": 7, "color": "#FF5757"}'
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  直接编辑JSON配置，shape/degree/font/material的值范围是0-10，color为HEX颜色值
-                </p>
+              <div className="max-h-80 overflow-y-auto">
+                <div className="space-y-2">
+                  {availableActions.map(actionName => {
+                    const isSelected = selectedActions.includes(actionName);
+                    const isAvailable = isActionAvailable(actionName);
+                    const action = RL_ACTIONS[actionName];
+                    
+                    return (
+                      <div key={actionName} className="flex items-center justify-between p-2 border rounded">
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            disabled={!isAvailable && !isSelected}
+                            onChange={() => handleActionToggle(actionName)}
+                            className="rounded"
+                          />
+                          <div>
+                            <span className={`text-sm font-medium ${!isAvailable && !isSelected ? 'text-gray-400' : 'text-gray-700'}`}>
+                              {getActionDescription(actionName)}
+                            </span>
+                            <div className="text-xs text-gray-500">
+                              {action.category} • {action.intensity}
+                            </div>
+                          </div>
+                        </div>
+                        {isSelected && (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">强度:</span>
+                            <input
+                              type="number"
+                              min="0.1"
+                              max="1.0"
+                              step="0.1"
+                              value={actionIntensities[actionName] || 0.5}
+                              onChange={(e) => {
+                                const value = parseFloat(e.target.value);
+                                if (value >= 0.1 && value <= 1.0) {
+                                  handleIntensityChange(actionName, value);
+                                }
+                              }}
+                              className="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
             
@@ -588,12 +842,12 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
                 onClick={visibleTab === 'html' ? applyStyleSettings : undefined}
                 disabled={visibleTab !== 'html'}
               >
-                应用样式设置
+                应用动作设置
               </button>
               <p className="text-xs text-gray-500 mt-1">
                 {visibleTab === 'html' 
-                  ? '样式种子会影响八要素结构的视觉效果' 
-                  : '请切换到HTML预览页面后再应用样式设置'
+                  ? `已选择 ${selectedActions.length} 个动作，将影响页面中 ${affectedElements.length} 种元件类型` 
+                  : '请切换到HTML预览页面后再应用动作设置'
                 }
               </p>
             </div>
@@ -696,10 +950,41 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$\n这是一个关于升力的公式。行�
             </div>
           </div>
 
-          {/* 当前使用的Seed */}
+          {/* 当前使用的动作 */}
           <div className="mt-4 text-xs text-gray-500 p-2 bg-gray-100 rounded">
-            <div className="font-medium mb-1">当前样式种子:</div>
-            <pre>{JSON.stringify(seed, null, 2)}</pre>
+            <div className="font-medium mb-1">动作系统状态:</div>
+            {actionManager ? (
+              <div className="space-y-2">
+                <div className="text-green-600">✅ 系统已初始化</div>
+                <div>页面元件类型: {pageElements.length} 种</div>
+                <div>可用动作: {actionManager.getAvailableActions().length} 个</div>
+                
+                {selectedActions.length > 0 ? (
+                  <div className="mt-2">
+                    <div className="font-medium mb-1">已选择的动作:</div>
+                    <div className="space-y-1">
+                      {selectedActions.map(actionName => (
+                        <div key={actionName} className="flex justify-between">
+                          <span>{getActionDescription(actionName)}</span>
+                          <span className="font-mono">
+                            {(actionIntensities[actionName] || 0.5).toFixed(1)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-gray-300">
+                      <div className="text-yellow-600">
+                        💡 影响范围: {affectedElements.length} 种元件 • 总计 {affectedElements.reduce((sum, el) => sum + el.count, 0)} 个元件
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-gray-400 mt-2">未选择动作</div>
+                )}
+              </div>
+            ) : (
+              <div className="text-red-500">❌ 系统未初始化</div>
+            )}
           </div>
         </div>
       </div>

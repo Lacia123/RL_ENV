@@ -213,7 +213,6 @@ function generateCSSFromClassStyles(classStyles) {
 }
 
 function generateStyleProperties(styleObj) {
-    console.log('styleObj', styleObj);
     let css = '';
     Object.entries(styleObj).forEach(([property, value]) => {
         if (value === null || value === undefined) return;
@@ -460,29 +459,36 @@ function processTextElement(processedElement, originalElement) {
     }
     processedElement.originalTextContent = rawTextContent; // Keep original for non-katex uses if any
 
-    // Process with KaTeX-enabled marked
+    // 🔧 修复：检查内容是否已经是HTML格式，避免重复处理
     if (rawTextContent && typeof rawTextContent === 'string') {
-        try {
-            let preppedMarkdown = rawTextContent;
+        // 如果内容已经包含HTML标签（如<p>, <math>, <span>等），说明已经被处理过了
+        if (rawTextContent.includes('<') && (rawTextContent.includes('<p>') || rawTextContent.includes('<math') || rawTextContent.includes('<span') || rawTextContent.includes('<li>'))) {
+            // 直接使用已处理的HTML内容
+            processedElement.katexProcessedContent = rawTextContent;
+        } else {
+            // 未处理的Markdown内容，需要用KaTeX-enabled marked处理
+            try {
+                let preppedMarkdown = rawTextContent;
 
-            // Correctly add a space before an inline $ if it's preceded by a non-whitespace character
-            // and is not part of a $$ block delimiter.
-            preppedMarkdown = preppedMarkdown.replace(/(\S)(\$)(?!\$)/g, (match, charBefore, dollarSign) => {
-                if (charBefore === '$') { // Avoid altering existing $$ pairs
-                    return match;
-                }
-                return charBefore + ' ' + dollarSign; // Add space: e.g., "word$" -> "word $"
-            });
+                // Correctly add a space before an inline $ if it's preceded by a non-whitespace character
+                // and is not part of a $$ block delimiter.
+                preppedMarkdown = preppedMarkdown.replace(/(\S)(\$)(?!\$)/g, (match, charBefore, dollarSign) => {
+                    if (charBefore === '$') { // Avoid altering existing $$ pairs
+                        return match;
+                    }
+                    return charBefore + ' ' + dollarSign; // Add space: e.g., "word$" -> "word $"
+                });
 
-            // Ensure newlines in original text are treated as <br> or new paragraphs by marked
-            preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
-            
-            processedElement.katexProcessedContent = markedInstance.parse(preppedMarkdown);
-        } catch (error) {
-            console.error("KaTeX or Marked parsing error for text:", error);
-            // Fallback to showing original text with an error message if parsing fails
-            const errorMessage = `<p style="color:red;">Error rendering math/markdown: ${escapeHtml(error.message)}</p>`;
-            processedElement.katexProcessedContent = errorMessage + escapeHtml(rawTextContent).replace(/\\n/g, '<br>');
+                // Ensure newlines in original text are treated as <br> or new paragraphs by marked
+                preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
+                
+                processedElement.katexProcessedContent = markedInstance.parse(preppedMarkdown);
+            } catch (error) {
+                console.error("KaTeX or Marked parsing error for text:", error);
+                // Fallback to showing original text with an error message if parsing fails
+                const errorMessage = `<p style="color:red;">Error rendering math/markdown: ${escapeHtml(error.message)}</p>`;
+                processedElement.katexProcessedContent = errorMessage + escapeHtml(rawTextContent).replace(/\\n/g, '<br>');
+            }
         }
     } else {
         processedElement.katexProcessedContent = escapeHtml(rawTextContent || '').replace(/\\n/g, '<br>'); // Handle null/undefined rawTextContent
@@ -899,6 +905,8 @@ function renderElement(element) {
 
     switch (elementType.toLowerCase()) {
         case 'text':
+        case 'math':
+        case 'list':
             return renderTextElement(element);
         case 'button':
             return renderButtonElement(element);
@@ -944,11 +952,15 @@ function renderTextElement(element) {
     const className = element.layout && element.layout.className ? element.layout.className : '';
     const classAttr = className ? `class="${className}"` : '';
 
-    // 直接使用预处理的HTML内容
+    // 🔧 修复：优先使用预处理的KaTeX+Markdown内容
     let contentHtml = '';
 
-    // 如果有预处理的Markdown+KaTeX内容，直接使用
-    if (element.font && element.font.fontsize && element.font.fontsize.default) {
+    // 1. 优先使用经过KaTeX和Markdown处理的内容
+    if (element.katexProcessedContent) {
+        contentHtml = element.katexProcessedContent;
+    }
+    // 2. 回退到原始font内容
+    else if (element.font && element.font.fontsize && element.font.fontsize.default) {
         contentHtml = element.font.fontsize.default.content || '';
 
         // 如果content不是HTML格式（老格式或纯文本），则进行简单的HTML转义和换行处理
