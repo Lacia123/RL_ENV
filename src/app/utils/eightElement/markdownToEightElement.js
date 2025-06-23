@@ -263,12 +263,12 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
             prop: "default",
             token: "bg"
           },
-          fontSizes: {
-            element: "font",
-            value: "fontsize",
-            prop: "default",
-            token: "fontsize"
-          }
+          // fontSizes: {
+          //   element: "font",
+          //   value: "fontsize",
+          //   prop: "default",
+          //   token: "fontsize"
+          // }
         },
         children: []
       },
@@ -302,12 +302,12 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
             prop: "default",
             token: "bg"
           },
-          fontSizes: {
-            element: "font",
-            value: "fontsize",
-            prop: "default",
-            token: "fontsize"
-          }
+          // fontSizes: {
+          //   element: "font",
+          //   value: "fontsize",
+          //   prop: "default",
+          //   token: "fontsize"
+          // }
         },
         children: []
       }
@@ -380,14 +380,14 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
         default: {
           "data-key": "",
           content: htmlContent, // 保存处理后的HTML内容，包含Markdown和KaTeX
-          style: {
-            fontsize: {
-              value: textStyleConfig.fontSize || FONT_CONSTANTS.SIZE.LARGE,
-              type: "fontSizes",
-              key: "font-fontsize"
-            }
-          },
-          resource: textStyleConfig.fontSize || FONT_CONSTANTS.SIZE.LARGE
+          // style: {
+          //   fontsize: {
+          //     value: textStyleConfig.fontSize || FONT_CONSTANTS.SIZE.LARGE,
+          //     type: "fontSizes",
+          //     key: "font-fontsize"
+          //   }
+          // },
+          // resource: textStyleConfig.fontSize || FONT_CONSTANTS.SIZE.LARGE
         }
       },
       fontweight: textStyleConfig.fontWeight || (richTextOptions.isBold ? {
@@ -1806,14 +1806,9 @@ function createCodeElement(codeContent, language = '') {
         border: [],
         scale: [],
         "box-sizing": "border-box",
-        padding: DIMENSION_CONSTANTS.PADDING.base,
         fontSize: FONT_CONSTANTS.SIZE.SMALL,
         lineHeight: "1.5",
         whiteSpace: "pre",
-        borderWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
-        borderStyle: "solid",
-        borderColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
-        borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.medium,
         width: "100%",
       }
     },

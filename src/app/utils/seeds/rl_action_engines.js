@@ -1801,10 +1801,11 @@ export class ActionConflictResolver {
  * 强化学习环境接口
  */
 export class RLStyleEnvironment {
-  constructor(initialStyles = {}) {
+  constructor(initialStyles = {}, metadata = {}) {
     this.conflictResolver = new ActionConflictResolver();
-    this.baseStyles = initialStyles; // 保存初始基准值
-    this.currentStyles = { ...initialStyles };
+    this.baseStyles = initialStyles; // 保存初始基准值（仅包含CSS样式属性）
+    this.currentStyles = { ...initialStyles, ...metadata }; // 当前样式包含元数据用于动作处理
+    this.metadata = metadata; // 分离存储元数据
     this.actionHistory = [];
   }
   
@@ -1897,7 +1898,7 @@ export class RLStyleEnvironment {
    * 重置环境
    */
   reset() {
-    this.currentStyles = { ...this.baseStyles };
+    this.currentStyles = { ...this.baseStyles, ...this.metadata };
     this.conflictResolver.reset();
     this.actionHistory = [];
   }
@@ -2136,14 +2137,17 @@ function extractTokensFromElementConfig(elementConfig) {
  * @param {Object} styleConfig - 样式配置对象
  * @param {string} elementType - 元件类型 (text, button, image, table, etc.)
  * @param {string} variant - 变体名称 (normal, primary, h1, h2, etc.)
- * @returns {Object} 该元件形态的基准token值
+ * @returns {Object} 该元件形态的基准token值和元数据
  */
 export function getElementBaseTokens(styleConfig, elementType = 'text', variant = 'normal') {
   
   const elementConfig = styleConfig[elementType];
   if (!elementConfig) {
     console.warn(`未找到元件类型 ${elementType} 的配置`);
-    return { elementType, variant, _configFound: false };
+    return { 
+      baseTokens: {},
+      metadata: { elementType, variant, _configFound: false }
+    };
   }
   
   const variantConfig = elementConfig[variant];
@@ -2158,16 +2162,21 @@ export function getElementBaseTokens(styleConfig, elementType = 'text', variant 
       console.log(`回退到变体: ${fallbackVariant}`);
       return getElementBaseTokens(styleConfig, elementType, fallbackVariant);
     }
-    return { elementType, variant, _configFound: false };
+    return { 
+      baseTokens: {},
+      metadata: { elementType, variant, _configFound: false }
+    };
   }
   
   // 从变体配置中提取基准tokens
   const baseTokens = extractTokensFromElementConfig(variantConfig);
   
-  // 添加元数据
-  baseTokens.elementType = elementType;
-  baseTokens.variant = variant;
-  baseTokens._configFound = true;
+  // 分离元数据，不混入到基准样式中
+  const metadata = {
+    elementType,
+    variant,
+    _configFound: true
+  };
   
 //   console.log(`✅ 成功提取 ${elementType}.${variant} 的基准tokens:`, Object.keys(baseTokens).filter(k => !k.startsWith('_')));
   
@@ -2176,7 +2185,7 @@ export function getElementBaseTokens(styleConfig, elementType = 'text', variant 
     console.log(`   🏗️ Layout层级: ${variant} (${variant === 'root' ? '根布局' : '内部布局'})`);
   }
   
-  return baseTokens;
+  return { baseTokens, metadata };
 }
 
 /**
@@ -2227,19 +2236,20 @@ export class ActionSystemManager {
     if (!this.environments.has(envKey)) {
       console.log(`🔧 为 ${envKey} 创建新的动作环境`);
       
-      // 获取该元件形态的基准tokens
-      const baseTokens = getElementBaseTokens(this.styleConfig, elementType, variant);
+      // 获取该元件形态的基准tokens和元数据
+      const { baseTokens, metadata } = getElementBaseTokens(this.styleConfig, elementType, variant);
       
-      if (!baseTokens._configFound) {
+      if (!metadata._configFound) {
         console.warn(`无法为 ${envKey} 创建环境：配置未找到`);
         return null;
       }
       
-      // 创建专用的RL环境
-      const environment = new RLStyleEnvironment(baseTokens);
+      // 创建专用的RL环境，分离传递基准样式和元数据
+      const environment = new RLStyleEnvironment(baseTokens, metadata);
       this.environments.set(envKey, environment);
       
-      console.log(`✅ ${envKey} 环境创建成功，基准tokens:`, Object.keys(baseTokens).filter(k => !k.startsWith('_')));
+      console.log(`✅ ${envKey} 环境创建成功，基准tokens:`, Object.keys(baseTokens));
+      console.log(`   📋 元数据:`, metadata);
     }
     
     return this.environments.get(envKey);
@@ -2402,8 +2412,8 @@ export class ActionSystemManager {
    * @param {string} variant - 变体名称
    */
   getBaseTokens(elementType = 'text', variant = 'normal') {
-    const baseTokens = getElementBaseTokens(this.styleConfig, elementType, variant);
-    return baseTokens;
+    const { baseTokens, metadata } = getElementBaseTokens(this.styleConfig, elementType, variant);
+    return { baseTokens, metadata };
   }
   
   /**
@@ -2413,7 +2423,8 @@ export class ActionSystemManager {
     const envInfo = {};
     this.environments.forEach((env, key) => {
       envInfo[key] = {
-        baseTokens: env.baseStyles,
+        baseTokens: env.baseStyles, // 仅包含CSS样式属性
+        metadata: env.metadata, // 分离的元数据
         currentState: env.getState()
       };
     });

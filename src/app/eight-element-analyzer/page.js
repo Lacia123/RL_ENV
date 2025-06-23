@@ -211,10 +211,10 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
       const { type, variant, count, elements, sampleContent } = pageElement;
       
       try {
-        // 获取该元件的基准tokens
-        const baseTokens = actionManager.getBaseTokens(type, variant);
+        // 获取该元件的基准tokens和元数据
+        const { baseTokens, metadata } = actionManager.getBaseTokens(type, variant);
         
-        if (baseTokens._configFound) {
+        if (metadata._configFound) {
           // 检查任一选中的动作是否会影响该元件的tokens
           const willBeAffected = selectedActionsList.some(actionName => {
             const actionInfo = actionManager.getActionInfo(actionName);
