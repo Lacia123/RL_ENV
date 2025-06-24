@@ -119,7 +119,7 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
       counterAxisAlignItems: direction === LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL ?
         LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER :
         LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
-      layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
+      // layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
       layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
       boxSizing: "border-box",
       "border-style": "solid",
@@ -247,7 +247,7 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
         resource: "",
         data: [],
         style: {
-          layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
+          // layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
           "word-break": "break-all",
           width: elementWidth, // 设置宽度
@@ -1386,6 +1386,7 @@ function createHorizontalButtonLayout(buttons) {
   return createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL, buttons, {
     gap: DIMENSION_CONSTANTS.GAP.base,
     alignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
+    variant: 'row', // 使用 row 布局变体
     // 无需明确设置counterAxisAlign，createLayoutElement会自动为水平布局设置交叉轴居中
   });
 }
@@ -2668,6 +2669,9 @@ function createEightElementRoot(markdownElements) {
   // 获取根布局的样式配置
   const rootStyleConfig = getElementStyleConfig('layout', 'root');
 
+  // 生成唯一的className
+  const uniqueClassName = `layout-root-${rootId}`;
+
   const rootLayout = {
     dataKeys: [],
     id: rootId,
@@ -2683,6 +2687,10 @@ function createEightElementRoot(markdownElements) {
       isRoot: true
     },
     layout: {
+      classStyle: {
+        ...rootStyleConfig // 应用根布局样式配置到classStyle
+      },
+      className: uniqueClassName,
       style: {
         display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
         layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
@@ -2704,17 +2712,6 @@ function createEightElementRoot(markdownElements) {
     },
     events: [{}]
   };
-
-  // 应用根布局样式配置
-  Object.entries(rootStyleConfig).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      rootLayout.layout.style[key] = value;
-    }
-  });
-
-  // 确保根容器的对齐设置不被配置覆盖
-  rootLayout.layout.style.primaryAxisAlignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
-  rootLayout.layout.style.counterAxisAlignItems = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER;
 
   return rootLayout;
 }
@@ -2963,6 +2960,40 @@ export function analyzeElementsInEightElement(eightElement) {
       path: path
     });
     
+    // 🔧 新增：表格元素的特殊处理 - 将子元素也识别为独立的页面元件
+    if (elementType === 'table' && variant === 'container') {
+      console.log(`🔍 表格元素特殊处理: 识别子元素为独立页面元件`);
+      
+      // 检查表格子元素配置是否存在
+      const subElementTypes = ['th', 'td', 'tr'];
+      subElementTypes.forEach(subType => {
+        if (element.layout && element.layout[subType]) {
+          const subKey = `table.${subType}`;
+          
+          if (!elementMap.has(subKey)) {
+            elementMap.set(subKey, {
+              type: 'table',
+              variant: subType,
+              count: 0,
+              elements: [],
+              sampleContent: `表格${subType}`
+            });
+          }
+          
+          const subElementInfo = elementMap.get(subKey);
+          subElementInfo.count++;
+          subElementInfo.elements.push({
+            id: `${element.id}-${subType}`, // 创建虚拟ID
+            element: element, // 指向父表格元素
+            path: `${path}.${subType}`,
+            subElementType: subType // 标记这是子元素
+          });
+          
+          console.log(`   ✅ 识别到 table.${subType} 子元件`);
+        }
+      });
+    }
+    
     // 设置示例内容
     if (!elementInfo.sampleContent) {
       if (sampleContent) {
@@ -3044,11 +3075,14 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
       actionList.forEach(action => {
         const actionInfo = actionManager.getActionInfo(action.name);
         console.log(`   • ${actionInfo?.name || action.name}: 强度 ${action.intensity.toFixed(1)}`);
+        console.log(`   • 预期修改属性: ${Object.keys(actionInfo?.styleMapping || {}).join(', ')}`);
       });
       
       const result = actionManager.executeActions(actionList, type, variant);
       
       if (result.success && result.styles) {   
+        console.log(`🔍 ${type}.${variant} 动作执行原始结果:`, Object.keys(result.styles));
+        console.log(`📊 原始结果样本:`, JSON.stringify(result.styles, null, 2).slice(0, 500) + '...');
         elementStyleUpdates.set(`${type}.${variant}`, result.styles);
       } else {
         console.warn(`⚠️ ${type}.${variant} 动作执行失败:`, result.error);
@@ -3062,34 +3096,69 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
   let updatedCount = 0;
   let updatedElementsCount = 0;
   
-  const applyStylesToElement = (element, elementType, variant, updates) => {
+    const applyStylesToElement = (element, elementType, variant, updates) => {
     if (!element || !updates) return;
     
-    // 确保元素有layout.classStyle
+    // 确保元素有layout结构
     if (!element.layout) element.layout = {};
     if (!element.layout.classStyle) element.layout.classStyle = {};
+    if (!element.layout.style) element.layout.style = {};
     
     const originalValues = {};
     const appliedChanges = [];
     
-    // 记录原始值并应用样式更新
-    Object.entries(updates).forEach(([property, value]) => {
-      if (value !== undefined && value !== null) {
-        originalValues[property] = element.layout.classStyle[property];
-        element.layout.classStyle[property] = value;
-        updatedCount++;
+    // 🔧 新增：过滤出真正的CSS样式属性，排除元数据
+    const cssProperties = {};
+    const filteredOut = [];
         
-        appliedChanges.push({
-          property,
-          oldValue: originalValues[property],
-          newValue: value
-        });
+    Object.entries(updates).forEach(([property, value]) => {
+      // 排除以下划线开头的元数据属性和特殊字段
+      if (!property.startsWith('_') && 
+          !['elementType', 'variant', 'configFound'].includes(property) &&
+          value !== undefined && value !== null) {
+        cssProperties[property] = value;
+      } else {
+        filteredOut.push(`${property}: ${value}`);
       }
+    });
+    
+    // 🔧 特别检查 fontSize 和 padding
+    if (elementType === 'table' && variant === 'container') {
+      console.log(`🎯 表格样式检查:`);
+      console.log(`   - fontSize: ${cssProperties.fontSize || 'undefined'}`);
+      console.log(`   - padding: ${cssProperties.padding || 'undefined'}`);
+      console.log(`   - background: ${cssProperties.background || 'undefined'}`);
+      console.log(`   - borderRadius: ${cssProperties.borderRadius || 'undefined'}`);
+    }
+    
+    // 记录原始值并应用样式更新 - 同时更新classStyle和style
+    Object.entries(cssProperties).forEach(([property, value]) => {
+      // 记录原始值（优先从classStyle获取）
+      originalValues[property] = element.layout.classStyle[property] || element.layout.style[property];
+      
+      // 🔧 关键改进：同时更新classStyle和style，确保动作在任何配置下都生效
+      element.layout.classStyle[property] = value;
+      element.layout.style[property] = value;
+      
+      // 🔧 新增：table.container 特殊处理 - 应用到 layout.table.style
+      if (elementType === 'table' && variant === 'container') {
+        if (!element.layout.table) element.layout.table = {};
+        if (!element.layout.table.style) element.layout.table.style = {};
+        element.layout.table.style[property] = value;
+        console.log(`📋 table.container: ${property} = ${value} 已应用到 layout.table.style`);
+      }
+      
+      updatedCount++;
+      
+      appliedChanges.push({
+        property,
+        oldValue: originalValues[property],
+        newValue: value
+      });
     });
     
     if (appliedChanges.length > 0) {
       updatedElementsCount++;
-  
     }
   };
   
@@ -3163,6 +3232,56 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
     
     if (styleUpdates) {
       applyStylesToElement(element, elementType, variant, styleUpdates);
+    }
+    
+    // 🔧 新增：表格子元素的特殊处理 - 直接应用到表格子元素
+    if (elementType === 'table' && variant === 'container') {
+      console.log(`🔍 表格子元素动作应用检查`);
+      
+      const subElementTypes = ['th', 'td', 'tr'];
+      subElementTypes.forEach(subType => {
+        const subUpdateKey = `table.${subType}`;
+        const subStyleUpdates = elementStyleUpdates.get(subUpdateKey);
+        
+        if (subStyleUpdates && element.layout && element.layout[subType]) {
+          console.log(`🎯 为 table.${subType} 应用独立动作`);
+          
+          // 创建一个特殊的应用函数，直接应用到子元素配置
+          const applySubElementStyles = (subType, updates) => {
+            // 过滤CSS属性
+            const cssProperties = {};
+            Object.entries(updates).forEach(([property, value]) => {
+              if (!property.startsWith('_') && 
+                  !['elementType', 'variant', 'configFound'].includes(property) &&
+                  value !== undefined && value !== null) {
+                cssProperties[property] = value;
+              }
+            });
+            
+            console.log(`📋 table.${subType} 收到动作结果:`, Object.keys(cssProperties));
+            
+            // 确保子元素结构存在
+            if (!element.layout[subType]) element.layout[subType] = {};
+            if (subType === 'tr') {
+              if (!element.layout[subType].classStyle) element.layout[subType].classStyle = {};
+            } else {
+              if (!element.layout[subType].style) element.layout[subType].style = {};
+            }
+            
+            // 应用样式到对应的子元素配置
+            Object.entries(cssProperties).forEach(([property, value]) => {
+              if (subType === 'tr') {
+                element.layout[subType].classStyle[property] = value;
+              } else {
+                element.layout[subType].style[property] = value;
+              }
+              console.log(`   ✅ ${property} = ${value} 已应用到 table.${subType}`);
+            });
+          };
+          
+          applySubElementStyles(subType, subStyleUpdates);
+        }
+      });
     }
     
     // 递归处理子元素

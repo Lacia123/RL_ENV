@@ -220,6 +220,28 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
             const actionInfo = actionManager.getActionInfo(actionName);
             if (!actionInfo) return false;
             
+            // 🔧 新增：首先检查动作是否适用于该元件类型和变体
+            if (actionInfo.applicableToElements && Array.isArray(actionInfo.applicableToElements)) {
+              const isApplicable = actionInfo.applicableToElements.some(target => {
+                // 支持两种格式：
+                // 1. 简单格式：'layout' （对所有 layout 变体有效）
+                // 2. 精细格式：'layout.root' （只对特定变体有效）
+                if (target.includes('.')) {
+                  // 精细格式：检查完整的 type.variant
+                  const [targetType, targetVariant] = target.split('.');
+                  return targetType === type && targetVariant === variant;
+                } else {
+                  // 简单格式：只检查 type
+                  return target === type;
+                }
+              });
+              
+              if (!isApplicable) {
+                console.log(`⚪ 动作 ${actionName} 不适用于元件 ${type}.${variant}`);
+                return false;
+              }
+            }
+            
             // 检查动作影响的CSS属性是否在该元件的基准tokens中
             const affectedProperties = Object.keys(baseTokens).filter(prop => !prop.startsWith('_'));
             
@@ -348,7 +370,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
         ...prev,
         [actionName]: 0.5 // 默认强度(0.1-1.0)
       }));
-    }
+      }
   };
 
   // 处理动作强度变化
@@ -366,7 +388,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
       const currentDimensions = customDimensions || dimensions;
       console.log('处理Markdown使用尺寸:', currentDimensions);
 
-
+      
       
       // 1. 转换Markdown为八要素结构
       let eightElementObj = markdownToEightElement(markdown);
@@ -511,8 +533,8 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
     }
     const actionInfo = actionManager.getActionInfo(actionName);
     return actionInfo ? actionInfo.name : actionName;
-  };
-
+    };
+    
   // 获取动作的冲突信息
   const getActionConflicts = (actionName) => {
     if (!actionManager) {
@@ -526,7 +548,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
   const isActionAvailable = (actionName) => {
     const conflicts = getActionConflicts(actionName);
     return conflicts.length === 0;
-  };
+    };
 
 
 
@@ -639,7 +661,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium text-gray-700">动作影响范围</h3>
-                <button
+              <button
                   onClick={() => setIsAffectedCollapsed(!isAffectedCollapsed)}
                   className="text-gray-500 hover:text-gray-700 transition-colors"
                   title={isAffectedCollapsed ? "展开" : "折叠"}
@@ -653,9 +675,9 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                     </svg>
                   )}
-                </button>
-              </div>
-              
+              </button>
+            </div>
+            
               {!isAffectedCollapsed && (
                 <div className="mb-4 p-3 bg-yellow-50 rounded border border-yellow-200">
                   {affectedElements.length > 0 ? (
@@ -671,17 +693,17 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                             </span>
                             <span className="text-sm text-yellow-700">
                               {sampleContent && `"${sampleContent}"`}
-                            </span>
-                          </div>
+                    </span>
+                  </div>
                           <div className="flex items-center space-x-2">
                             <span className="text-xs bg-yellow-200 px-2 py-1 rounded">
                               {count}个元件
                             </span>
                             <span className="text-xs bg-yellow-200 px-2 py-1 rounded">
                               {tokenCount}个tokens
-                            </span>
-                          </div>
-                        </div>
+                    </span>
+                  </div>
+                </div>
                       ))}
                     </div>
                   ) : (
@@ -710,7 +732,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
               >
                 列表模式
               </button>
-            </div>
+                  </div>
             
             {actionInputMode === 'categories' ? (
               <div className="space-y-4 max-h-80 overflow-y-auto">
@@ -737,26 +759,26 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                         return (
                           <div key={actionName} className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
-                              <input
+                  <input
                                 type="checkbox"
                                 checked={isSelected}
                                 disabled={!isAvailable && !isSelected}
                                 onChange={() => handleActionToggle(actionName)}
                                 className="rounded"
-                              />
+                  />
                               <span className={`text-sm ${!isAvailable && !isSelected ? 'text-gray-400' : 'text-gray-700'}`}>
                                 {getActionDescription(actionName)}
-                              </span>
+                    </span>
                               {conflicts.length > 0 && (
                                 <span className="text-xs text-orange-500" title={`冲突动作: ${conflicts.join(', ')}`}>
                                   ⚠️
                                 </span>
                               )}
-                            </div>
+                  </div>
                             {isSelected && (
                               <div className="flex items-center space-x-2">
                                 <span className="text-xs text-gray-500">强度:</span>
-                                <input
+                  <input
                                   type="number"
                                   min="0.1"
                                   max="1.0"
@@ -769,8 +791,8 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                                     }
                                   }}
                                   className="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded"
-                                />
-                              </div>
+                  />
+                </div>
                             )}
                           </div>
                         );
@@ -797,19 +819,19 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                             onChange={() => handleActionToggle(actionName)}
                             className="rounded"
                           />
-                          <div>
+                <div>
                             <span className={`text-sm font-medium ${!isAvailable && !isSelected ? 'text-gray-400' : 'text-gray-700'}`}>
                               {getActionDescription(actionName)}
-                            </span>
+                    </span>
                             <div className="text-xs text-gray-500">
                               {action.category} • {action.intensity}
-                            </div>
+                  </div>
                           </div>
                         </div>
                         {isSelected && (
                           <div className="flex items-center space-x-2">
                             <span className="text-xs text-gray-500">强度:</span>
-                            <input
+                  <input
                               type="number"
                               min="0.1"
                               max="1.0"
@@ -822,10 +844,10 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                                 }
                               }}
                               className="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded"
-                            />
-                          </div>
+                  />
+                </div>
                         )}
-                      </div>
+              </div>
                     );
                   })}
                 </div>
@@ -969,7 +991,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                           <span className="font-mono">
                             {(actionIntensities[actionName] || 0.5).toFixed(1)}
                           </span>
-                        </div>
+          </div>
                       ))}
                     </div>
                     <div className="mt-2 pt-2 border-t border-gray-300">

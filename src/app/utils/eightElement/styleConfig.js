@@ -445,19 +445,52 @@ export const DEFAULT_STYLE_CONFIG = {
       margin: DIMENSION_CONSTANTS.MARGIN.base,
       backgroundColor: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
       borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.large,
-      // gap: DIMENSION_CONSTANTS.GAP.tight
+      
+      // 🔧 新增：布局动作所需的默认属性
+      display: 'flex',
+      flexDirection: 'column',
+      flexWrap: 'nowrap',
+      justifyContent: 'flex-start',
+      alignItems: 'stretch',
+      gap: DIMENSION_CONSTANTS.GAP.none,
+      
+      // 网格布局属性（默认不启用，由动作激活）
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
     },
     // 内部布局元素
     inner: {
       padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
       margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
       backgroundColor: "none",
-      // "padding-left": DIMENSION_CONSTANTS.PADDING.tight,
-      // "padding-right": DIMENSION_CONSTANTS.PADDING.tight,
-      // "margin-left": DIMENSION_CONSTANTS.MARGIN.tight,
-      // "margin-right": DIMENSION_CONSTANTS.MARGIN.tight,
-      // "border-width": DIMENSION_CONSTANTS.BORDER_WIDTH.none,
-      // "gap": DIMENSION_CONSTANTS.GAP.tight
+      
+      // 🔧 新增：布局动作所需的默认属性
+      display: 'flex',
+      flexDirection: 'column',
+      flexWrap: 'nowrap',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+      gap: DIMENSION_CONSTANTS.GAP.none,
+      
+      // 网格布局属性（默认不启用，由动作激活）
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    // row 布局元素
+    row: {
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+      gap: DIMENSION_CONSTANTS.GAP.none,
+
+      // 网格布局属性（默认不启用，由动作激活）
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
     }
   },
 
@@ -476,7 +509,7 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     // 标题文本（h1 - h6）
     h1: {
-      width: "auto",
+      width: "100%",
       fontSize: "{font.size.xxxl}",
       fontWeight: "{font.fontweight.bold}",
       lineHeight: "{font.lineheight.base}",
@@ -484,24 +517,27 @@ export const DEFAULT_STYLE_CONFIG = {
       color: "{color.onsurface.black88}",
       // marginTop: "{dimension.margin.superloose}",
       marginBottom: "{dimension.margin.loose}",
-      marginLeft: "auto",
-      marginRight: "auto",
+      textAlign: "center",
+      // marginLeft: "auto",
+      // marginRight: "auto",
       position: 'relative',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      '&::after': {
-        content: "''",
-        position: 'absolute',
-        bottom: '-8px',
-        left: '0',
-        width: '60px',
-        height: '4px',
-        background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.secondary.violet5} 100%)`,
-        borderRadius: "{dimension.borderradius.large}"
-      }
+      
+      // '&::after': {
+      //   content: "''",
+      //   position: 'absolute',
+      //   bottom: '-8px',
+      //   left: '0',
+      //   width: '60px',
+      //   height: '4px',
+      //   background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.secondary.violet5} 100%)`,
+      //   borderRadius: "{dimension.borderradius.large}"
+      // }
     },
     h2: {
       width: "100%",
       fontSize: "{font.size.xxl}",
+      textAlign: "left",
       fontWeight: "{font.fontweight.bold}",
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
@@ -515,8 +551,9 @@ export const DEFAULT_STYLE_CONFIG = {
       boxShadow: "{material.hierarchy.main}"
     },
     h3: {
-      width: "auto",
+      width: "100%",
       display: "flex",
+      textAlign: "left",
       fontSize: "{font.size.xl}",
       fontWeight: "{font.fontweight.semibold}",
       lineHeight: "{font.lineheight.base}",
@@ -539,6 +576,7 @@ export const DEFAULT_STYLE_CONFIG = {
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
       color: "{color.onsurface.black76}",
+      justifyContent: "center",
       marginTop: "{dimension.margin.semiloose}",
       marginBottom: "{dimension.margin.tight}",
       textTransform: "capitalize",
@@ -591,7 +629,7 @@ export const DEFAULT_STYLE_CONFIG = {
       borderRadius: "{dimension.borderradius.small}"
     },
 
-    // 引用文本，TODO: 需要确定解析关系
+    // 引用文本，对应 markdown 中的 >
     quote: {
       fontSize: "{font.size.large}",
       fontWeight: "400",
@@ -681,12 +719,14 @@ export const DEFAULT_STYLE_CONFIG = {
   math: {
     // 行内公式
     inline: {
-      fontSizes: "1.1em",
+      textAlign: "left",
+      fontSize: "{font.size.medium}",
       color: "{color.onsurface.black88}",
       verticalAlign: "baseline"
     },
     // 块级公式
     display: {
+      fontSize: "{font.size.large}",
       margin: "{dimension.margin.loose} 0",
       padding: "{dimension.padding.base}",
       background: "{color.surface.grey1}",
@@ -767,6 +807,7 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     // 表格行  
     tr: {
+      fontSize: "{font.size.medium}",
       borderBottom: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
       '&:hover': {

@@ -323,7 +323,7 @@ function resolveToken(tokenReference, maxDepth = 20, customTokenSystem = null) {
       // 单token处理逻辑将在下面执行
     } else {
       // 多token情况，委托给 resolveTokensInText 处理
-      return resolveTokensInText(tokenReference, maxDepth, customTokenSystem);
+    return resolveTokensInText(tokenReference, maxDepth, customTokenSystem);
     }
   }
 

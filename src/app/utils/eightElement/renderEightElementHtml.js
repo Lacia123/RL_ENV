@@ -467,27 +467,27 @@ function processTextElement(processedElement, originalElement) {
             processedElement.katexProcessedContent = rawTextContent;
         } else {
             // 未处理的Markdown内容，需要用KaTeX-enabled marked处理
-            try {
-                let preppedMarkdown = rawTextContent;
+        try {
+            let preppedMarkdown = rawTextContent;
 
-                // Correctly add a space before an inline $ if it's preceded by a non-whitespace character
-                // and is not part of a $$ block delimiter.
-                preppedMarkdown = preppedMarkdown.replace(/(\S)(\$)(?!\$)/g, (match, charBefore, dollarSign) => {
-                    if (charBefore === '$') { // Avoid altering existing $$ pairs
-                        return match;
-                    }
-                    return charBefore + ' ' + dollarSign; // Add space: e.g., "word$" -> "word $"
-                });
+            // Correctly add a space before an inline $ if it's preceded by a non-whitespace character
+            // and is not part of a $$ block delimiter.
+            preppedMarkdown = preppedMarkdown.replace(/(\S)(\$)(?!\$)/g, (match, charBefore, dollarSign) => {
+                if (charBefore === '$') { // Avoid altering existing $$ pairs
+                    return match;
+                }
+                return charBefore + ' ' + dollarSign; // Add space: e.g., "word$" -> "word $"
+            });
 
-                // Ensure newlines in original text are treated as <br> or new paragraphs by marked
-                preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
-                
-                processedElement.katexProcessedContent = markedInstance.parse(preppedMarkdown);
-            } catch (error) {
-                console.error("KaTeX or Marked parsing error for text:", error);
-                // Fallback to showing original text with an error message if parsing fails
-                const errorMessage = `<p style="color:red;">Error rendering math/markdown: ${escapeHtml(error.message)}</p>`;
-                processedElement.katexProcessedContent = errorMessage + escapeHtml(rawTextContent).replace(/\\n/g, '<br>');
+            // Ensure newlines in original text are treated as <br> or new paragraphs by marked
+            preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
+            
+            processedElement.katexProcessedContent = markedInstance.parse(preppedMarkdown);
+        } catch (error) {
+            console.error("KaTeX or Marked parsing error for text:", error);
+            // Fallback to showing original text with an error message if parsing fails
+            const errorMessage = `<p style="color:red;">Error rendering math/markdown: ${escapeHtml(error.message)}</p>`;
+            processedElement.katexProcessedContent = errorMessage + escapeHtml(rawTextContent).replace(/\\n/g, '<br>');
             }
         }
     } else {

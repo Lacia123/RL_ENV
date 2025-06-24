@@ -72,6 +72,9 @@
  *   └── 无障碍: enhanceAccessibility
  */
 
+/**
+ * Code 存在问题，不能根据 token 调节
+ */
 
 
 /**
@@ -521,18 +524,25 @@ export const RL_ACTIONS = {
       primaryColor: 'enhance'
     },
     styleMapping: {
-      color: (current, delta, elementType) => {
-        if (elementType === 'title' && delta > 0.3) {
+      color: (current, delta, elementType, variant) => {
+        // 检查是否为标题类型（text元素的h1-h6变体）
+        if (elementType === 'text' && variant && ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(variant) && delta > 0.3) {
           return DESIGN_TOKEN_MAPPING.color.primary.brand5;
         }
+        // button 的 backgroundColor 也必须发生变化，否则对比度又问题
         if (elementType === 'button' && delta > 0.2) {
           return DESIGN_TOKEN_MAPPING.color.primary.brand4;
         }
         return current;
       },
-      backgroundColor: (current, delta, elementType) => {
-        if (elementType === 'container' && delta > 0.5) {
+      backgroundColor: (current, delta, elementType, variant) => {
+        // 根布局容器应用品牌色背景
+        if (elementType === 'layout' && variant === 'root' && delta > 0.5) {
           return DESIGN_TOKEN_MAPPING.color.primary.brand3;
+        }
+        // 按钮元素应用品牌色背景
+        if (elementType === 'button' && delta > 0.3) {
+          return DESIGN_TOKEN_MAPPING.color.primary.brand4;
         }
         return current;
       }
@@ -797,7 +807,7 @@ export const RL_ACTIONS = {
     conflicts: ['increaseShadowDepth']
   },
   
-  // 20. 增加材质纹理
+  // 20. 增加材质纹理，增加材质纹理目前没有设置，需要确定
   increaseTexture: {
     category: 'material',
     name: '增加材质纹理',
@@ -833,7 +843,7 @@ export const RL_ACTIONS = {
     conflicts: ['increaseTexture']
   },
   
-  // 22. 增加透明度
+  // 22. 增加透明度，增加透明度也需要确认
   increaseTransparency: {
     category: 'material',
     name: '增加透明度',
@@ -1047,6 +1057,7 @@ export const RL_ACTIONS = {
     category: 'composition',
     name: '增强网格对齐',
     intensity: 'strong',
+    applicableToElements: ['layout.inner', 'layout.row'], // 🔧 精细化：只对内部布局生效
     effects: {
       display: 'grid',
       gridAlignment: 'strict',
@@ -1059,6 +1070,7 @@ export const RL_ACTIONS = {
         if (delta > 0.4) return '1fr 1fr';
         return '1fr';
       },
+      gap: () => DESIGN_TOKEN_MAPPING.dimension.gap.base,
       justifyItems: () => 'center',
       alignItems: () => 'center'
     },
@@ -1070,6 +1082,7 @@ export const RL_ACTIONS = {
     category: 'composition',
     name: '放松网格对齐',
     intensity: 'moderate',
+    applicableToElements: ['layout.root', 'layout.inner', 'layout.row'], // 🔧 精细化：对所有布局变体生效
     effects: {
       display: 'flex',
       gridAlignment: 'loose',
@@ -1089,6 +1102,7 @@ export const RL_ACTIONS = {
     category: 'composition',
     name: '结构化布局',
     intensity: 'strong',
+    applicableToElements: ['layout.inner', 'layout.row'], // 🔧 精细化：只对内部布局生效
     effects: {
       gridTemplateAreas: 'define',
       layoutStructure: 'organize'
@@ -1112,6 +1126,7 @@ export const RL_ACTIONS = {
     category: 'composition',
     name: '灵活布局',
     intensity: 'moderate',
+    applicableToElements: ['layout.inner', 'layout.row'], // 🔧 精细化：只对内部布局生效（局部弹性布局）
     effects: {
       display: 'flex',
       layoutStructure: 'fluid'
@@ -1336,11 +1351,13 @@ export const RL_ACTIONS = {
         }
         return current;
       },
-      fontSize: (current, delta, elementType) => {
-        if (elementType === 'title' && delta > 0.6) {
+      fontSize: (current, delta, elementType, variant) => {
+        // 检查是否为标题类型（text元素的h1-h6变体）
+        if (elementType === 'text' && variant && ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(variant) && delta > 0.6) {
           return DESIGN_TOKEN_MAPPING.font.size.xxxl;
         }
-        if (elementType === 'body' && delta > 0.4) {
+        // 检查是否为正文类型（text元素的normal变体或无变体）
+        if (elementType === 'text' && (!variant || variant === 'normal') && delta > 0.4) {
           return DESIGN_TOKEN_MAPPING.font.size.large;
         }
         return current;
@@ -1602,10 +1619,11 @@ export class ActionConflictResolver {
     
     // 检查动作是否适用于当前元件类型
     const elementType = currentStyles.elementType || 'general';
-    console.log(`🔍 [DEBUG] 元件类型: ${elementType}, 动作类别: ${action.category}`);
+    const variant = currentStyles.variant || 'normal';
+    console.log(`🔍 [DEBUG] 元件类型: ${elementType}.${variant}, 动作类别: ${action.category}`);
     
-    if (!this.isActionApplicableToElement(action, elementType)) {
-      console.warn(`❌ [WARN] 动作 ${actionName} 不适用于元件类型 ${elementType}`);
+    if (!this.isActionApplicableToElement(action, elementType, variant)) {
+      console.warn(`❌ [WARN] 动作 ${actionName} 不适用于元件类型 ${elementType}.${variant}`);
       return currentStyles;
     }
     
@@ -1619,7 +1637,6 @@ export class ActionConflictResolver {
     const normalizedIntensity = intensityRange.min + effectiveIntensity * (intensityRange.max - intensityRange.min);
     
     // 🎯 动作执行开始
-    const variant = currentStyles.variant || 'default';
     console.log(`\n${'='.repeat(60)}`);
     console.log(`🎯 执行动作: ${action.name}`);
     console.log(`   📊 强度: ${intensity.toFixed(1)} (用户) → ${normalizedIntensity.toFixed(2)} (系统)`);
@@ -1647,7 +1664,7 @@ export class ActionConflictResolver {
             return;
           }
           
-          const newValue = mappingFunc(baseValue, normalizedIntensity, updatedStyles.elementType);
+          const newValue = mappingFunc(baseValue, normalizedIntensity, updatedStyles.elementType, updatedStyles.variant);
           
           // 确保新值有效
           if (newValue === undefined) {
@@ -1745,8 +1762,25 @@ export class ActionConflictResolver {
    * @param {string} elementType - 元件类型
    * @returns {boolean} 是否适用
    */
-  isActionApplicableToElement(action, elementType) {
-    // 构图动作只对Layout元件生效
+  isActionApplicableToElement(action, elementType, variant = 'normal') {
+    // 🔧 新增：基于动作的 applicableToElements 属性判断
+    if (action.applicableToElements && Array.isArray(action.applicableToElements)) {
+      return action.applicableToElements.some(target => {
+        // 支持两种格式：
+        // 1. 简单格式：'layout' （对所有 layout 变体有效）
+        // 2. 精细格式：'layout.root' （只对特定变体有效）
+        if (target.includes('.')) {
+          // 精细格式：检查完整的 elementType.variant
+          const [targetType, targetVariant] = target.split('.');
+          return targetType === elementType && targetVariant === variant;
+        } else {
+          // 简单格式：只检查 elementType
+          return target === elementType;
+        }
+      });
+    }
+    
+    // 🔧 兼容性回退：构图动作只对Layout元件生效
     if (action.category === 'composition') {
       return elementType === 'layout' || elementType === 'container';
     }
@@ -2108,24 +2142,33 @@ function extractTokensFromElementConfig(elementConfig) {
   
   // 遍历配置中的所有样式属性
   Object.entries(elementConfig).forEach(([cssProperty, value]) => {
-    if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
-      // 这是一个token引用，提取实际的token
-      const tokenPath = value.slice(1, -1); // 去掉大括号
-      const [category, subcategory, level] = tokenPath.split('.');
-      
-      if (category && subcategory && level) {
-        // 映射CSS属性到对应的token
-        baseTokens[cssProperty] = value;
+    if (typeof value === 'string') {
+      if (value.startsWith('{') && value.endsWith('}')) {
+        // 这是一个token引用，提取实际的token
+        const tokenPath = value.slice(1, -1); // 去掉大括号
+        const [category, subcategory, level] = tokenPath.split('.');
         
-        // 同时建立逆向索引，方便按token类型查找
-        if (!baseTokens._tokens) baseTokens._tokens = {};
-        if (!baseTokens._tokens[category]) baseTokens._tokens[category] = {};
-        if (!baseTokens._tokens[category][subcategory]) baseTokens._tokens[category][subcategory] = {};
-        baseTokens._tokens[category][subcategory][level] = {
-          cssProperty,
-          tokenValue: value
-        };
+        if (category && subcategory && level) {
+          // 映射CSS属性到对应的token
+          baseTokens[cssProperty] = value;
+          
+          // 同时建立逆向索引，方便按token类型查找
+          if (!baseTokens._tokens) baseTokens._tokens = {};
+          if (!baseTokens._tokens[category]) baseTokens._tokens[category] = {};
+          if (!baseTokens._tokens[category][subcategory]) baseTokens._tokens[category][subcategory] = {};
+          baseTokens._tokens[category][subcategory][level] = {
+            cssProperty,
+            tokenValue: value
+          };
+        }
+      } else {
+        // 🔧 新增：对于非token的直接CSS值，也添加到baseTokens中
+        // 这样动作系统能够正确检测对这些属性的影响
+        baseTokens[cssProperty] = value;
       }
+    } else if (typeof value === 'number') {
+      // 🔧 新增：对于数值类型的CSS属性，也添加到baseTokens中
+      baseTokens[cssProperty] = value;
     }
   });
   
