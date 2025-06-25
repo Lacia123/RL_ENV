@@ -459,8 +459,8 @@ export const DEFAULT_STYLE_CONFIG = {
       gridTemplateAreas: 'none',
       justifyItems: 'stretch'
     },
-    // 内部布局元素
-    inner: {
+    // 列布局元素（默认垂直布局）
+    column: {
       padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
       margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
       backgroundColor: "none",
@@ -480,6 +480,10 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     // row 布局元素
     row: {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+
       display: 'flex',
       flexDirection: 'row',
       flexWrap: 'nowrap',

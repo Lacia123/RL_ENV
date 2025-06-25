@@ -472,6 +472,29 @@ function isQuoteText(line) {
   return line.trim().match(/^>\s*(.*)$/);
 }
 
+// 检测是否为布局标签
+function isLayoutTag(line) {
+  const layoutTagMatch = line.trim().match(/^<layout:(\w+)>$/);
+  if (layoutTagMatch) {
+    return {
+      isLayoutTag: true,
+      variant: layoutTagMatch[1],
+      isClosing: false
+    };
+  }
+  
+  const closingTagMatch = line.trim().match(/^<\/layout:(\w+)>$/);
+  if (closingTagMatch) {
+    return {
+      isLayoutTag: true,
+      variant: closingTagMatch[1],
+      isClosing: true
+    };
+  }
+  
+  return { isLayoutTag: false };
+}
+
 // 提取完整的引用块
 function extractQuoteBlock(lines, startIndex) {
   console.log(`开始提取引用块，从第${startIndex}行开始`);
@@ -508,6 +531,51 @@ function extractQuoteBlock(lines, startIndex) {
   
   return {
     quoteContent: quoteLines.join('\n').trim(),
+    endIndex: i - 1
+  };
+}
+
+// 提取完整的布局标签块
+function extractLayoutBlock(lines, startIndex) {
+  console.log(`开始提取布局标签块，从第${startIndex}行开始`);
+  
+  const startLine = lines[startIndex];
+  const startTagInfo = isLayoutTag(startLine);
+  
+  if (!startTagInfo.isLayoutTag || startTagInfo.isClosing) {
+    console.error('无效的布局标签起始行');
+    return { layoutContent: '', variant: '', endIndex: startIndex };
+  }
+  
+  const variant = startTagInfo.variant;
+  const contentLines = [];
+  let i = startIndex + 1;
+  let foundEnd = false;
+  
+  // 查找对应的结束标签
+  while (i < lines.length) {
+    const line = lines[i];
+    const tagInfo = isLayoutTag(line);
+    
+    if (tagInfo.isLayoutTag && tagInfo.isClosing && tagInfo.variant === variant) {
+      foundEnd = true;
+      i++;
+      break;
+    }
+    
+    contentLines.push(line);
+    i++;
+  }
+  
+  if (!foundEnd) {
+    console.warn(`警告: 未找到布局标签 ${variant} 的结束标签`);
+  }
+  
+  console.log(`布局标签块提取完成，变体: ${variant}，内容行数: ${contentLines.length}，结束索引: ${i - 1}`);
+  
+  return {
+    layoutContent: contentLines.join('\n').trim(),
+    variant: variant,
     endIndex: i - 1
   };
 }
@@ -557,7 +625,7 @@ function createButtonElement(text, url, variant = 'primary') {
   const id = generateUUID();
   // 获取按钮元素的样式配置
   const buttonStyleConfig = getElementStyleConfig('button', variant);
-  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
+  const layoutStyleConfig = getElementStyleConfig('layout', 'column');
 
   // 生成唯一的className
   const uniqueClassName = `button-${id}`;
@@ -1141,7 +1209,7 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
   const id = generateUUID();
   // 获取图片元素的样式配置
   const imageStyleConfig = getElementStyleConfig('image', variant);
-  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
+  const layoutStyleConfig = getElementStyleConfig('layout', 'column');
 
   // 生成唯一的className
   const uniqueClassName = `background-${id}`;
@@ -1313,7 +1381,7 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
 // 创建布局元素，支持自定义选项
 function createLayoutElement(direction, children = [], options = {}) {
   const layoutId = generateUUID();
-  const { width, height, gap, variant = 'inner', isRoot = false,
+  const { width, height, gap, variant = 'column', isRoot = false,
     alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN } = options;
 
   // 根据方向自动计算交叉轴对齐方式
@@ -1381,7 +1449,17 @@ function createLayoutElement(direction, children = [], options = {}) {
   return layout;
 }
 
-// 更新水平按钮布局创建函数
+// 创建垂直按钮布局创建函数（默认布局）
+function createVerticalButtonLayout(buttons) {
+  return createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, buttons, {
+    gap: DIMENSION_CONSTANTS.GAP.base,
+    alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+    variant: 'column', // 使用 column 布局变体
+    counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+  });
+}
+
+// 保留水平按钮布局创建函数（用于布局标签）
 function createHorizontalButtonLayout(buttons) {
   return createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL, buttons, {
     gap: DIMENSION_CONSTANTS.GAP.base,
@@ -1660,7 +1738,7 @@ function processTableOrChartData(result, stack) {
 function createTableElement(markdownTableContent) {
   console.log('开始创建表格元素，原始表格内容长度:', markdownTableContent.length);
   const id = generateUUID();
-  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
+  const layoutStyleConfig = getElementStyleConfig('layout', 'column');
 
   
   const tableContainerStyleConfig = getElementStyleConfig('table', 'container');
@@ -1896,7 +1974,7 @@ function generateChartSvg(chartType, data) {
 // 创建图表元素
 function createChartElement(chartType, svgContent, tableData, rawData) {
   const id = generateUUID();
-  const layoutStyleConfig = getElementStyleConfig('layout', 'inner');
+  const layoutStyleConfig = getElementStyleConfig('layout', 'column');
   const chartStyleConfig = getElementStyleConfig('chart', 'container');
 
   console.log('创建图表元素，类型:', chartType);
@@ -2033,7 +2111,8 @@ function processMarkdownWithMathProtection(markdown) {
 }
 
 // 改进Markdown解析功能，支持列表和富文本
-function parseMarkdown(markdown) {
+function parseMarkdown(markdown, options = {}) {
+  const { disableButtonGrouping = false } = options;
   // 首先规范化换行符处理
   // 把所有的\r\n转换为\n
   const normalizedMarkdown = markdown.replace(/\r\n/g, '\n');
@@ -2195,6 +2274,75 @@ function parseMarkdown(markdown) {
       stack[stack.length - 1].elements.push(codeElement);
 
       // 跳过已处理的代码块行
+      i = endIndex;
+      continue;
+    }
+
+    // 处理布局标签
+    const layoutTagInfo = isLayoutTag(trimmedLine);
+    if (layoutTagInfo.isLayoutTag && !layoutTagInfo.isClosing) {
+      console.log(`发现布局标签，行号: ${i}，变体: ${layoutTagInfo.variant}`);
+      
+      // 处理之前累积的内容
+      flushTextBlock();
+      flushConsecutiveButtons();
+
+      // 如果正在处理列表，先结束列表
+      if (inList && listItems.length > 0) {
+        const listLayout = createLayoutElement(
+          LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+          listItems,
+          {
+            alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+            counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+          }
+        );
+        stack[stack.length - 1].elements.push(listLayout);
+        inList = false;
+        listItems = [];
+      }
+
+      // 提取布局标签内容
+      const { layoutContent, variant, endIndex } = extractLayoutBlock(
+        markedLines.map(item => item.line),
+        i
+      );
+
+      // 递归解析布局标签内的内容
+      if (layoutContent.trim()) {
+        console.log(`递归解析布局内容，变体: ${variant}`);
+        const layoutChildren = parseMarkdown(layoutContent, { disableButtonGrouping: true });
+
+        // 根据变体确定布局方向
+        let direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL; // 默认垂直
+        let alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
+        let counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
+
+        if (variant === 'row') {
+          direction = LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL;
+          alignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
+          counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER;
+        } else if (variant === 'column') {
+          direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL;
+          alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
+          counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
+        }
+
+        // 创建布局容器
+        const layoutContainer = createLayoutElement(
+          direction,
+          layoutChildren,
+          {
+            variant: variant,
+            alignItems: alignItems,
+            counterAxisAlign: counterAxisAlign
+          }
+        );
+
+        stack[stack.length - 1].elements.push(layoutContainer);
+      }
+
+      // 跳过已处理的布局标签行
       i = endIndex;
       continue;
     }
@@ -2579,20 +2727,26 @@ function parseMarkdown(markdown) {
     }
   }
 
-  // 辅助函数：将累积的按钮添加为水平布局
+  // 辅助函数：将累积的按钮添加为布局（现在默认使用垂直布局）
   function flushConsecutiveButtons() {
     if (consecutiveButtons.length > 0) {
       console.log(`处理 ${consecutiveButtons.length} 个连续按钮`);
 
-      if (consecutiveButtons.length === 1) {
-        // 单个按钮不需要水平布局
+      if (disableButtonGrouping) {
+        // 在布局标签内，按钮作为独立元素添加，不创建按钮布局容器
+        consecutiveButtons.forEach(button => {
+          stack[stack.length - 1].elements.push(button);
+          console.log(`添加独立按钮: ${button.id} (布局标签内)`);
+        });
+      } else if (consecutiveButtons.length === 1) {
+        // 单个按钮直接添加
         stack[stack.length - 1].elements.push(consecutiveButtons[0]);
         console.log(`添加单个按钮: ${consecutiveButtons[0].id}`);
       } else {
-        // 多个连续按钮放在水平布局中
-        const buttonLayout = createHorizontalButtonLayout(consecutiveButtons);
+        // 多个连续按钮放在垂直布局中（默认布局）
+        const buttonLayout = createVerticalButtonLayout(consecutiveButtons);
         stack[stack.length - 1].elements.push(buttonLayout);
-        console.log(`添加按钮布局: ${buttonLayout.id}, 包含 ${consecutiveButtons.length} 个按钮`);
+        console.log(`添加按钮布局: ${buttonLayout.id}, 包含 ${consecutiveButtons.length} 个按钮，默认垂直布局 (使用 <layout:row> 标签可改为水平布局)`);
       }
       consecutiveButtons = [];
     }
@@ -2845,7 +2999,7 @@ export function analyzeElementsInEightElement(eightElement) {
       
       // 对于layout元素，特别检查isRoot标志
       if (elementType === 'layout' && metadata.isRoot !== undefined) {
-        variant = metadata.isRoot ? 'root' : 'inner';
+        variant = metadata.isRoot ? 'root' : 'column';
       }
       
       // 根据元数据设置示例内容
@@ -2864,7 +3018,7 @@ export function analyzeElementsInEightElement(eightElement) {
       } else if (metadata.actualType === 'image') {
         sampleContent = '图片';
       } else if (metadata.actualType === 'layout') {
-        sampleContent = metadata.isRoot ? '根布局' : '内部布局';
+        sampleContent = metadata.isRoot ? '根布局' : '列布局';
       }
     }
     
@@ -2913,8 +3067,8 @@ export function analyzeElementsInEightElement(eightElement) {
         sampleContent = '图片';
       } else if (elementType === 'layout') {
         // 🔧 关键修复：根据深度确定layout的变体
-        variant = depth === 0 ? 'root' : 'inner';
-        sampleContent = depth === 0 ? '根布局' : '内部布局';
+        variant = depth === 0 ? 'root' : 'column';
+        sampleContent = depth === 0 ? '根布局' : '列布局';
       } else if (elementType === 'table') {
         variant = 'container';
         sampleContent = '表格';
@@ -3178,7 +3332,7 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
       
       // 对于layout元素，特别检查isRoot标志
       if (elementType === 'layout' && metadata.isRoot !== undefined) {
-        variant = metadata.isRoot ? 'root' : 'inner';
+        variant = metadata.isRoot ? 'root' : 'column';
       }
     }
     // 2. 回退到传统判断方法
@@ -3210,7 +3364,7 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
         variant = 'normal';
       } else if (elementType === 'layout') {
         // 🔧 关键修复：根据深度确定layout的变体
-        variant = depth === 0 ? 'root' : 'inner';
+        variant = depth === 0 ? 'root' : 'column';
       } else if (elementType === 'table') {
         variant = 'container';
       } else if (elementType === 'code') {
@@ -3329,6 +3483,7 @@ export {
   createButtonElement,
   createBackgroundElement,
   createLayoutElement,
+  createVerticalButtonLayout,  // 导出垂直按钮布局函数
   createHorizontalButtonLayout,
   createHeadingLayout,
   createFlexWrapLayout,
@@ -3342,6 +3497,8 @@ export {
   extractTableOrChartData, // 导出表格/图表提取函数
   isQuoteText,          // 导出引用文本检测函数
   extractQuoteBlock,    // 导出引用文本提取函数
+  isLayoutTag,          // 导出布局标签检测函数
+  extractLayoutBlock,   // 导出布局标签提取函数
   generateChartSvg,
   printEightElementStructure,
   exampleMarkdownToEightElement,
