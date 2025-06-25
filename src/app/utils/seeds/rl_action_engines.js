@@ -1050,95 +1050,14 @@ export const RL_ACTIONS = {
     conflicts: ['increaseVisualWeight']
   },
 
-  // ==================== 构图动作 (Composition Actions) ====================
+  // ==================== 构图动作 (Composition Actions) - 已废弃，使用新的布局调控系统 ====================
   
-  // 30. 增强网格对齐
-  enhanceGridAlignment: {
-    category: 'composition',
-    name: '增强网格对齐',
-    intensity: 'strong',
-    applicableToElements: ['layout.inner', 'layout.row'], // 🔧 精细化：只对内部布局生效
-    effects: {
-      display: 'grid',
-      gridAlignment: 'strict',
-      justifyItems: 'center'
-    },
-    styleMapping: {
-      display: () => 'grid',
-      gridTemplateColumns: (current, delta) => {
-        if (delta > 0.7) return 'repeat(auto-fit, minmax(200px, 1fr))';
-        if (delta > 0.4) return '1fr 1fr';
-        return '1fr';
-      },
-      gap: () => DESIGN_TOKEN_MAPPING.dimension.gap.base,
-      justifyItems: () => 'center',
-      alignItems: () => 'center'
-    },
-    conflicts: ['relaxGridAlignment']
-  },
-  
-  // 31. 放松网格对齐
-  relaxGridAlignment: {
-    category: 'composition',
-    name: '放松网格对齐',
-    intensity: 'moderate',
-    applicableToElements: ['layout.root', 'layout.inner', 'layout.row'], // 🔧 精细化：对所有布局变体生效
-    effects: {
-      display: 'flex',
-      gridAlignment: 'loose',
-      justifyContent: 'flex-start'
-    },
-    styleMapping: {
-      display: () => 'flex',
-      flexDirection: () => 'column',
-      justifyContent: () => 'flex-start',
-      alignItems: () => 'flex-start'
-    },
-    conflicts: ['enhanceGridAlignment']
-  },
-  
-  // 32. 结构化布局
-  structureLayout: {
-    category: 'composition',
-    name: '结构化布局',
-    intensity: 'strong',
-    applicableToElements: ['layout.inner', 'layout.row'], // 🔧 精细化：只对内部布局生效
-    effects: {
-      gridTemplateAreas: 'define',
-      layoutStructure: 'organize'
-    },
-    styleMapping: {
-      display: () => 'grid',
-      gridTemplateAreas: () => `
-        "title title"
-        "image content"
-        "tags tags"
-        "buttons buttons"
-      `,
-      gridTemplateColumns: () => '1fr 2fr',
-      gap: () => DESIGN_TOKEN_MAPPING.dimension.gap.base
-    },
-    conflicts: ['flexibleLayout']
-  },
-  
-  // 33. 灵活布局
-  flexibleLayout: {
-    category: 'composition',
-    name: '灵活布局',
-    intensity: 'moderate',
-    applicableToElements: ['layout.inner', 'layout.row'], // 🔧 精细化：只对内部布局生效（局部弹性布局）
-    effects: {
-      display: 'flex',
-      layoutStructure: 'fluid'
-    },
-    styleMapping: {
-      display: () => 'flex',
-      flexDirection: () => 'column',
-      flexWrap: () => 'wrap',
-      justifyContent: () => 'space-between'
-    },
-    conflicts: ['structureLayout']
-  },
+  // 注意：布局动作已被移除，现在使用基于布局ID的精确调控系统
+  // 新系统支持：
+  // - 解析所有有子元素的layout
+  // - 根据布局ID精确调控
+  // - 强度0-0.5为column，0.5-1.0为row
+  // - 显示layout对应的markdown内容
 
   // ==================== 状态指示动作 (State Actions) ====================
   
@@ -2402,7 +2321,11 @@ export class ActionSystemManager {
    * 获取可用动作列表
    */
   getAvailableActions() {
-    return Object.keys(RL_ACTIONS);
+    // 🔧 过滤掉废弃的构图动作
+    return Object.keys(RL_ACTIONS).filter(actionName => {
+      const action = RL_ACTIONS[actionName];
+      return action.category !== 'composition'; // 排除构图动作
+    });
   }
   
   /**
@@ -2419,6 +2342,11 @@ export class ActionSystemManager {
   getActionCategories() {
     const categories = {};
     Object.entries(RL_ACTIONS).forEach(([actionName, action]) => {
+      // 🔧 过滤掉废弃的构图动作类别
+      if (action.category === 'composition') {
+        return; // 跳过构图动作，因为已被新的布局调控系统替代
+      }
+      
       if (!categories[action.category]) {
         categories[action.category] = [];
       }

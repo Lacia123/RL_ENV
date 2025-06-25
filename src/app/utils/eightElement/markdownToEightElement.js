@@ -41,6 +41,9 @@ function generateUUID() {
   });
 }
 
+// 恢复随机UUID生成 - 简单可靠
+// 布局调控将改为使用解析索引而不是ID
+
 // HTML转义函数，用于安全处理文本
 function escapeHtml(text) {
   if (!text || typeof text !== 'string') return '';
@@ -1382,9 +1385,11 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
 
 // 创建布局元素，支持自定义选项
 function createLayoutElement(direction, children = [], options = {}) {
-  const layoutId = generateUUID();
   const { width, height, gap, variant = 'column', isRoot = false,
     alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN } = options;
+  
+  // 使用随机UUID生成ID
+  const layoutId = generateUUID();
 
   // 根据方向自动计算交叉轴对齐方式
   // 对于水平布局，默认交叉轴居中对齐；对于垂直布局，使用传入的选项或默认左对齐
@@ -1466,7 +1471,7 @@ function createHorizontalButtonLayout(buttons) {
   return createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL, buttons, {
     gap: DIMENSION_CONSTANTS.GAP.base,
     alignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
-    variant: 'row', // 使用 row 布局变体
+    variant: 'row' // 使用 row 布局变体
     // 无需明确设置counterAxisAlign，createLayoutElement会自动为水平布局设置交叉轴居中
   });
 }
@@ -2343,6 +2348,10 @@ function parseMarkdown(markdown, options = {}) {
           counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
         }
 
+        // 🔧 创建稳定的内容种子用于生成稳定ID
+        const contentSeed = `${variant}-${layoutContent}`;
+        const position = `line-${i}`;
+        
         // 创建布局容器
         const layoutContainer = createLayoutElement(
           direction,
@@ -2350,9 +2359,20 @@ function parseMarkdown(markdown, options = {}) {
           {
             variant: variant,
             alignItems: alignItems,
-            counterAxisAlign: counterAxisAlign
+            counterAxisAlign: counterAxisAlign,
+            contentSeed: contentSeed,
+            position: position
           }
         );
+        
+        // 🔧 确保元数据正确保存了variant信息
+        if (layoutContainer._metadata) {
+          layoutContainer._metadata.variant = variant;
+          layoutContainer._metadata.originalVariant = variant; // 保存原始variant
+          layoutContainer._metadata.isLayoutTag = true; // 标记这是来自layout标签的
+        }
+        
+        console.log(`🔧 创建layout标签容器: ID=${layoutContainer.id}, variant=${variant}, 内容长度=${layoutContent.length}`);
 
         stack[stack.length - 1].elements.push(layoutContainer);
       }
@@ -2490,6 +2510,10 @@ function parseMarkdown(markdown, options = {}) {
             const siblingIndex = parentElements.indexOf(existingSiblingHeading);
             parentElements.splice(siblingIndex, 1);
             
+            // 🔧 为同级标题组合创建稳定ID
+            const siblingContentSeed = `sibling-h${level}-${existingSiblingHeading.id}-${newHeadingLayout.id}`;
+            const siblingPosition = `sibling-group-${level}`;
+            
             // 创建同级标题组合容器
             const siblingGroupContainer = createLayoutElement(
               LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
@@ -2497,7 +2521,9 @@ function parseMarkdown(markdown, options = {}) {
               {
                 alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
                 counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
-                variant: 'column'
+                variant: 'column',
+                contentSeed: siblingContentSeed,
+                position: siblingPosition
               }
             );
             
@@ -2737,12 +2763,25 @@ function parseMarkdown(markdown, options = {}) {
               // 如果不是列表项，直接添加到当前元素栈
               else {
                 if (inList && listItems.length > 0) {
+                  // 🔧 生成稳定的内容种子，使用列表内容而不是ID
+                  const listTexts = listItems.map(item => {
+                    if (item.font?.fontsize?.default?.content) {
+                      return item.font.fontsize.default.content.slice(0, 15);
+                    }
+                    return 'listitem';
+                  }).join('|');
+                  const listHash = listTexts.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
+                  const listContentSeed = `list-items-${listTexts}-count${listItems.length}`;
+                  const listPosition = `vertical-list-hash${listHash}`;
+                  
                   const listLayout = createLayoutElement(
                     LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
                     listItems,
                     {
                       alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
-                      counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                      counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
+                      contentSeed: listContentSeed,
+                      position: listPosition
                     }
                   );
                   stack[stack.length - 1].elements.push(listLayout);
@@ -2760,12 +2799,19 @@ function parseMarkdown(markdown, options = {}) {
         }
         // 如果有多行，为每行单独处理
         else {
+          // 🔧 生成稳定的内容种子，添加文本块哈希
+          const textHash = cleanedTextBlock.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
+          const contentSeed = `multi-text-${cleanedTextBlock.slice(0, 30)}-lines${lines.length}`;
+          const position = `vertical-text-hash${textHash}`;
+          
           const textLayout = createLayoutElement(
             LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
             [],
             {
               alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
-              counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+              counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
+              contentSeed: contentSeed,
+              position: position
             }
           );
 
@@ -2794,12 +2840,25 @@ function parseMarkdown(markdown, options = {}) {
           }
 
           if (inList && listItems.length > 0) {
+            // 🔧 生成稳定的内容种子，使用列表内容而不是ID
+            const listTexts = listItems.map(item => {
+              if (item.font?.fontsize?.default?.content) {
+                return item.font.fontsize.default.content.slice(0, 15);
+              }
+              return 'listitem';
+            }).join('|');
+            const listHash = listTexts.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
+            const listContentSeed = `multiline-list-${listTexts}-count${listItems.length}`;
+            const listPosition = `vertical-list-multiline-hash${listHash}`;
+            
             const listLayout = createLayoutElement(
               LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
               listItems,
               {
                 alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
-                counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
+                contentSeed: listContentSeed,
+                position: listPosition
               }
             );
             stack[stack.length - 1].elements.push(listLayout);
@@ -2839,8 +2898,16 @@ function parseMarkdown(markdown, options = {}) {
 
   // 辅助函数：处理混合内容行
   function processMixedContent(line) {
+    // 🔧 生成稳定的内容种子，添加行内容哈希
+    const lineHash = line.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
+    const contentSeed = `mixed-content-${line.slice(0, 30)}-len${line.length}`;
+    const position = `horizontal-mixed-hash${lineHash}`;
+    
     // 创建一个水平布局元素
-    let currentLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL);
+    let currentLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL, [], {
+      contentSeed: contentSeed,
+      position: position
+    });
 
     // 查找所有普通链接 [text](url) 但不是图片链接
     const normalLinkRegex = /(?<!!)\[(.*?)\]\((.*?)\)/g;
@@ -2903,6 +2970,7 @@ function parseMarkdown(markdown, options = {}) {
 
 // 创建八要素根对象
 function createEightElementRoot(markdownElements) {
+  // 使用随机UUID生成根布局ID
   const rootId = generateUUID();
 
   // 获取根布局的样式配置
@@ -3067,8 +3135,10 @@ export function analyzeElementsInEightElement(eightElement) {
   }
 
   const elementMap = new Map();
+  const layoutAnalysis = []; // 新增：专门用于layout分析的数组
+  let layoutIndexCounter = 0; // 🆕 改为索引计数器：为每个layout分配唯一索引
   
-  const analyzeElement = (element, path = '', depth = 0) => {
+  const analyzeElement = (element, path = '', depth = 0, parentContent = '') => {
     if (!element || !element.name) return;
     
     // 🔍 优先使用保存的元数据来确定元件类型和形态
@@ -3174,6 +3244,48 @@ export function analyzeElementsInEightElement(eightElement) {
       }
     }
     
+    // 🆕 Layout专门分析：识别所有有子元素的layout，但排除根布局
+    if (elementType === 'layout' && element.layout && element.layout.children) {
+      const childrenCount = element.layout.children.length;
+      
+      // 🔧 修复：排除根布局，只识别有多个子元素的非根布局
+      if (childrenCount > 1 && variant !== 'root') {
+        // 🆕 为layout分配唯一索引
+        const layoutIndex = layoutIndexCounter++;
+        
+        // 提取layout的内容信息用于显示
+        const layoutContent = extractLayoutContent(element, parentContent);
+        
+        // 🔧 改进：正确识别布局方向，优先从元数据获取
+        let actualLayoutDirection = 'VERTICAL'; // 默认垂直
+        if (element._metadata?.originalVariant === 'row' || variant === 'row') {
+          actualLayoutDirection = 'HORIZONTAL';
+        } else if (element.layout.style?.layoutMode) {
+          actualLayoutDirection = element.layout.style.layoutMode;
+        }
+        
+        const layoutInfo = {
+          index: layoutIndex, // 🆕 使用索引作为唯一标识
+          id: element.id, // 保留ID用于调试显示
+          variant: variant,
+          childrenCount: childrenCount,
+          path: path,
+          depth: depth,
+          isRoot: false, // 根布局已被排除，这里总是false
+          layoutDirection: actualLayoutDirection,
+          content: layoutContent,
+          element: element // 保存元素引用以便后续修改
+        };
+        
+        layoutAnalysis.push(layoutInfo);
+        
+        console.log(`🏗️ 识别可调控Layout: 索引=${layoutIndex}, ID=${element.id}, 变体=${variant}, 子元素=${childrenCount}, 深度=${depth}`);
+        console.log(`   📋 内容预览: ${layoutContent.preview}`);
+      } else if (variant === 'root') {
+        console.log(`🚫 跳过根布局: ID=${element.id}, 深度=${depth} (根布局不可调控)`);
+      }
+    }
+    
     const key = `${elementType}.${variant}`;
     
     // 🔧 调试信息：显示layout层级识别结果
@@ -3247,12 +3359,69 @@ export function analyzeElementsInEightElement(eightElement) {
       }
     }
     
-    // 递归分析子元素
+    // 递归分析子元素，传递当前元素的内容信息
     if (element.layout && element.layout.children && element.layout.children.length > 0) {
+      const currentContent = extractLayoutContent(element);
       element.layout.children.forEach((child, index) => {
-        analyzeElement(child, `${path}/${index}`, depth + 1);
+        analyzeElement(child, `${path}/${index}`, depth + 1, currentContent.full);
       });
     }
+  };
+  
+  // 🆕 Layout内容提取函数
+  const extractLayoutContent = (layoutElement, parentContent = '') => {
+    const children = layoutElement.layout?.children || [];
+    let contentItems = [];
+    
+    // 遍历子元素，提取内容信息
+    children.forEach((child, index) => {
+      let itemContent = '';
+      
+      if (child.name === 'text' && child.font?.fontsize?.default?.content) {
+        // 文本元素：提取文本内容
+        const content = child.font.fontsize.default.content.replace(/<[^>]*>/g, '').trim();
+        if (content) {
+          itemContent = content.slice(0, 30) + (content.length > 30 ? '...' : '');
+        }
+      } else if (child.name === 'button' && child.font?.fontsize?.default?.content) {
+        // 按钮元素：提取按钮文本
+        const buttonText = child.font.fontsize.default.content;
+        itemContent = `[${buttonText}]`;
+      } else if (child.name === 'background' || child.name === 'image') {
+        // 图片元素
+        itemContent = '[图片]';
+      } else if (child.name === 'table') {
+        // 表格元素
+        itemContent = '[表格]';
+      } else if (child.name === 'chart') {
+        // 图表元素
+        itemContent = `[图表:${child.chartType || 'unknown'}]`;
+      } else if (child.name === 'code') {
+        // 代码元素
+        itemContent = `[代码:${child.language || 'unknown'}]`;
+      } else if (child.name === 'layout') {
+        // 嵌套布局：递归提取
+        const nestedContent = extractLayoutContent(child);
+        itemContent = `{${nestedContent.preview}}`;
+      } else {
+        // 其他元素类型
+        itemContent = `[${child.name || 'unknown'}]`;
+      }
+      
+      if (itemContent) {
+        contentItems.push(itemContent);
+      }
+    });
+    
+    const preview = contentItems.slice(0, 3).join(', ') + (contentItems.length > 3 ? `... (+${contentItems.length - 3}项)` : '');
+    const full = contentItems.join(', ');
+    
+    return {
+      preview: preview || '[空布局]',
+      full: full || '[空布局]',
+      items: contentItems,
+      childrenCount: children.length
+    };
   };
   
   // 先分析根布局本身
@@ -3267,6 +3436,10 @@ export function analyzeElementsInEightElement(eightElement) {
   
   const result = Array.from(elementMap.values());
   console.log('📊 八要素中的元件分析结果:', result);
+  console.log('🏗️ 可调控的Layout数量:', layoutAnalysis.length);
+  
+  // 🆕 返回结果中包含layout分析
+  result.layoutAnalysis = layoutAnalysis;
   
   return result;
 }
@@ -3560,6 +3733,246 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
   return updatedEightElement;
 }
 
+/**
+ * 应用布局调控到八要素结构
+ * @param {Object} eightElement - 八要素结构对象
+ * @param {Array} layoutControls - 布局调控列表 [{layoutIndex, intensity}, ...]
+ * @param {Array} layoutAnalysis - 布局分析结果，包含索引到layout的映射
+ * @returns {Object} 应用了布局调控的八要素结构
+ */
+export function applyLayoutControlsToEightElement(eightElement, layoutControls, layoutAnalysis = null) {
+  if (!eightElement || !layoutControls || layoutControls.length === 0) {
+    return eightElement;
+  }
+
+  console.log(`🏗️ 开始应用基于索引的布局调控`);
+  console.log(`   📊 调控项数量: ${layoutControls.length}`);
+  console.log(`   🎯 调控目标:`);
+  layoutControls.forEach(control => {
+    console.log(`      Layout 索引: ${control.layoutIndex}, 强度: ${control.intensity.toFixed(2)}`);
+  });
+
+  // 深拷贝八要素结构以避免修改原对象
+  const updatedEightElement = JSON.parse(JSON.stringify(eightElement));
+  
+  // 🔧 修复关键问题：必须重新分析深拷贝后的八要素结构来建立索引映射
+  // 不能使用传入的layoutAnalysis，因为它指向原始结构，不是深拷贝后的结构
+  console.log(`   🔍 重新分析深拷贝后的八要素结构获取layout索引映射`);
+  let indexToLayoutMap = new Map();
+  let layoutIndexCounter = 0;
+  
+  const buildIndexMap = (element, depth = 0) => {
+    if (!element || !element.name) return;
+    
+    if (element.name === 'layout' && element.layout && element.layout.children) {
+      const childrenCount = element.layout.children.length;
+      const isRoot = depth === 0;
+      
+      // 🔧 修复：排除根布局，只映射非根布局
+      if (childrenCount > 1 && !isRoot) {
+        const layoutIndex = layoutIndexCounter++;
+        indexToLayoutMap.set(layoutIndex, element);
+        console.log(`     📍 索引 ${layoutIndex} → Layout ID ${element.id} (layout)`);
+      } else if (isRoot) {
+        console.log(`     🚫 跳过根布局: ID=${element.id} (根布局不可调控)`);
+      }
+    }
+    
+    // 递归处理子元素
+    if (element.layout && element.layout.children) {
+      element.layout.children.forEach(child => {
+        buildIndexMap(child, depth + 1);
+      });
+    }
+  };
+  
+  buildIndexMap(updatedEightElement, 0);
+  console.log(`   📋 重新分析完成，映射了 ${indexToLayoutMap.size} 个layout`);
+  
+  if (layoutAnalysis) {
+    console.log(`   ℹ️ 已忽略传入的layoutAnalysis，使用深拷贝后结构的重新分析结果`);
+  }
+  
+  // 创建基于索引的布局调控映射
+  const controlsMap = new Map();
+  layoutControls.forEach(control => {
+    controlsMap.set(control.layoutIndex, control.intensity);
+    
+    // 根据强度确定目标variant
+    const targetVariant = control.intensity <= 0.5 ? 'column' : 'row';
+    const direction = control.intensity <= 0.5 ? 'VERTICAL' : 'HORIZONTAL';
+    
+    console.log(`   🎯 布局调控: 索引=${control.layoutIndex}, 强度=${control.intensity.toFixed(2)}, 目标=${targetVariant}`);
+  });
+
+  // 直接应用布局调控，不需要递归查找
+  let updatedLayoutsCount = 0;
+  
+  // 🆕 直接通过索引映射更新layout元素
+  controlsMap.forEach((intensity, layoutIndex) => {
+    const element = indexToLayoutMap.get(layoutIndex);
+    
+    if (!element) {
+      console.warn(`⚠️ 警告: 索引 ${layoutIndex} 对应的layout元素不存在`);
+      return;
+    }
+    
+    console.log(`   🔍 更新Layout: 索引=${layoutIndex}, ID=${element.id}, 强度=${intensity.toFixed(2)}`);
+    console.log(`      当前元素信息: variant=${element._metadata?.variant}, originalVariant=${element._metadata?.originalVariant}`);
+    console.log(`      当前layout.style.layoutMode=${element.layout?.style?.layoutMode}`);
+    
+    const targetVariant = intensity <= 0.5 ? 'column' : 'row';
+    const targetDirection = intensity <= 0.5 ? 'VERTICAL' : 'HORIZONTAL';
+    
+    // 获取当前layout信息
+    const currentDirection = element.layout?.style?.layoutMode || 'VERTICAL';
+    const currentVariant = element._metadata?.variant || 'column';
+    
+    console.log(`   🔧 更新Layout 索引=${layoutIndex}, ID=${element.id}:`);
+    console.log(`      原: ${currentVariant}(${currentDirection}) → 新: ${targetVariant}(${targetDirection})`);
+    console.log(`      强度: ${intensity.toFixed(2)}`);
+    console.log(`      🔍 更新前状态:`);
+    console.log(`         element.layout.style.layoutMode: ${element.layout?.style?.layoutMode}`);
+    console.log(`         element.layout.classStyle.layoutMode: ${element.layout?.classStyle?.layoutMode}`);
+    console.log(`         element._metadata.variant: ${element._metadata?.variant}`);
+    
+    // 🔧 修复：先清理可能冲突的布局属性，然后同时更新style和classStyle
+    if (element.layout) {
+      console.log(`      🎯 更新layoutMode: ${currentDirection} → ${targetDirection}`);
+      
+      // 🆕 先清理可能冲突的属性
+      const layoutPropertiesToClear = ['layoutMode', 'primaryAxisAlignItems', 'counterAxisAlignItems'];
+      layoutPropertiesToClear.forEach(prop => {
+        if (element.layout.style && element.layout.style.hasOwnProperty(prop)) {
+          console.log(`      🧹 清理 style.${prop}: ${element.layout.style[prop]} → 即将覆盖`);
+        }
+        if (element.layout.classStyle && element.layout.classStyle.hasOwnProperty(prop)) {
+          console.log(`      🧹 清理 classStyle.${prop}: ${element.layout.classStyle[prop]} → 即将覆盖`);
+        }
+      });
+      
+      // 计算新的对齐方式
+      const newPrimaryAxisAlignItems = targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start';
+      const newCounterAxisAlignItems = targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start';
+      
+      // 🔧 同时更新layout.style和layout.classStyle
+      if (element.layout.style) {
+        element.layout.style.layoutMode = targetDirection;
+        element.layout.style.primaryAxisAlignItems = newPrimaryAxisAlignItems;
+        element.layout.style.counterAxisAlignItems = newCounterAxisAlignItems;
+        console.log(`      ✅ 已更新 style: layoutMode=${targetDirection}, primaryAxis=${newPrimaryAxisAlignItems}, counterAxis=${newCounterAxisAlignItems}`);
+      }
+      
+      if (element.layout.classStyle) {
+        element.layout.classStyle.layoutMode = targetDirection;
+        element.layout.classStyle.primaryAxisAlignItems = newPrimaryAxisAlignItems;
+        element.layout.classStyle.counterAxisAlignItems = newCounterAxisAlignItems;
+        console.log(`      ✅ 已更新 classStyle: layoutMode=${targetDirection}, primaryAxis=${newPrimaryAxisAlignItems}, counterAxis=${newCounterAxisAlignItems}`);
+      }
+    }
+  
+    // 🔧 更新元数据，保存调控信息
+    if (element._metadata) {
+      element._metadata.variant = targetVariant;
+      element._metadata.controlledLayoutMode = targetDirection; // 🆕 保存被调控的布局方向
+      element._metadata.appliedLayoutControl = {
+        layoutIndex: layoutIndex,
+        intensity: intensity,
+        targetVariant: targetVariant,
+        targetDirection: targetDirection,
+        timestamp: Date.now()
+      };
+    } else {
+      // 如果没有元数据，创建一个
+      element._metadata = {
+        actualType: 'layout',
+        variant: targetVariant,
+        controlledLayoutMode: targetDirection,
+        appliedLayoutControl: {
+          layoutIndex: layoutIndex,
+          intensity: intensity,
+          targetVariant: targetVariant,
+          targetDirection: targetDirection,
+          timestamp: Date.now()
+        }
+      };
+    }
+    
+    // 🔧 修复：先保存重要的调控设置，然后应用样式配置，最后恢复调控设置
+    const importantSettings = {
+      layoutMode: targetDirection,
+      primaryAxisAlignItems: targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start',
+      counterAxisAlignItems: targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start'
+    };
+    
+    // 🔧 修复：同时更新样式配置到style和classStyle（但不包括会被覆盖的关键设置）
+    try {
+      const newStyleConfig = getElementStyleConfig('layout', targetVariant);
+      if (newStyleConfig) {
+        // 合并新的样式配置，但排除会覆盖调控设置的属性
+        Object.entries(newStyleConfig).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && 
+              !['layoutMode', 'primaryAxisAlignItems', 'counterAxisAlignItems'].includes(key)) {
+            
+            // 🔧 关键修复：同时更新classStyle和style
+            if (element.layout.classStyle) {
+              element.layout.classStyle[key] = value;
+            }
+            if (element.layout.style) {
+              element.layout.style[key] = value;
+            }
+          }
+        });
+        console.log(`      📝 应用了 ${targetVariant} 样式配置到 classStyle 和 style (排除布局调控属性)`);
+      }
+    } catch (error) {
+      console.warn(`⚠️ 获取Layout样式配置失败 (${targetVariant}):`, error);
+    }
+    
+    // 🔧 关键修复：确保调控设置不被样式配置覆盖
+    if (element.layout.style) {
+      element.layout.style.layoutMode = importantSettings.layoutMode;
+      element.layout.style.primaryAxisAlignItems = importantSettings.primaryAxisAlignItems;
+      element.layout.style.counterAxisAlignItems = importantSettings.counterAxisAlignItems;
+    }
+    
+    if (element.layout.classStyle) {
+      element.layout.classStyle.layoutMode = importantSettings.layoutMode;
+      element.layout.classStyle.primaryAxisAlignItems = importantSettings.primaryAxisAlignItems;
+      element.layout.classStyle.counterAxisAlignItems = importantSettings.counterAxisAlignItems;
+    }
+    
+    console.log(`      🔒 已确保布局调控设置不被覆盖: layoutMode=${importantSettings.layoutMode}`);
+    
+    // 🔧 最终验证：确认更新是否成功
+    console.log(`      🔍 更新后状态验证:`);
+    console.log(`         element.layout.style.layoutMode: ${element.layout?.style?.layoutMode}`);
+    console.log(`         element.layout.classStyle.layoutMode: ${element.layout?.classStyle?.layoutMode}`);
+    console.log(`         element._metadata.variant: ${element._metadata?.variant}`);
+    console.log(`         目标应该是: ${targetDirection}`);
+    
+    const isUpdateSuccessful = (element.layout?.style?.layoutMode === targetDirection) && 
+                             (element.layout?.classStyle?.layoutMode === targetDirection);
+    console.log(`         更新${isUpdateSuccessful ? '成功✅' : '失败❌'}`);
+    
+    updatedLayoutsCount++;
+    console.log(`      ✅ Layout 索引=${layoutIndex}, ID=${element.id} 更新完成`);
+  });
+  
+  console.log(`\n🎨 布局调控应用完成！`);
+  console.log(`   📊 更新的布局数量: ${updatedLayoutsCount}`);
+  
+  if (updatedLayoutsCount > 0) {
+    console.log(`   ✅ 所有布局变化已应用到八要素结构中`);
+  } else {
+    console.log(`   ⚪ 没有布局被更新，可能是因为:`);
+    console.log(`      - 提供的布局ID不存在`);
+    console.log(`      - 布局调控强度未发生变化`);
+  }
+  
+  return updatedEightElement;
+}
+
 // 命名导出
 export {
   markdownToEightElement,
@@ -3587,6 +4000,7 @@ export {
   generateChartSvg,
   printEightElementStructure,
   exampleMarkdownToEightElement,
+  // applyLayoutControlsToEightElement 已在函数定义时导出，无需重复导出
   LAYOUT_CONSTANTS,
   COLOR_CONSTANTS,
   DIMENSION_CONSTANTS,

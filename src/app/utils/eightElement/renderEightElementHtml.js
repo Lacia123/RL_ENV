@@ -759,11 +759,11 @@ function applyLayoutToken(computedStyle, key, value) {
 
         // 布局方向
         case 'layoutMode':
-            if (value === 'HORIZONTAL') {
+            if (value === 'HORIZONTAL' || value === '{layout.direction.HORIZONTAL}') {
                 computedStyle.flexDirection = 'row';
-            } else if (value === 'VERTICAL') {
+            } else if (value === 'VERTICAL' || value === '{layout.direction.VERTICAL}') {
                 computedStyle.flexDirection = 'column';
-            } else if (value === 'NONE') {
+            } else if (value === 'NONE' || value === '{layout.direction.NONE}') {
                 computedStyle.flexDirection = 'unset';
             }
             break;

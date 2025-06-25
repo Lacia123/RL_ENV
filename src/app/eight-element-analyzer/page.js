@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { renderEightElementToHtml } from '../utils/eightElement/renderEightElementHtml';
 import { convertEightElementToLayout } from '../utils/layoutAnalysis/eightElementAnalysis';
-import { markdownToEightElement } from '../utils/eightElement/markdownToEightElement';
+import { markdownToEightElement, applyLayoutControlsToEightElement } from '../utils/eightElement/markdownToEightElement';
 
 import { RL_ACTIONS, ActionSystemManager, createActionSystemManager, convertActionResultsToTokens } from '../utils/seeds/rl_action_engines';
 import { DEFAULT_STYLE_CONFIG } from '../utils/eightElement/styleConfig';
@@ -14,9 +14,11 @@ const EightElementAnalyzer = () => {
   const [markdown, setMarkdown] = useState(`# 八要素测试文档
 
 ## 基本元素
-
-### 三级标题
+<layout:row>
+### 左侧标题
 这是一段普通文本，将被转换为text元素。
+
+### 右侧标题
 
 #### 四级标题
 四级标题正文四级标题正文四级标题正文四级标题正文四级标题正文四级标题正文
@@ -28,10 +30,13 @@ const EightElementAnalyzer = () => {
 六级标题正文六级标题正文六级标题正文六级标题正文六级标题正文六级标题正文
 
 > 这是一段引用文本，展示重要的观点或引述
+</layout:row>
 
 ### 按钮（超链接）
+<layout:row>
 [确认](https://example.com)
 [取消](https://example.com)
+</layout:row>
 
 ### 示例图片
 ![示例图片](https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg)
@@ -153,12 +158,17 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
   const [actionIntensities, setActionIntensities] = useState({}); // 动作强度
   const [actionInputMode, setActionInputMode] = useState('categories'); // 'categories' 或 'list'
   const [availableActions, setAvailableActions] = useState(Object.keys(RL_ACTIONS));
-  
+
   // 页面元件分析状态
   const [pageElements, setPageElements] = useState([]); // 当前页面包含的所有元件 [{type, variant, count, elements}]
   const [affectedElements, setAffectedElements] = useState([]); // 当前动作会影响的元件列表
   const [isElementsCollapsed, setIsElementsCollapsed] = useState(false); // 页面元件分析折叠状态
   const [isAffectedCollapsed, setIsAffectedCollapsed] = useState(false); // 动作影响范围折叠状态
+
+  // 🆕 布局调控状态 - 改为基于索引
+  const [layoutAnalysis, setLayoutAnalysis] = useState([]); // 可调控的布局列表
+  const [layoutControls, setLayoutControls] = useState({}); // 布局调控设置 {layoutIndex: intensity}
+  const [isLayoutControlsCollapsed, setIsLayoutControlsCollapsed] = useState(false); // 布局调控折叠状态
   const [eightElement, setEightElement] = useState(null);
   const [processedEightElement, setProcessedEightElement] = useState(null);
   const [renderedHtml, setRenderedHtml] = useState('');
@@ -190,7 +200,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
       // 使用ActionSystemManager，它会自动从styleConfig中提取基准token
       const manager = createActionSystemManager(DEFAULT_STYLE_CONFIG);
       setActionManager(manager);
-      
+
       console.log('动作系统管理器初始化完成');
       console.log('可用动作数量:', manager.getAvailableActions().length);
     } catch (error) {
@@ -206,21 +216,21 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
     }
 
     const affected = [];
-    
+
     // 对每种元件类型和形态，检查是否会被当前动作影响
     for (const pageElement of pageElementsList) {
       const { type, variant, count, elements, sampleContent } = pageElement;
-      
+
       try {
         // 获取该元件的基准tokens和元数据
         const { baseTokens, metadata } = actionManager.getBaseTokens(type, variant);
-        
+
         if (metadata._configFound) {
           // 检查任一选中的动作是否会影响该元件的tokens
           const willBeAffected = selectedActionsList.some(actionName => {
             const actionInfo = actionManager.getActionInfo(actionName);
             if (!actionInfo) return false;
-            
+
             // 🔧 新增：首先检查动作是否适用于该元件类型和变体
             if (actionInfo.applicableToElements && Array.isArray(actionInfo.applicableToElements)) {
               const isApplicable = actionInfo.applicableToElements.some(target => {
@@ -236,21 +246,21 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                   return target === type;
                 }
               });
-              
+
               if (!isApplicable) {
                 console.log(`⚪ 动作 ${actionName} 不适用于元件 ${type}.${variant}`);
                 return false;
               }
             }
-            
+
             // 检查动作影响的CSS属性是否在该元件的基准tokens中
             const affectedProperties = Object.keys(baseTokens).filter(prop => !prop.startsWith('_'));
-            
+
             // 🔧 改进的检测逻辑：基于动作的styleMapping检测实际影响的属性
             if (actionInfo.styleMapping) {
               // 获取动作实际会影响的CSS属性
               const actionTargetProperties = Object.keys(actionInfo.styleMapping);
-              
+
               // 🔍 调试日志：显示动作目标属性和元件属性的匹配情况
               const hasMatch = actionTargetProperties.some(targetProp => {
                 const matches = affectedProperties.includes(targetProp);
@@ -259,14 +269,14 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                 }
                 return matches;
               });
-              
+
               if (!hasMatch) {
                 console.log(`⚪ 动作 ${actionName} 目标属性 [${actionTargetProperties.join(', ')}] 与元件 ${type}.${variant} 属性 [${affectedProperties.join(', ')}] 无匹配`);
               }
-              
+
               return hasMatch;
             }
-            
+
             // 🔧 兼容性回退：更完整的启发式判断
             return affectedProperties.some(prop => {
               return (
@@ -299,7 +309,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
               );
             });
           });
-          
+
           if (willBeAffected) {
             affected.push({
               type,
@@ -315,10 +325,10 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
         console.warn(`无法分析元件 ${type}.${variant}:`, error);
       }
     }
-    
+
     setAffectedElements(affected);
     console.log('🎯 受影响的元件:', affected);
-    
+
     return affected;
   };
 
@@ -327,7 +337,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
     if (markdown && !renderedHtml) {
       processMarkdown();
     }
-  }, [markdown, selectedActions, actionIntensities]);
+  }, [markdown]);
 
   // 处理iframe加载完成后的测量
   useEffect(() => {
@@ -371,7 +381,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
         ...prev,
         [actionName]: 0.5 // 默认强度(0.1-1.0)
       }));
-      }
+    }
   };
 
   // 处理动作强度变化
@@ -383,21 +393,67 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
   };
 
   // 处理Markdown转换为八要素结构
-  const processMarkdown = (customDimensions = null) => {
+  const processMarkdown = (customDimensions = null, forceLayoutControls = null) => {
     try {
       // 使用传入的自定义尺寸或当前状态中的尺寸
       const currentDimensions = customDimensions || dimensions;
       console.log('处理Markdown使用尺寸:', currentDimensions);
 
-      
-      
+      // 🔧 使用强制传入的布局调控或当前状态
+      const currentLayoutControls = forceLayoutControls || layoutControls;
+      console.log('🎯 使用布局调控设置:', currentLayoutControls);
+
+
+
       // 1. 转换Markdown为八要素结构
       let eightElementObj = markdownToEightElement(markdown);
-      
+
       // 2. 分析八要素中的元件类型（使用八要素层面的函数）
       const pageElementsList = analyzeElementsInEightElement(eightElementObj);
       setPageElements(pageElementsList);
-      
+
+      // 🆕 3. 提取布局分析信息
+      if (pageElementsList.layoutAnalysis) {
+        setLayoutAnalysis(pageElementsList.layoutAnalysis);
+        console.log(`🏗️ 识别到 ${pageElementsList.layoutAnalysis.length} 个可调控的布局`);
+
+        // 🔧 修复：基于索引初始化布局调控，保持现有调控设置不变
+        const layoutControlsToUpdate = { ...currentLayoutControls };
+        let hasNewLayouts = false;
+
+        pageElementsList.layoutAnalysis.forEach(layout => {
+          if (!(layout.index in layoutControlsToUpdate)) {
+            // 只对真正新发现的布局设置默认值
+            const isCurrentlyRow = layout.variant === 'row' ||
+              layout.layoutDirection === 'HORIZONTAL' ||
+              (layout.element._metadata?.originalVariant === 'row');
+            layoutControlsToUpdate[layout.index] = isCurrentlyRow ? 0.8 : 0.2;
+            hasNewLayouts = true;
+            console.log(`🔧 初始化新布局 索引=${layout.index}: 方向=${layout.layoutDirection}, 变体=${layout.variant}, 原始变体=${layout.element._metadata?.originalVariant}, 默认强度=${layoutControlsToUpdate[layout.index]}`);
+          } else {
+            console.log(`🔍 保持现有布局调控 索引=${layout.index}: 当前强度=${layoutControlsToUpdate[layout.index]}`);
+          }
+        });
+
+        // 🔧 清理不存在的布局索引（布局可能被删除或修改）
+        const validLayoutIndices = new Set(pageElementsList.layoutAnalysis.map(layout => layout.index));
+        Object.keys(layoutControlsToUpdate).forEach(layoutIndexStr => {
+          const layoutIndex = parseInt(layoutIndexStr);
+          if (!validLayoutIndices.has(layoutIndex)) {
+            console.log(`🗑️ 清理不存在的布局调控 索引=${layoutIndex}`);
+            delete layoutControlsToUpdate[layoutIndexStr];
+          }
+        });
+
+        // 只在有变化时更新状态
+        if (hasNewLayouts || Object.keys(layoutControlsToUpdate).length !== Object.keys(currentLayoutControls).length) {
+          setLayoutControls(layoutControlsToUpdate);
+          console.log('🔧 更新布局调控设置：新布局数量=' + (hasNewLayouts ? '有' : '无') + ', 当前总数=' + Object.keys(layoutControlsToUpdate).length);
+        }
+      } else {
+        setLayoutAnalysis([]);
+      }
+
       // 3. 如果有选中的动作，应用到八要素结构上
       if (actionManager && selectedActions.length > 0 && pageElementsList.length > 0) {
         console.log(`\n🚀 开始应用动作到八要素结构`);
@@ -408,17 +464,17 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
           const intensity = actionIntensities[actionName] || 0.5;
           console.log(`      ${actionName}: ${intensity.toFixed(1)}`);
         });
-        
+
         try {
           // 使用八要素层面的函数应用动作
           eightElementObj = applyActionsToEightElement(
-            eightElementObj, 
-            pageElementsList, 
-            actionManager, 
-            selectedActions, 
+            eightElementObj,
+            pageElementsList,
+            actionManager,
+            selectedActions,
             actionIntensities
           );
-          
+
           console.log('\n🎉 动作应用到八要素结构完成！');
           console.log('   八要素结构已更新，包含所有token变化');
         } catch (error) {
@@ -430,19 +486,51 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
         if (!actionManager) reason = '动作管理器未初始化';
         else if (selectedActions.length === 0) reason = '未选择任何动作';
         else if (pageElementsList.length === 0) reason = '页面中没有检测到元件';
-        
+
         console.log(`\n⚪ 跳过动作应用 - ${reason}`);
       }
-      
+
+      // 🆕 4. 如果有布局调控设置，应用到八要素结构上
+      const layoutControlsList = Object.entries(currentLayoutControls)
+        .filter(([layoutIndexStr, intensity]) => intensity !== undefined)
+        .map(([layoutIndexStr, intensity]) => ({
+          layoutIndex: parseInt(layoutIndexStr),
+          intensity
+        }));
+
+      if (layoutControlsList.length > 0) {
+        console.log(`\n🏗️ 开始应用基于索引的布局调控到八要素结构`);
+        console.log(`   调控的布局数量: ${layoutControlsList.length}`);
+        layoutControlsList.forEach(({ layoutIndex, intensity }) => {
+          const targetVariant = intensity <= 0.5 ? 'column' : 'row';
+          console.log(`   📝 布局调控: 索引=${layoutIndex} → ${targetVariant} (强度: ${intensity.toFixed(2)})`);
+        });
+
+        try {
+          // 传递layoutAnalysis参数以使用索引映射
+          eightElementObj = applyLayoutControlsToEightElement(
+            eightElementObj,
+            layoutControlsList,
+            pageElementsList.layoutAnalysis
+          );
+          console.log('\n🎨 基于索引的布局调控应用完成！');
+        } catch (error) {
+          console.error('\n❌ 布局调控应用出错:', error);
+          console.error('   将使用当前八要素结构继续渲染');
+        }
+      } else {
+        console.log(`\n⚪ 跳过布局调控 - 没有设置布局调控`);
+      }
+
       // 4. 保存处理后的八要素结构
       setEightElement(eightElementObj);
-      
+
       // 5. 渲染HTML（使用应用了动作的八要素结构）
-      const { html, processedEightElement } = renderEightElementToHtml(eightElementObj, { 
-        width: currentDimensions.width, 
+      const { html, processedEightElement } = renderEightElementToHtml(eightElementObj, {
+        width: currentDimensions.width,
         height: currentDimensions.height
       });
-      
+
       setRenderedHtml(html);
       setProcessedEightElement(processedEightElement);
 
@@ -458,9 +546,9 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
         },
         elements: []
       };
-      
+
       setDomMeasurements(measurements);
-      
+
       console.log(`\n🏁 Markdown处理流程完成！`);
       console.log(`   📄 生成的HTML长度: ${html.length} 字符`);
       console.log(`   🎨 八要素结构: ${pageElementsList.length} 种元件类型`);
@@ -468,7 +556,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
       if (selectedActions.length > 0) {
         console.log(`   ⚡ 应用的动作: ${selectedActions.length} 个`);
       }
-      
+
       return html; // 返回生成的HTML，方便调用者使用
     } catch (error) {
       console.error('\n❌ Markdown 处理出错:', error);
@@ -484,7 +572,35 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 
   // 显式添加应用样式的函数 - 与processMarkdown分开
   const applyStyleSettings = () => {
-    processMarkdown();
+    console.log('🎮 应用调控设置被点击');
+    console.log('   当前布局调控状态:', layoutControls);
+    console.log('   当前选中动作:', selectedActions);
+    console.log('   当前动作强度:', actionIntensities);
+
+    // 🔧 强制传递当前的布局调控设置
+    processMarkdown(null, layoutControls);
+  };
+
+  // 🆕 布局调控处理函数 - 改为基于索引
+  const handleLayoutControlChange = (layoutIndex, intensity) => {
+    setLayoutControls(prev => ({
+      ...prev,
+      [layoutIndex]: intensity
+    }));
+  };
+
+  // 🆕 重置布局调控 - 改为基于索引
+  const resetLayoutControls = () => {
+    const resetControls = {};
+    layoutAnalysis.forEach(layout => {
+      // 🔧 修复：正确判断原始布局方向来设置重置强度
+      const isCurrentlyRow = layout.variant === 'row' ||
+        layout.layoutDirection === 'HORIZONTAL' ||
+        (layout.element._metadata?.originalVariant === 'row');
+      resetControls[layout.index] = isCurrentlyRow ? 0.8 : 0.2;
+      console.log(`🔄 重置布局 索引=${layout.index}: 方向=${layout.layoutDirection}, 变体=${layout.variant}, 原始变体=${layout.element._metadata?.originalVariant}, 重置强度=${resetControls[layout.index]}`);
+    });
+    setLayoutControls(resetControls);
   };
 
   // 测量iframe内容时使用通用函数替换内联逻辑
@@ -495,7 +611,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 
       // 获取iframe内容文档
       const iframeDocument = iframe.contentDocument;
-      
+
       // 使用状态中的固定尺寸，而不是iframe的实际尺寸
       // 这样避免了iframe隐藏时测量不准确的问题
       const measureDimensions = {
@@ -534,8 +650,8 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
     }
     const actionInfo = actionManager.getActionInfo(actionName);
     return actionInfo ? actionInfo.name : actionName;
-    };
-    
+  };
+
   // 获取动作的冲突信息
   const getActionConflicts = (actionName) => {
     if (!actionManager) {
@@ -549,7 +665,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
   const isActionAvailable = (actionName) => {
     const conflicts = getActionConflicts(actionName);
     return conflicts.length === 0;
-    };
+  };
 
 
 
@@ -558,23 +674,23 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
     if (!eightElement) {
       return;
     }
-    
+
     try {
       const jsonString = JSON.stringify(eightElement, null, 2);
       await navigator.clipboard.writeText(jsonString);
-      
+
       // 显示成功反馈
       setCopySuccess(true);
-      
+
       // 2秒后隐藏反馈
       setTimeout(() => {
         setCopySuccess(false);
       }, 2000);
-      
+
       console.log('八要素JSON已复制到剪贴板');
     } catch (error) {
       console.error('复制到剪贴板失败:', error);
-      
+
       // 降级方案：选择文本并提示用户手动复制
       try {
         const textArea = document.createElement('textarea');
@@ -583,7 +699,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        
+
         setCopySuccess(true);
         setTimeout(() => setCopySuccess(false), 2000);
         console.log('八要素JSON已复制到剪贴板 (降级方案)');
@@ -601,26 +717,26 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
       console.log('已经是当前尺寸，无需更改');
       return;
     }
-    
+
     console.log('尺寸变更为:', dimension.width, 'x', dimension.height);
-    
+
     // 先重置 iframe key 强制重新渲染
     setIframeKey(prev => prev + 1);
-    
+
     // 先处理新尺寸的渲染，得到新的HTML
     const newDimensions = {
       width: dimension.width,
       height: dimension.height
     };
-    
+
     // 先清除旧的渲染结果
     setRenderedHtml('');
     setProcessedEightElement(null);
     setDomMeasurements(null);
-    
+
     // 更新维度状态
     setDimensions(newDimensions);
-    
+
     // 使用新尺寸强制重新处理
     if (markdown) {
       // 使用新尺寸立即生成HTML，不依赖状态更新
@@ -633,7 +749,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <h1 className="text-2xl font-bold mb-4">八要素结构分析工具</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* 左侧编辑器区域 */}
         <div className="bg-white rounded-lg shadow p-4">
@@ -644,7 +760,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
             onChange={(e) => setMarkdown(e.target.value)}
             placeholder="输入Markdown文本..."
           />
-          
+
           {/* 页面元件分析 */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
@@ -665,7 +781,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                 )}
               </button>
             </div>
-            
+
             {!isElementsCollapsed && (
               <div className="mb-4 p-3 bg-gray-50 rounded border">
                 {pageElements.length > 0 ? (
@@ -697,13 +813,13 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
               </div>
             )}
           </div>
-          
+
           {/* 动作影响范围 */}
           {selectedActions.length > 0 && (
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium text-gray-700">动作影响范围</h3>
-              <button
+                <button
                   onClick={() => setIsAffectedCollapsed(!isAffectedCollapsed)}
                   className="text-gray-500 hover:text-gray-700 transition-colors"
                   title={isAffectedCollapsed ? "展开" : "折叠"}
@@ -717,9 +833,9 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                     </svg>
                   )}
-              </button>
-            </div>
-            
+                </button>
+              </div>
+
               {!isAffectedCollapsed && (
                 <div className="mb-4 p-3 bg-yellow-50 rounded border border-yellow-200">
                   {affectedElements.length > 0 ? (
@@ -735,17 +851,17 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                             </span>
                             <span className="text-sm text-yellow-700">
                               {sampleContent && `"${sampleContent}"`}
-                    </span>
-                  </div>
+                            </span>
+                          </div>
                           <div className="flex items-center space-x-2">
                             <span className="text-xs bg-yellow-200 px-2 py-1 rounded">
                               {count}个元件
                             </span>
                             <span className="text-xs bg-yellow-200 px-2 py-1 rounded">
                               {tokenCount}个tokens
-                    </span>
-                  </div>
-                </div>
+                            </span>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   ) : (
@@ -757,10 +873,10 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
               )}
             </div>
           )}
-          
+
           <div className="mb-6">
             <h3 className="font-medium text-gray-700 mb-2">动作空间设置</h3>
-            
+
             <div className="flex mb-3">
               <button
                 className={`px-3 py-1 text-sm rounded-l ${actionInputMode === 'categories' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
@@ -774,8 +890,8 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
               >
                 列表模式
               </button>
-                  </div>
-            
+            </div>
+
             {actionInputMode === 'categories' ? (
               <div className="space-y-4 max-h-80 overflow-y-auto">
                 {Object.entries(getActionsByCategory()).map(([category, actions]) => (
@@ -797,30 +913,30 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                         const isSelected = selectedActions.includes(actionName);
                         const isAvailable = isActionAvailable(actionName);
                         const conflicts = getActionConflicts(actionName);
-                        
+
                         return (
                           <div key={actionName} className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
-                  <input
+                              <input
                                 type="checkbox"
                                 checked={isSelected}
                                 disabled={!isAvailable && !isSelected}
                                 onChange={() => handleActionToggle(actionName)}
                                 className="rounded"
-                  />
+                              />
                               <span className={`text-sm ${!isAvailable && !isSelected ? 'text-gray-400' : 'text-gray-700'}`}>
                                 {getActionDescription(actionName)}
-                    </span>
+                              </span>
                               {conflicts.length > 0 && (
                                 <span className="text-xs text-orange-500" title={`冲突动作: ${conflicts.join(', ')}`}>
                                   ⚠️
                                 </span>
                               )}
-                  </div>
+                            </div>
                             {isSelected && (
                               <div className="flex items-center space-x-2">
                                 <span className="text-xs text-gray-500">强度:</span>
-                  <input
+                                <input
                                   type="number"
                                   min="0.1"
                                   max="1.0"
@@ -833,8 +949,8 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                                     }
                                   }}
                                   className="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded"
-                  />
-                </div>
+                                />
+                              </div>
                             )}
                           </div>
                         );
@@ -850,7 +966,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                     const isSelected = selectedActions.includes(actionName);
                     const isAvailable = isActionAvailable(actionName);
                     const action = RL_ACTIONS[actionName];
-                    
+
                     return (
                       <div key={actionName} className="flex items-center justify-between p-2 border rounded">
                         <div className="flex items-center space-x-2">
@@ -861,19 +977,19 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                             onChange={() => handleActionToggle(actionName)}
                             className="rounded"
                           />
-                <div>
+                          <div>
                             <span className={`text-sm font-medium ${!isAvailable && !isSelected ? 'text-gray-400' : 'text-gray-700'}`}>
                               {getActionDescription(actionName)}
-                    </span>
+                            </span>
                             <div className="text-xs text-gray-500">
                               {action.category} • {action.intensity}
-                  </div>
+                            </div>
                           </div>
                         </div>
                         {isSelected && (
                           <div className="flex items-center space-x-2">
                             <span className="text-xs text-gray-500">强度:</span>
-                  <input
+                            <input
                               type="number"
                               min="0.1"
                               max="1.0"
@@ -886,32 +1002,134 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                                 }
                               }}
                               className="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded"
-                  />
-                </div>
+                            />
+                          </div>
                         )}
-              </div>
+                      </div>
                     );
                   })}
                 </div>
               </div>
             )}
-            
+
+            {/* 🆕 布局调控（作为动作空间设置的子项） */}
+            {layoutAnalysis.length > 0 && (
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-medium text-gray-700">🏗️ 布局调控</h4>
+                  <button
+                    onClick={() => setIsLayoutControlsCollapsed(!isLayoutControlsCollapsed)}
+                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                    title={isLayoutControlsCollapsed ? "展开" : "折叠"}
+                  >
+                    {isLayoutControlsCollapsed ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+
+                <div className="text-xs text-blue-600 mb-3">
+                  发现 {layoutAnalysis.length} 个可调控的布局，可精确控制每个布局的方向
+                </div>
+
+                {!isLayoutControlsCollapsed && (
+                  <div className="space-y-3 max-h-60 overflow-y-auto">
+                    {layoutAnalysis.map((layout) => {
+                      const currentIntensity = layoutControls[layout.index] || 0.5;
+                      const currentVariant = currentIntensity <= 0.5 ? 'column' : 'row';
+                      // 🔧 修复：正确判断原始布局方向
+                      const originallyRow = layout.variant === 'row' ||
+                        layout.layoutDirection === 'HORIZONTAL' ||
+                        (layout.element._metadata?.originalVariant === 'row');
+                      const originalIntensity = originallyRow ? 0.8 : 0.2;
+                      const isChanged = Math.abs(currentIntensity - originalIntensity) > 0.1;
+
+                      return (
+                        <div key={layout.index} className={`p-3 rounded border ${isChanged ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-200'}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">
+                                {layout.isRoot ? 'root' : 'layout'}
+                              </span>
+                              <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">
+                                索引:{layout.index}
+                              </span>
+                              <span className={`text-xs px-2 py-1 rounded font-mono ${currentVariant === 'row' ? 'bg-orange-200 text-orange-800' : 'bg-green-200 text-green-800'
+                                }`}>
+                                {currentVariant}
+                              </span>
+                              <span className="text-xs text-gray-600">
+                                {layout.childrenCount}子
+                              </span>
+                            </div>
+                            {isChanged && (
+                              <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
+                                已调整
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="text-xs text-gray-700 mb-2">
+                            <span className="font-medium">内容:</span> {layout.content.preview}
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-600 w-12">强度:</span>
+                            <input
+                              type="range"
+                              min="0"
+                              max="1"
+                              step="0.1"
+                              value={currentIntensity}
+                              onChange={(e) => handleLayoutControlChange(layout.index, parseFloat(e.target.value))}
+                              className="flex-1"
+                            />
+                            <span className="text-xs font-mono w-8 text-center">
+                              {currentIntensity.toFixed(1)}
+                            </span>
+                          </div>
+
+                          <div className="text-xs text-gray-500 mt-1">
+                            0.0-0.5: 垂直 (column) | 0.5-1.0: 水平 (row)
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    <div className="pt-2 border-t border-gray-200">
+                      <button
+                        onClick={resetLayoutControls}
+                        className="w-full px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors text-xs"
+                      >
+                        重置布局调控
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="mt-4">
               <button
-                className={`px-4 py-2 rounded w-full ${
-                  visibleTab === 'html' 
-                    ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                className={`px-4 py-2 rounded w-full ${visibleTab === 'html'
+                    ? 'bg-blue-500 text-white hover:bg-blue-600'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
+                  }`}
                 onClick={visibleTab === 'html' ? applyStyleSettings : undefined}
                 disabled={visibleTab !== 'html'}
               >
-                应用动作设置
+                应用调控设置
               </button>
               <p className="text-xs text-gray-500 mt-1">
-                {visibleTab === 'html' 
-                  ? `已选择 ${selectedActions.length} 个动作，将影响页面中 ${affectedElements.length} 种元件类型` 
-                  : '请切换到HTML预览页面后再应用动作设置'
+                {visibleTab === 'html'
+                  ? `${selectedActions.length} 个动作 + ${Object.keys(layoutControls).length} 个布局调控，影响 ${affectedElements.length} 种元件类型`
+                  : '请切换到HTML预览页面后再应用调控设置'
                 }
               </p>
             </div>
@@ -922,11 +1140,10 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
               {commonDimensions.map((dim) => (
                 <button
                   key={dim.name}
-                  className={`px-3 py-2 text-sm rounded ${
-                    dimensions.width === dim.width && dimensions.height === dim.height
+                  className={`px-3 py-2 text-sm rounded ${dimensions.width === dim.width && dimensions.height === dim.height
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                    }`}
                   onClick={() => handleDimensionChange(dim)}
                 >
                   {dim.name}
@@ -938,30 +1155,30 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
             </div>
           </div>
         </div>
-        
+
         {/* 右侧预览区域 */}
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex border-b mb-4">
-            <button 
+            <button
               className={`px-4 py-2 ${visibleTab === 'html' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
               onClick={() => setVisibleTab('html')}
             >
               HTML预览
             </button>
-            <button 
+            <button
               className={`px-4 py-2 ${visibleTab === 'json' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
               onClick={() => setVisibleTab('json')}
             >
               八要素JSON
             </button>
-            <button 
+            <button
               className={`px-4 py-2 ${visibleTab === 'score' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
               onClick={() => setVisibleTab('score')}
             >
               布局评分
             </button>
           </div>
-          
+
           {/* HTML预览 */}
           <div className={`${visibleTab === 'html' ? 'block' : 'hidden'}`}>
             <h2 className="text-lg font-medium mb-2">HTML预览</h2>
@@ -990,7 +1207,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
               </div>
             </div>
           </div>
-          
+
           {/* JSON预览 */}
           <div className={`${visibleTab === 'json' ? 'block' : 'hidden'}`}>
             <div className="flex items-center justify-between mb-2">
@@ -1007,11 +1224,10 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                 <button
                   onClick={copyToClipboard}
                   disabled={!eightElement}
-                  className={`flex items-center space-x-1 px-3 py-1 text-sm rounded transition-colors ${
-                    eightElement 
-                      ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                  className={`flex items-center space-x-1 px-3 py-1 text-sm rounded transition-colors ${eightElement
+                      ? 'bg-blue-500 text-white hover:bg-blue-600'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
+                    }`}
                   title="复制JSON到剪贴板"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1027,14 +1243,14 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
               </pre>
             </div>
           </div>
-          
+
           {/* 评分结果 */}
           <div className={`${visibleTab === 'score' ? 'block' : 'hidden'}`}>
             <h2 className="text-lg font-medium mb-2">布局评分</h2>
             <div className="h-96 overflow-auto">
               {layout && domMeasurements && (
-                <VisualSpaceEvaluator 
-                  layout={layout} 
+                <VisualSpaceEvaluator
+                  layout={layout}
                   domMeasurements={domMeasurements}
                 />
               )}
@@ -1049,7 +1265,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                 <div className="text-green-600">✅ 系统已初始化</div>
                 <div>页面元件类型: {pageElements.length} 种</div>
                 <div>可用动作: {actionManager.getAvailableActions().length} 个</div>
-                
+
                 {selectedActions.length > 0 ? (
                   <div className="mt-2">
                     <div className="font-medium mb-1">已选择的动作:</div>
@@ -1060,7 +1276,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                           <span className="font-mono">
                             {(actionIntensities[actionName] || 0.5).toFixed(1)}
                           </span>
-          </div>
+                        </div>
                       ))}
                     </div>
                     <div className="mt-2 pt-2 border-t border-gray-300">
@@ -1071,6 +1287,44 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                   </div>
                 ) : (
                   <div className="text-gray-400 mt-2">未选择动作</div>
+                )}
+
+                {/* 🆕 布局调控状态 */}
+                {layoutAnalysis.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-gray-300">
+                    <div className="font-medium mb-1">布局调控状态:</div>
+                    <div className="text-blue-600">
+                      🏗️ 发现 {layoutAnalysis.length} 个可调控布局
+                    </div>
+                    {Object.keys(layoutControls).length > 0 && (
+                      <div className="mt-1">
+                        <div className="text-xs">当前调控:</div>
+                        {layoutAnalysis.map(layout => {
+                          const currentIntensity = layoutControls[layout.index];
+                          if (currentIntensity === undefined) return null;
+
+                          const currentVariant = currentIntensity <= 0.5 ? 'column' : 'row';
+                          // 🔧 修复：正确判断原始布局方向
+                          const originallyRow = layout.variant === 'row' ||
+                            layout.layoutDirection === 'HORIZONTAL' ||
+                            (layout.element._metadata?.originalVariant === 'row');
+                          const originalIntensity = originallyRow ? 0.8 : 0.2;
+                          const isChanged = Math.abs(currentIntensity - originalIntensity) > 0.1;
+
+                          return (
+                            <div key={layout.index} className="flex justify-between items-center">
+                              <span className="text-xs">
+                                索引{layout.index} ({layout.childrenCount}子)
+                              </span>
+                              <span className={`font-mono ${isChanged ? 'text-blue-600 font-bold' : ''}`}>
+                                {currentVariant} ({currentIntensity.toFixed(1)})
+                              </span>
+                            </div>
+                          );
+                        }).filter(Boolean)}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             ) : (
