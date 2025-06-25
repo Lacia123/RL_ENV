@@ -168,6 +168,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
   const iframeRef = useRef(null);
   const [layout, setLayout] = useState(null);
   const [iframeKey, setIframeKey] = useState(0);  // 添加 iframe key 状态
+  const [copySuccess, setCopySuccess] = useState(false); // 复制成功状态
 
   // 先定义commonDimensions
   const commonDimensions = [
@@ -551,6 +552,47 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
     };
 
 
+
+  // 复制到剪贴板函数
+  const copyToClipboard = async () => {
+    if (!eightElement) {
+      return;
+    }
+    
+    try {
+      const jsonString = JSON.stringify(eightElement, null, 2);
+      await navigator.clipboard.writeText(jsonString);
+      
+      // 显示成功反馈
+      setCopySuccess(true);
+      
+      // 2秒后隐藏反馈
+      setTimeout(() => {
+        setCopySuccess(false);
+      }, 2000);
+      
+      console.log('八要素JSON已复制到剪贴板');
+    } catch (error) {
+      console.error('复制到剪贴板失败:', error);
+      
+      // 降级方案：选择文本并提示用户手动复制
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = JSON.stringify(eightElement, null, 2);
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+        console.log('八要素JSON已复制到剪贴板 (降级方案)');
+      } catch (fallbackError) {
+        console.error('复制失败:', fallbackError);
+        alert('复制失败，请手动选择文本进行复制');
+      }
+    }
+  };
 
   // 添加尺寸选择处理函数
   const handleDimensionChange = (dimension) => {
@@ -951,7 +993,34 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
           
           {/* JSON预览 */}
           <div className={`${visibleTab === 'json' ? 'block' : 'hidden'}`}>
-            <h2 className="text-lg font-medium mb-2">八要素结构</h2>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-medium">八要素结构</h2>
+              <div className="flex items-center space-x-2">
+                {copySuccess && (
+                  <span className="text-sm text-green-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    已复制！
+                  </span>
+                )}
+                <button
+                  onClick={copyToClipboard}
+                  disabled={!eightElement}
+                  className={`flex items-center space-x-1 px-3 py-1 text-sm rounded transition-colors ${
+                    eightElement 
+                      ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                  title="复制JSON到剪贴板"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  <span>复制</span>
+                </button>
+              </div>
+            </div>
             <div className="border border-gray-300 rounded p-2 h-96 overflow-auto bg-gray-50">
               <pre className="text-xs">
                 {eightElement ? JSON.stringify(eightElement, null, 2) : '等待处理...'}
