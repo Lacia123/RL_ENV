@@ -1482,6 +1482,16 @@ function createHeadingLayout(headingContent, subElements = [], headingLevel = 1)
     }
   );
 
+  // 🏷️ 设置标题布局的元数据，包含标题级别信息
+  layout._metadata = {
+    ...layout._metadata,
+    actualType: 'layout',
+    variant: 'column',
+    headingLevel: headingLevel, // 添加标题级别信息
+    isHeadingLayout: true,
+    isLayout: true
+  };
+
   // 添加标题文本，根据标题级别选择文本样式
   const headingVariant = `h${headingLevel}`;
   const headingText = createTextElement(headingContent, headingVariant);
@@ -2441,9 +2451,72 @@ function parseMarkdown(markdown, options = {}) {
           stack.pop();
         }
 
+        // 🆕 检查同级标题分组逻辑
+        const parentElements = stack[stack.length - 1].elements;
+        
+        // 查找父容器中是否已经有同级标题
+        const existingSiblingHeading = parentElements.find(element => 
+          element._metadata?.actualType === 'layout' && 
+          element._metadata?.headingLevel === level &&
+          !element._metadata?.isSiblingGroup  // 不是同级组合容器本身
+        );
+
+        // 查找是否已经有同级标题组合容器
+        const existingSiblingGroup = parentElements.find(element =>
+          element._metadata?.actualType === 'layout' &&
+          element._metadata?.isSiblingGroup === true &&
+          element._metadata?.headingLevel === level
+        );
+
         // 创建新的嵌套层级，传递标题级别
         const newHeadingLayout = createHeadingLayout(content, [], level);
-        stack[stack.length - 1].elements.push(newHeadingLayout);
+
+        if (existingSiblingHeading && !existingSiblingGroup) {
+          // 🔧 第一次遇到同级标题：创建同级标题组合容器
+          console.log(`检测到同级标题(level ${level})，创建同级标题组合容器`);
+          
+          // 从父容器中移除已存在的同级标题
+          const siblingIndex = parentElements.indexOf(existingSiblingHeading);
+          parentElements.splice(siblingIndex, 1);
+          
+          // 创建同级标题组合容器
+          const siblingGroupContainer = createLayoutElement(
+            LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+            [existingSiblingHeading, newHeadingLayout],
+            {
+              alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+              counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
+              variant: 'column'
+            }
+          );
+          
+          // 🏷️ 标记为同级标题组合容器
+          siblingGroupContainer._metadata = {
+            ...siblingGroupContainer._metadata,
+            actualType: 'layout',
+            variant: 'column',
+            isSiblingGroup: true,
+            headingLevel: level,
+            isLayout: true
+          };
+          
+          // 将同级标题组合容器添加到父容器
+          parentElements.push(siblingGroupContainer);
+          
+          console.log(`✅ 创建同级标题组合容器(level ${level})，包含 2 个同级标题`);
+          
+        } else if (existingSiblingGroup) {
+          // 🔧 已有同级标题组合容器：添加到现有容器
+          console.log(`向现有同级标题组合容器添加标题(level ${level})`);
+          
+          existingSiblingGroup.layout.children.push(newHeadingLayout);
+          console.log(`✅ 已添加到同级标题组合容器，当前包含 ${existingSiblingGroup.layout.children.length} 个同级标题`);
+          
+        } else {
+          // 🔧 首个标题或无同级标题：正常添加
+          parentElements.push(newHeadingLayout);
+          console.log(`添加独立标题(level ${level})`);
+        }
 
         // 将新的嵌套层级添加到栈中
         stack.push({ level, elements: newHeadingLayout.layout.children });
