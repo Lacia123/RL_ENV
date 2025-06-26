@@ -10,8 +10,248 @@ import { analyzeElementsInEightElement, applyActionsToEightElement } from '../ut
 import VisualSpaceEvaluator from '../components/VisualSpaceEvaluator';
 import collectEightElementMeasurements from '../utils/eightElement/collectElementMeasurements.js';
 
-const EightElementAnalyzer = () => {
-  const [markdown, setMarkdown] = useState(`# 八要素测试文档
+// 🆕 Markdown 示例配置
+// 扩展说明：要添加新的模板，只需要在下面的 MARKDOWN_TEMPLATES 对象中添加新的条目
+// 格式：templateId: { name: '显示名称', description: '描述', markdown: '模板内容' }
+// 支持的特殊语法：
+// - <layout:row> 水平布局
+// - [chart:type] 图表（支持 line, bar, pie, grouped_line, barh 等）
+// - **粗体** ~~删除线~~ 等 markdown 格式
+// - 数学公式 $inline$ 和 $$block$$
+// - 表格、代码块、引用等标准 markdown 语法
+const MARKDOWN_TEMPLATES = {
+
+
+
+  landing: {
+    name: '🏢 企业官网',
+    description: '企业着陆页，包含导航、特性介绍、联系方式',
+    markdown: `<layout:row>
+[首页](/)
+[产品](/products)
+[解决方案](/solutions)
+[关于我们](/about)
+[联系我们](/contact)
+</layout:row>
+
+![企业Logo](https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=300)
+
+## 创新科技，引领未来
+
+我们致力于为企业提供最先进的数字化解决方案，助力业务增长和数字化转型。
+
+<layout:row>
+[免费试用](https://example.com/trial)
+[了解更多](https://example.com/learn)
+[观看演示](https://example.com/demo)
+</layout:row>
+
+<layout:row>
+### 产品特性
+我们的产品具有强大的功能和优异的性能，满足各种业务需求
+
+- ✅ 模块化设计，灵活配置
+- ✅ 实时数据处理能力
+- ✅ 智能化推荐算法
+- ✅ 多端同步支持
+
+[查看功能详情](https://example.com/features)
+
+### 技术优势
+采用最新的技术架构，确保系统的稳定性和可扩展性
+
+- 🔧 微服务架构
+- 🔧 容器化部署
+- 🔧 分布式缓存
+- 🔧 负载均衡
+
+[技术白皮书](https://example.com/tech)
+</layout:row>
+
+### 核心优势
+
+<layout:row>
+**🚀 高性能**
+优化的架构设计，提供毫秒级响应
+
+**🔒 安全可靠**
+银行级安全保障，数据加密传输
+</layout:row>
+
+<layout:row>
+**📈 智能分析**
+AI驱动的数据分析，洞察业务趋势
+
+**🛠️ 易于集成**
+RESTful API，快速集成现有系统
+</layout:row>
+
+<layout:row>
+### 服务支持
+7x24小时专业技术支持，快速响应客户需求
+
+- 📞 **热线支持**: 400-800-1234
+- 💬 **在线客服**: 实时响应
+- 📧 **邮件支持**: 技术工单系统
+- 🎓 **培训服务**: 产品使用培训
+
+<layout:row>
+[联系客服](https://example.com/support)
+[提交工单](https://example.com/ticket)
+</layout:row>
+
+### 质量保证
+严格的质量管控体系，确保产品交付质量
+
+> **质量承诺**: 99.9% 服务可用性保障
+
+1. **代码审查**: 多重代码质量检查
+2. **自动化测试**: 持续集成测试流程
+3. **性能监控**: 实时系统性能监控
+4. **安全扫描**: 定期安全漏洞扫描
+
+[质量报告](https://example.com/quality)
+</layout:row>
+
+### 客户案例
+
+> "使用该解决方案后，我们的工作效率提升了300%，强烈推荐！" —— 某科技公司CEO
+
+<layout:row>
+### 行业经验
+深耕行业10年，服务超过1000家企业客户
+
+**成功案例分布:**
+- 🏦 金融行业: 150+ 客户
+- 🛒 电商平台: 230+ 客户  
+- 🎓 教育机构: 89+ 客户
+- 🏥 医疗健康: 67+ 客户
+
+<layout:row>
+[查看案例](https://example.com/cases)
+[客户推荐](https://example.com/testimonials)
+</layout:row>
+
+### 团队实力
+拥有资深技术团队，平均从业经验8年以上
+
+**团队构成:**
+
+| 角色 | 人数 | 经验 |
+| --- | --- | --- |
+| 架构师 | 8人 | 10+ 年 |
+| 开发工程师 | 32人 | 5+ 年 |
+| 测试工程师 | 12人 | 4+ 年 |
+| 产品经理 | 6人 | 6+ 年 |
+
+[团队介绍](https://example.com/team)
+</layout:row>
+
+### 服务覆盖
+
+[chart:pie]| 行业 | 客户数 |
+| --- | --- |
+| 金融 | 150 |
+| 电商 | 230 |
+| 教育 | 89 |
+| 医疗 | 67 |
+| 制造 | 145 |
+
+<layout:row>
+### 全球部署
+支持多云部署，覆盖全球主要区域
+
+**部署方案:**
+- ☁️ AWS: 美国、欧洲、亚太
+- 🌐 Azure: 全球20+区域
+- 🚀 阿里云: 中国大陆主要城市
+- 🔧 私有云: 定制化部署
+
+> **性能保障**: 全球延迟 < 100ms
+
+[部署指南](https://example.com/deploy)
+
+### 合规认证
+通过ISO27001、SOC2等多项安全认证
+
+**认证列表:**
+
+1. ✓ **ISO 27001**: 信息安全管理
+2. ✓ **SOC 2 Type II**: 安全控制审计
+3. ✓ **GDPR**: 欧盟数据保护
+4. ✓ **PCI DSS**: 支付卡行业标准
+
+<layout:row>
+[查看证书](https://example.com/certificates)
+[合规文档](https://example.com/compliance)
+</layout:row>
+</layout:row>
+
+### 价格方案
+
+| 套餐 | 价格 | 功能 | 用户数 |
+| --- | --- | --- | --- |
+| 基础版 | ¥99/月 | 基础功能 | 10人 |
+| 专业版 | ¥299/月 | 高级功能 | 50人 |
+| 企业版 | 联系销售 | 全部功能 | 无限制 |
+
+<layout:row>
+[立即注册](https://example.com/signup)
+[联系销售](https://example.com/sales)
+[技术支持](https://example.com/support)
+</layout:row>
+
+<layout:row>
+### 业务咨询
+专业的业务顾问为您提供定制化解决方案
+
+**咨询流程:**
+
+1. 📋 **需求调研**: 深入了解业务场景
+2. 📊 **方案设计**: 制定最佳技术方案  
+3. 💰 **成本评估**: 详细项目预算分析
+4. 📝 **方案交付**: 完整解决方案文档
+
+**专业领域:**
+- 数字化转型咨询
+- 系统架构设计
+- 业务流程优化
+
+[预约咨询](https://example.com/consult)
+
+### 实施服务
+完整的项目实施流程，确保顺利上线
+
+**实施阶段:**
+
+| 阶段 | 周期 | 交付物 |
+| --- | --- | --- |
+| 环境搭建 | 1-2周 | 测试环境 |
+| 系统集成 | 2-4周 | 集成方案 |
+| 数据迁移 | 1-3周 | 迁移报告 |
+| 上线部署 | 1周 | 生产环境 |
+
+> **服务承诺**: 7×24小时项目支持，确保按期交付
+
+<layout:row>
+[实施流程](https://example.com/implementation)
+[项目管理](https://example.com/pm)
+</layout:row>
+</layout:row>
+
+### 联系我们
+
+<layout:row>
+**📞 电话**: 400-123-4567
+**📧 邮箱**: hello@company.com
+**📍 地址**: 北京市朝阳区科技园
+</layout:row>`
+  },
+
+  article: {
+    name: '📖 技术文档',
+    description: '原始的技术文档风格，包含各种元素类型',
+    markdown: `# 八要素测试文档
 
 ## 基本元素
 
@@ -148,9 +388,14 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 
 8. **高斯率（Integral Form）**  
    - 电场的环流量等于包围的净电荷量：  
-     $$ \\oint \\mathbf{E} \\cdot d\\mathbf{l} = 4\\pi k_e Q_{enc} $$
+     $$ \\oint \\mathbf{E} \\cdot d\\mathbf{l} = 4\\pi k_e Q_{enc} $$`
+  }
+};
 
-`);
+const EightElementAnalyzer = () => {
+  // 🆕 新增模板相关状态
+  const [currentTemplate, setCurrentTemplate] = useState('landing');
+  const [markdown, setMarkdown] = useState(MARKDOWN_TEMPLATES.landing.markdown);
   // 动作系统状态
   const [actionManager, setActionManager] = useState(null);
   const [selectedActions, setSelectedActions] = useState([]); // 已选择的动作
@@ -331,12 +576,16 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
     return affected;
   };
 
-  // 处理markdown变化
+  // 🔧 处理markdown变化和模板切换
   useEffect(() => {
-    if (markdown && !renderedHtml) {
-      processMarkdown();
+    if (markdown) {
+      // 🆕 模板切换时自动处理markdown
+      const timer = setTimeout(() => {
+        processMarkdown(null, {});
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [markdown]);
+  }, [markdown, currentTemplate]);
 
   // 处理iframe加载完成后的测量
   useEffect(() => {
@@ -436,7 +685,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
               layoutControlsToUpdate[layout.index] = isCurrentlyRow ? 0.8 : 0.2;
               console.log(`🔧 初始化常规布局: 索引=${layout.index}, 默认强度=${layoutControlsToUpdate[layout.index]}`);
             }
-            
+
             hasNewLayouts = true;
             console.log(`🔧 初始化新布局 索引=${layout.index}: 方向=${layout.layoutDirection}, 变体=${layout.variant}, 原始变体=${layout.element._metadata?.originalVariant}, 来自标签=${!!layout.element._metadata?.isLayoutTag}, 默认强度=${layoutControlsToUpdate[layout.index]}`);
           } else {
@@ -458,7 +707,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
         if (hasNewLayouts || Object.keys(layoutControlsToUpdate).length !== Object.keys(currentLayoutControls).length) {
           setLayoutControls(layoutControlsToUpdate);
           console.log('🔧 更新布局调控设置：新布局数量=' + (hasNewLayouts ? '有' : '无') + ', 当前总数=' + Object.keys(layoutControlsToUpdate).length);
-          
+
           // 🆕 如果有新的布局调控且当前没有强制传入的布局调控，使用新的布局调控设置
           if (hasNewLayouts && forceLayoutControls === null) {
             console.log('🎯 检测到新布局，将使用更新后的布局调控设置');
@@ -597,9 +846,29 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
     processMarkdown(null, layoutControls);
   };
 
-  // 🆕 重新初始化 Markdown 和动作空间
-  const applyMarkdownChanges = () => {
+  // 🆕 模板切换处理函数
+  const handleTemplateChange = (templateId) => {
+    if (templateId === currentTemplate) return; // 避免重复切换
 
+    console.log('切换模板到:', templateId);
+    setCurrentTemplate(templateId);
+
+    // 更新markdown内容
+    const template = MARKDOWN_TEMPLATES[templateId];
+    if (template) {
+      setMarkdown(template.markdown);
+
+      // 重置所有状态
+      resetAllStates();
+
+      console.log(`已切换到模板: ${template.name}`);
+    } else {
+      console.warn('模板不存在:', templateId);
+    }
+  };
+
+  // 🆕 重置所有状态的通用函数
+  const resetAllStates = () => {
     // 清空现有的动作选择和强度
     setSelectedActions([]);
     setActionIntensities({});
@@ -620,9 +889,12 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 
     // 强制更新 iframe key 来重新渲染
     setIframeKey(prev => prev + 1);
+  };
 
+  // 🆕 重新初始化 Markdown 和动作空间
+  const applyMarkdownChanges = () => {
+    resetAllStates();
 
-    
     // 使用 setTimeout 确保状态清空后再处理
     setTimeout(() => {
       // 🔧 传入空的布局调控，确保只做 markdown 解析，不应用调控效果
@@ -802,13 +1074,46 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* 左侧编辑器区域 */}
         <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="text-lg font-medium mb-2">Markdown编辑器</h2>
-          <textarea
-            className="w-full h-64 border border-gray-300 rounded p-2 mb-4 font-mono"
-            value={markdown}
-            onChange={(e) => setMarkdown(e.target.value)}
-            placeholder="输入Markdown文本..."
-          />
+          <h2 className="text-lg font-medium mb-4">Markdown编辑器</h2>
+
+          {/* 🆕 模板选择Tab */}
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">模板选择</h3>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {Object.entries(MARKDOWN_TEMPLATES).map(([templateId, template]) => (
+                <button
+                  key={templateId}
+                  onClick={() => handleTemplateChange(templateId)}
+                  className={`px-3 py-2 text-sm rounded-lg border transition-all ${currentTemplate === templateId
+                    ? 'bg-blue-500 text-white border-blue-500 shadow-md'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50'
+                    }`}
+                  title={template.description}
+                >
+                  {template.name}
+                </button>
+              ))}
+            </div>
+            <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
+              <strong>当前模板:</strong> {MARKDOWN_TEMPLATES[currentTemplate].description}
+            </div>
+          </div>
+
+          {/* Markdown编辑器 */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-gray-700">Markdown内容</h3>
+              <span className="text-xs text-gray-500">
+                {markdown.length} 字符 | {markdown.split('\n').length} 行
+              </span>
+            </div>
+            <textarea
+              className="w-full h-64 border border-gray-300 rounded p-2 font-mono text-sm"
+              value={markdown}
+              onChange={(e) => setMarkdown(e.target.value)}
+              placeholder="输入Markdown文本..."
+            />
+          </div>
 
           {/* 页面元件分析 */}
           <div className="mb-6">
@@ -1169,16 +1474,16 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                 className="px-4 py-2 rounded w-full bg-green-500 text-white hover:bg-green-600"
                 onClick={applyMarkdownChanges}
               >
-                📝 应用 Markdown 变更
+                📝 重新解析 Markdown
               </button>
               <p className="text-xs text-gray-500">
-                重新解析 Markdown 内容，初始化动作空间和布局调控（当你修改了 Markdown 结构时使用）
+                手动重新解析当前 Markdown 内容（模板切换会自动触发解析）
               </p>
 
               <button
                 className={`px-4 py-2 rounded w-full ${visibleTab === 'html'
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ? 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 onClick={visibleTab === 'html' ? applyStyleSettings : undefined}
                 disabled={visibleTab !== 'html'}
@@ -1200,8 +1505,8 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                 <button
                   key={dim.name}
                   className={`px-3 py-2 text-sm rounded ${dimensions.width === dim.width && dimensions.height === dim.height
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   onClick={() => handleDimensionChange(dim)}
                 >
@@ -1284,8 +1589,8 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                   onClick={copyToClipboard}
                   disabled={!eightElement}
                   className={`flex items-center space-x-1 px-3 py-1 text-sm rounded transition-colors ${eightElement
-                      ? 'bg-blue-500 text-white hover:bg-blue-600'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   title="复制JSON到剪贴板"
                 >

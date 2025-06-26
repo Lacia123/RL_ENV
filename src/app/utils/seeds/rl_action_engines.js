@@ -845,7 +845,7 @@ export const RL_ACTIONS = {
         if (delta < 0.5) return 'radial-gradient(rgba(0,0,0,0.1) 2px, transparent 2px)';
         return 'repeating-linear-gradient(45deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 2px, transparent 2px, transparent 10px)';
       },
-      backgroundSize: (current, delta) => `${10 + delta * 20}px ${10 + delta * 20}px`
+      backgroundSize: (current, delta) => `100% 100%`
     },
     conflicts: ['decreaseTexture']
   },

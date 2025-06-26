@@ -648,6 +648,11 @@ export const DEFAULT_STYLE_CONFIG = {
       borderRadius: "{dimension.borderradius.medium}",
       boxShadow: "{material.hierarchy.1f}",
       position: 'relative',
+      // 🆕 纹理动作所需的默认属性
+      backgroundImage: 'none',
+      backgroundSize: 'auto',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
       '&::before': {
         content: '"""',
         fontSize: '3rem',
