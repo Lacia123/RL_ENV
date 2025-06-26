@@ -1,0 +1,1740 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Eight Element Renderer</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css" crossorigin="anonymous"></link>
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        p {
+           margin-block: 0;
+           margin-inline: 0;
+           padding-block: 0;
+           padding-inline: 0;
+        }
+        .eight-element-container {
+          position: relative;
+        }
+        * {
+          box-sizing: border-box;
+        }
+
+        pre code.hljs {
+            display: block;
+            overflow-x: auto;
+            padding: 1em;
+        }
+        code.hljs {
+            padding: 3px 5px;
+        }
+        
+        /* 动态生成的类样式 */
+        .layout-root-dd-0e80f74a-0bfc-48b6-be7e-10f0e4f0f191 {
+  padding: 16px 16px 16px 24px;
+  margin: 16px;
+  background-color: #FFFFFFff;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.layout-dd-867dcd93-e967-4c00-9c8a-de894e02d898 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-42aab7a7-c4c8-4773-80e4-281c0185cb89 {
+  width: 100%;
+  font-size: 52px;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000e0;
+  margin-bottom: 24px;
+  text-align: center;
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.layout-dd-a54cef85-4cc0-4856-98f1-4281c03f8dc9 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-c42267ae-930f-4d2c-9add-443a16caa173 {
+  width: 100%;
+  font-size: 36px;
+  text-align: left;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000e0;
+  margin-top: 28px;
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  border-left: 4px solid #FD2323;
+  background: linear-gradient(90deg, #FDE6E6 0%, transparent 100%);
+  border-radius: 6px;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+}
+
+.layout-dd-ef042784-964b-423d-a58b-141e4bfa4e42 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.layout-dd-eae5bcd9-39bc-4db1-b755-134c4b422173 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-aaccb86b-9fd0-471c-bcd1-cd01b9e38683 {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.text-dd-ed7f7836-031a-44fa-a1ec-8f136878e7a4 {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.layout-dd-993e15c2-dbc7-425a-a382-ccf44ff40756 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-de32a7d3-9aef-4031-a48f-3ece8ac6a090 {
+  width: auto;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000c2;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #0000001f;
+}
+
+.text-dd-9ccff6ca-9e87-4151-ba9e-7d789e12dd27 {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.layout-dd-5088f72a-e82b-44c4-879e-806925c0be25 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-b8dcfc4d-1f47-4188-89fd-a7d5aeafc434 {
+  width: auto;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000a3;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  text-decoration: underline;
+  text-decoration-color: #FCD4D4;
+  text-underline-offset: 4px;
+}
+
+.text-dd-4c84c525-c495-43c5-b40c-16318ef3e2c5 {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.layout-dd-c27fb582-f729-4759-ae80-11f6814b5239 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-33f0d088-73f4-4ade-928b-ff2668ffe36d {
+  width: auto;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 200;
+  line-height: 140%;
+  letter-spacing: 1px;
+  color: #0000007a;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  background: #0000000a;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.text-dd-f5e051f9-794b-45a4-8a06-70020d26e3c8 {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.layout-dd-e943b1c1-9bd7-4c87-b4c8-ffe68364e744 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-ce4720e3-4d7e-43e9-82a6-e10b3f34b94b {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.layout-dd-d51f8470-62d8-4e54-8daf-5d6244e2ea99 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.button-dd-afbad486-969d-409e-9e1b-4a3dfe5192d0 {
+  font-size: 16px;
+  font-weight: 400;
+  color: #FFFFFFff;
+  background: linear-gradient(135deg, #FA7676 0%, #CD0303 100%);
+  border-radius: 14px;
+  padding: 16px 28px;
+  cursor: pointer;
+  transition: var(--animation-smooth, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
+  box-shadow: 0px 6px 16px 0px #1f1f2a2b;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px;
+}
+
+.button-dd-afbad486-969d-409e-9e1b-4a3dfe5192d0:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 12px 24px 0px #1f1f2a30;
+  background: linear-gradient(135deg, #FD2323 0%, #8F0505 100%);
+}
+
+.button-dd-7d74ac5b-8e40-4c85-853a-6a74e4fb2c0f {
+  font-size: 16px;
+  font-weight: 400;
+  color: #FFFFFFff;
+  background: linear-gradient(135deg, #FA7676 0%, #CD0303 100%);
+  border-radius: 14px;
+  padding: 16px 28px;
+  cursor: pointer;
+  transition: var(--animation-smooth, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
+  box-shadow: 0px 6px 16px 0px #1f1f2a2b;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px;
+}
+
+.button-dd-7d74ac5b-8e40-4c85-853a-6a74e4fb2c0f:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 12px 24px 0px #1f1f2a30;
+  background: linear-gradient(135deg, #FD2323 0%, #8F0505 100%);
+}
+
+.layout-dd-998cde3e-c507-46e0-90b8-75327dfb0fc5 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-05f2fb0d-e8a8-45ba-8dd4-a19c683006e7 {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.background-dd-bf7da548-39c5-4dd1-ac06-36530dbc7466 {
+  border-radius: 12px;
+  border-width: 2px;
+  border-color: #00000029;
+  border-style: solid;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  transition: var(--animation-smooth, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
+  max-width: 100%;
+  height: auto;
+}
+
+.background-dd-bf7da548-39c5-4dd1-ac06-36530dbc7466:hover {
+  box-shadow: 0px 6px 16px 0px #1f1f2a2b;
+  transform: scale(1.02);
+}
+
+.layout-dd-6790cf1f-bb90-4f1e-a169-05a3a5cdbb62 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-d6ecc4e8-14ea-4af4-a0ae-cd34570fdf60 {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.text-dd-416a0710-c32e-49f7-9247-6f1093a7fdb5 {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.code-dd-1ba2309c-43bb-48c8-9403-9b36e283eb56 {
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Fira Code', 'Monaco', 'Cascadia Code', monospace;
+  line-height: 1.5;
+  color: #FFFFFFe0;
+  background-color: #FFF;
+  padding: 24px 28px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+  border-width: 2px;
+  border-color: #4F4444;
+  border-style: solid;
+  box-shadow: 0px 6px 16px 0px #1f1f2a2b;
+  overflow: auto;
+  position: relative;
+}
+
+.code-dd-1ba2309c-43bb-48c8-9403-9b36e283eb56::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #F79029;
+  box-shadow: 24px 0 0 #C86808, 48px 0 0 #54CC54;
+}
+
+.code-dd-fe8aa1d6-7c06-4e28-8bdc-0759f2dceedb {
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Fira Code', 'Monaco', 'Cascadia Code', monospace;
+  line-height: 1.5;
+  color: #FFFFFFe0;
+  background-color: #FFF;
+  padding: 24px 28px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+  border-width: 2px;
+  border-color: #4F4444;
+  border-style: solid;
+  box-shadow: 0px 6px 16px 0px #1f1f2a2b;
+  overflow: auto;
+  position: relative;
+}
+
+.code-dd-fe8aa1d6-7c06-4e28-8bdc-0759f2dceedb::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #F79029;
+  box-shadow: 24px 0 0 #C86808, 48px 0 0 #54CC54;
+}
+
+.layout-dd-7b89d669-1107-43b8-8ddb-6e82da828b45 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-23f9dd6b-b407-42ba-a791-75fe76d4f549 {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.layout-dd-899b53b6-c263-40c1-b58f-7b5962a80122 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-555dd6b4-6f87-457c-a209-f91d9d2854c0 {
+  text-align: left;
+  font-size: 16px;
+  color: #000000e0;
+  vertical-align: baseline;
+}
+
+.text-dd-fa8e668b-0ab9-47b7-8d23-001a39a2a0b8 {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.text-dd-53d975d3-f60d-4edd-8392-65b87b1e8e3a {
+  font-size: 20px;
+  margin: 24px 0;
+  padding: 16px;
+  background: #F3F1F1;
+  border-radius: 12px;
+  border-left: 6px solid #FA7676;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  text-align: center;
+}
+
+.text-dd-61215130-a31c-4fb1-bb33-906bf5fcfc4d {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.text-dd-a613f313-b691-47eb-bb45-fe2fa0ab9b4f {
+  font-size: 20px;
+  margin: 24px 0;
+  padding: 16px;
+  background: #F3F1F1;
+  border-radius: 12px;
+  border-left: 6px solid #FA7676;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  text-align: center;
+}
+
+.text-dd-36223651-1bd0-4ada-b638-15c26a32bdd3 {
+  text-align: left;
+  font-size: 16px;
+  color: #000000e0;
+  vertical-align: baseline;
+}
+
+.layout-dd-4a58ccac-8773-406f-a788-9fdfb19497a8 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-80ba7e1e-8360-4407-a552-d871d0c23f2f {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.text-dd-aeb80671-1a25-4c79-993b-27de457fce34 {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff {
+  font-size: 16px;
+  border-bottom: 2px solid #0000001f;
+  transition: var(--animation-fast, all 0.2s cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff:hover {
+  background: #F7F5F5;
+}
+
+.tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff:last-child {
+  border-bottom: 0px;
+}
+
+.layout-dd-b80ced52-1447-4947-8a19-67dc3c4581bc {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-01ef6145-0f9e-435c-b351-10df45d75fe7 {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.text-dd-eb34614c-0a8f-44d2-ba8c-6d0ee7774b72 {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.chart-dd-e1142d53-b065-4b05-b910-d3824362544e {
+  margin: 24px 0;
+  padding: 28px;
+  background: #FFFFFFff;
+  border-radius: 20px;
+  box-shadow: 0px 6px 16px 0px #1f1f2a2b;
+  border-width: 2px;
+  border-color: #0000001f;
+  border-style: solid;
+}
+
+.text-dd-8a0b047f-789c-4fa2-8ca1-b2fe3ff1df6c {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-bottom: 16px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.chart-dd-f0ab1b7c-2727-4b63-ab42-9b063d49a516 {
+  margin: 24px 0;
+  padding: 28px;
+  background: #FFFFFFff;
+  border-radius: 20px;
+  box-shadow: 0px 6px 16px 0px #1f1f2a2b;
+  border-width: 2px;
+  border-color: #0000001f;
+  border-style: solid;
+}
+
+.layout-dd-bca70b9e-9bae-4486-b79b-10e670a2be54 {
+  padding: 8px 0;
+  margin: 8px 0;
+  background-color: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0px;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.text-dd-8023504c-49ce-4384-a8e6-55d76b614a8d {
+  width: 100%;
+  display: flex;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0;
+  color: #000000c2;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.text-dd-3317da13-9259-45a7-80aa-7c087f79d52b {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-3317da13-9259-45a7-80aa-7c087f79d52b::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-c4be8d24-4371-4c53-a736-e3cd47bc0ab8 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-c4be8d24-4371-4c53-a736-e3cd47bc0ab8::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-418b1d41-a8c5-45fe-8aaf-57a4cd15e9b5 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-418b1d41-a8c5-45fe-8aaf-57a4cd15e9b5::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-dc704556-a7e6-4888-9421-2994dc605299 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-dc704556-a7e6-4888-9421-2994dc605299::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-0d40eddf-06f8-4d94-b1fa-49353a60a642 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-0d40eddf-06f8-4d94-b1fa-49353a60a642::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-788031e8-b8fc-47e2-ab56-a21edf3d1d40 {
+  font-size: 20px;
+  margin: 24px 0;
+  padding: 16px;
+  background: #F3F1F1;
+  border-radius: 12px;
+  border-left: 6px solid #FA7676;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  text-align: center;
+}
+
+.text-dd-066955f1-16ce-4822-8ba6-f35479e4242c {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-066955f1-16ce-4822-8ba6-f35479e4242c::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-9d44e465-c3e5-410e-ab03-1ddf4b602e36 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-9d44e465-c3e5-410e-ab03-1ddf4b602e36::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-4a1ab35a-6902-4910-a5d9-312d33daa106 {
+  font-size: 20px;
+  margin: 24px 0;
+  padding: 16px;
+  background: #F3F1F1;
+  border-radius: 12px;
+  border-left: 6px solid #FA7676;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  text-align: center;
+}
+
+.text-dd-583d4e63-eadb-4a77-89ef-1b7da66e679b {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-583d4e63-eadb-4a77-89ef-1b7da66e679b::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-50a83a8b-0f99-47a2-9449-1606163dac2a {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-50a83a8b-0f99-47a2-9449-1606163dac2a::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-94f3d1ac-d5d0-4c7b-8925-15047ae8e875 {
+  font-size: 20px;
+  margin: 24px 0;
+  padding: 16px;
+  background: #F3F1F1;
+  border-radius: 12px;
+  border-left: 6px solid #FA7676;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  text-align: center;
+}
+
+.text-dd-e626a882-5125-4fca-8fc5-570e8f5401c6 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-e626a882-5125-4fca-8fc5-570e8f5401c6::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-b31e3868-ce06-4ab4-8735-6cac99b52382 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-b31e3868-ce06-4ab4-8735-6cac99b52382::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-a96cb835-f76a-4745-be27-b45639a01b9e {
+  font-size: 20px;
+  margin: 24px 0;
+  padding: 16px;
+  background: #F3F1F1;
+  border-radius: 12px;
+  border-left: 6px solid #FA7676;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  text-align: center;
+}
+
+.text-dd-78cbad23-200f-49da-a247-30446353afe1 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-78cbad23-200f-49da-a247-30446353afe1::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-787a7723-3f4d-40e4-8d98-4c810d38eeae {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-787a7723-3f4d-40e4-8d98-4c810d38eeae::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-8433788d-d8f5-4e97-ad77-a9a75e84cee8 {
+  font-size: 20px;
+  margin: 24px 0;
+  padding: 16px;
+  background: #F3F1F1;
+  border-radius: 12px;
+  border-left: 6px solid #FA7676;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  text-align: center;
+}
+
+.text-dd-03fae6a4-6d57-493b-97ce-075ab81a02dd {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-03fae6a4-6d57-493b-97ce-075ab81a02dd::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-7670e3ef-c336-44f8-8f0f-e05188a6ad04 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-7670e3ef-c336-44f8-8f0f-e05188a6ad04::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-3531ff14-05be-4591-bda1-fbabaefec1db {
+  font-size: 20px;
+  margin: 24px 0;
+  padding: 16px;
+  background: #F3F1F1;
+  border-radius: 12px;
+  border-left: 6px solid #FA7676;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  text-align: center;
+}
+
+.text-dd-2907b2f1-184d-4aba-b9bf-6e2f823fbb1f {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-2907b2f1-184d-4aba-b9bf-6e2f823fbb1f::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-99c76895-8327-479f-8ffe-7d4d224b5a82 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-99c76895-8327-479f-8ffe-7d4d224b5a82::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-82474a0c-74e3-4dad-8021-942ff2202d21 {
+  font-size: 20px;
+  margin: 24px 0;
+  padding: 16px;
+  background: #F3F1F1;
+  border-radius: 12px;
+  border-left: 6px solid #FA7676;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  text-align: center;
+}
+
+.text-dd-1eb45df3-e3d7-42ee-b028-59b605d5dad3 {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-1eb45df3-e3d7-42ee-b028-59b605d5dad3::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-1f1efbcf-c04d-4eb9-9433-354cc58e622f {
+  padding-left: 24px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #000000c2;
+  position: relative;
+}
+
+.text-dd-1f1efbcf-c04d-4eb9-9433-354cc58e622f::before {
+  content: '•';
+  color: #FD2323;
+  font-size: 1.2em;
+  position: absolute;
+  top: -3px;
+  left: 0px;
+}
+
+.text-dd-ab3efa9a-4a30-4926-9d5b-a179f14299f9 {
+  font-size: 20px;
+  margin: 24px 0;
+  padding: 16px;
+  background: #F3F1F1;
+  border-radius: 12px;
+  border-left: 6px solid #FA7676;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  text-align: center;
+}
+
+
+      </style>
+    </head>
+    <body>
+      <div class="eight-element-container" id="root">
+  <div id="dd-0e80f74a-0bfc-48b6-be7e-10f0e4f0f191" class="layout-root-dd-0e80f74a-0bfc-48b6-be7e-10f0e4f0f191" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: responsive; counter-axis-sizing-mode: FIXED; justify-content: center; align-items: center; align-self: inherit; flex-grow: 0; width: calc(100% - 30px); height: 100%; position: relative; back-width: auto; back-height: 100px; box-sizing: border-box"><div id="dd-867dcd93-e967-4c00-9c8a-de894e02d898" class="layout-dd-867dcd93-e967-4c00-9c8a-de894e02d898" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-42aab7a7-c4c8-4773-80e4-281c0185cb89" class="text-dd-42aab7a7-c4c8-4773-80e4-281c0185cb89" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>八要素测试文档</p>
+
+      </div>
+    <div id="dd-a54cef85-4cc0-4856-98f1-4281c03f8dc9" class="layout-dd-a54cef85-4cc0-4856-98f1-4281c03f8dc9" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-c42267ae-930f-4d2c-9add-443a16caa173" class="text-dd-c42267ae-930f-4d2c-9add-443a16caa173" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>基本元素</p>
+
+      </div>
+    <div id="dd-ef042784-964b-423d-a58b-141e4bfa4e42" class="layout-dd-ef042784-964b-423d-a58b-141e4bfa4e42" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch"><div id="dd-eae5bcd9-39bc-4db1-b755-134c4b422173" class="layout-dd-eae5bcd9-39bc-4db1-b755-134c4b422173" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-aaccb86b-9fd0-471c-bcd1-cd01b9e38683" class="text-dd-aaccb86b-9fd0-471c-bcd1-cd01b9e38683" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>三级标题</p>
+
+      </div>
+    
+      <div id="dd-ed7f7836-031a-44fa-a1ec-8f136878e7a4" class="text-dd-ed7f7836-031a-44fa-a1ec-8f136878e7a4" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>这是一段普通文本，将被转换为text元素。</p>
+
+      </div>
+    <div id="dd-993e15c2-dbc7-425a-a382-ccf44ff40756" class="layout-dd-993e15c2-dbc7-425a-a382-ccf44ff40756" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-de32a7d3-9aef-4031-a48f-3ece8ac6a090" class="text-dd-de32a7d3-9aef-4031-a48f-3ece8ac6a090" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>四级标题</p>
+
+      </div>
+    
+      <div id="dd-9ccff6ca-9e87-4151-ba9e-7d789e12dd27" class="text-dd-9ccff6ca-9e87-4151-ba9e-7d789e12dd27" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>四级标题正文四级标题正文四级标题正文四级标题正文四级标题正文四级标题正文</p>
+
+      </div>
+    <div id="dd-5088f72a-e82b-44c4-879e-806925c0be25" class="layout-dd-5088f72a-e82b-44c4-879e-806925c0be25" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-b8dcfc4d-1f47-4188-89fd-a7d5aeafc434" class="text-dd-b8dcfc4d-1f47-4188-89fd-a7d5aeafc434" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>五级标题</p>
+
+      </div>
+    
+      <div id="dd-4c84c525-c495-43c5-b40c-16318ef3e2c5" class="text-dd-4c84c525-c495-43c5-b40c-16318ef3e2c5" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>五级标题正文五级标题正文五级标题正文五级标题正文五级标题正文五级标题正文</p>
+
+      </div>
+    <div id="dd-c27fb582-f729-4759-ae80-11f6814b5239" class="layout-dd-c27fb582-f729-4759-ae80-11f6814b5239" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-33f0d088-73f4-4ade-928b-ff2668ffe36d" class="text-dd-33f0d088-73f4-4ade-928b-ff2668ffe36d" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>六级标题</p>
+
+      </div>
+    
+      <div id="dd-f5e051f9-794b-45a4-8a06-70020d26e3c8" class="text-dd-f5e051f9-794b-45a4-8a06-70020d26e3c8" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>六级标题正文六级标题正文六级标题正文六级标题正文六级标题正文六级标题正文</p>
+
+      </div>
+    </div></div></div></div><div id="dd-e943b1c1-9bd7-4c87-b4c8-ffe68364e744" class="layout-dd-e943b1c1-9bd7-4c87-b4c8-ffe68364e744" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-ce4720e3-4d7e-43e9-82a6-e10b3f34b94b" class="text-dd-ce4720e3-4d7e-43e9-82a6-e10b3f34b94b" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>按钮（超链接）</p>
+
+      </div>
+    <div id="dd-d51f8470-62d8-4e54-8daf-5d6244e2ea99" class="layout-dd-d51f8470-62d8-4e54-8daf-5d6244e2ea99" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 16px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+    <div id="dd-afbad486-969d-409e-9e1b-4a3dfe5192d0" class="button-dd-afbad486-969d-409e-9e1b-4a3dfe5192d0" data-element-type="button" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; padding: 16px 28px; margin: 8px; background-color: none; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 8px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch; flex-direction: column">
+      <a href="https://example.com" style="display:block;width:100%;height:100%;text-decoration:none;color:inherit;">
+        确认
+      </a>
+      </div>
+    
+    <div id="dd-7d74ac5b-8e40-4c85-853a-6a74e4fb2c0f" class="button-dd-7d74ac5b-8e40-4c85-853a-6a74e4fb2c0f" data-element-type="button" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; padding: 16px 28px; margin: 8px; background-color: none; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 8px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch; flex-direction: column">
+      <a href="https://example.com" style="display:block;width:100%;height:100%;text-decoration:none;color:inherit;">
+        取消
+      </a>
+      </div>
+    </div></div><div id="dd-998cde3e-c507-46e0-90b8-75327dfb0fc5" class="layout-dd-998cde3e-c507-46e0-90b8-75327dfb0fc5" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-05f2fb0d-e8a8-45ba-8dd4-a19c683006e7" class="text-dd-05f2fb0d-e8a8-45ba-8dd4-a19c683006e7" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>示例图片</p>
+
+      </div>
+    
+      <div id="dd-bf7da548-39c5-4dd1-ac06-36530dbc7466" class="background-dd-bf7da548-39c5-4dd1-ac06-36530dbc7466" data-element-type="image" style="overflow: hidden; box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch; flex-direction: column">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="Element Image" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+    </div><div id="dd-6790cf1f-bb90-4f1e-a169-05a3a5cdbb62" class="layout-dd-6790cf1f-bb90-4f1e-a169-05a3a5cdbb62" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-d6ecc4e8-14ea-4af4-a0ae-cd34570fdf60" class="text-dd-d6ecc4e8-14ea-4af4-a0ae-cd34570fdf60" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>代码块示例</p>
+
+      </div>
+    
+      <div id="dd-416a0710-c32e-49f7-9247-6f1093a7fdb5" class="text-dd-416a0710-c32e-49f7-9247-6f1093a7fdb5" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>下面是一个JavaScript代码示例：</p>
+
+      </div>
+    
+      <div id="dd-1ba2309c-43bb-48c8-9403-9b36e283eb56" class="code-dd-1ba2309c-43bb-48c8-9403-9b36e283eb56" data-element-type="code" style="box-sizing: border-box; font-size: 14px; line-height: 1.5; white-space: pre; width: 100%">
+        <pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">greeting</span>(<span class="hljs-params">name</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${name}</span>!`</span>;
+}
+<span class="hljs-comment">// 调用函数</span>
+<span class="hljs-keyword">const</span> message = <span class="hljs-title function_">greeting</span>(<span class="hljs-string">&#x27;World&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message);  <span class="hljs-comment">// 输出: Hello, World!</span>
+</code></pre>
+      </div>
+    
+      <div id="dd-fe8aa1d6-7c06-4e28-8bdc-0759f2dceedb" class="code-dd-fe8aa1d6-7c06-4e28-8bdc-0759f2dceedb" data-element-type="code" style="box-sizing: border-box; font-size: 14px; line-height: 1.5; white-space: pre; width: 100%">
+        <pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">greeting</span>(<span class="hljs-params">name</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${name}</span>!`</span>;
+}
+<span class="hljs-comment">// 调用函数</span>
+<span class="hljs-keyword">const</span> message = <span class="hljs-title function_">greeting</span>(<span class="hljs-string">&#x27;World&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message);  <span class="hljs-comment">// 输出: Hello, World!</span>
+</code></pre>
+      </div>
+    </div><div id="dd-7b89d669-1107-43b8-8ddb-6e82da828b45" class="layout-dd-7b89d669-1107-43b8-8ddb-6e82da828b45" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-23f9dd6b-b407-42ba-a791-75fe76d4f549" class="text-dd-23f9dd6b-b407-42ba-a791-75fe76d4f549" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>数学公式示例</p>
+
+      </div>
+    <div id="dd-899b53b6-c263-40c1-b58f-7b5962a80122" class="layout-dd-899b53b6-c263-40c1-b58f-7b5962a80122" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-555dd6b4-6f87-457c-a209-f91d9d2854c0" class="text-dd-555dd6b4-6f87-457c-a209-f91d9d2854c0" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p>行内公式： <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo>=</mo><mi>m</mi><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">E = mc^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord mathnormal">m</span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></p>
+
+      </div>
+    
+      <div id="dd-fa8e668b-0ab9-47b7-8d23-001a39a2a0b8" class="text-dd-fa8e668b-0ab9-47b7-8d23-001a39a2a0b8" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>块级公式：</p>
+
+      </div>
+    
+      <div id="dd-53d975d3-f60d-4edd-8392-65b87b1e8e3a" class="text-dd-53d975d3-f60d-4edd-8392-65b87b1e8e3a" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></msubsup><msup><mi>e</mi><mrow><mo>−</mo><msup><mi>x</mi><mn>2</mn></msup></mrow></msup><mi>d</mi><mi>x</mi><mo>=</mo><msqrt><mi>π</mi></msqrt></mrow><annotation encoding="application/x-tex">\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.3846em;vertical-align:-0.9703em;"></span><span class="mop"><span class="mop op-symbol large-op" style="margin-right:0.44445em;position:relative;top:-0.0011em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4143em;"><span style="top:-1.7881em;margin-left:-0.4445em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">∞</span></span></span></span><span style="top:-3.8129em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">∞</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9703em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.0369em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mord mathnormal">d</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.04em;vertical-align:-0.1908em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8492em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal" style="margin-right:0.03588em;">π</span></span></span><span style="top:-2.8092em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1908em;"><span></span></span></span></span></span></span></span></span></span></p>
+
+      </div>
+    
+      <div id="dd-61215130-a31c-4fb1-bb33-906bf5fcfc4d" class="text-dd-61215130-a31c-4fb1-bb33-906bf5fcfc4d" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>我们还可以有更复杂的公式，例如：</p>
+
+      </div>
+    
+      <div id="dd-a613f313-b691-47eb-bb45-fe2fa0ab9b4f" class="text-dd-a613f313-b691-47eb-bb45-fe2fa0ab9b4f" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>L</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msup><mi>v</mi><mn>2</mn></msup><mi>S</mi><msub><mi>C</mi><mi>L</mi></msub></mrow><annotation encoding="application/x-tex">L = \frac{1}{2} \rho v^2 S C_L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathnormal">ρ</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+
+      </div>
+    
+      <div id="dd-36223651-1bd0-4ada-b638-15c26a32bdd3" class="text-dd-36223651-1bd0-4ada-b638-15c26a32bdd3" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p>这是一个关于升力的公式。行内也可以混合：例如 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>+</mo><mi>β</mi><mo>=</mo><mi>γ</mi></mrow><annotation encoding="application/x-tex">\alpha + \beta = \gamma</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05556em;">γ</span></span></span></span>。</p>
+
+      </div>
+    </div></div><div id="dd-4a58ccac-8773-406f-a788-9fdfb19497a8" class="layout-dd-4a58ccac-8773-406f-a788-9fdfb19497a8" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-80ba7e1e-8360-4407-a552-d871d0c23f2f" class="text-dd-80ba7e1e-8360-4407-a552-d871d0c23f2f" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>表格示例</p>
+
+      </div>
+    
+      <div id="dd-aeb80671-1a25-4c79-993b-27de457fce34" class="text-dd-aeb80671-1a25-4c79-993b-27de457fce34" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>下面是一个简单的表格示例：</p>
+
+      </div>
+    
+      <div id="dd-52652658-4c42-4acc-8a73-c2aaa314e3ff"  data-element-type="table" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch; flex-direction: column">
+        <table style="width: 100%; border-collapse: collapse; margin: {dimension.margin.loose} 0; background-color: #FFFFFFff; border-radius: 14px; overflow: hidden; box-shadow: 0px 4px 12px 0px #1f1f2a29; border-width: 2px; border-color: #0000001f; border-style: solid;">
+<thead>
+<tr class="tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff">
+<th style="background-color: #F3F1F1; color: #000000e0; font-weight: 400; font-size: 14px; padding: 16px 20px; text-align: left; border-bottom: 4px solid #00000033; text-transform: uppercase; letter-spacing: 0.5px;">功能</th>
+<th style="background-color: #F3F1F1; color: #000000e0; font-weight: 400; font-size: 14px; padding: 16px 20px; text-align: left; border-bottom: 4px solid #00000033; text-transform: uppercase; letter-spacing: 0.5px;">描述</th>
+<th style="background-color: #F3F1F1; color: #000000e0; font-weight: 400; font-size: 14px; padding: 16px 20px; text-align: left; border-bottom: 4px solid #00000033; text-transform: uppercase; letter-spacing: 0.5px;" align="center">支持状态</th>
+</tr>
+</thead>
+<tbody><tr class="tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff">
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">文本</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">支持普通文本和标题</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;" align="center">✅</td>
+</tr>
+<tr class="tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff">
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">按钮</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">支持超链接按钮</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;" align="center">✅</td>
+</tr>
+<tr class="tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff">
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">图片</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">支持图片显示</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;" align="center">✅</td>
+</tr>
+<tr class="tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff">
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">表格</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">支持表格渲染和样式</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;" align="center">✅</td>
+</tr>
+<tr class="tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff">
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">代码块</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">支持代码高亮显示</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;" align="center">✅</td>
+</tr>
+<tr class="tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff">
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">图表</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">支持数据可视化图表</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;" align="center">✅</td>
+</tr>
+<tr class="tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff">
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">混合内容</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">支持在一行中文本</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;" align="center">✅</td>
+</tr>
+<tr class="tr-dd-52652658-4c42-4acc-8a73-c2aaa314e3ff">
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">数学公式</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;">支持行内和块级公式</td>
+<td style="font-size: 16px; padding: 16px 20px; color: #000000c2; vertical-align: top;" align="center">✅</td>
+</tr>
+</tbody></table>
+      </div>
+    </div><div id="dd-b80ced52-1447-4947-8a19-67dc3c4581bc" class="layout-dd-b80ced52-1447-4947-8a19-67dc3c4581bc" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-01ef6145-0f9e-435c-b351-10df45d75fe7" class="text-dd-01ef6145-0f9e-435c-b351-10df45d75fe7" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>图表示例</p>
+
+      </div>
+    
+      <div id="dd-eb34614c-0a8f-44d2-ba8c-6d0ee7774b72" class="text-dd-eb34614c-0a8f-44d2-ba8c-6d0ee7774b72" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>下面是一个分组折线图示例：</p>
+
+      </div>
+    
+      <div id="dd-e1142d53-b065-4b05-b910-d3824362544e" class="chart-dd-e1142d53-b065-4b05-b910-d3824362544e" data-element-type="chart" data-chart-type="grouped_line" style="box-sizing: border-box; overflow: hidden; primary-axis-sizing-mode: fixed; position: relative; width: 100%; height: auto; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch; flex-direction: column">
+        <svg width="100%" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg"><defs><style>
+    .axis line, .axis path {
+      stroke: #bdbdbd;
+      shape-rendering: crispEdges;
+    }
+    .axis text {
+      fill: #666;
+      font-size: 12px;
+    }
+    .grid line {
+      stroke: #e0e0e0;
+      stroke-opacity: 0.7;
+      shape-rendering: crispEdges;
+    }
+    .grid path {
+      stroke-width: 0;
+    }
+    .line {
+      fill: none;
+      stroke-width: 2.5;
+    }
+    .dot {
+      stroke: #fff;
+      stroke-width: 1;
+    }
+    .dot-color-brand6 {
+      fill: #CD0303; 
+    }
+    .dot-color-brand5 {
+      fill: #FD2323; 
+    }
+    .dot-color-brand4 {
+      fill: #FA7676; 
+    }
+    .line-color-brand6 {
+      stroke: #CD0303; 
+    }
+    .line-color-brand5 {
+      stroke: #FD2323; 
+    }
+    .line-color-brand4 {
+      stroke: #FA7676; 
+    }
+    .data-label-color-brand6 {
+      fill: #CD0303; 
+    }
+    .data-label-color-brand5 {
+      fill: #FD2323; 
+    }
+    .data-label-color-brand4 {
+      fill: #FA7676; 
+    }
+    .bar {
+      fill-opacity: 0.8;
+    }
+    .bar:hover {
+      fill-opacity: 1;
+    }
+    .bar-color-brand6 {
+      fill: #CD0303; 
+    }
+    .bar-color-brand5 {
+      fill: #FD2323; 
+    }
+    .bar-color-brand4 {
+      fill: #FA7676; 
+    }
+  </style></defs><g transform="translate(70,50)"><g class="line-group"><path class="line line-color-brand6" d="M17.895,380L53.684,380L89.474,380L125.263,380L161.053,380L196.842,380L232.632,380L268.421,380L304.211,380L340,380L375.789,380L411.579,380L447.368,380L483.158,380L518.947,380L554.737,380L590.526,380L626.316,380L662.105,380" stroke="#000" fill="none" stroke-width="3" stroke-dasharray="0"></path><g class="dot-group" transform="translate(17.89473684210526,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(53.68421052631579,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(89.47368421052632,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(125.26315789473685,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(161.05263157894737,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(196.8421052631579,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(232.63157894736844,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(268.42105263157896,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(304.2105263157895,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(340,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(375.7894736842105,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(411.57894736842104,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(447.3684210526316,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(483.15789473684214,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(518.9473684210527,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(554.7368421052631,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(590.5263157894738,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(626.3157894736842,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g><g class="dot-group" transform="translate(662.1052631578948,380)"><circle class="dot dot-color-brand6" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand6" x="6" y="-14" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.00</text></g></g><g class="line-group"><path class="line line-color-brand5" d="M17.895,341.734L53.684,336.42L89.474,341.734L125.263,345.986L161.053,328.979L196.842,335.357L232.632,336.42L268.421,347.049L304.211,336.42L340,320.476L375.789,343.86L411.579,315.161L447.368,325.79L483.158,349.175L518.947,326.853L554.737,345.986L590.526,342.797L626.316,322.601L662.105,328.979" stroke="#000" fill="none" stroke-width="2.5" stroke-dasharray="0"></path><g class="dot-group" transform="translate(17.89473684210526,341.73426573426576)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.36</text></g><g class="dot-group" transform="translate(53.68421052631579,336.4195804195804)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.41</text></g><g class="dot-group" transform="translate(89.47368421052632,341.73426573426576)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.36</text></g><g class="dot-group" transform="translate(125.26315789473685,345.98601398601403)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.32</text></g><g class="dot-group" transform="translate(161.05263157894737,328.97902097902096)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.48</text></g><g class="dot-group" transform="translate(196.8421052631579,335.35664335664336)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.42</text></g><g class="dot-group" transform="translate(232.63157894736844,336.4195804195804)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.41</text></g><g class="dot-group" transform="translate(268.42105263157896,347.04895104895104)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.31</text></g><g class="dot-group" transform="translate(304.2105263157895,336.4195804195804)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.41</text></g><g class="dot-group" transform="translate(340,320.4755244755244)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.56</text></g><g class="dot-group" transform="translate(375.7894736842105,343.8601398601399)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.34</text></g><g class="dot-group" transform="translate(411.57894736842104,315.16083916083915)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.61</text></g><g class="dot-group" transform="translate(447.3684210526316,325.7902097902098)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.51</text></g><g class="dot-group" transform="translate(483.15789473684214,349.1748251748252)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.29</text></g><g class="dot-group" transform="translate(518.9473684210527,326.8531468531469)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.50</text></g><g class="dot-group" transform="translate(554.7368421052631,345.98601398601403)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.32</text></g><g class="dot-group" transform="translate(590.5263157894738,342.7972027972028)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.35</text></g><g class="dot-group" transform="translate(626.3157894736842,322.6013986013986)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.54</text></g><g class="dot-group" transform="translate(662.1052631578948,328.97902097902096)"><circle class="dot dot-color-brand5" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand5" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">0.48</text></g></g><g class="line-group"><path class="line line-color-brand4" d="M17.895,108.951L53.684,144.028L89.474,99.385L125.263,67.497L161.053,181.231L196.842,150.406L232.632,137.65L268.421,64.308L304.211,148.28L340,218.434L375.789,96.196L411.579,218.434L447.368,183.357L483.158,34.545L518.947,175.916L554.737,58.993L590.526,88.755L626.316,197.175L662.105,169.538" stroke="#000" fill="none" stroke-width="2" stroke-dasharray="0"></path><g class="dot-group" transform="translate(17.89473684210526,108.95104895104897)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">2.55</text></g><g class="dot-group" transform="translate(53.68421052631579,144.027972027972)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">2.22</text></g><g class="dot-group" transform="translate(89.47368421052632,99.38461538461537)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">2.64</text></g><g class="dot-group" transform="translate(125.26315789473685,67.49650349650351)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">2.94</text></g><g class="dot-group" transform="translate(161.05263157894737,181.23076923076923)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">1.87</text></g><g class="dot-group" transform="translate(196.8421052631579,150.4055944055944)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">2.16</text></g><g class="dot-group" transform="translate(232.63157894736844,137.65034965034965)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">2.28</text></g><g class="dot-group" transform="translate(268.42105263157896,64.30769230769229)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">2.97</text></g><g class="dot-group" transform="translate(304.2105263157895,148.27972027972027)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">2.18</text></g><g class="dot-group" transform="translate(340,218.43356643356648)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">1.52</text></g><g class="dot-group" transform="translate(375.7894736842105,96.19580419580424)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">2.67</text></g><g class="dot-group" transform="translate(411.57894736842104,218.43356643356648)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">1.52</text></g><g class="dot-group" transform="translate(447.3684210526316,183.35664335664336)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">1.85</text></g><g class="dot-group" transform="translate(483.15789473684214,34.545454545454554)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">3.25</text></g><g class="dot-group" transform="translate(518.9473684210527,175.91608391608392)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">1.92</text></g><g class="dot-group" transform="translate(554.7368421052631,58.993006993006986)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">3.02</text></g><g class="dot-group" transform="translate(590.5263157894738,88.75524475524476)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">2.74</text></g><g class="dot-group" transform="translate(626.3157894736842,197.17482517482517)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">1.72</text></g><g class="dot-group" transform="translate(662.1052631578948,169.53846153846158)"><circle class="dot dot-color-brand4" r="4" fill="#000" stroke="#fff" stroke-width="1.5"></circle><text class="data-label data-label-color-brand4" x="6" y="4" font-size="10px" text-anchor="start" fill="#000" font-weight="normal" stroke="white" stroke-width="2px" stroke-opacity="0.85" paint-order="stroke">1.98</text></g></g><g class="grid x-grid"><line x1="17.89473684210526" y1="0" x2="17.89473684210526" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="53.68421052631579" y1="0" x2="53.68421052631579" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="89.47368421052632" y1="0" x2="89.47368421052632" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="125.26315789473685" y1="0" x2="125.26315789473685" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="161.05263157894737" y1="0" x2="161.05263157894737" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="196.8421052631579" y1="0" x2="196.8421052631579" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="232.63157894736844" y1="0" x2="232.63157894736844" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="268.42105263157896" y1="0" x2="268.42105263157896" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="304.2105263157895" y1="0" x2="304.2105263157895" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="340" y1="0" x2="340" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="375.7894736842105" y1="0" x2="375.7894736842105" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="411.57894736842104" y1="0" x2="411.57894736842104" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="447.3684210526316" y1="0" x2="447.3684210526316" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="483.15789473684214" y1="0" x2="483.15789473684214" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="518.9473684210527" y1="0" x2="518.9473684210527" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="554.7368421052631" y1="0" x2="554.7368421052631" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="590.5263157894738" y1="0" x2="590.5263157894738" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="626.3157894736842" y1="0" x2="626.3157894736842" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="662.1052631578948" y1="0" x2="662.1052631578948" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line></g><g class="grid y-grid"><line x1="0" y1="380" x2="680" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="0" y1="273.7062937062937" x2="680" y2="273.7062937062937" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="0" y1="167.41258741258744" x2="680" y2="167.41258741258744" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="0" y1="61.11888111888112" x2="680" y2="61.11888111888112" stroke="#e0e0e0" stroke-opacity="0.7"></line></g><g class="axis x-axis" transform="translate(0,380)"><g transform="translate(17.89473684210526,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-10</text></g><g transform="translate(53.68421052631579,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-11</text></g><g transform="translate(89.47368421052632,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-12</text></g><g transform="translate(125.26315789473685,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-13</text></g><g transform="translate(161.05263157894737,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-14</text></g><g transform="translate(196.8421052631579,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-17</text></g><g transform="translate(232.63157894736844,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-18</text></g><g transform="translate(268.42105263157896,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-19</text></g><g transform="translate(304.2105263157895,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-20</text></g><g transform="translate(340,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-21</text></g><g transform="translate(375.7894736842105,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-24</text></g><g transform="translate(411.57894736842104,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-25</text></g><g transform="translate(447.3684210526316,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-26</text></g><g transform="translate(483.15789473684214,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-27</text></g><g transform="translate(518.9473684210527,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-28</text></g><g transform="translate(554.7368421052631,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-03-31</text></g><g transform="translate(590.5263157894738,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-04-01</text></g><g transform="translate(626.3157894736842,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-04-02</text></g><g transform="translate(662.1052631578948,0)"><text y="9" dy=".71em" transform="rotate(45)" text-anchor="start" font-size="12px">2025-04-03</text></g></g><g class="axis y-axis"><g transform="translate(0,380)"><line x2="-6" stroke="#666"></line><text x="-9" dy=".32em" text-anchor="end" font-size="12px">0.00</text></g><g transform="translate(0,273.7062937062937)"><line x2="-6" stroke="#666"></line><text x="-9" dy=".32em" text-anchor="end" font-size="12px">1.00</text></g><g transform="translate(0,167.41258741258744)"><line x2="-6" stroke="#666"></line><text x="-9" dy=".32em" text-anchor="end" font-size="12px">2.00</text></g><g transform="translate(0,61.11888111888112)"><line x2="-6" stroke="#666"></line><text x="-9" dy=".32em" text-anchor="end" font-size="12px">3.00</text></g></g><g class="legend" transform="translate(0, -40)"><g transform="translate(0, 0)"><line x1="0" y1="6" x2="15" y2="6" class="line line-color-brand6" stroke="#000" stroke-width="3" stroke-dasharray="0"></line><circle cx="8" cy="6" r="3" class="dot dot-color-brand6" fill="#000" stroke="#fff" stroke-width="1"></circle><text x="20" y="9" font-size="10px" alignment-baseline="middle">心流满意度FSV</text></g><g transform="translate(140, 0)"><line x1="0" y1="6" x2="15" y2="6" class="line line-color-brand5" stroke="#000" stroke-width="2.5" stroke-dasharray="0"></line><circle cx="8" cy="6" r="3" class="dot dot-color-brand5" fill="#000" stroke="#fff" stroke-width="1"></circle><text x="20" y="9" font-size="10px" alignment-baseline="middle">心流专注值FFV</text></g><g transform="translate(280, 0)"><line x1="0" y1="6" x2="15" y2="6" class="line line-color-brand4" stroke="#000" stroke-width="2" stroke-dasharray="0"></line><circle cx="8" cy="6" r="3" class="dot dot-color-brand4" fill="#000" stroke="#fff" stroke-width="1"></circle><text x="20" y="9" font-size="10px" alignment-baseline="middle">心流效能值FEV</text></g></g></g></svg>
+      </div>
+    
+      <div id="dd-8a0b047f-789c-4fa2-8ca1-b2fe3ff1df6c" class="text-dd-8a0b047f-789c-4fa2-8ca1-b2fe3ff1df6c" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>下面是一个水平柱状图示例：</p>
+
+      </div>
+    
+      <div id="dd-f0ab1b7c-2727-4b63-ab42-9b063d49a516" class="chart-dd-f0ab1b7c-2727-4b63-ab42-9b063d49a516" data-element-type="chart" data-chart-type="barh" style="box-sizing: border-box; overflow: hidden; primary-axis-sizing-mode: fixed; position: relative; width: 100%; height: auto; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch; flex-direction: column">
+        <svg width="100%" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg"><defs><style>
+    .axis line, .axis path {
+      stroke: #bdbdbd;
+      shape-rendering: crispEdges;
+    }
+    .axis text {
+      fill: #666;
+      font-size: 12px;
+    }
+    .grid line {
+      stroke: #e0e0e0;
+      stroke-opacity: 0.7;
+      shape-rendering: crispEdges;
+    }
+    .grid path {
+      stroke-width: 0;
+    }
+    .line {
+      fill: none;
+      stroke-width: 2.5;
+    }
+    .dot {
+      stroke: #fff;
+      stroke-width: 1;
+    }
+    .dot-color-brand6 {
+      fill: #CD0303; 
+    }
+    .dot-color-brand5 {
+      fill: #FD2323; 
+    }
+    .dot-color-brand4 {
+      fill: #FA7676; 
+    }
+    .line-color-brand6 {
+      stroke: #CD0303; 
+    }
+    .line-color-brand5 {
+      stroke: #FD2323; 
+    }
+    .line-color-brand4 {
+      stroke: #FA7676; 
+    }
+    .data-label-color-brand6 {
+      fill: #CD0303; 
+    }
+    .data-label-color-brand5 {
+      fill: #FD2323; 
+    }
+    .data-label-color-brand4 {
+      fill: #FA7676; 
+    }
+    .bar {
+      fill-opacity: 0.8;
+    }
+    .bar:hover {
+      fill-opacity: 1;
+    }
+    .bar-color-brand6 {
+      fill: #CD0303; 
+    }
+    .bar-color-brand5 {
+      fill: #FD2323; 
+    }
+    .bar-color-brand4 {
+      fill: #FA7676; 
+    }
+  </style></defs><g transform="translate(70,50)"><g class="grid y-grid"><line x1="0" y1="0" x2="0" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="98.9090909090909" y1="0" x2="98.9090909090909" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="197.8181818181818" y1="0" x2="197.8181818181818" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="296.7272727272727" y1="0" x2="296.7272727272727" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="395.6363636363636" y1="0" x2="395.6363636363636" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="494.54545454545456" y1="0" x2="494.54545454545456" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line><line x1="593.4545454545454" y1="0" x2="593.4545454545454" y2="380" stroke="#e0e0e0" stroke-opacity="0.7"></line></g><g class="axis x-axis" transform="translate(0,380)" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle"><path class="domain" stroke="currentColor" d="M0.5,6V0.5H680.5V6"></path><g class="tick" opacity="1" transform="translate(0.5,0)"><line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">0</text></g><g class="tick" opacity="1" transform="translate(99.4090909090909,0)"><line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">200</text></g><g class="tick" opacity="1" transform="translate(198.3181818181818,0)"><line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">400</text></g><g class="tick" opacity="1" transform="translate(297.2272727272727,0)"><line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">600</text></g><g class="tick" opacity="1" transform="translate(396.1363636363636,0)"><line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">800</text></g><g class="tick" opacity="1" transform="translate(495.04545454545456,0)"><line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1000</text></g><g class="tick" opacity="1" transform="translate(593.9545454545454,0)"><line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1200</text></g></g><g class="axis y-axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"><path class="domain" stroke="currentColor" d="M-6,0.5H0.5V380.5H-6"></path><g class="tick" opacity="1" transform="translate(0,46.60377358490566)"><line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">客服部</text></g><g class="tick" opacity="1" transform="translate(0,118.30188679245282)"><line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">市场部</text></g><g class="tick" opacity="1" transform="translate(0,190)"><line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">技术部</text></g><g class="tick" opacity="1" transform="translate(0,261.6981132075471)"><line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">行政部</text></g><g class="tick" opacity="1" transform="translate(0,333.3962264150943)"><line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">销售部</text></g></g><rect class="bar bar-color-brand6" y="21.509433962264154" x="0" height="50.18867924528301" width="306.6181818181818" fill="#000"></rect><rect class="bar bar-color-brand6" y="93.20754716981132" x="0" height="50.18867924528301" width="484.6545454545455" fill="#000"></rect><rect class="bar bar-color-brand6" y="164.9056603773585" x="0" height="50.18867924528301" width="370.9090909090909" fill="#000"></rect><rect class="bar bar-color-brand6" y="236.60377358490564" x="0" height="50.18867924528301" width="222.54545454545453" fill="#000"></rect><rect class="bar bar-color-brand6" y="308.3018867924528" x="0" height="50.18867924528301" width="618.1818181818181" fill="#000"></rect><text class="bar-label" y="46.60377358490566" x="311.6181818181818" dy=".35em" text-anchor="start" fill="#333" font-size="12px">620</text><text class="bar-label" y="118.30188679245282" x="489.6545454545455" dy=".35em" text-anchor="start" fill="#333" font-size="12px">980</text><text class="bar-label" y="190" x="375.9090909090909" dy=".35em" text-anchor="start" fill="#333" font-size="12px">750</text><text class="bar-label" y="261.6981132075471" x="227.54545454545453" dy=".35em" text-anchor="start" fill="#333" font-size="12px">450</text><text class="bar-label" y="333.3962264150943" x="623.1818181818181" dy=".35em" text-anchor="start" fill="#333" font-size="12px">1250</text><text x="340" y="420" text-anchor="middle" font-size="14px">销售额</text><text transform="rotate(-90)" x="-190" y="-60" text-anchor="middle" font-size="14px">部门</text></g></svg>
+      </div>
+    </div><div id="dd-bca70b9e-9bae-4486-b79b-10e670a2be54" class="layout-dd-bca70b9e-9bae-4486-b79b-10e670a2be54" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; primary-axis-sizing-mode: fixed; counter-axis-sizing-mode: FIXED; justify-content: flex-start; align-items: flex-start; flex-grow: 0; box-sizing: border-box; border-style: solid; border-width: 0; border-color: initial; height: 100%; width: 100%; back-width: 100%; back-height: 100%; position: relative; padding: {dimension.padding.tight} 0; margin: {dimension.margin.tight} 0; background-color: none; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; align-items: flex-start; gap: 0px; grid-template-columns: none; grid-template-areas: none; justify-items: stretch">
+      <div id="dd-8023504c-49ce-4384-a8e6-55d76b614a8d" class="text-dd-8023504c-49ce-4384-a8e6-55d76b614a8d" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ; flex-grow: 0; word-break: break-all; background-color: none">
+        <p>指标定义</p>
+
+      </div>
+    
+      <div id="dd-3317da13-9259-45a7-80aa-7c087f79d52b" class="text-dd-3317da13-9259-45a7-80aa-7c087f79d52b" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">FSV</span> (FSV = 用户满意度评分 / 每日心流空间交互次数): 衡量美学交互的心流满意度，数值越高表示每次交互带来的用户满意度越高。</p>
+
+      </div>
+    
+      <div id="dd-c4be8d24-4371-4c53-a736-e3cd47bc0ab8" class="text-dd-c4be8d24-4371-4c53-a736-e3cd47bc0ab8" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">FFV</span> (FFV = 每日心流空间服务总时长 / 每日心流空间交互次数): 衡量意图协同的心流专注值，数值越高表示用户在每次互动时保持的专注度越长。</p>
+
+      </div>
+    
+      <div id="dd-418b1d41-a8c5-45fe-8aaf-57a4cd15e9b5" class="text-dd-418b1d41-a8c5-45fe-8aaf-57a4cd15e9b5" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">FEV</span> (FEV = 每日心流空间服务总次数 / 每日心流空间总时长): 衡量效能跃迁的心流效能值，数值越高表示服务使用效率越高。</p>
+
+      </div>
+    
+      <div id="dd-dc704556-a7e6-4888-9421-2994dc605299" class="text-dd-dc704556-a7e6-4888-9421-2994dc605299" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">高斯定律（Integral Form）</span></p>
+
+      </div>
+    
+      <div id="dd-0d40eddf-06f8-4d94-b1fa-49353a60a642" class="text-dd-0d40eddf-06f8-4d94-b1fa-49353a60a642" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p>磁场的通量：</p>
+
+      </div>
+    
+      <div id="dd-788031e8-b8fc-47e2-ab56-a21edf3d1d40" class="text-dd-788031e8-b8fc-47e2-ab56-a21edf3d1d40" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo>∮</mo><mi mathvariant="bold">B</mi><mo>⋅</mo><mi>d</mi><mi mathvariant="bold">l</mi><mo>=</mo><mfrac><msub><mi>Q</mi><mrow><mi>e</mi><mi>n</mi><mi>c</mi></mrow></msub><msub><mi>ε</mi><mn>0</mn></msub></mfrac></mrow><annotation encoding="application/x-tex">\oint \mathbf{B} \cdot d\mathbf{l} = \frac{Q_{enc}}{\varepsilon_0}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.2222em;vertical-align:-0.8622em;"></span><span class="mop op-symbol large-op" style="margin-right:0.44445em;position:relative;top:-0.0011em;">∮</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mord mathbf">l</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.1963em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">ε</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+
+      </div>
+    
+      <div id="dd-066955f1-16ce-4822-8ba6-f35479e4242c" class="text-dd-066955f1-16ce-4822-8ba6-f35479e4242c" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">法拉第电磁感应定律（Integral Form）</span></p>
+
+      </div>
+    
+      <div id="dd-9d44e465-c3e5-410e-ab03-1ddf4b602e36" class="text-dd-9d44e465-c3e5-410e-ab03-1ddf4b602e36" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p>电场的旋度等于变化磁场：</p>
+
+      </div>
+    
+      <div id="dd-4a1ab35a-6902-4910-a5d9-312d33daa106" class="text-dd-4a1ab35a-6902-4910-a5d9-312d33daa106" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∇</mi><mo>×</mo><mi mathvariant="bold">E</mi><mo>=</mo><mo>−</mo><mfrac><mrow><mi mathvariant="normal">∂</mi><mi mathvariant="bold">B</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\nabla \times \mathbf{E} = -\frac{\partial \mathbf{B}}{\partial t}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">E</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord">−</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathbf">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+
+      </div>
+    
+      <div id="dd-583d4e63-eadb-4a77-89ef-1b7da66e679b" class="text-dd-583d4e63-eadb-4a77-89ef-1b7da66e679b" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">安培- Maxwell 恒等式（Integral Form）</span></p>
+
+      </div>
+    
+      <div id="dd-50a83a8b-0f99-47a2-9449-1606163dac2a" class="text-dd-50a83a8b-0f99-47a2-9449-1606163dac2a" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p>磁通量的变化：</p>
+
+      </div>
+    
+      <div id="dd-94f3d1ac-d5d0-4c7b-8925-15047ae8e875" class="text-dd-94f3d1ac-d5d0-4c7b-8925-15047ae8e875" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo>∮</mo><mi mathvariant="bold">B</mi><mo>⋅</mo><mi>d</mi><mi mathvariant="bold">l</mi><mo>=</mo><msub><mi>μ</mi><mn>0</mn></msub><msub><mi>I</mi><mrow><mi>e</mi><mi>n</mi><mi>c</mi></mrow></msub><mo>+</mo><msub><mi>μ</mi><mn>0</mn></msub><msub><mi>ε</mi><mn>0</mn></msub><mfrac><mrow><mi mathvariant="normal">∂</mi><msub><mi mathvariant="normal">Φ</mi><mi>E</mi></msub></mrow><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\oint \mathbf{B} \cdot d\mathbf{l} = \mu_0 I_{enc} + \mu_0 \varepsilon_0 \frac{\partial \Phi_E}{\partial t}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.2222em;vertical-align:-0.8622em;"></span><span class="mop op-symbol large-op" style="margin-right:0.44445em;position:relative;top:-0.0011em;">∮</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mord mathbf">l</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">μ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mord mathnormal">μ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">ε</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord"><span class="mord">Φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05764em;">E</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+
+      </div>
+    
+      <div id="dd-e626a882-5125-4fca-8fc5-570e8f5401c6" class="text-dd-e626a882-5125-4fca-8fc5-570e8f5401c6" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">高斯率（Divergence Form）</span></p>
+
+      </div>
+    
+      <div id="dd-b31e3868-ce06-4ab4-8735-6cac99b52382" class="text-dd-b31e3868-ce06-4ab4-8735-6cac99b52382" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p>电场的散度等于电荷密度：</p>
+
+      </div>
+    
+      <div id="dd-a96cb835-f76a-4745-be27-b45639a01b9e" class="text-dd-a96cb835-f76a-4745-be27-b45639a01b9e" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∇</mi><mo>⋅</mo><mi mathvariant="bold">E</mi><mo>=</mo><msub><mi>ρ</mi><mtext>enc</mtext></msub><mi mathvariant="normal">/</mi><msub><mi>ε</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">\nabla \cdot \mathbf{E} = \rho_\text{enc} / \varepsilon_0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">E</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">enc</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">ε</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+
+      </div>
+    
+      <div id="dd-78cbad23-200f-49da-a247-30446353afe1" class="text-dd-78cbad23-200f-49da-a247-30446353afe1" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">高斯率（Ampère 法则）</span></p>
+
+      </div>
+    
+      <div id="dd-787a7723-3f4d-40e4-8d98-4c810d38eeae" class="text-dd-787a7723-3f4d-40e4-8d98-4c810d38eeae" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p>磁感应线的旋度等于电流密度加上变化磁场：</p>
+
+      </div>
+    
+      <div id="dd-8433788d-d8f5-4e97-ad77-a9a75e84cee8" class="text-dd-8433788d-d8f5-4e97-ad77-a9a75e84cee8" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∇</mi><mo>×</mo><mi mathvariant="bold">B</mi><mo>=</mo><msub><mi>μ</mi><mn>0</mn></msub><msub><mi>I</mi><mrow><mi>e</mi><mi>n</mi><mi>c</mi></mrow></msub><mo>+</mo><msub><mi>μ</mi><mn>0</mn></msub><msub><mi>ε</mi><mn>0</mn></msub><mfrac><mrow><mi mathvariant="normal">∂</mi><mi mathvariant="bold">B</mi></mrow><mrow><mi mathvariant="normal">∂</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\nabla \times \mathbf{B} = \mu_0 I_{enc} + \mu_0 \varepsilon_0 \frac{\partial \mathbf{B}}{\partial t}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">μ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mord mathnormal">μ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">ε</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathnormal">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord" style="margin-right:0.05556em;">∂</span><span class="mord mathbf">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+
+      </div>
+    
+      <div id="dd-03fae6a4-6d57-493b-97ce-075ab81a02dd" class="text-dd-03fae6a4-6d57-493b-97ce-075ab81a02dd" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">高斯率（Divergence Form）</span></p>
+
+      </div>
+    
+      <div id="dd-7670e3ef-c336-44f8-8f0f-e05188a6ad04" class="text-dd-7670e3ef-c336-44f8-8f0f-e05188a6ad04" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p>位移场的散度等于自由电荷密度：</p>
+
+      </div>
+    
+      <div id="dd-3531ff14-05be-4591-bda1-fbabaefec1db" class="text-dd-3531ff14-05be-4591-bda1-fbabaefec1db" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∇</mi><mo>⋅</mo><mi mathvariant="bold">D</mi><mo>=</mo><msub><mi>ρ</mi><mtext>free</mtext></msub></mrow><annotation encoding="application/x-tex">\nabla \cdot \mathbf{D} = \rho_\text{free}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">D</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">free</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+
+      </div>
+    
+      <div id="dd-2907b2f1-184d-4aba-b9bf-6e2f823fbb1f" class="text-dd-2907b2f1-184d-4aba-b9bf-6e2f823fbb1f" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">高斯率（Divergence Form）</span></p>
+
+      </div>
+    
+      <div id="dd-99c76895-8327-479f-8ffe-7d4d224b5a82" class="text-dd-99c76895-8327-479f-8ffe-7d4d224b5a82" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p>磁通密度的散度等于变化磁场：</p>
+
+      </div>
+    
+      <div id="dd-82474a0c-74e3-4dad-8021-942ff2202d21" class="text-dd-82474a0c-74e3-4dad-8021-942ff2202d21" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="normal">∇</mi><mo>⋅</mo><mi mathvariant="bold">B</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\nabla \cdot \mathbf{B} = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">∇</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></span></p>
+
+      </div>
+    
+      <div id="dd-1eb45df3-e3d7-42ee-b028-59b605d5dad3" class="text-dd-1eb45df3-e3d7-42ee-b028-59b605d5dad3" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p><span style="font-weight: bold;">高斯率（Integral Form）</span></p>
+
+      </div>
+    
+      <div id="dd-1f1efbcf-c04d-4eb9-9433-354cc58e622f" class="text-dd-1f1efbcf-c04d-4eb9-9433-354cc58e622f" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: ">
+        <p>电场的环流量等于包围的净电荷量：</p>
+
+      </div>
+    
+      <div id="dd-ab3efa9a-4a30-4926-9d5b-a179f14299f9" class="text-dd-ab3efa9a-4a30-4926-9d5b-a179f14299f9" data-element-type="text" style="box-sizing: border-box; primary-axis-sizing-mode: fixed; position: relative; width: 100%">
+        <p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo>∮</mo><mi mathvariant="bold">E</mi><mo>⋅</mo><mi>d</mi><mi mathvariant="bold">l</mi><mo>=</mo><mn>4</mn><mi>π</mi><msub><mi>k</mi><mi>e</mi></msub><msub><mi>Q</mi><mrow><mi>e</mi><mi>n</mi><mi>c</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\oint \mathbf{E} \cdot d\mathbf{l} = 4\pi k_e Q_{enc}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.2222em;vertical-align:-0.8622em;"></span><span class="mop op-symbol large-op" style="margin-right:0.44445em;position:relative;top:-0.0011em;">∮</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf">E</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mord mathbf">l</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">e</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">e</span><span class="mord mathnormal mtight">n</span><span class="mord mathnormal mtight">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+
+      </div>
+    </div></div></div></div></div>
+      </div>
+    </body>
+    </html>
+  

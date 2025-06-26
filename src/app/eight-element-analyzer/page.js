@@ -599,9 +599,6 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 
   // 🆕 重新初始化 Markdown 和动作空间
   const applyMarkdownChanges = () => {
-    console.log('📝 应用 Markdown 变更被点击');
-    console.log('   当前 Markdown 内容长度:', markdown.length);
-    console.log('   将重新解析 markdown 并初始化动作空间');
 
     // 清空现有的动作选择和强度
     setSelectedActions([]);
@@ -624,29 +621,12 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
     // 强制更新 iframe key 来重新渲染
     setIframeKey(prev => prev + 1);
 
-    // 重新处理 markdown
-    console.log('🔄 开始重新处理 markdown...');
-    console.log('   检查 markdown 中是否包含布局标签:', markdown.includes('<layout:'));
+
     
     // 使用 setTimeout 确保状态清空后再处理
     setTimeout(() => {
-      console.log('🔄 第一步：重新解析 Markdown（不应用任何调控设置）');
       // 🔧 传入空的布局调控，确保只做 markdown 解析，不应用调控效果
       processMarkdown(null, {});
-      
-             // 再次 setTimeout 确保布局调控设置更新后再检查
-       setTimeout(() => {
-         console.log('🔄 第二步：检查解析结果');
-         
-         if (layoutAnalysis.length > 0) {
-           console.log(`🎯 发现 ${layoutAnalysis.length} 个布局调控选项已准备就绪`);
-           console.log('💡 现在可以点击"🎨 应用调控设置"按钮查看布局效果');
-         } else {
-           console.log('ℹ️ 未发现布局调控选项');
-         }
-         
-         console.log('✅ Markdown 重新初始化完成 - 请手动点击"应用调控设置"查看效果');
-       }, 200);
     }, 100);
   };
 

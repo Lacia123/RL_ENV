@@ -17,7 +17,7 @@ export async function POST(request) {
     }
     
     // 提取参数
-    const { markdown, width = 1024, height = 768, seed, useAims = false } = requestData;
+    const { markdown, width = 1024, height = 768, seed, useAims = false, takeScreenshot = false } = requestData;
     
     // 处理seed参数，生成自定义设计令牌
     let designTokens = null;
@@ -39,7 +39,7 @@ export async function POST(request) {
     const eightElement = markdownToEightElement(markdown);
             
     // 渲染并评分
-    const result = await renderAndEvaluateEightElement(eightElement, { width, height, useAims });
+    const result = await renderAndEvaluateEightElement(eightElement, { width, height, useAims, takeScreenshot });
     
     // 如果设置了动态token系统，需要清除
     if (designTokens) {
@@ -56,6 +56,7 @@ export async function POST(request) {
       success: true,
       score: result.score,
       aims: result.aims,
+      base64Image: result.base64Image,
       // 确保scoreDetails与result.score.categories保持一致
       // scoreDetails: result.score.categories,
       // 如果使用了自定义设计令牌，返回相关信息

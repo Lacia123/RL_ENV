@@ -56,7 +56,7 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
   const layout = convertEightElementToLayout(processedEightElement);
 
   // 使用Playwright进行测量和截图
-  const { measurements, screenshotPath, aims } = await measureWithPlaywright(
+  const { measurements, screenshotPath, aims, base64Image } = await measureWithPlaywright(
     html,
     processedEightElement,
     {
@@ -88,6 +88,7 @@ export async function renderAndEvaluateEightElement(eightElement, options = {}) 
     score,
     aims,
     html,
+    base64Image,
     processedEightElement,
     outputFiles: {
       screenshotPath: screenshotPath || null,
@@ -115,6 +116,7 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
 
   // 如果需要截图
   let screenshotPath = null;
+  let base64Image = null;
 
   // 尝试使用安全选项启动浏览器
   const browser = await chromium.launch({
@@ -321,6 +323,27 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
       return measurements;
     }, { processedEightElement, containerDimensions: { width, height } });
 
+    if (takeScreenshot) {
+      // 生成截图路径
+      const timestamp = Date.now();
+      screenshotPath = path.join(outputDir, `${outputPrefix}-${timestamp}.png`);
+
+      const screenshotBuffer = await page.screenshot({
+        fullPage: true,
+        type: 'png'
+      });
+
+      // 转换为Base64
+    base64Image = screenshotBuffer.toString('base64');
+
+    const buffer = Buffer.from(base64Image, 'base64');
+
+    fs.writeFileSync(screenshotPath, buffer);
+
+    console.log(`截图已保存至: ${screenshotPath}`);
+ 
+    }
+
   } else {
 
     // 生成截图路径
@@ -350,7 +373,7 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
     });
 
     // 转换为Base64
-    const base64Image = screenshotBuffer.toString('base64');
+    base64Image = screenshotBuffer.toString('base64');
 
     if (takeScreenshot) {
       const buffer = Buffer.from(base64Image, 'base64');
@@ -367,7 +390,7 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
 
   await browser.close();
 
-  return { measurements, screenshotPath, aims };
+  return { measurements, screenshotPath, aims, base64Image };
 }
 
 function resolveMetrics(aims) {
