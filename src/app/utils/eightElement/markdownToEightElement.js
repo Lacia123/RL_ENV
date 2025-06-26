@@ -3152,9 +3152,14 @@ export function analyzeElementsInEightElement(eightElement) {
       elementType = metadata.actualType || element.name;
       variant = metadata.variant || 'normal';
       
-      // 对于layout元素，特别检查isRoot标志
+      // 🔧 修复：对于layout元素，正确保留原始variant信息
       if (elementType === 'layout' && metadata.isRoot !== undefined) {
-        variant = metadata.isRoot ? 'root' : 'column';
+        if (metadata.isRoot) {
+          variant = 'root';
+        } else {
+          // 优先使用originalVariant，如果没有则使用variant，最后回退到'column'
+          variant = metadata.originalVariant || metadata.variant || 'column';
+        }
       }
       
       // 根据元数据设置示例内容

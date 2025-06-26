@@ -376,16 +376,26 @@ export function calculateLevelChange(baseValue, delta, levels, tokenType, defaul
   const baseLevelName = parseBaseValueLevel(baseValue, tokenType, defaultLevel);
   let baseIndex = levels.indexOf(baseLevelName);
   
+  console.log(`     🔍 calculateLevelChange调试:`);
+  console.log(`       原始基准值: "${baseValue}"`);
+  console.log(`       解析后级别名: "${baseLevelName}"`);
+  console.log(`       在级别数组中的索引: ${baseIndex}`);
+  
   // 如果找不到基准级别，使用默认级别
   if (baseIndex === -1) {
     const defaultIndex = levels.indexOf(defaultLevel);
     baseIndex = defaultIndex !== -1 ? defaultIndex : Math.floor(levels.length / 2); // 如果默认级别也找不到，使用中间值
+    console.log(`       ⚠️ 级别未找到，使用默认: "${defaultLevel}" (索引: ${baseIndex})`);
   }
   
   const offset = Math.ceil(delta * 4); // 最大可以变化4个级别
   const newIndex = isIncrease 
     ? Math.min(levels.length - 1, baseIndex + offset)
     : Math.max(0, baseIndex - offset);
+  
+  console.log(`       强度: ${delta}, 偏移量: ${offset}, 方向: ${isIncrease ? '增加' : '减少'}`);
+  console.log(`       新索引: ${baseIndex} → ${newIndex}`);
+  console.log(`       新级别: "${levels[newIndex]}"`);
   
   return levels[newIndex];
 }
@@ -407,13 +417,26 @@ export const RL_ACTIONS = {
       clipPath: 'soften'
     },
     styleMapping: {
-      borderRadius: (baseValue, delta) => {
+      borderRadius: (baseValue, delta, elementType, variant) => {
         const levels = ['none', 'xs', 'small', 'medium', 'large', 'xl', 'xxl', 'xxxl', 'xxxxl'];
+        console.log(`🔧 increaseRoundness调试: 元素=${elementType}.${variant}, 基准值="${baseValue}", 强度=${delta}`);
+        
         try {
           const newLevel = calculateLevelChange(baseValue, delta, levels, 'borderradius', 'small', true);
-          return DESIGN_TOKEN_MAPPING.dimension.borderRadius[newLevel];
+          const newValue = DESIGN_TOKEN_MAPPING.dimension.borderRadius[newLevel];
+          
+          console.log(`   计算结果: 级别="${newLevel}" → 值="${newValue}"`);
+          console.log(`   级别数组: [${levels.join(', ')}]`);
+          console.log(`   可用的映射: [${Object.keys(DESIGN_TOKEN_MAPPING.dimension.borderRadius).join(', ')}]`);
+          
+          if (!newValue) {
+            console.error(`   ❌ 映射失败: 级别"${newLevel}"在DESIGN_TOKEN_MAPPING中不存在`);
+            return DESIGN_TOKEN_MAPPING.dimension.borderRadius.small;
+          }
+          
+          return newValue;
         } catch (error) {
-          console.error('borderRadius映射错误:', error.message, '基准值:', baseValue, '强度:', delta);
+          console.error('❌ borderRadius映射错误:', error.message, '基准值:', baseValue, '强度:', delta);
           return DESIGN_TOKEN_MAPPING.dimension.borderRadius.small; // 回退到默认值
         }
       }
