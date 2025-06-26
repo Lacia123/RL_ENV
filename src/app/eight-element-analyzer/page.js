@@ -14,7 +14,7 @@ const EightElementAnalyzer = () => {
   const [markdown, setMarkdown] = useState(`# 八要素测试文档
 
 ## 基本元素
-<layout:row>
+
 ### 左侧标题
 这是一段普通文本，将被转换为text元素。
 
@@ -30,7 +30,6 @@ const EightElementAnalyzer = () => {
 六级标题正文六级标题正文六级标题正文六级标题正文六级标题正文六级标题正文
 
 > 这是一段引用文本，展示重要的观点或引述
-</layout:row>
 
 ### 按钮（超链接）
 <layout:row>
@@ -400,7 +399,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
       console.log('处理Markdown使用尺寸:', currentDimensions);
 
       // 🔧 使用强制传入的布局调控或当前状态
-      const currentLayoutControls = forceLayoutControls || layoutControls;
+      let currentLayoutControls = forceLayoutControls || layoutControls;
       console.log('🎯 使用布局调控设置:', currentLayoutControls);
 
 
@@ -426,10 +425,20 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
             // 只对真正新发现的布局设置默认值
             const isCurrentlyRow = layout.variant === 'row' ||
               layout.layoutDirection === 'HORIZONTAL' ||
-              (layout.element._metadata?.originalVariant === 'row');
-            layoutControlsToUpdate[layout.index] = isCurrentlyRow ? 0.8 : 0.2;
+              (layout.element._metadata?.originalVariant === 'row') ||
+              (layout.element._metadata?.isLayoutTag && layout.variant === 'row'); // 🆕 特别检查layout标签
+
+            // 🆕 对于来自layout标签的布局，使用更明显的默认强度
+            if (layout.element._metadata?.isLayoutTag) {
+              layoutControlsToUpdate[layout.index] = isCurrentlyRow ? 0.9 : 0.1; // 更明显的强度
+              console.log(`🎯 检测到layout标签: 索引=${layout.index}, 变体=${layout.variant}, 设置明显强度=${layoutControlsToUpdate[layout.index]}`);
+            } else {
+              layoutControlsToUpdate[layout.index] = isCurrentlyRow ? 0.8 : 0.2;
+              console.log(`🔧 初始化常规布局: 索引=${layout.index}, 默认强度=${layoutControlsToUpdate[layout.index]}`);
+            }
+            
             hasNewLayouts = true;
-            console.log(`🔧 初始化新布局 索引=${layout.index}: 方向=${layout.layoutDirection}, 变体=${layout.variant}, 原始变体=${layout.element._metadata?.originalVariant}, 默认强度=${layoutControlsToUpdate[layout.index]}`);
+            console.log(`🔧 初始化新布局 索引=${layout.index}: 方向=${layout.layoutDirection}, 变体=${layout.variant}, 原始变体=${layout.element._metadata?.originalVariant}, 来自标签=${!!layout.element._metadata?.isLayoutTag}, 默认强度=${layoutControlsToUpdate[layout.index]}`);
           } else {
             console.log(`🔍 保持现有布局调控 索引=${layout.index}: 当前强度=${layoutControlsToUpdate[layout.index]}`);
           }
@@ -449,6 +458,13 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
         if (hasNewLayouts || Object.keys(layoutControlsToUpdate).length !== Object.keys(currentLayoutControls).length) {
           setLayoutControls(layoutControlsToUpdate);
           console.log('🔧 更新布局调控设置：新布局数量=' + (hasNewLayouts ? '有' : '无') + ', 当前总数=' + Object.keys(layoutControlsToUpdate).length);
+          
+          // 🆕 如果有新的布局调控且当前没有强制传入的布局调控，使用新的布局调控设置
+          if (hasNewLayouts && forceLayoutControls === null) {
+            console.log('🎯 检测到新布局，将使用更新后的布局调控设置');
+            // 更新当前使用的布局调控设置
+            currentLayoutControls = layoutControlsToUpdate;
+          }
         }
       } else {
         setLayoutAnalysis([]);
@@ -579,6 +595,59 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 
     // 🔧 强制传递当前的布局调控设置
     processMarkdown(null, layoutControls);
+  };
+
+  // 🆕 重新初始化 Markdown 和动作空间
+  const applyMarkdownChanges = () => {
+    console.log('📝 应用 Markdown 变更被点击');
+    console.log('   当前 Markdown 内容长度:', markdown.length);
+    console.log('   将重新解析 markdown 并初始化动作空间');
+
+    // 清空现有的动作选择和强度
+    setSelectedActions([]);
+    setActionIntensities({});
+
+    // 清空现有的页面元件和影响范围
+    setPageElements([]);
+    setAffectedElements([]);
+
+    // 清空现有的布局分析和调控
+    setLayoutAnalysis([]);
+    setLayoutControls({});
+
+    // 清空渲染结果，强制重新渲染
+    setRenderedHtml('');
+    setProcessedEightElement(null);
+    setDomMeasurements(null);
+    setScoreResult(null);
+
+    // 强制更新 iframe key 来重新渲染
+    setIframeKey(prev => prev + 1);
+
+    // 重新处理 markdown
+    console.log('🔄 开始重新处理 markdown...');
+    console.log('   检查 markdown 中是否包含布局标签:', markdown.includes('<layout:'));
+    
+    // 使用 setTimeout 确保状态清空后再处理
+    setTimeout(() => {
+      console.log('🔄 第一步：重新解析 Markdown（不应用任何调控设置）');
+      // 🔧 传入空的布局调控，确保只做 markdown 解析，不应用调控效果
+      processMarkdown(null, {});
+      
+             // 再次 setTimeout 确保布局调控设置更新后再检查
+       setTimeout(() => {
+         console.log('🔄 第二步：检查解析结果');
+         
+         if (layoutAnalysis.length > 0) {
+           console.log(`🎯 发现 ${layoutAnalysis.length} 个布局调控选项已准备就绪`);
+           console.log('💡 现在可以点击"🎨 应用调控设置"按钮查看布局效果');
+         } else {
+           console.log('ℹ️ 未发现布局调控选项');
+         }
+         
+         console.log('✅ Markdown 重新初始化完成 - 请手动点击"应用调控设置"查看效果');
+       }, 200);
+    }, 100);
   };
 
   // 🆕 布局调控处理函数 - 改为基于索引
@@ -1115,7 +1184,17 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
               </div>
             )}
 
-            <div className="mt-4">
+            <div className="mt-4 space-y-3">
+              <button
+                className="px-4 py-2 rounded w-full bg-green-500 text-white hover:bg-green-600"
+                onClick={applyMarkdownChanges}
+              >
+                📝 应用 Markdown 变更
+              </button>
+              <p className="text-xs text-gray-500">
+                重新解析 Markdown 内容，初始化动作空间和布局调控（当你修改了 Markdown 结构时使用）
+              </p>
+
               <button
                 className={`px-4 py-2 rounded w-full ${visibleTab === 'html'
                     ? 'bg-blue-500 text-white hover:bg-blue-600'
@@ -1124,9 +1203,9 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
                 onClick={visibleTab === 'html' ? applyStyleSettings : undefined}
                 disabled={visibleTab !== 'html'}
               >
-                应用调控设置
+                🎨 应用调控设置
               </button>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500">
                 {visibleTab === 'html'
                   ? `${selectedActions.length} 个动作 + ${Object.keys(layoutControls).length} 个布局调控，影响 ${affectedElements.length} 种元件类型`
                   : '请切换到HTML预览页面后再应用调控设置'
