@@ -488,7 +488,7 @@ export const DEFAULT_STYLE_CONFIG = {
       flexDirection: 'row',
       flexWrap: 'nowrap',
       justifyContent: 'flex-start',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       gap: DIMENSION_CONSTANTS.GAP.base,
 
       // 网格布局属性（默认不启用，由动作激活）

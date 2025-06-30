@@ -624,6 +624,30 @@ function processListItemAndRichText(line) {
   return { processed: false };
 }
 
+// 解析按钮类型标记
+function parseButtonVariant(text) {
+  // 匹配按钮类型标记格式：[variant] [文本](链接) 或 [variant][文本](链接)
+  const variantPattern = /^\[(\w+)\]\s*\[([^\]]+)\]\(([^)]+)\)$/;
+  const match = text.match(variantPattern);
+  
+  if (match) {
+    const [, variant, buttonText, url] = match;
+    const supportedVariants = ['primary', 'secondary', 'success', 'warning', 'error', 'ghost', 'link'];
+    
+    // 检查variant是否在支持的列表中
+    if (supportedVariants.includes(variant)) {
+      return {
+        hasVariant: true,
+        variant: variant,
+        text: buttonText,
+        url: url
+      };
+    }
+  }
+  
+  return { hasVariant: false };
+}
+
 // 创建按钮元素（用于超链接）
 function createButtonElement(text, url, variant = 'primary') {
   const id = generateUUID();
@@ -645,7 +669,8 @@ function createButtonElement(text, url, variant = 'primary') {
       variant: variant,
       isButton: true,
       buttonText: text,
-      buttonUrl: url
+      buttonUrl: url,
+      hasVariantTag: variant !== 'primary' // 标记是否使用了类型标记（非默认primary）
     },
     layout: {
       classStyle: {
@@ -2620,6 +2645,22 @@ function parseMarkdown(markdown, options = {}) {
 
     // 检查是否有多个链接或混合内容
     if (trimmedLine.includes('[') && trimmedLine.includes('](') && trimmedLine.includes(')')) {
+      // 首先检查是否是按钮类型标记格式
+      const buttonVariantResult = parseButtonVariant(trimmedLine);
+      
+      if (buttonVariantResult.hasVariant) {
+        // 处理带类型标记的按钮
+        flushTextBlock();
+
+        console.log(`发现按钮类型标记: variant="${buttonVariantResult.variant}", 文本="${buttonVariantResult.text}", URL="${buttonVariantResult.url}"`);
+
+        const buttonElement = createButtonElement(buttonVariantResult.text, buttonVariantResult.url, buttonVariantResult.variant);
+        console.log(`按钮ID: ${buttonElement.id}, 名称: ${buttonElement.name}, 样式: ${buttonVariantResult.variant}`);
+        consecutiveButtons.push(buttonElement);
+
+        continue;
+      }
+
       // 如果该行不仅仅只有一个链接（即前后有其他文本），视为混合内容行
       const multiLinkMatch = trimmedLine.match(/\[([^\]]+)\]\(([^)]+)\)/g);
       const linkPattern = /^\[([^\]]+)\]\(([^)]+)\)$/;
@@ -2638,7 +2679,7 @@ function parseMarkdown(markdown, options = {}) {
         continue;
       }
 
-      // 如果只有一个链接且占据整行，视为按钮
+      // 如果只有一个链接且占据整行，视为按钮（默认primary样式）
       if (multiLinkMatch && multiLinkMatch.length === 1 && isLinkLine) {
         console.log(`发现单个链接: ${multiLinkMatch[0]}`);
         flushTextBlock();
@@ -2648,10 +2689,10 @@ function parseMarkdown(markdown, options = {}) {
           const linkText = singleLinkMatch[1];
           const linkUrl = singleLinkMatch[2];
 
-          console.log(`创建按钮: 文本="${linkText}", URL="${linkUrl}"`);
+          console.log(`创建默认按钮: 文本="${linkText}", URL="${linkUrl}"`);
 
-          const buttonElement = createButtonElement(linkText, linkUrl);
-          console.log(`按钮ID: ${buttonElement.id}, 名称: ${buttonElement.name}`);
+          const buttonElement = createButtonElement(linkText, linkUrl, 'primary'); // 默认使用primary样式
+          console.log(`按钮ID: ${buttonElement.id}, 名称: ${buttonElement.name}, 样式: primary`);
           consecutiveButtons.push(buttonElement);
 
           continue;
@@ -2909,10 +2950,28 @@ function parseMarkdown(markdown, options = {}) {
       position: position
     });
 
-    // 查找所有普通链接 [text](url) 但不是图片链接
+    // 查找所有按钮类型标记 [variant] [text](url) 或 [variant][text](url)
+    const buttonVariantRegex = /\[(\w+)\]\s*\[([^\]]+)\]\(([^)]+)\)/g;
+    const buttonVariantMatches = [...line.matchAll(buttonVariantRegex)];
+    console.log(`找到 ${buttonVariantMatches.length} 个按钮类型标记`);
+
+    // 查找所有普通链接 [text](url) 但不是图片链接，也不是按钮类型标记
     const normalLinkRegex = /(?<!!)\[(.*?)\]\((.*?)\)/g;
     const linkMatches = [...line.matchAll(normalLinkRegex)];
-    console.log(`找到 ${linkMatches.length} 个普通链接`);
+    
+    // 过滤掉已经被按钮类型标记匹配的链接
+    const filteredLinkMatches = linkMatches.filter(linkMatch => {
+      return !buttonVariantMatches.some(buttonMatch => {
+        // 检查链接是否在按钮类型标记的范围内
+        const linkStart = linkMatch.index;
+        const linkEnd = linkMatch.index + linkMatch[0].length;
+        const buttonStart = buttonMatch.index;
+        const buttonEnd = buttonMatch.index + buttonMatch[0].length;
+        return linkStart >= buttonStart && linkEnd <= buttonEnd;
+      });
+    });
+    
+    console.log(`找到 ${filteredLinkMatches.length} 个普通链接（排除按钮类型标记）`);
 
     // 查找所有图片 ![alt](url)
     const imageMatches = [...line.matchAll(/!\[(.*?)\]\((.*?)\)/g)];
@@ -2920,7 +2979,8 @@ function parseMarkdown(markdown, options = {}) {
 
     // 合并并按照在原文中的位置排序
     const allMatches = [
-      ...linkMatches.map(match => ({ type: 'link', match })),
+      ...buttonVariantMatches.map(match => ({ type: 'buttonVariant', match })),
+      ...filteredLinkMatches.map(match => ({ type: 'link', match })),
       ...imageMatches.map(match => ({ type: 'image', match }))
     ].sort((a, b) => a.match.index - b.match.index);
 
@@ -2939,11 +2999,26 @@ function parseMarkdown(markdown, options = {}) {
       }
 
       // 处理匹配项
-      if (type === 'link') {
+      if (type === 'buttonVariant') {
+        const variant = match[1];
+        const buttonText = match[2];
+        const buttonUrl = match[3];
+        const supportedVariants = ['primary', 'secondary', 'success', 'warning', 'error', 'ghost', 'link'];
+        
+        if (supportedVariants.includes(variant)) {
+          console.log(`处理混合内容中的按钮类型标记: variant="${variant}", 文本="${buttonText}", URL="${buttonUrl}"`);
+          const buttonElement = createButtonElement(buttonText, buttonUrl, variant);
+          currentLayout.layout.children.push(buttonElement);
+        } else {
+          // 如果variant不支持，当作普通文本处理
+          const textElement = createTextElement(match[0]);
+          currentLayout.layout.children.push(textElement);
+        }
+      } else if (type === 'link') {
         const linkText = match[1];
         const linkUrl = match[2];
-        console.log(`处理混合内容中的链接: 文本="${linkText}", URL="${linkUrl}"`);
-        const buttonElement = createButtonElement(linkText, linkUrl);
+        console.log(`处理混合内容中的普通链接: 文本="${linkText}", URL="${linkUrl}"`);
+        const buttonElement = createButtonElement(linkText, linkUrl, 'primary'); // 默认使用primary样式
         currentLayout.layout.children.push(buttonElement);
       } else if (type === 'image') {
         const imgAlt = match[1];
@@ -3994,6 +4069,7 @@ export {
   createTableElement,
   createCodeElement,
   createChartElement,
+  parseButtonVariant,   // 导出按钮类型标记解析函数
   isMarkdownTable,
   isMarkdownCodeBlock,
   isTableOrChartData,   // 导出表格/图表检测函数

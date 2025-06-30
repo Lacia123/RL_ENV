@@ -283,8 +283,13 @@ RESTful API，快速集成现有系统
 
 ### 按钮（超链接）
 <layout:row>
-[确认](https://example.com)
-[取消](https://example.com)
+[primary][主要按钮](https://example.com)
+[secondary][次要按钮](https://example.com)
+[success][成功按钮](https://example.com)
+[warning][警告按钮](https://example.com)
+[error][错误按钮](https://example.com)
+[ghost][幽灵按钮](https://example.com)
+[link][链接按钮](https://example.com)
 </layout:row>
 
 ### 示例图片
