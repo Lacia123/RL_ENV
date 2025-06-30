@@ -489,7 +489,7 @@ export const DEFAULT_STYLE_CONFIG = {
       flexWrap: 'nowrap',
       justifyContent: 'flex-start',
       alignItems: 'flex-start',
-      gap: DIMENSION_CONSTANTS.GAP.none,
+      gap: DIMENSION_CONSTANTS.GAP.base,
 
       // 网格布局属性（默认不启用，由动作激活）
       gridTemplateColumns: 'none',
