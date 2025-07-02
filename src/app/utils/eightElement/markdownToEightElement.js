@@ -3452,11 +3452,37 @@ export function analyzeElementsInEightElement(eightElement) {
   const extractLayoutContent = (layoutElement, parentContent = '') => {
     const children = layoutElement.layout?.children || [];
     let contentItems = [];
+    let itemTypes = []; // 新增：存储每个子元素的类型信息
     
-    // 遍历子元素，提取内容信息
+    // 遍历子元素，提取内容信息和类型信息
     children.forEach((child, index) => {
       let itemContent = '';
+      let itemType = child.name;
+      let itemVariant = 'normal';
       
+      // 使用元数据确定实际类型和形态
+      if (child._metadata) {
+        const metadata = child._metadata;
+        itemType = metadata.actualType || child.name;
+        itemVariant = metadata.variant || 'normal';
+        
+        // 对于layout元素，特别处理
+        if (itemType === 'layout' && metadata.isRoot !== undefined) {
+          itemVariant = metadata.isRoot ? 'root' : 'column';
+        }
+      } else {
+        // 回退到基于名称的判断
+        if (itemType === 'background') {
+          itemType = 'image';
+        } else if (itemType === 'code') {
+          itemType = 'text';
+          itemVariant = 'codeBlock';
+        } else if (itemType === 'layout') {
+          itemVariant = 'column'; // 默认为column
+        }
+      }
+      
+      // 先生成内容预览
       if (child.name === 'text' && child.font?.fontsize?.default?.content) {
         // 文本元素：提取文本内容
         const content = child.font.fontsize.default.content.replace(/<[^>]*>/g, '').trim();
@@ -3488,6 +3514,42 @@ export function analyzeElementsInEightElement(eightElement) {
         itemContent = `[${child.name || 'unknown'}]`;
       }
       
+      // 现在有了内容后，再添加类型信息到itemTypes数组
+      const itemInfo = {
+        type: itemType,
+        variant: itemVariant,
+        content: itemContent || `[${itemType}]` // 添加内容字段
+      };
+      
+      // 🆕 如果是layout类型，添加第一个子元素的类型信息
+      if (itemType === 'layout' && child.layout?.children?.length > 0) {
+        const firstChild = child.layout.children[0];
+        if (firstChild && firstChild.name) {
+          let firstElementType = firstChild.name;
+          let firstElementVariant = 'normal';
+          
+          // 使用元数据确定第一个子元素的实际类型
+          if (firstChild._metadata) {
+            const metadata = firstChild._metadata;
+            firstElementType = metadata.actualType || firstChild.name;
+            firstElementVariant = metadata.variant || 'normal';
+          } else {
+            // 回退到基于名称的判断
+            if (firstElementType === 'background') {
+              firstElementType = 'image';
+            } else if (firstElementType === 'code') {
+              firstElementType = 'text';
+              firstElementVariant = 'codeBlock';
+            }
+          }
+          
+          itemInfo.firstElementType = firstElementType;
+          itemInfo.firstElementVariant = firstElementVariant;
+        }
+      }
+      
+      itemTypes.push(itemInfo);
+      
       if (itemContent) {
         contentItems.push(itemContent);
       }
@@ -3499,7 +3561,7 @@ export function analyzeElementsInEightElement(eightElement) {
     return {
       preview: preview || '[空布局]',
       full: full || '[空布局]',
-      items: contentItems,
+      items: itemTypes, // 现在返回类型信息数组而不是内容字符串数组
       childrenCount: children.length
     };
   };

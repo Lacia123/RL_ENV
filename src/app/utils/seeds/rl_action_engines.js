@@ -1,11 +1,11 @@
 /**
  * 
- * 🎯 总共包含 45 个动作，分为以下类别：
+ * 🎯 总共包含 29 个动作，分为以下类别：
  * 
  * ⚠️ 调控失效的样式属性（需要在 styleConfig.js 中补充）：
  * 
  * 📋 Form Actions 相关：
- *   - clipPath: 当前样式系统中完全没有设置，影响 increaseComplexity, decreaseComplexity, makeExtremeRounded
+ *   - clipPath: 当前样式系统中完全没有设置，影响 complexityLevel
  *   - transform: 部分元素没有设置，影响 increaseVisualWeight, decreaseVisualWeight, responsiveScale
  * 
  * 📋 Material Actions 相关：
@@ -13,11 +13,6 @@
  *   - backgroundSize: 没有设置，影响纹理动作
  *   - backdropFilter: 完全没有设置，影响 increaseTransparency, decreaseTransparency
  *   - opacity: 某些元素没有设置，影响透明度动作
- * 
- * 📋 Composition Actions 相关：
- *   - display: 某些布局没有设置为 grid，影响 enhanceGridAlignment, structureLayout
- *   - gridTemplateColumns/Areas: 只在特定布局中设置，影响网格相关动作
- *   - flexDirection/flexWrap: 某些元素没有设置，影响 flexibleLayout
  * 
  * 📋 Animation Actions 相关：
  *   - transition: 部分元素没有设置，影响 addMicroInteractions
@@ -27,22 +22,17 @@
  *   - &:focus 伪类: 大部分元素没有设置，影响 enhanceAccessibility
  *   - outline/outlineOffset: 没有设置，影响焦点可见性
  * 
- * 🎯 总共包含 45 个动作，分为以下类别：
+ * 🎯 总共包含 29 个动作，分为以下类别：
  * 
- * 📐 形态动作 (Form Actions) - 8个
- *   ├── 圆润度调节: increaseRoundness, decreaseRoundness
- *   ├── 复杂度调节: increaseComplexity, decreaseComplexity  
- *   ├── 轮廓调节: strengthenOutline, weakenOutline
- *   └── 极致调节: makeExtremeRounded, makeAngular
+ * 📐 形态动作 (Form Actions) - 3个
+ *   └── 连续调控: roundnessLevel, complexityLevel, outlineStrength
  * 
- * 🎨 色彩动作 (Color Actions) - 4个
- *   ├── 品牌色调节: increaseBrandColor, decreaseBrandColor
- *   └── 明暗调节: brightenTheme, darkenTheme
+ * 🎨 色彩动作 (Color Actions) - 2个
+ *   └── 连续调控: brandColorRatio, colorBrightness
  * 
- * 📝 字体动作 (Typography Actions) - 7个
- *   ├── 密度调节: increaseInfoDensity, decreaseInfoDensity
- *   ├── 强度调节: enhanceVisualStrength, softenVisualStrength
- *   └── 对齐调节: centerAlignment, leftAlignment, rightAlignment
+ * 📝 字体动作 (Typography Actions) - 3个
+ *   ├── 连续调控: informationDensity, visualStrength, layoutBalance
+ *   └── 综合调节: 视觉强度、板式重心、信息密度
  * 
  * 🎭 质感动作 (Material Actions) - 6个
  *   ├── 阴影调节: increaseShadowDepth, decreaseShadowDepth
@@ -53,10 +43,6 @@
  *   ├── 空间调节: increaseSpacing, decreaseSpacing
  *   ├── 张力调节: increaseEdgeTension, decreaseEdgeTension
  *   └── 重量调节: increaseVisualWeight, decreaseVisualWeight
- * 
- * 🏗️ 构图动作 (Composition Actions) - 4个
- *   ├── 对齐调节: enhanceGridAlignment, relaxGridAlignment
- *   └── 布局调节: structureLayout, flexibleLayout
  * 
  * 🚦 状态动作 (State Actions) - 5个
  *   └── 状态指示: applySuccessState, applyErrorState, applyWarningState, 
@@ -327,6 +313,8 @@ export const DESIGN_TOKEN_MAPPING = {
  * 定义每个动作的强度等级和对应的数值变化
  */
 export const ACTION_INTENSITY_MAP = {
+  // 连续调控 (0.0-1.0全范围)
+  continuous: { min: 0.0, max: 1.0, step: 0.01 },
   // 微调 (0.1-0.3范围)
   subtle: { min: 0.1, max: 0.3, step: 0.05 },
   // 中等调整 (0.3-0.7范围) 
@@ -407,392 +395,518 @@ export function calculateLevelChange(baseValue, delta, levels, tokenType, defaul
 export const RL_ACTIONS = {
   // ==================== 形态动作 (Form Actions) ====================
   
-  // 1. 增加圆润度
-  increaseRoundness: {
+  // 1. 圆润程度 (合并的连续调控动作)
+  roundnessLevel: {
     category: 'form',
-    name: '增加圆润度',
-    intensity: 'moderate',
+    name: '圆润程度',
+    intensity: 'continuous', // 标记为连续动作
     effects: {
-      borderRadius: 'increase',
-      clipPath: 'soften'
+      borderRadius: 'continuous',
+      clipPath: 'adaptive'
     },
     styleMapping: {
-      borderRadius: (baseValue, delta, elementType, variant) => {
-        const levels = ['none', 'xs', 'small', 'medium', 'large', 'xl', 'xxl', 'xxxl', 'xxxxl'];
-        console.log(`🔧 increaseRoundness调试: 元素=${elementType}.${variant}, 基准值="${baseValue}", 强度=${delta}`);
+      borderRadius: (baseValue, intensity, elementType, variant) => {
+        // 定义圆润度级别数组
+        const roundnessLevels = ['none', 'xs', 'small', 'medium', 'large', 'xl', 'xxl', 'xxxl', 'xxxxl'];
+        
+        console.log(`🎯 圆润程度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
         
         try {
-          const newLevel = calculateLevelChange(baseValue, delta, levels, 'borderradius', 'small', true);
-          const newValue = DESIGN_TOKEN_MAPPING.dimension.borderRadius[newLevel];
+          // 将 intensity (0-1) 映射到级别索引 (0-8)
+          const maxIndex = roundnessLevels.length - 1;
+          const targetIndex = Math.round(intensity * maxIndex);
           
-          console.log(`   计算结果: 级别="${newLevel}" → 值="${newValue}"`);
-          console.log(`   级别数组: [${levels.join(', ')}]`);
-          console.log(`   可用的映射: [${Object.keys(DESIGN_TOKEN_MAPPING.dimension.borderRadius).join(', ')}]`);
+          // 确保索引在有效范围内
+          const levelIndex = Math.max(0, Math.min(maxIndex, targetIndex));
+          const selectedLevel = roundnessLevels[levelIndex];
           
-          if (!newValue) {
-            console.error(`   ❌ 映射失败: 级别"${newLevel}"在DESIGN_TOKEN_MAPPING中不存在`);
-            return DESIGN_TOKEN_MAPPING.dimension.borderRadius.small;
-          }
+          // 直接返回对应的 token 值
+          const tokenValue = DESIGN_TOKEN_MAPPING.dimension.borderRadius[selectedLevel];
           
-          return newValue;
+          console.log(`   📍 选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue}`);
+          
+          return tokenValue;
         } catch (error) {
-          console.error('❌ borderRadius映射错误:', error.message, '基准值:', baseValue, '强度:', delta);
+          console.error('❌ 圆润程度映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.dimension.borderRadius.small; // 回退到默认值
         }
       }
     },
-    conflicts: ['decreaseRoundness']
+    conflicts: [] // 连续动作不与其他动作冲突
   },
   
-  // 2. 减少圆润度
-  decreaseRoundness: {
+  // 2. 形态复杂度 (合并的连续调控动作)
+  complexityLevel: {
     category: 'form',
-    name: '减少圆润度',
-    intensity: 'moderate',
+    name: '形态复杂度',
+    intensity: 'continuous', // 标记为连续动作
     effects: {
-      borderRadius: 'decrease',
-      clipPath: 'sharpen'
+      clipPath: 'continuous',
+      borderStyle: 'adaptive'
     },
     styleMapping: {
-      borderRadius: (baseValue, delta) => {
-        const levels = ['none', 'xs', 'small', 'medium', 'large', 'xl', 'xxl', 'xxxl', 'xxxxl'];
-        const newLevel = calculateLevelChange(baseValue, delta, levels, 'borderradius', 'small', false);
-        return DESIGN_TOKEN_MAPPING.dimension.borderRadius[newLevel];
+      clipPath: (baseValue, intensity, elementType, variant) => {
+        console.log(`🎯 形态复杂度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
+        
+        try {
+          // 定义复杂度级别
+          let clipPathValue = 'none';
+          
+          if (intensity <= 0.2) {
+            // 0.0-0.2: 无复杂度，保持简单形状
+            clipPathValue = 'none';
+          } else if (intensity <= 0.4) {
+            // 0.2-0.4: 基础几何变形
+            clipPathValue = 'inset(5% round 10px)';
+          } else if (intensity <= 0.6) {
+            // 0.4-0.6: 圆形变形
+            clipPathValue = 'circle(50% at 50% 50%)';
+          } else if (intensity <= 0.8) {
+            // 0.6-0.8: 简单多边形
+            clipPathValue = 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)';
+          } else {
+            // 0.8-1.0: 复杂多边形
+            clipPathValue = 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)';
+      }
+          
+          console.log(`   📍 复杂度级别: ${clipPathValue} (强度: ${intensity.toFixed(2)})`);
+          
+          return clipPathValue;
+        } catch (error) {
+          console.error('❌ 形态复杂度映射错误:', error.message, '强度:', intensity);
+          return 'none'; // 回退到默认值
+        }
       }
     },
-    conflicts: ['increaseRoundness']
+    conflicts: [] // 连续动作不与其他动作冲突
   },
   
-  // 3. 增加形态复杂度
-  increaseComplexity: {
+  // 3. 轮廓强度 (合并的连续调控动作)
+  outlineStrength: {
     category: 'form',
-    name: '增加形态复杂度',
-    intensity: 'strong',
+    name: '轮廓强度',
+    intensity: 'continuous', // 标记为连续动作
     effects: {
-      clipPath: 'complex',
-      borderStyle: 'decorative'
+      borderWidth: 'continuous',
+      borderColor: 'adaptive'
     },
     styleMapping: {
-      clipPath: (current, delta) => {
-        if (delta < 0.3) return 'none';
-        if (delta < 0.6) return 'circle(50% at 50% 50%)';
-        return 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)';
+      borderWidth: (baseValue, intensity, elementType, variant) => {
+        // 定义轮廓强度级别数组
+        const outlineLevels = ['none', 'narrow', 'base', 'wide'];
+        
+        console.log(`🎯 轮廓强度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
+        
+        try {
+          // 将 intensity (0-1) 映射到级别索引 (0-3)
+          const maxIndex = outlineLevels.length - 1;
+          const targetIndex = Math.round(intensity * maxIndex);
+          
+          // 确保索引在有效范围内
+          const levelIndex = Math.max(0, Math.min(maxIndex, targetIndex));
+          const selectedLevel = outlineLevels[levelIndex];
+          
+          // 直接返回对应的 token 值
+          const tokenValue = DESIGN_TOKEN_MAPPING.dimension.borderWidth[selectedLevel];
+          
+          console.log(`   📍 选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue}`);
+          
+          return tokenValue;
+        } catch (error) {
+          console.error('❌ 轮廓强度映射错误:', error.message, '强度:', intensity);
+          return DESIGN_TOKEN_MAPPING.dimension.borderWidth.narrow; // 回退到默认值
+        }
       }
     },
-    conflicts: ['decreaseComplexity']
-  },
-  
-  // 4. 减少形态复杂度
-  decreaseComplexity: {
-    category: 'form',
-    name: '减少形态复杂度',
-    intensity: 'moderate',
-    effects: {
-      clipPath: 'simple',
-      borderStyle: 'minimal'
-    },
-    styleMapping: {
-      clipPath: () => 'none'
-    },
-    conflicts: ['increaseComplexity']
-  },
-  
-  // 5. 增强轮廓强度
-  strengthenOutline: {
-    category: 'form',
-    name: '增强轮廓强度',
-    intensity: 'moderate',
-    effects: {
-      borderWidth: 'increase',
-      borderColor: 'enhance'
-    },
-    styleMapping: {
-      borderWidth: (baseValue, delta) => {
-        const levels = ['none', 'narrow', 'base', 'wide'];
-        const newLevel = calculateLevelChange(baseValue, delta, levels, 'borderwidth', 'narrow', true);
-        return DESIGN_TOKEN_MAPPING.dimension.borderWidth[newLevel];
-      }
-    },
-    conflicts: ['weakenOutline']
-  },
-  
-  // 6. 减弱轮廓强度
-  weakenOutline: {
-    category: 'form',
-    name: '减弱轮廓强度',
-    intensity: 'moderate',
-    effects: {
-      borderWidth: 'decrease',
-      borderColor: 'soften'
-    },
-    styleMapping: {
-      borderWidth: (baseValue, delta) => {
-        const levels = ['none', 'narrow', 'base', 'wide'];
-        const newLevel = calculateLevelChange(baseValue, delta, levels, 'borderwidth', 'narrow', false);
-        return DESIGN_TOKEN_MAPPING.dimension.borderWidth[newLevel];
-      }
-    },
-    conflicts: ['strengthenOutline']
+    conflicts: [] // 连续动作不与其他动作冲突
   },
 
   // ==================== 色彩动作 (Color Actions) ====================
   
-  // 7. 增加品牌色使用
-  increaseBrandColor: {
+  // 4. 品牌色占比 (合并的连续调控动作)
+  brandColorRatio: {
     category: 'color',
-    name: '增加品牌色使用',
-    intensity: 'moderate',
+    name: '品牌色占比',
+    intensity: 'continuous', // 标记为连续动作
     effects: {
-      brandColorRatio: 'increase',
-      primaryColor: 'enhance'
+      brandColorRatio: 'continuous',
+      primaryColor: 'adaptive'
     },
     styleMapping: {
-      color: (current, delta, elementType, variant) => {
-        // 检查是否为标题类型（text元素的h1-h6变体）
-        if (elementType === 'text' && variant && ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(variant) && delta > 0.3) {
+      color: (current, intensity, elementType, variant) => {
+        console.log(`🎯 品牌色占比调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
+        
+        try {
+          // 根据不同元素类型和强度调整颜色
+          if (intensity <= 0.2) {
+            // 0.0-0.2: 中性色为主
+            return DESIGN_TOKEN_MAPPING.color.onSurface.black76;
+          } else if (intensity <= 0.4) {
+            // 0.2-0.4: 轻微品牌色
+            if (elementType === 'text' && variant && ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(variant)) {
+              return DESIGN_TOKEN_MAPPING.color.primary.brand4;
+            }
+            return current;
+          } else if (intensity <= 0.6) {
+            // 0.4-0.6: 平衡状态，保持原有颜色
+            return current;
+          } else if (intensity <= 0.8) {
+            // 0.6-0.8: 增强品牌色
+            if (elementType === 'text' && variant && ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(variant)) {
           return DESIGN_TOKEN_MAPPING.color.primary.brand5;
         }
-        // button 的 backgroundColor 也必须发生变化，否则对比度又问题
-        if (elementType === 'button' && delta > 0.2) {
+            if (elementType === 'button') {
           return DESIGN_TOKEN_MAPPING.color.primary.brand4;
         }
         return current;
+          } else {
+            // 0.8-1.0: 最大品牌色占比
+            if (elementType === 'text' && variant && ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(variant)) {
+              return DESIGN_TOKEN_MAPPING.color.primary.brand6;
+            }
+            if (elementType === 'button') {
+              return DESIGN_TOKEN_MAPPING.color.primary.brand5;
+            }
+            return current;
+          }
+        } catch (error) {
+          console.error('❌ 品牌色文字颜色映射错误:', error.message, '强度:', intensity);
+          return current;
+        }
       },
-      backgroundColor: (current, delta, elementType, variant) => {
-        // 根布局容器应用品牌色背景
-        if (elementType === 'layout' && variant === 'root' && delta > 0.5) {
+      backgroundColor: (current, intensity, elementType, variant) => {
+        try {
+          // 根据不同元素类型和强度调整背景色
+          if (intensity <= 0.2) {
+            // 0.0-0.2: 中性背景色
+            return DESIGN_TOKEN_MAPPING.color.surface.grey1;
+          } else if (intensity <= 0.4) {
+            // 0.2-0.4: 轻微品牌色背景
+            if (elementType === 'layout' && variant === 'root') {
+              return DESIGN_TOKEN_MAPPING.color.primaryContainer.brand1;
+            }
+            return current;
+          } else if (intensity <= 0.6) {
+            // 0.4-0.6: 平衡状态，保持原有背景
+            return current;
+          } else if (intensity <= 0.8) {
+            // 0.6-0.8: 增强品牌色背景
+            if (elementType === 'layout' && variant === 'root') {
           return DESIGN_TOKEN_MAPPING.color.primary.brand3;
         }
-        // 按钮元素应用品牌色背景
-        if (elementType === 'button' && delta > 0.3) {
+            if (elementType === 'button') {
           return DESIGN_TOKEN_MAPPING.color.primary.brand4;
         }
         return current;
+          } else {
+            // 0.8-1.0: 最大品牌色背景
+            if (elementType === 'layout' && variant === 'root') {
+              return DESIGN_TOKEN_MAPPING.color.primary.brand4;
+            }
+            if (elementType === 'button') {
+              return DESIGN_TOKEN_MAPPING.color.primary.brand5;
+            }
+        return current;
+          }
+        } catch (error) {
+          console.error('❌ 品牌色背景颜色映射错误:', error.message, '强度:', intensity);
+        return current;
+        }
       }
     },
-    conflicts: ['decreaseBrandColor']
+    conflicts: [] // 连续动作不与其他动作冲突
   },
   
-  // 8. 减少品牌色使用
-  decreaseBrandColor: {
-    category: 'color',
-    name: '减少品牌色使用',
-    intensity: 'moderate',
-    effects: {
-      brandColorRatio: 'decrease',
-      primaryColor: 'neutralize'
-    },
-    styleMapping: {
-      color: (current, delta) => {
-        if (delta > 0.3) return DESIGN_TOKEN_MAPPING.color.onSurface.black76;
-        return current;
-      },
-      backgroundColor: (current, delta) => {
-        if (delta > 0.3) return DESIGN_TOKEN_MAPPING.color.surface.grey1;
-        return current;
-      }
-    },
-    conflicts: ['increaseBrandColor']
-  },
-  
-  // 9. 调亮主题
-  brightenTheme: {
+  // 5. 色彩明暗 (合并的连续调控动作)
+  colorBrightness: {
     category: 'color', 
-    name: '调亮主题',
-    intensity: 'moderate',
+    name: '色彩明暗',
+    intensity: 'continuous', // 标记为连续动作
     effects: {
-      brightness: 'increase',
-      contrast: 'soften'
+      brightness: 'continuous',
+      contrast: 'adaptive'
     },
     styleMapping: {
-      backgroundColor: (current, delta) => {
-        if (delta > 0.4) return DESIGN_TOKEN_MAPPING.color.surface.grey0;
+      backgroundColor: (current, intensity, elementType, variant) => {
+        console.log(`🎯 色彩明暗调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
+        
+        try {
+          // 根据强度调整背景亮度
+          if (intensity <= 0.2) {
+            // 0.0-0.2: 最暗背景
+            return DESIGN_TOKEN_MAPPING.color.surface.grey2;
+          } else if (intensity <= 0.4) {
+            // 0.2-0.4: 较暗背景
         return DESIGN_TOKEN_MAPPING.color.surface.grey1;
-      },
-      color: (current, delta) => {
-        if (delta > 0.3) return DESIGN_TOKEN_MAPPING.color.onSurface.black64;
-        return DESIGN_TOKEN_MAPPING.color.onSurface.black76;
+          } else if (intensity <= 0.6) {
+            // 0.4-0.6: 平衡状态，保持原有背景
+            return current;
+          } else if (intensity <= 0.8) {
+            // 0.6-0.8: 较亮背景
+            return DESIGN_TOKEN_MAPPING.color.surface.grey1;
+          } else {
+            // 0.8-1.0: 最亮背景
+            return DESIGN_TOKEN_MAPPING.color.surface.grey0;
       }
-    },
-    conflicts: ['darkenTheme']
-  },
-  
-  // 10. 调暗主题
-  darkenTheme: {
-    category: 'color',
-    name: '调暗主题',
-    intensity: 'moderate', 
-    effects: {
-      brightness: 'decrease',
-      contrast: 'enhance'
-    },
-    styleMapping: {
-      backgroundColor: (current, delta) => {
-        if (delta > 0.4) return DESIGN_TOKEN_MAPPING.color.surface.grey2;
-        return DESIGN_TOKEN_MAPPING.color.surface.grey1;
+        } catch (error) {
+          console.error('❌ 色彩明暗背景映射错误:', error.message, '强度:', intensity);
+          return current;
+        }
       },
-      color: (current, delta) => {
-        if (delta > 0.3) return DESIGN_TOKEN_MAPPING.color.onSurface.black100;
+      color: (current, intensity, elementType, variant) => {
+        try {
+          // 根据强度调整文字颜色
+          if (intensity <= 0.2) {
+            // 0.0-0.2: 最暗主题，文字最深
+            return DESIGN_TOKEN_MAPPING.color.onSurface.black100;
+          } else if (intensity <= 0.4) {
+            // 0.2-0.4: 较暗主题，文字较深
         return DESIGN_TOKEN_MAPPING.color.onSurface.black88;
+          } else if (intensity <= 0.6) {
+            // 0.4-0.6: 平衡状态，保持原有文字色
+            return current;
+          } else if (intensity <= 0.8) {
+            // 0.6-0.8: 较亮主题，文字较浅
+            return DESIGN_TOKEN_MAPPING.color.onSurface.black76;
+          } else {
+            // 0.8-1.0: 最亮主题，文字最浅
+            return DESIGN_TOKEN_MAPPING.color.onSurface.black64;
+          }
+        } catch (error) {
+          console.error('❌ 色彩明暗文字映射错误:', error.message, '强度:', intensity);
+          return current;
+        }
       }
     },
-    conflicts: ['brightenTheme']
+    conflicts: [] // 连续动作不与其他动作冲突
   },
 
   // ==================== 字体动作 (Typography Actions) ====================
   
-  // 11. 增加信息密度
-  increaseInfoDensity: {
+  // 6. 信息密度 (合并的连续调控动作)
+  informationDensity: {
     category: 'typography',
-    name: '增加信息密度',
-    intensity: 'moderate',
+    name: '信息密度',
+    intensity: 'continuous', // 标记为连续动作
     effects: {
-      fontSize: 'decrease',
-      lineHeight: 'tighten',
-      padding: 'reduce'
+      fontSize: 'continuous',
+      padding: 'continuous',
+      lineHeight: 'adaptive'
     },
     styleMapping: {
-      fontSize: (baseValue, delta) => {
-        const levels = ['tiny', 'small', 'medium', 'large', 'xl', 'xxl', 'xxxl'];
-        const newLevel = calculateLevelChange(baseValue, delta, levels, 'size', 'medium', false);
-        return DESIGN_TOKEN_MAPPING.font.size[newLevel];
+      fontSize: (baseValue, intensity, elementType, variant) => {
+        console.log(`🎯 信息密度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
+        
+        try {
+          // 定义字体大小级别数组
+          const fontSizeLevels = ['tiny', 'small', 'medium', 'large', 'xl', 'xxl', 'xxxl'];
+          
+          // 根据强度调整字体大小
+          if (intensity <= 0.2) {
+            // 0.0-0.2: 最高信息密度，最小字体
+            const selectedLevel = fontSizeLevels[0]; // tiny
+            return DESIGN_TOKEN_MAPPING.font.size[selectedLevel];
+          } else if (intensity <= 0.4) {
+            // 0.2-0.4: 较高信息密度，较小字体
+            const selectedLevel = fontSizeLevels[1]; // small
+            return DESIGN_TOKEN_MAPPING.font.size[selectedLevel];
+          } else if (intensity <= 0.6) {
+            // 0.4-0.6: 平衡状态，保持原有字体大小
+            return baseValue;
+          } else if (intensity <= 0.8) {
+            // 0.6-0.8: 较低信息密度，较大字体
+            const selectedLevel = fontSizeLevels[4]; // xl
+            return DESIGN_TOKEN_MAPPING.font.size[selectedLevel];
+          } else {
+            // 0.8-1.0: 最低信息密度，最大字体
+            const selectedLevel = fontSizeLevels[5]; // xxl
+            return DESIGN_TOKEN_MAPPING.font.size[selectedLevel];
+          }
+        } catch (error) {
+          console.error('❌ 信息密度字体映射错误:', error.message, '强度:', intensity);
+          return baseValue;
+        }
       },
-      padding: (baseValue, delta) => {
-        const levels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-        const newLevel = calculateLevelChange(baseValue, delta, levels, 'padding', 'base', false);
-        return DESIGN_TOKEN_MAPPING.dimension.padding[newLevel];
+      padding: (baseValue, intensity, elementType, variant) => {
+        try {
+          // 定义间距级别数组
+          const paddingLevels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
+          
+          // 根据强度调整间距
+          if (intensity <= 0.2) {
+            // 0.0-0.2: 最高信息密度，最紧凑间距
+            const selectedLevel = paddingLevels[1]; // supertight
+            return DESIGN_TOKEN_MAPPING.dimension.padding[selectedLevel];
+          } else if (intensity <= 0.4) {
+            // 0.2-0.4: 较高信息密度，较紧凑间距
+            const selectedLevel = paddingLevels[3]; // tight
+            return DESIGN_TOKEN_MAPPING.dimension.padding[selectedLevel];
+          } else if (intensity <= 0.6) {
+            // 0.4-0.6: 平衡状态，保持原有间距
+            return baseValue;
+          } else if (intensity <= 0.8) {
+            // 0.6-0.8: 较低信息密度，较宽松间距
+            const selectedLevel = paddingLevels[7]; // loose
+            return DESIGN_TOKEN_MAPPING.dimension.padding[selectedLevel];
+          } else {
+            // 0.8-1.0: 最低信息密度，最宽松间距
+            const selectedLevel = paddingLevels[8]; // extraloose
+            return DESIGN_TOKEN_MAPPING.dimension.padding[selectedLevel];
+      }
+        } catch (error) {
+          console.error('❌ 信息密度间距映射错误:', error.message, '强度:', intensity);
+          return baseValue;
+        }
       }
     },
-    conflicts: ['decreaseInfoDensity']
+    conflicts: [] // 连续动作不与其他动作冲突
   },
   
-  // 12. 减少信息密度
-  decreaseInfoDensity: {
+  // 7. 视觉强度 (合并的连续调控动作)
+  visualStrength: {
     category: 'typography',
-    name: '减少信息密度',
-    intensity: 'moderate',
+    name: '视觉强度',
+    intensity: 'continuous', // 标记为连续动作
     effects: {
-      fontSize: 'increase',
-      lineHeight: 'expand',
-      padding: 'increase'
+      fontWeight: 'continuous',
+      contrast: 'continuous'
     },
     styleMapping: {
-      fontSize: (baseValue, delta) => {
-        const levels = ['tiny', 'small', 'medium', 'large', 'xl', 'xxl', 'xxxl'];
-        const newLevel = calculateLevelChange(baseValue, delta, levels, 'size', 'medium', true);
-        return DESIGN_TOKEN_MAPPING.font.size[newLevel];
+      fontWeight: (baseValue, intensity, elementType, variant) => {
+        console.log(`🎯 视觉强度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
+        
+        try {
+          // 定义字体重量级别数组
+          const fontWeightLevels = ['light', 'medium', 'semibold', 'bold'];
+          
+          // 根据强度调整字体重量
+          if (intensity <= 0.2) {
+            // 0.0-0.2: 最弱视觉强度，最轻字重
+            const selectedLevel = fontWeightLevels[0]; // light
+            return DESIGN_TOKEN_MAPPING.font.weight[selectedLevel];
+          } else if (intensity <= 0.4) {
+            // 0.2-0.4: 较弱视觉强度，较轻字重
+            const selectedLevel = fontWeightLevels[1]; // medium
+            return DESIGN_TOKEN_MAPPING.font.weight[selectedLevel];
+          } else if (intensity <= 0.6) {
+            // 0.4-0.6: 平衡状态，保持原有字重
+            return baseValue;
+          } else if (intensity <= 0.8) {
+            // 0.6-0.8: 较强视觉强度，较重字重
+            const selectedLevel = fontWeightLevels[2]; // semibold
+            return DESIGN_TOKEN_MAPPING.font.weight[selectedLevel];
+          } else {
+            // 0.8-1.0: 最强视觉强度，最重字重
+            const selectedLevel = fontWeightLevels[3]; // bold
+            return DESIGN_TOKEN_MAPPING.font.weight[selectedLevel];
+          }
+        } catch (error) {
+          console.error('❌ 视觉强度字重映射错误:', error.message, '强度:', intensity);
+          return baseValue;
+        }
       },
-      padding: (baseValue, delta) => {
-        const levels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-        const newLevel = calculateLevelChange(baseValue, delta, levels, 'padding', 'base', true);
-        return DESIGN_TOKEN_MAPPING.dimension.padding[newLevel];
-      }
-    },
-    conflicts: ['increaseInfoDensity']
-  },
-  
-  // 13. 增强视觉强度
-  enhanceVisualStrength: {
-    category: 'typography',
-    name: '增强视觉强度',
-    intensity: 'strong',
-    effects: {
-      fontWeight: 'increase',
-      fontSize: 'increase',
-      contrast: 'enhance'
-    },
-    styleMapping: {
-      fontWeight: (baseValue, delta) => {
-        const levels = ['light', 'medium', 'semibold', 'bold'];
-        const newLevel = calculateLevelChange(baseValue, delta, levels, 'fontweight', 'medium', true);
-        return DESIGN_TOKEN_MAPPING.font.weight[newLevel];
-      },
-      color: (current, delta) => {
-        if (delta > 0.5) return DESIGN_TOKEN_MAPPING.color.onSurface.black100;
-        return DESIGN_TOKEN_MAPPING.color.onSurface.black88;
-      }
-    },
-    conflicts: ['softenVisualStrength']
-  },
-  
-  // 14. 减弱视觉强度
-  softenVisualStrength: {
-    category: 'typography',
-    name: '减弱视觉强度',
-    intensity: 'moderate',
-    effects: {
-      fontWeight: 'decrease',
-      fontSize: 'decrease', 
-      contrast: 'soften'
-    },
-    styleMapping: {
-      fontWeight: (baseValue, delta) => {
-        const levels = ['light', 'medium', 'semibold', 'bold'];
-        const newLevel = calculateLevelChange(baseValue, delta, levels, 'fontweight', 'medium', false);
-        return DESIGN_TOKEN_MAPPING.font.weight[newLevel];
-      },
-      color: (current, delta) => {
-        if (delta > 0.5) return DESIGN_TOKEN_MAPPING.color.onSurface.black48;
+      color: (current, intensity, elementType, variant) => {
+        try {
+          // 根据强度调整文字颜色对比度
+          if (intensity <= 0.2) {
+            // 0.0-0.2: 最弱视觉强度，最浅文字
+            return DESIGN_TOKEN_MAPPING.color.onSurface.black48;
+          } else if (intensity <= 0.4) {
+            // 0.2-0.4: 较弱视觉强度，较浅文字
         return DESIGN_TOKEN_MAPPING.color.onSurface.black64;
+          } else if (intensity <= 0.6) {
+            // 0.4-0.6: 平衡状态，保持原有颜色
+            return current;
+          } else if (intensity <= 0.8) {
+            // 0.6-0.8: 较强视觉强度，较深文字
+            return DESIGN_TOKEN_MAPPING.color.onSurface.black88;
+          } else {
+            // 0.8-1.0: 最强视觉强度，最深文字
+            return DESIGN_TOKEN_MAPPING.color.onSurface.black100;
+          }
+        } catch (error) {
+          console.error('❌ 视觉强度颜色映射错误:', error.message, '强度:', intensity);
+          return current;
+        }
       }
     },
-    conflicts: ['enhanceVisualStrength']
+    conflicts: [] // 连续动作不与其他动作冲突
   },
   
-  // 15. 居中对齐
-  centerAlignment: {
+  // 8. 板式重心 (合并的连续调控动作)
+  layoutBalance: {
     category: 'typography',
-    name: '居中对齐',
-    intensity: 'moderate',
+    name: '板式重心',
+    intensity: 'continuous', // 标记为连续动作
     effects: {
-      textAlign: 'center',
-      justifyContent: 'center'
+      textAlign: 'continuous',
+      justifyContent: 'continuous',
+      alignItems: 'continuous'
     },
     styleMapping: {
-      textAlign: () => 'center',
-      justifyContent: () => 'center',
-      alignItems: () => 'center'
+      textAlign: (baseValue, intensity, elementType, variant) => {
+        console.log(`🎯 板式重心调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
+        
+        try {
+          // 根据强度调整文本对齐方式
+          if (intensity <= 0.3) {
+            // 0.0-0.3: 左重心，文本左对齐
+            return 'left';
+          } else if (intensity <= 0.7) {
+            // 0.3-0.7: 中心重心，文本居中对齐
+            return 'center';
+          } else {
+            // 0.7-1.0: 右重心，文本右对齐
+            return 'right';
+          }
+        } catch (error) {
+          console.error('❌ 板式重心文本对齐映射错误:', error.message, '强度:', intensity);
+          return 'center'; // 回退到居中
+        }
+      },
+      justifyContent: (baseValue, intensity, elementType, variant) => {
+        try {
+          // 根据强度调整Flex主轴对齐方式
+          if (intensity <= 0.3) {
+            // 0.0-0.3: 左重心，内容左对齐
+            return 'flex-start';
+          } else if (intensity <= 0.7) {
+            // 0.3-0.7: 中心重心，内容居中对齐
+            return 'center';
+          } else {
+            // 0.7-1.0: 右重心，内容右对齐
+            return 'flex-end';
+          }
+        } catch (error) {
+          console.error('❌ 板式重心主轴对齐映射错误:', error.message, '强度:', intensity);
+          return 'center'; // 回退到居中
+        }
+      },
+      alignItems: (baseValue, intensity, elementType, variant) => {
+        try {
+          // 根据强度调整Flex交叉轴对齐方式
+          if (intensity <= 0.3) {
+            // 0.0-0.3: 左重心，交叉轴起始对齐
+            return 'flex-start';
+          } else if (intensity <= 0.7) {
+            // 0.3-0.7: 中心重心，交叉轴居中对齐
+            return 'center';
+          } else {
+            // 0.7-1.0: 右重心，交叉轴末尾对齐
+            return 'flex-end';
+          }
+        } catch (error) {
+          console.error('❌ 板式重心交叉轴对齐映射错误:', error.message, '强度:', intensity);
+          return 'center'; // 回退到居中
+        }
+      }
     },
-    conflicts: ['leftAlignment', 'rightAlignment']
-  },
-  
-  // 16. 左对齐
-  leftAlignment: {
-    category: 'typography',
-    name: '左对齐',
-    intensity: 'moderate',
-    effects: {
-      textAlign: 'left',
-      justifyContent: 'flex-start'
-    },
-    styleMapping: {
-      textAlign: () => 'left',
-      justifyContent: () => 'flex-start',
-      alignItems: () => 'flex-start'
-    },
-    conflicts: ['centerAlignment', 'rightAlignment']
-  },
-  
-  // 17. 右对齐
-  rightAlignment: {
-    category: 'typography',
-    name: '右对齐',
-    intensity: 'moderate',
-    effects: {
-      textAlign: 'right',
-      justifyContent: 'flex-end'
-    },
-    styleMapping: {
-      textAlign: () => 'right',
-      justifyContent: () => 'flex-end',
-      alignItems: () => 'flex-end'
-    },
-    conflicts: ['centerAlignment', 'leftAlignment']
+    conflicts: [] // 连续动作不与其他动作冲突
   },
 
   // ==================== 质感动作 (Material Actions) ====================
   
-  // 18. 增加阴影深度
+  // 9. 增加阴影深度
   increaseShadowDepth: {
     category: 'material',
     name: '增加阴影深度',
@@ -811,7 +925,7 @@ export const RL_ACTIONS = {
     conflicts: ['decreaseShadowDepth']
   },
   
-  // 19. 减少阴影深度
+  // 10. 减少阴影深度
   decreaseShadowDepth: {
     category: 'material',
     name: '减少阴影深度',
@@ -830,7 +944,7 @@ export const RL_ACTIONS = {
     conflicts: ['increaseShadowDepth']
   },
   
-  // 20. 增加材质纹理，增加材质纹理目前没有设置，需要确定
+  // 11. 增加材质纹理，增加材质纹理目前没有设置，需要确定
   increaseTexture: {
     category: 'material',
     name: '增加材质纹理',
@@ -850,7 +964,7 @@ export const RL_ACTIONS = {
     conflicts: ['decreaseTexture']
   },
   
-  // 21. 减少材质纹理
+  // 12. 减少材质纹理
   decreaseTexture: {
     category: 'material',
     name: '减少材质纹理',
@@ -866,7 +980,7 @@ export const RL_ACTIONS = {
     conflicts: ['increaseTexture']
   },
   
-  // 22. 增加透明度，增加透明度也需要确认
+  // 13. 增加透明度，增加透明度也需要确认
   increaseTransparency: {
     category: 'material',
     name: '增加透明度',
@@ -891,7 +1005,7 @@ export const RL_ACTIONS = {
     conflicts: ['decreaseTransparency']
   },
   
-  // 23. 减少透明度
+  // 14. 减少透明度
   decreaseTransparency: {
     category: 'material',
     name: '减少透明度',
@@ -915,7 +1029,7 @@ export const RL_ACTIONS = {
 
   // ==================== 比例动作 (Proportion Actions) ====================
   
-  // 24. 增加空间感
+  // 15. 增加空间感
   increaseSpacing: {
     category: 'proportion',
     name: '增加空间感',
@@ -945,7 +1059,7 @@ export const RL_ACTIONS = {
     conflicts: ['decreaseSpacing']
   },
   
-  // 25. 减少空间感
+  // 16. 减少空间感
   decreaseSpacing: {
     category: 'proportion',
     name: '减少空间感',
@@ -975,7 +1089,7 @@ export const RL_ACTIONS = {
     conflicts: ['increaseSpacing']
   },
   
-  // 26. 增强边缘张力
+  // 17. 增强边缘张力
   increaseEdgeTension: {
     category: 'proportion',
     name: '增强边缘张力',
@@ -1000,7 +1114,7 @@ export const RL_ACTIONS = {
     conflicts: ['decreaseEdgeTension']
   },
   
-  // 27. 减弱边缘张力
+  // 18. 减弱边缘张力
   decreaseEdgeTension: {
     category: 'proportion',
     name: '减弱边缘张力',
@@ -1025,7 +1139,7 @@ export const RL_ACTIONS = {
     conflicts: ['increaseEdgeTension']
   },
   
-  // 28. 增加视觉重量
+  // 19. 增加视觉重量
   increaseVisualWeight: {
     category: 'proportion',
     name: '增加视觉重量',
@@ -1049,7 +1163,7 @@ export const RL_ACTIONS = {
     conflicts: ['decreaseVisualWeight']
   },
   
-  // 29. 减少视觉重量
+  // 20. 减少视觉重量
   decreaseVisualWeight: {
     category: 'proportion',
     name: '减少视觉重量',
@@ -1084,7 +1198,7 @@ export const RL_ACTIONS = {
 
   // ==================== 状态指示动作 (State Actions) ====================
   
-  // 34. 应用成功状态
+  // 21. 应用成功状态
   applySuccessState: {
     category: 'state',
     name: '应用成功状态',
@@ -1112,7 +1226,7 @@ export const RL_ACTIONS = {
     conflicts: ['applyErrorState', 'applyWarningState', 'applyDisableState']
   },
   
-  // 35. 应用错误状态
+  // 22. 应用错误状态
   applyErrorState: {
     category: 'state',
     name: '应用错误状态',
@@ -1140,7 +1254,7 @@ export const RL_ACTIONS = {
     conflicts: ['applySuccessState', 'applyWarningState', 'applyDisableState']
   },
   
-  // 36. 应用警告状态
+  // 23. 应用警告状态
   applyWarningState: {
     category: 'state',
     name: '应用警告状态',
@@ -1168,7 +1282,7 @@ export const RL_ACTIONS = {
     conflicts: ['applySuccessState', 'applyErrorState', 'applyDisableState']
   },
   
-  // 37. 应用禁用状态
+  // 24. 应用禁用状态
   applyDisableState: {
     category: 'state',
     name: '应用禁用状态',
@@ -1198,7 +1312,7 @@ export const RL_ACTIONS = {
     conflicts: ['applySuccessState', 'applyErrorState', 'applyWarningState']
   },
   
-  // 38. 应用信息状态
+  // 25. 应用信息状态
   applyInfoState: {
     category: 'state',
     name: '应用信息状态',
@@ -1225,51 +1339,11 @@ export const RL_ACTIONS = {
     conflicts: []
   },
 
-  // ==================== 极致圆角动作 (Extreme Roundness Actions) ====================
-  
-  // 39. 极致圆角化
-  makeExtremeRounded: {
-    category: 'form',
-    name: '极致圆角化',
-    intensity: 'strong',
-    effects: {
-      borderRadius: 'extreme',
-      clipPath: 'round'
-    },
-    styleMapping: {
-      borderRadius: (current, delta) => {
-        if (delta > 0.8) return DESIGN_TOKEN_MAPPING.dimension.borderRadius.full; // 完全圆形
-        if (delta > 0.6) return DESIGN_TOKEN_MAPPING.dimension.borderRadius.xxxxl;
-        if (delta > 0.4) return DESIGN_TOKEN_MAPPING.dimension.borderRadius.xxxl;
-        return DESIGN_TOKEN_MAPPING.dimension.borderRadius.xxl;
-      },
-      clipPath: (current, delta) => {
-        if (delta > 0.7) return 'circle(50% at 50% 50%)';
-        return 'none';
-      }
-    },
-    conflicts: ['decreaseRoundness', 'makeAngular']
-  },
-  
-  // 40. 完全方角化
-  makeAngular: {
-    category: 'form',
-    name: '完全方角化',
-    intensity: 'strong',
-    effects: {
-      borderRadius: 'none',
-      clipPath: 'rectangular'
-    },
-    styleMapping: {
-      borderRadius: () => DESIGN_TOKEN_MAPPING.dimension.borderRadius.none,
-      clipPath: () => 'none'
-    },
-    conflicts: ['increaseRoundness', 'makeExtremeRounded']
-  },
+
 
   // ==================== 智能适应动作 (Adaptive Actions) ====================
   
-  // 41. 智能状态适应
+  // 26. 智能状态适应
   adaptToContext: {
     category: 'adaptive',
     name: '智能状态适应',
@@ -1308,7 +1382,7 @@ export const RL_ACTIONS = {
     conflicts: []
   },
   
-  // 42. 响应式缩放
+  // 27. 响应式缩放
   responsiveScale: {
     category: 'adaptive',
     name: '响应式缩放',
@@ -1340,7 +1414,7 @@ export const RL_ACTIONS = {
 
   // ==================== 高级动画动作 (Animation Actions) ====================
   
-  // 43. 增加微动效
+  // 28. 增加微动效
   addMicroInteractions: {
     category: 'animation',
     name: '增加微动效',
@@ -1371,7 +1445,7 @@ export const RL_ACTIONS = {
     conflicts: ['removeAnimations']
   },
   
-  // 44. 移除动画效果
+  // 29. 移除动画效果
   removeAnimations: {
     category: 'animation',
     name: '移除动画效果',
@@ -1394,7 +1468,7 @@ export const RL_ACTIONS = {
 
   // ==================== 可访问性动作 (Accessibility Actions) ====================
   
-  // 45. 增强可访问性
+  // 30. 增强可访问性
   enhanceAccessibility: {
     category: 'accessibility',
     name: '增强可访问性',
@@ -2040,9 +2114,9 @@ export default {
  * });
  * 
  * // 执行单个动作
- * const result1 = env.step('increaseRoundness', 0.7);
+ * const result1 = env.step('roundnessLevel', 0.7); // 使用连续调控的圆润度
  * const result2 = env.step('applySuccessState', 0.8);
- * const result3 = env.step('makeExtremeRounded', 0.9); // 使用新的极致圆角
+ * const result3 = env.step('outlineStrength', 0.9); // 使用连续调控的轮廓强度
  * 
  * // 批量执行动作 - 状态指示组合
  * const result4 = env.stepBatch([
