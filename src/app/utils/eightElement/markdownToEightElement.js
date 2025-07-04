@@ -13,7 +13,6 @@ import { Marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
 import markedKatex from 'marked-katex-extension';
-import padding from '../tokens/dimension/padding.js';
 
 // 配置Marked实例，支持KaTeX和代码高亮
 const katexOptions = {

@@ -471,6 +471,114 @@ function convertStyle(style, customTokenSystem = null) {
   return result;
 }
 
+/**
+ * 将颜色值转换为RGB数组
+ * @param {string} color - 颜色值，支持十六进制、rgb、rgba等格式
+ * @returns {Array|null} - RGB数组 [r, g, b] 或 null 如果无法解析
+ */
+function parseColor(color) {
+  if (!color || typeof color !== 'string') return null;
+  
+  const colorStr = color.trim().toLowerCase();
+  
+  // 处理十六进制格式 #rgb 或 #rrggbb
+  if (colorStr.startsWith('#')) {
+    const hex = colorStr.slice(1);
+    if (hex.length === 3) {
+      // #rgb -> #rrggbb
+      const r = parseInt(hex[0] + hex[0], 16);
+      const g = parseInt(hex[1] + hex[1], 16);
+      const b = parseInt(hex[2] + hex[2], 16);
+      return [r, g, b];
+    } else if (hex.length === 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return [r, g, b];
+    }
+  }
+  
+  // 处理 rgb 格式
+  const rgbMatch = colorStr.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
+  if (rgbMatch) {
+    return [parseInt(rgbMatch[1]), parseInt(rgbMatch[2]), parseInt(rgbMatch[3])];
+  }
+  
+  // 处理 rgba 格式
+  const rgbaMatch = colorStr.match(/rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*[\d.]+\s*\)/);
+  if (rgbaMatch) {
+    return [parseInt(rgbaMatch[1]), parseInt(rgbaMatch[2]), parseInt(rgbaMatch[3])];
+  }
+  
+  return null;
+}
+
+/**
+ * 判断颜色是否为深色
+ * @param {string} color - 颜色值
+ * @returns {boolean} - true表示深色，false表示浅色，null表示无法判断
+ */
+function isColorDark(color) {
+  const rgb = parseColor(color);
+  if (!rgb) return null;
+  
+  const [r, g, b] = rgb;
+  
+  // 使用相对亮度公式计算亮度
+  // 公式来源：https://www.w3.org/WAI/GL/wiki/Relative_luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  
+  // 亮度小于0.5认为是深色
+  return luminance < 0.5;
+}
+
+/**
+ * 基于背景色获取合适的文字颜色（从onSurface色系中选择）
+ * @param {string} backgroundColor - 背景色
+ * @param {number} intensity - 强度值 0-1，影响透明度选择
+ * @param {Object} [customTokenSystem=null] - 可选的自定义token系统
+ * @returns {string} - 合适的文字颜色token引用
+ */
+function getContrastTextColor(backgroundColor, intensity = 0.5, customTokenSystem = null) {
+  // 先解析背景色token（如果是token引用）
+  const resolvedBgColor = isTokenReference(backgroundColor) || containsTokenReferences(backgroundColor) 
+    ? resolveToken(backgroundColor, 20, customTokenSystem) 
+    : backgroundColor;
+  
+  // 判断背景色深浅
+  const isDark = isColorDark(resolvedBgColor);
+  
+  if (isDark === null) {
+    console.warn('无法判断背景色深浅，使用默认文字颜色:', backgroundColor);
+    return '{color.onsurface.black88}'; // 默认颜色
+  }
+  
+  // 根据强度选择透明度级别
+  // 强度越高，文字越透明（更融入背景）
+  // 透明度最小不小于76%
+  let transparencyLevel;
+  if (intensity <= 0.2) {
+    transparencyLevel = '100'; // 完全不透明
+  } else if (intensity <= 0.4) {
+    transparencyLevel = '88';  // 88%不透明
+  } else if (intensity <= 0.6) {
+    transparencyLevel = '88';  // 88%不透明
+  } else if (intensity <= 0.8) {
+    transparencyLevel = '76';  // 76%不透明
+  } else {
+    transparencyLevel = '76';  // 最少76%不透明
+  }
+  
+  // 根据背景色深浅选择文字颜色
+  if (isDark) {
+    // 深色背景用白色文字
+    return `{color.onsurface.white${transparencyLevel}}`;
+  } else {
+    // 浅色背景用黑色文字
+    return `{color.onsurface.black${transparencyLevel}}`;
+  }
+}
+
 export default resolveToken;
 export {
   resolveTokensInText,
@@ -481,5 +589,8 @@ export {
   processStyleValue,
   setDynamicTokenSystem,
   getDynamicTokenSystem,
-  clearDynamicTokenSystem
+  clearDynamicTokenSystem,
+  parseColor,
+  isColorDark,
+  getContrastTextColor
 }; 

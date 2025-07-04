@@ -789,7 +789,7 @@ export const DEFAULT_STYLE_CONFIG = {
       width: '100%',
       borderCollapse: 'collapse',
       margin: "{dimension.margin.loose} 0",
-      background: "{color.surfacecontainer.white100}",
+      backgroundColor: "{color.surfacecontainer.white100}",
       borderRadius: "{dimension.borderradius.large}",
       overflow: 'hidden',
       boxShadow: "{material.hierarchy.1f}",
@@ -798,7 +798,7 @@ export const DEFAULT_STYLE_CONFIG = {
       borderStyle: "solid",
     },
     th: {
-      background: "{color.surface.grey1}",
+      backgroundColor: "{color.surface.grey1}",
       color: "{color.onsurface.black88}",
       fontWeight: "{font.fontweight.semibold}",
       fontSize: "{font.size.small}",
@@ -820,7 +820,7 @@ export const DEFAULT_STYLE_CONFIG = {
       borderBottom: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
       '&:hover': {
-        background: "{color.surface.grey0}"
+        backgroundColor: "{color.surface.grey0}"
       },
       '&:last-child': {
         borderBottom: "{dimension.borderwidth.none}"
@@ -1214,6 +1214,7 @@ export const DEFAULT_STYLE_CONFIG = {
       borderColor: "{color.surfacecontainer.black16}",
       borderStyle: "solid",
       boxShadow: "{material.hierarchy.main}",
+      clipPath: "none",
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       maxWidth: "100%",
       height: "auto",
@@ -1230,6 +1231,7 @@ export const DEFAULT_STYLE_CONFIG = {
       borderColor: "{color.surfacecontainer.black12}",
       borderStyle: "solid",
       boxShadow: "{material.hierarchy.1f}",
+      clipPath: "none",
       maxWidth: "100%",
       height: "auto",
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
@@ -1246,6 +1248,7 @@ export const DEFAULT_STYLE_CONFIG = {
       borderColor: "{color.primarycontainer.brand2}",
       borderStyle: "solid",
       boxShadow: "{material.hierarchy.2f}",
+      clipPath: "none",
       aspectRatio: "1",
       objectFit: "cover",
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
@@ -1263,6 +1266,7 @@ export const DEFAULT_STYLE_CONFIG = {
       borderColor: "{color.surfacecontainer.white100}",
       borderStyle: "solid",
       boxShadow: "{material.hierarchy.3f}",
+      clipPath: "none",
       maxWidth: "100%",
       height: "auto",
       position: "relative",
@@ -1288,6 +1292,7 @@ export const DEFAULT_STYLE_CONFIG = {
       width: "100%",
       height: "400px",
       objectFit: "cover",
+      clipPath: "none",
       background: `linear-gradient(135deg, {color.surface.grey1} 0%, {color.surface.grey2} 100%)`,
       position: "relative",
       '&::after': {
