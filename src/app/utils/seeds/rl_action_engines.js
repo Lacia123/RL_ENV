@@ -760,6 +760,9 @@ export const RL_ACTIONS = {
       },
       color: (current, intensity, elementType, variant) => {
         try {
+          if (elementType === 'button') {
+            return current;
+          }
           // 根据强度调整文字颜色
           if (intensity <= 0.2) {
             // 0.0-0.2: 最暗主题，文字最深
@@ -912,6 +915,9 @@ export const RL_ACTIONS = {
       },
       color: (current, intensity, elementType, variant) => {
         try {
+          if (elementType === 'button') {
+            return current;
+          }
           // 根据强度调整文字颜色对比度
           if (intensity <= 0.2) {
             // 0.0-0.2: 最弱视觉强度，最浅文字
@@ -949,60 +955,77 @@ export const RL_ACTIONS = {
       alignItems: 'continuous'
     },
     styleMapping: {
-      textAlign: (baseValue, intensity, elementType, variant) => {
+      justifyContent: (baseValue, intensity, elementType, variant) => {
         console.log(`🎯 板式重心调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
-          // 根据强度调整文本对齐方式
-          if (intensity <= 0.3) {
-            // 0.0-0.3: 左重心，文本左对齐
-            return 'left';
-          } else if (intensity <= 0.7) {
-            // 0.3-0.7: 中心重心，文本居中对齐
-            return 'center';
-          } else {
-            // 0.7-1.0: 右重心，文本右对齐
-            return 'right';
+          // 只对 layout 元素且 variant 为 row 时设置 justifyContent
+          if (elementType === 'layout' && variant === 'row') {
+            // 根据强度调整Flex主轴对齐方式（左右对齐）
+            if (intensity <= 0.3) {
+              // 0.0-0.3: 左重心，内容左对齐
+              return 'flex-start';
+            } else if (intensity <= 0.7) {
+              // 0.3-0.7: 中心重心，内容居中对齐
+              return 'center';
+            } else {
+              // 0.7-1.0: 右重心，内容右对齐
+              return 'flex-end';
+            }
           }
-        } catch (error) {
-          console.error('❌ 板式重心文本对齐映射错误:', error.message, '强度:', intensity);
-          return 'center'; // 回退到居中
-        }
-      },
-      justifyContent: (baseValue, intensity, elementType, variant) => {
-        try {
-          // 根据强度调整Flex主轴对齐方式
-          if (intensity <= 0.3) {
-            // 0.0-0.3: 左重心，内容左对齐
-            return 'flex-start';
-          } else if (intensity <= 0.7) {
-            // 0.3-0.7: 中心重心，内容居中对齐
-            return 'center';
-          } else {
-            // 0.7-1.0: 右重心，内容右对齐
-            return 'flex-end';
-          }
+          // 其他情况保持原值
+          return baseValue;
         } catch (error) {
           console.error('❌ 板式重心主轴对齐映射错误:', error.message, '强度:', intensity);
-          return 'center'; // 回退到居中
+          return baseValue; // 回退到原值
         }
       },
       alignItems: (baseValue, intensity, elementType, variant) => {
         try {
-          // 根据强度调整Flex交叉轴对齐方式
-          if (intensity <= 0.3) {
-            // 0.0-0.3: 左重心，交叉轴起始对齐
-            return 'flex-start';
-          } else if (intensity <= 0.7) {
-            // 0.3-0.7: 中心重心，交叉轴居中对齐
-            return 'center';
-          } else {
-            // 0.7-1.0: 右重心，交叉轴末尾对齐
-            return 'flex-end';
+          // 只对 layout 元素且 variant 为 column 时设置 alignItems
+          if (elementType === 'layout' && variant === 'column') {
+            // 根据强度调整Flex交叉轴对齐方式（左右对齐）
+            if (intensity <= 0.3) {
+              // 0.0-0.3: 左重心，交叉轴起始对齐
+              return 'flex-start';
+            } else if (intensity <= 0.7) {
+              // 0.3-0.7: 中心重心，交叉轴居中对齐
+              return 'center';
+            } else {
+              // 0.7-1.0: 右重心，交叉轴末尾对齐
+              return 'flex-end';
+            }
           }
+          // 其他情况保持原值
+          return baseValue;
         } catch (error) {
           console.error('❌ 板式重心交叉轴对齐映射错误:', error.message, '强度:', intensity);
-          return 'center'; // 回退到居中
+          return baseValue; // 回退到原值
+        }
+      },
+      textAlign: (baseValue, intensity, elementType, variant) => {
+        console.log(`🎯 板式重心文本对齐: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
+        
+        try {
+          // 对文本元素应用文本对齐调整
+          if (elementType === 'text' || elementType === 'math' || elementType === 'list') {
+            // 根据强度调整文本对齐方式
+            if (intensity <= 0.3) {
+              // 0.0-0.3: 左重心，文本左对齐
+              return 'left';
+            } else if (intensity <= 0.7) {
+              // 0.3-0.7: 中心重心，文本居中对齐
+              return 'center';
+            } else {
+              // 0.7-1.0: 右重心，文本右对齐
+              return 'right';
+            }
+          }
+          // 其他情况保持原值
+          return baseValue;
+        } catch (error) {
+          console.error('❌ 板式重心文本对齐映射错误:', error.message, '强度:', intensity);
+          return baseValue; // 回退到原值
         }
       }
     },

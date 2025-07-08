@@ -195,12 +195,6 @@ function getTokenByPath(path, customTokenSystem = null) {
 
   const parts = path.split('.');
 
-
-  if (path == 'font.size.xxl') {
-    console.log('parts')
-    console.log(parts)
-  }
-
   // 优先使用传入的自定义token系统
   if (customTokenSystem) {
     let current = customTokenSystem;
@@ -226,12 +220,6 @@ function getTokenByPath(path, customTokenSystem = null) {
     let current = dynamicTokenSystem;
     let allFound = true;
 
-
-    if (path == 'font.size.xxl') {
-      console.log('current')
-      console.log(current)
-    }
-
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       if (current && Object.prototype.hasOwnProperty.call(current, part)) {
@@ -245,11 +233,6 @@ function getTokenByPath(path, customTokenSystem = null) {
     if (allFound) {
       return current;
     }
-  }
-
-  if (path == 'material.hierarchy.4f') {
-    console.log('tokenCollections')
-    console.log(tokenCollections)
   }
 
   // 最后使用默认token集合
@@ -341,13 +324,6 @@ function resolveToken(tokenReference, maxDepth = 20, customTokenSystem = null) {
   // 解析 token 路径
   const tokenPath = parseTokenReference(tokenReference);
   const token = getTokenByPath(tokenPath, customTokenSystem);
-
-  if (tokenReference == '{material.hierarchy.4f}') {
-    console.log('..... tokenReference')
-    console.log(tokenReference)
-    console.log('..... tokenPath')
-    console.log(tokenPath)
-  }
 
 
   // 找不到 token

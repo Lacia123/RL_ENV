@@ -1430,9 +1430,14 @@ function createLayoutElement(direction, children = [], options = {}) {
   // 创建基础布局
   const baseLayout = createBaseLayout(direction, { width, height, alignItems });
 
-  // 应用来自配置的样式
+  // 应用来自配置的样式，但保留传入的对齐设置
   Object.entries(layoutStyleConfig).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
+      // 🔧 重要：保留传入的对齐设置，不覆盖 justifyContent 和 alignItems
+      if ((key === 'justifyContent' || key === 'alignItems') && options[key] !== undefined) {
+        // 如果传入的选项中明确设置了这些属性，则跳过默认配置
+        return;
+      }
       baseLayout.style[key] = value;
     }
   });
@@ -1447,6 +1452,14 @@ function createLayoutElement(direction, children = [], options = {}) {
 
   // 设置交叉轴对齐方式
   baseLayout.style.counterAxisAlignItems = counterAxisAlign;
+
+  // 🔧 重要：确保传入的 justifyContent 和 alignItems 被正确设置
+  if (options.justifyContent !== undefined) {
+    baseLayout.style.justifyContent = options.justifyContent;
+  }
+  if (options.alignItems !== undefined) {
+    baseLayout.style.alignItems = options.alignItems;
+  }
 
   // 生成唯一的className
   const uniqueClassName = `layout-${layoutId}`;
@@ -1493,11 +1506,13 @@ function createVerticalButtonLayout(buttons) {
 }
 
 // 保留水平按钮布局创建函数（用于布局标签）
-function createHorizontalButtonLayout(buttons) {
+function createHorizontalButtonLayout(buttons, options = {}) {
   return createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL, buttons, {
     gap: DIMENSION_CONSTANTS.GAP.base,
     alignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
-    variant: 'row' // 使用 row 布局变体
+    variant: 'row', // 使用 row 布局变体
+    // 允许传入自定义的 justifyContent 设置
+    justifyContent: options.justifyContent,
     // 无需明确设置counterAxisAlign，createLayoutElement会自动为水平布局设置交叉轴居中
   });
 }
@@ -3848,8 +3863,8 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
       elementType = metadata.actualType || element.name;
       variant = metadata.variant || 'normal';
       
-      // 对于layout元素，特别检查isRoot标志
-      if (elementType === 'layout' && metadata.isRoot !== undefined) {
+      // 🔧 对于layout元素，优先使用 variant，只有在没有 variant 时才使用 isRoot 标志
+      if (elementType === 'layout' && !metadata.variant && metadata.isRoot !== undefined) {
         variant = metadata.isRoot ? 'root' : 'column';
       }
     }
@@ -3881,8 +3896,12 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
         elementType = 'image';
         variant = 'normal';
       } else if (elementType === 'layout') {
-        // 🔧 关键修复：根据深度确定layout的变体
-        variant = depth === 0 ? 'root' : 'column';
+        // 🔧 关键修复：优先使用元数据确定layout的变体，回退到深度判断
+        if (element._metadata && element._metadata.variant) {
+          variant = element._metadata.variant;
+        } else {
+          variant = depth === 0 ? 'root' : 'column';
+        }
       } else if (elementType === 'table') {
         variant = 'container';
       } else if (elementType === 'code') {
@@ -4183,8 +4202,8 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
     if (element.layout) {
       console.log(`      🎯 更新layoutMode: ${currentDirection} → ${targetDirection}`);
       
-      // 🆕 先清理可能冲突的属性
-      const layoutPropertiesToClear = ['layoutMode', 'primaryAxisAlignItems', 'counterAxisAlignItems'];
+      // 🆕 先清理可能冲突的属性（但保留板式重心动作设置）
+      const layoutPropertiesToClear = ['layoutMode'];
       layoutPropertiesToClear.forEach(prop => {
         if (element.layout.style && element.layout.style.hasOwnProperty(prop)) {
           console.log(`      🧹 清理 style.${prop}: ${element.layout.style[prop]} → 即将覆盖`);
@@ -4194,9 +4213,56 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
         }
       });
       
-      // 计算新的对齐方式
-      const newPrimaryAxisAlignItems = targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start';
-      const newCounterAxisAlignItems = targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start';
+      // 🔧 不清理 primaryAxisAlignItems 和 counterAxisAlignItems，因为它们可能包含板式重心动作的设置
+      console.log(`      🔒 保留对齐属性以避免覆盖板式重心动作设置`);
+      console.log(`         保留 primaryAxisAlignItems 和 counterAxisAlignItems`);
+      
+      // 🔧 保留板式重心动作设置的对齐方式
+      // 检查是否已有板式重心动作设置的对齐方式
+      const hasExistingJustifyContent = element.layout.style?.justifyContent || element.layout.classStyle?.justifyContent;
+      const hasExistingAlignItems = element.layout.style?.alignItems || element.layout.classStyle?.alignItems;
+      
+      console.log(`      🔍 检查现有对齐设置:`);
+      console.log(`         justifyContent: ${hasExistingJustifyContent || 'none'}`);
+      console.log(`         alignItems: ${hasExistingAlignItems || 'none'}`);
+      
+      // 🔧 根据布局方向和现有的板式重心动作设置计算新的对齐方式
+      let newPrimaryAxisAlignItems, newCounterAxisAlignItems;
+      
+      if (targetDirection === 'HORIZONTAL') {
+        // 水平布局：主轴对应justifyContent，交叉轴对应alignItems
+        // 如果从 column 变为 row，需要交换对齐设置
+        if (currentDirection && currentDirection.includes('VERTICAL')) {
+          // 从垂直变为水平：alignItems(左右对齐) → justifyContent(左右对齐)
+          newPrimaryAxisAlignItems = hasExistingAlignItems || 'center';
+          newCounterAxisAlignItems = hasExistingJustifyContent || 'center';
+        } else {
+          // 本来就是水平或新建：保持现有设置
+          newPrimaryAxisAlignItems = hasExistingJustifyContent || 'center';
+          newCounterAxisAlignItems = hasExistingAlignItems || 'center';
+        }
+      } else {
+        // 垂直布局：主轴对应alignItems，交叉轴对应justifyContent
+        // 如果从 row 变为 column，需要交换对齐设置
+        if (currentDirection && currentDirection.includes('HORIZONTAL')) {
+          // 从水平变为垂直：justifyContent(左右对齐) → alignItems(左右对齐)
+          newPrimaryAxisAlignItems = hasExistingJustifyContent || 'flex-start';
+          newCounterAxisAlignItems = hasExistingAlignItems || 'flex-start';
+        } else {
+          // 本来就是垂直或新建：保持现有设置
+          newPrimaryAxisAlignItems = hasExistingAlignItems || 'flex-start';
+          newCounterAxisAlignItems = hasExistingJustifyContent || 'flex-start';
+        }
+      }
+      
+      // 🔧 重要：布局调控不应该干预板式重心动作设置
+      // 布局调控只负责方向转换，板式重心动作的对齐设置由板式重心动作本身负责
+      console.log(`      🔄 布局调控策略: 只转换布局方向，保留现有对齐设置`);
+      console.log(`         现有 justifyContent: ${hasExistingJustifyContent || 'none'}`);
+      console.log(`         现有 alignItems: ${hasExistingAlignItems || 'none'}`);
+      console.log(`         策略: 保持现有对齐设置不变，让板式重心动作自己处理`)
+      
+      console.log(`      🎯 计算的新对齐方式: primaryAxis=${newPrimaryAxisAlignItems}, counterAxis=${newCounterAxisAlignItems}`);
       
       // 🔧 同时更新layout.style和layout.classStyle
       if (element.layout.style) {
@@ -4242,20 +4308,24 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
     }
     
     // 🔧 修复：先保存重要的调控设置，然后应用样式配置，最后恢复调控设置
+    // 获取当前设置的对齐方式
+    const currentPrimaryAxisAlignItems = element.layout.style?.primaryAxisAlignItems || element.layout.classStyle?.primaryAxisAlignItems;
+    const currentCounterAxisAlignItems = element.layout.style?.counterAxisAlignItems || element.layout.classStyle?.counterAxisAlignItems;
+    
     const importantSettings = {
       layoutMode: targetDirection,
-      primaryAxisAlignItems: targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start',
-      counterAxisAlignItems: targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start'
+      primaryAxisAlignItems: currentPrimaryAxisAlignItems || (targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start'),
+      counterAxisAlignItems: currentCounterAxisAlignItems || (targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start')
     };
     
     // 🔧 修复：同时更新样式配置到style和classStyle（但不包括会被覆盖的关键设置）
     try {
       const newStyleConfig = getElementStyleConfig('layout', targetVariant);
       if (newStyleConfig) {
-        // 合并新的样式配置，但排除会覆盖调控设置的属性
+        // 合并新的样式配置，但排除会覆盖调控设置和板式重心动作的属性
         Object.entries(newStyleConfig).forEach(([key, value]) => {
           if (value !== undefined && value !== null && 
-              !['layoutMode', 'primaryAxisAlignItems', 'counterAxisAlignItems'].includes(key)) {
+              !['layoutMode', 'primaryAxisAlignItems', 'counterAxisAlignItems', 'justifyContent', 'alignItems'].includes(key)) {
             
             // 🔧 关键修复：同时更新classStyle和style
             if (element.layout.classStyle) {
@@ -4266,13 +4336,15 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
             }
           }
         });
-        console.log(`      📝 应用了 ${targetVariant} 样式配置到 classStyle 和 style (排除布局调控属性)`);
+        console.log(`      📝 应用了 ${targetVariant} 样式配置到 classStyle 和 style (排除布局调控和板式重心动作属性)`);
       }
     } catch (error) {
       console.warn(`⚠️ 获取Layout样式配置失败 (${targetVariant}):`, error);
     }
     
-    // 🔧 关键修复：确保调控设置不被样式配置覆盖
+    // 🔧 关键修复：只确保布局调控设置不被样式配置覆盖
+    // 板式重心动作的设置由板式重心动作本身负责，布局调控不干预
+    
     if (element.layout.style) {
       element.layout.style.layoutMode = importantSettings.layoutMode;
       element.layout.style.primaryAxisAlignItems = importantSettings.primaryAxisAlignItems;
@@ -4286,6 +4358,7 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
     }
     
     console.log(`      🔒 已确保布局调控设置不被覆盖: layoutMode=${importantSettings.layoutMode}`);
+    console.log(`      📝 板式重心动作的 justifyContent 和 alignItems 由板式重心动作本身负责设置`);
     
     // 🔧 最终验证：确认更新是否成功
     console.log(`      🔍 更新后状态验证:`);
