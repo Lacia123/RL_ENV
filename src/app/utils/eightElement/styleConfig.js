@@ -643,7 +643,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontStyle: 'italic',
       padding: "{dimension.padding.loose} {dimension.padding.extraloose}",
       margin: "{dimension.margin.loose} 0",
-      background: "{color.surface.grey1}",
+      backgroundColor: "{color.surface.grey1}",
       borderLeft: `6px solid {color.primary.brand4}`,
       borderRadius: "{dimension.borderradius.medium}",
       boxShadow: "{material.hierarchy.1f}",
@@ -670,8 +670,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "400",
       fontFamily: "'Fira Code', 'Monaco', 'Cascadia Code', monospace",
       lineHeight: "1.5",
-      color: "{color.onsurface.white88}",
-      backgroundColor: "#FFF",
+      backgroundColor: "{color.onsurface.white88}",
       padding: "{dimension.padding.loose} {dimension.padding.extraloose}",
       marginTop: "{dimension.margin.base}",
       marginBottom: "{dimension.margin.base}",
@@ -738,7 +737,8 @@ export const DEFAULT_STYLE_CONFIG = {
       fontSize: "{font.size.large}",
       margin: "{dimension.margin.loose} 0",
       padding: "{dimension.padding.base}",
-      background: "{color.surface.grey1}",
+      backgroundColor: "{color.surface.grey1}",
+      // background: "{color.surface.grey1}",
       borderRadius: "{dimension.borderradius.medium}",
       borderLeft: `{dimension.borderwidth.wide} solid {color.basic.brand.4}`,
       boxShadow: "{material.hierarchy.main}",
@@ -750,7 +750,7 @@ export const DEFAULT_STYLE_CONFIG = {
     container: {
       margin: "{dimension.margin.loose} 0",
       padding: "{dimension.padding.extraloose}",
-      background: "{color.surfacecontainer.white100}",
+      backgroundColor: "{color.surfacecontainer.white100}",
       borderRadius: "{dimension.borderradius.xl}",
       boxShadow: "{material.hierarchy.2f}",
       borderWidth: "{dimension.borderwidth.narrow}",
@@ -761,7 +761,8 @@ export const DEFAULT_STYLE_CONFIG = {
     title: {
       fontSize: "{font.size.large}",
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onsurface.black88}",
+      color: "{color.surfacecontainer.white100}",
+      // color: "{color.onsurface.black88}",
       marginBottom: "{dimension.margin.base}",
       textAlign: 'center'
     },
@@ -769,7 +770,7 @@ export const DEFAULT_STYLE_CONFIG = {
     legend: {
       fontSize: "{font.size.small}",
       fontWeight: "400",
-      color: "{color.onsurface.black64}",
+      fill: "{color.onsurface.black88}",
       display: 'flex',
       justifyContent: 'center',
       gap: "{dimension.gap.loose}",
@@ -779,7 +780,7 @@ export const DEFAULT_STYLE_CONFIG = {
     axis: {
       fontSize: "{font.size.tiny}",
       fontWeight: "400",
-      color: "{color.onsurface.black48}"
+      fill: "{color.onsurface.black88}",
     },
   },
   // 表格元素配置

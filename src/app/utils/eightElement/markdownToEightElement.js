@@ -13,6 +13,8 @@ import { Marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
 import markedKatex from 'marked-katex-extension';
+// 导入token解析和颜色判断功能
+import resolveToken, { isColorDark } from '../tokens/resolveToken.js';
 
 // 配置Marked实例，支持KaTeX和代码高亮
 const katexOptions = {
@@ -1744,11 +1746,23 @@ function processTableOrChartData(result, stack) {
     // 处理为图表
     try {
       console.log(`处理图表数据，类型: ${chartType}`);
-      // 生成SVG图表
-      const svgContent = generateChartSvg(chartType, tableData);
-
-      // 创建图表元素
-      const chartElement = createChartElement(chartType, svgContent, tableData, tableContent);
+      
+      // 先创建图表元素（包含样式配置）
+      const chartElement = createChartElement(chartType, '', tableData, tableContent);
+      
+      // 提取样式配置
+      const chartStyleConfig = {
+        title: chartElement.layout.title,
+        legend: chartElement.layout.legend,
+        axis: chartElement.layout.axis
+      };
+      
+      // 生成SVG图表，传入样式配置
+      const svgContent = generateChartSvg(chartType, tableData, chartStyleConfig);
+      
+      // 更新图表元素的SVG内容
+      chartElement.svgContent = svgContent;
+      
       stack[stack.length - 1].elements.push(chartElement);
     } catch (error) {
       console.error('生成图表时出错:', error);
@@ -1883,6 +1897,23 @@ function createCodeElement(codeContent, language = '') {
 
   console.log('创建代码元素，语言:', language);
 
+  // 判断是否为深色主题
+  let isDarkMode = false;
+  let backgroundColor = null;
+  
+  // 检查 codeStyleConfig 中是否有 background 或 backgroundColor 设置
+  if (codeStyleConfig.background) {
+    backgroundColor = resolveToken(codeStyleConfig.background);
+  } else if (codeStyleConfig.backgroundColor) {
+    backgroundColor = resolveToken(codeStyleConfig.backgroundColor);
+  }
+  
+  // 如果有背景色，判断是否为深色主题
+  if (backgroundColor) {
+    isDarkMode = isColorDark(backgroundColor);
+    console.log('代码背景色:', backgroundColor, '是否为深色主题:', isDarkMode);
+  }
+
   // 使用markedInstance处理代码高亮
   let highlightedCode = codeContent;
   try {
@@ -1892,6 +1923,27 @@ function createCodeElement(codeContent, language = '') {
     console.error('代码高亮处理错误:', error);
     // 出错时转义原始代码内容
     highlightedCode = `<pre><code>${escapeHtml(codeContent)}</code></pre>`;
+  }
+
+  // 如果有背景色，将其注入到highlightedCode的code标签中
+  if (backgroundColor) {
+    // 使用正则表达式找到code标签并添加背景色样式
+    highlightedCode = highlightedCode.replace(
+      /<code([^>]*)>/g,
+      (match, attributes) => {
+        // 检查是否已经有style属性
+        if (attributes.includes('style=')) {
+          // 如果已有style属性，在现有style中添加背景色
+          return match.replace(
+            /style="([^"]*)"/g,
+            `style="$1; background-color: inherit;"`
+          );
+        } else {
+          // 如果没有style属性，添加新的style属性
+          return `<code${attributes} style="background-color: inherit;">`;
+        }
+      }
+    );
   }
 
   // 生成唯一的className
@@ -1911,6 +1963,7 @@ function createCodeElement(codeContent, language = '') {
       language: language || 'plaintext',
       isCodeBlock: true
     },
+    isDarkMode: isDarkMode, // 新增字段：是否为深色主题
     rawData: codeContent,       // 保存原始代码内容
     highlightedCode: highlightedCode, // 保存高亮后的HTML
     language: language || 'plaintext', // 保存代码语言
@@ -1995,12 +2048,12 @@ function extractMarkdownCodeBlock(lines, startIndex) {
 }
 
 // 使用D3生成SVG图表
-function generateChartSvg(chartType, data) {
+function generateChartSvg(chartType, data, chartStyleConfig = null) {
   console.log('开始生成图表SVG，类型:', chartType);
 
   try {
-    // 使用chartGenerator提供的功能生成SVG
-    return generateChartFromTableData(data, chartType);
+    // 使用chartGenerator提供的功能生成SVG，传入样式配置
+    return generateChartFromTableData(data, chartType, chartStyleConfig);
   } catch (error) {
     console.error('生成图表SVG时出错:', error);
     // 返回错误信息的SVG
@@ -2016,12 +2069,18 @@ function generateChartSvg(chartType, data) {
 function createChartElement(chartType, svgContent, tableData, rawData) {
   const id = generateUUID();
   const layoutStyleConfig = getElementStyleConfig('layout', 'column');
-  const chartStyleConfig = getElementStyleConfig('chart', 'container');
+  const chartContainerStyleConfig = getElementStyleConfig('chart', 'container');
+  const chartTitleStyleConfig = getElementStyleConfig('chart', 'title');
+  const chartLegendStyleConfig = getElementStyleConfig('chart', 'legend');
+  const chartAxisStyleConfig = getElementStyleConfig('chart', 'axis');
 
   console.log('创建图表元素，类型:', chartType);
 
   // 生成唯一的className
   const uniqueClassName = `chart-${id}`;
+  const uniqueTitleClassName = `chart-title-${id}`;
+  const uniqueLegendClassName = `chart-legend-${id}`;
+  const uniqueAxisClassName = `chart-axis-${id}`;
 
   // 创建符合要求的图表元素结构
   const chartElement = {
@@ -2041,8 +2100,9 @@ function createChartElement(chartType, svgContent, tableData, rawData) {
     tableData: tableData, // 保存解析后的表格数据
     rawData: rawData,     // 保存原始Markdown表格内容
     layout: {
+      // 图表容器样式
       classStyle: {
-        ...chartStyleConfig
+        ...chartContainerStyleConfig
       },
       className: uniqueClassName,
       style: {
@@ -2059,6 +2119,30 @@ function createChartElement(chartType, svgContent, tableData, rawData) {
         width: "100%",
         height: "auto",
         ...layoutStyleConfig
+      },
+      // 图表子元素样式配置
+      chart: {
+        style: {
+          ...chartContainerStyleConfig
+        }
+      },
+      title: {
+        className: uniqueTitleClassName,
+        classStyle: {
+          ...chartTitleStyleConfig
+        }
+      },
+      legend: {
+        className: uniqueLegendClassName,
+        classStyle: {
+          ...chartLegendStyleConfig
+        }
+      },
+      axis: {
+        className: uniqueAxisClassName,
+        classStyle: {
+          ...chartAxisStyleConfig
+        }
       }
     },
     events: [{}]
@@ -2070,7 +2154,8 @@ function createChartElement(chartType, svgContent, tableData, rawData) {
     type: chartElement.type,
     chartType: chartElement.chartType,
     hasTableData: !!(tableData && tableData.length),
-    dataRows: tableData ? tableData.length : 0
+    dataRows: tableData ? tableData.length : 0,
+    hasSubElements: !!(chartElement.layout.title && chartElement.layout.legend && chartElement.layout.axis)
   }, null, 2));
 
   return chartElement;
@@ -3424,6 +3509,40 @@ export function analyzeElementsInEightElement(eightElement) {
       });
     }
     
+    // 🔧 新增：图表元素的特殊处理 - 将子元素也识别为独立的页面元件
+    if (elementType === 'chart' && variant === 'container') {
+      console.log(`🔍 图表元素特殊处理: 识别子元素为独立页面元件`);
+      
+      // 检查图表子元素配置是否存在
+      const subElementTypes = ['title', 'legend', 'axis'];
+      subElementTypes.forEach(subType => {
+        if (element.layout && element.layout[subType]) {
+          const subKey = `chart.${subType}`;
+          
+          if (!elementMap.has(subKey)) {
+            elementMap.set(subKey, {
+              type: 'chart',
+              variant: subType,
+              count: 0,
+              elements: [],
+              sampleContent: `图表${subType}`
+            });
+          }
+          
+          const subElementInfo = elementMap.get(subKey);
+          subElementInfo.count++;
+          subElementInfo.elements.push({
+            id: `${element.id}-${subType}`, // 创建虚拟ID
+            element: element, // 指向父图表元素
+            path: `${path}.${subType}`,
+            subElementType: subType // 标记这是子元素
+          });
+          
+          console.log(`   ✅ 识别到 chart.${subType} 子元件`);
+        }
+      });
+    }
+    
     // 设置示例内容
     if (!elementInfo.sampleContent) {
       if (sampleContent) {
@@ -3821,14 +3940,97 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
               if (!element.layout[subType].style) element.layout[subType].style = {};
             }
             
+            // 🔧 转换扁平格式为嵌套格式的函数
+            const convertFlatToNested = (flatStyles) => {
+              const nestedStyles = {};
+              
+              Object.entries(flatStyles).forEach(([property, value]) => {
+                // 检查是否是伪类嵌套属性（如 &:hover.backgroundColor）
+                if (property.includes('&:') && property.includes('.')) {
+                  const [pseudoClass, nestedProperty] = property.split('.');
+                  
+                  // 创建嵌套结构
+                  if (!nestedStyles[pseudoClass]) {
+                    nestedStyles[pseudoClass] = {};
+                  }
+                  nestedStyles[pseudoClass][nestedProperty] = value;
+                  
+                  console.log(`   🔄 转换嵌套属性: ${property} → ${pseudoClass}.${nestedProperty} = ${value}`);
+                } else {
+                  // 普通属性直接复制
+                  nestedStyles[property] = value;
+                }
+              });
+              
+              return nestedStyles;
+            };
+            
+            // 应用样式到对应的子元素配置
+            if (subType === 'tr') {
+              // 🔧 对 tr 使用嵌套格式转换
+              const nestedStyles = convertFlatToNested(cssProperties);
+              element.layout[subType].classStyle = nestedStyles;
+              
+              // 记录转换后的样式
+              Object.entries(nestedStyles).forEach(([property, value]) => {
+                if (typeof value === 'object') {
+                  // 嵌套对象
+                  Object.entries(value).forEach(([nestedProp, nestedValue]) => {
+                    console.log(`   ✅ ${property}.${nestedProp} = ${nestedValue} 已应用到 table.${subType}`);
+                  });
+                } else {
+                  // 普通属性
+                  console.log(`   ✅ ${property} = ${value} 已应用到 table.${subType}`);
+                }
+              });
+            } else {
+              // 其他子元素使用原有逻辑
+              Object.entries(cssProperties).forEach(([property, value]) => {
+                element.layout[subType].style[property] = value;
+                console.log(`   ✅ ${property} = ${value} 已应用到 table.${subType}`);
+              });
+            }
+          };
+          
+          applySubElementStyles(subType, subStyleUpdates);
+        }
+      });
+    }
+    
+    // 🔧 新增：图表子元素的特殊处理 - 直接应用到图表子元素
+    if (elementType === 'chart' && variant === 'container') {
+      console.log(`🔍 图表子元素动作应用检查`);
+      
+      const subElementTypes = ['title', 'legend', 'axis'];
+      subElementTypes.forEach(subType => {
+        const subUpdateKey = `chart.${subType}`;
+        const subStyleUpdates = elementStyleUpdates.get(subUpdateKey);
+        
+        if (subStyleUpdates && element.layout && element.layout[subType]) {
+          console.log(`🎯 为 chart.${subType} 应用独立动作`);
+          
+          // 创建一个特殊的应用函数，直接应用到子元素配置
+          const applySubElementStyles = (subType, updates) => {
+            // 过滤CSS属性
+            const cssProperties = {};
+            Object.entries(updates).forEach(([property, value]) => {
+              if (!property.startsWith('_') && 
+                  !['elementType', 'variant', 'configFound'].includes(property) &&
+                  value !== undefined && value !== null) {
+                cssProperties[property] = value;
+              }
+            });
+            
+            console.log(`📋 chart.${subType} 收到动作结果:`, Object.keys(cssProperties));
+            
+            // 确保子元素结构存在
+            if (!element.layout[subType]) element.layout[subType] = {};
+            if (!element.layout[subType].classStyle) element.layout[subType].classStyle = {};
+            
             // 应用样式到对应的子元素配置
             Object.entries(cssProperties).forEach(([property, value]) => {
-              if (subType === 'tr') {
-                element.layout[subType].classStyle[property] = value;
-              } else {
-                element.layout[subType].style[property] = value;
-              }
-              console.log(`   ✅ ${property} = ${value} 已应用到 table.${subType}`);
+              element.layout[subType].classStyle[property] = value;
+              console.log(`   ✅ ${property} = ${value} 已应用到 chart.${subType}`);
             });
           };
           

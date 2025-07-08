@@ -481,7 +481,7 @@ function parseColor(color) {
   
   const colorStr = color.trim().toLowerCase();
   
-  // 处理十六进制格式 #rgb 或 #rrggbb
+  // 处理十六进制格式 #rgb、#rrggbb 或 #rrggbbaa
   if (colorStr.startsWith('#')) {
     const hex = colorStr.slice(1);
     if (hex.length === 3) {
@@ -491,6 +491,13 @@ function parseColor(color) {
       const b = parseInt(hex[2] + hex[2], 16);
       return [r, g, b];
     } else if (hex.length === 6) {
+      // #rrggbb
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return [r, g, b];
+    } else if (hex.length === 8) {
+      // #rrggbbaa - 忽略透明度，只取RGB部分
       const r = parseInt(hex.slice(0, 2), 16);
       const g = parseInt(hex.slice(2, 4), 16);
       const b = parseInt(hex.slice(4, 6), 16);

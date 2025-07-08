@@ -48,6 +48,12 @@ export function renderEightElementToHtml(eightElement, options = {}) {
     // 生成CSS样式表
     const cssStyles = generateCSSFromClassStyles(classStyles);
 
+    // 检查是否有代码元素，并确定主题
+    const hasCodeElement = checkForCodeElement(processedEightElement);
+    const highlightTheme = hasCodeElement.isDarkMode ? 
+        'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css' :
+        'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css';
+
     // 创建HTML文档头部
     const htmlHeader = `
     <!DOCTYPE html>
@@ -57,7 +63,8 @@ export function renderEightElementToHtml(eightElement, options = {}) {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Eight Element Renderer</title>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css" crossorigin="anonymous"></link>
+      <link rel="stylesheet" href="${highlightTheme}" crossorigin="anonymous"></link>
+      
       <style>
         body {
           margin: 0;
@@ -111,6 +118,41 @@ export function renderEightElementToHtml(eightElement, options = {}) {
 }
 
 /**
+ * 检查八要素结构中是否有代码元素，并确定主题
+ * @param {Object} element - 八要素元素
+ * @returns {Object} - 包含是否有代码元素和主题信息的对象
+ */
+function checkForCodeElement(element) {
+    if (!element) return { hasCode: false, isDarkMode: false };
+
+    let hasCode = false;
+    let isDarkMode = false;
+
+    // 递归检查所有代码元素
+    const checkElement = (el) => {
+        if (!el) return;
+
+        // 检查当前元素是否为代码元素
+        if (el.name === 'code' || el.type === 'code') {
+            hasCode = true;
+            // 如果任何一个代码元素是深色主题，就使用深色主题
+            if (el.isDarkMode === true) {
+                isDarkMode = true;
+            }
+        }
+
+        // 递归检查子元素
+        if (el.layout && el.layout.children && Array.isArray(el.layout.children)) {
+            el.layout.children.forEach(checkElement);
+        }
+    };
+
+    checkElement(element);
+
+    return { hasCode, isDarkMode };
+}
+
+/**
  * 收集所有元素的classStyle
  * @param {Object} element - 八要素元素
  * @param {Object} classStyles - 收集的类样式对象
@@ -144,6 +186,29 @@ function collectClassStyles(element, classStyles = {}) {
         // 收集td的classStyle
         if (element.layout.td && element.layout.td.className && element.layout.td.classStyle) {
             classStyles[element.layout.td.className] = element.layout.td.classStyle;
+        }
+    }
+    
+    // 特殊处理图表元素的classStyle（新结构：chart、title、legend、axis在layout下）
+    if (element.name === 'chart' && element.layout) {
+        // 收集chart的classStyle
+        if (element.layout.chart && element.layout.chart.className && element.layout.chart.classStyle) {
+            classStyles[element.layout.chart.className] = element.layout.chart.classStyle;
+        }
+        
+        // 收集title的classStyle
+        if (element.layout.title && element.layout.title.className && element.layout.title.classStyle) {
+            classStyles[element.layout.title.className] = element.layout.title.classStyle;
+        }
+        
+        // 收集legend的classStyle
+        if (element.layout.legend && element.layout.legend.className && element.layout.legend.classStyle) {
+            classStyles[element.layout.legend.className] = element.layout.legend.classStyle;
+        }
+        
+        // 收集axis的classStyle
+        if (element.layout.axis && element.layout.axis.className && element.layout.axis.classStyle) {
+            classStyles[element.layout.axis.className] = element.layout.axis.classStyle;
         }
     }
 
@@ -711,9 +776,61 @@ function processChartElement(processedElement, originalElement) {
     processedElement.tableData = originalElement.tableData || []; // 保存表格数据
     processedElement.rawData = originalElement.rawData || ''; // 保存原始数据
 
-    // 处理样式引用
+    // 确保layout存在
+    if (!processedElement.layout) {
+        processedElement.layout = {};
+    }
+
+    // 确保图表子元素样式对象存在
+    if (!processedElement.layout.title) processedElement.layout.title = {};
+    if (!processedElement.layout.legend) processedElement.layout.legend = {};
+    if (!processedElement.layout.axis) processedElement.layout.axis = {};
+
+    // 处理图表容器样式引用（只处理layout.style，不处理子元素的classStyle）
     if (originalElement.layout && originalElement.layout.style) {
         processStyleReferences(processedElement, originalElement, originalElement.layout.style);
+    }
+
+    // 处理图表子元素样式 - 保持classStyle格式，不转换为内联样式
+    if (originalElement.layout) {
+        // 处理title样式
+        if (originalElement.layout.title) {
+            const titleConfig = originalElement.layout.title;
+            
+            // 保存className和classStyle信息
+            if (titleConfig.className) {
+                processedElement.layout.title.className = titleConfig.className;
+            }
+            if (titleConfig.classStyle) {
+                processedElement.layout.title.classStyle = titleConfig.classStyle;
+            }
+        }
+
+        // 处理legend样式
+        if (originalElement.layout.legend) {
+            const legendConfig = originalElement.layout.legend;
+            
+            // 保存className和classStyle信息
+            if (legendConfig.className) {
+                processedElement.layout.legend.className = legendConfig.className;
+            }
+            if (legendConfig.classStyle) {
+                processedElement.layout.legend.classStyle = legendConfig.classStyle;
+            }
+        }
+
+        // 处理axis样式
+        if (originalElement.layout.axis) {
+            const axisConfig = originalElement.layout.axis;
+            
+            // 保存className和classStyle信息
+            if (axisConfig.className) {
+                processedElement.layout.axis.className = axisConfig.className;
+            }
+            if (axisConfig.classStyle) {
+                processedElement.layout.axis.classStyle = axisConfig.classStyle;
+            }
+        }
     }
 }
 
@@ -1116,6 +1233,49 @@ function renderTableElement(element) {
 }
 
 /**
+ * 生成内联样式字符串
+ * @param {Object} styleObj - 样式对象
+ * @returns {string} - 内联样式字符串
+ */
+function generateInlineStyle(styleObj) {
+    if (!styleObj || Object.keys(styleObj).length === 0) return '';
+
+    return Object.entries(styleObj)
+        .filter(([key, value]) => {
+            // 过滤掉className和classStyle，这些不是CSS样式属性
+            if (key === 'className' || key === 'classStyle') {
+                return false;
+            }
+            
+            // 过滤掉对象类型的值，只保留基本类型（字符串、数字、布尔值）
+            if (value === null || value === undefined) {
+                return false;
+            }
+            
+            if (typeof value === 'object') {
+                console.warn(`跳过对象类型的样式值: ${key}:`, value);
+                return false;
+            }
+            
+            return true;
+        })
+        .map(([key, value]) => {
+            // 转换驼峰式为连字符式
+            const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+            
+            // 如果值是数字但不是特定属性，添加px
+            let cssValue = value;
+            if (typeof value === 'number' &&
+                !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
+                cssValue = `${value}px`;
+            }
+            
+            return `${cssKey}: ${cssValue}`;
+        })
+        .join('; ');
+}
+
+/**
  * 为表格应用样式
  * @param {string} tableHtml - 原始表格HTML
  * @param {Object} tableStyleConfig - 表格样式配置
@@ -1130,45 +1290,6 @@ function applyTableStyles(tableHtml, tableStyleConfig, thStyleConfig, trStyleCon
     const ensureStyleEndsWithSemicolon = (style) => {
         if (!style) return '';
         return style.endsWith(';') ? style : `${style};`;
-    };
-
-    // 生成内联样式字符串
-    const generateInlineStyle = (styleObj) => {
-        if (!styleObj || Object.keys(styleObj).length === 0) return '';
-
-        return Object.entries(styleObj)
-            .filter(([key, value]) => {
-                // 过滤掉className和classStyle，这些不是CSS样式属性
-                if (key === 'className' || key === 'classStyle') {
-                    return false;
-                }
-                
-                // 过滤掉对象类型的值，只保留基本类型（字符串、数字、布尔值）
-                if (value === null || value === undefined) {
-                    return false;
-                }
-                
-                if (typeof value === 'object') {
-                    console.warn(`跳过对象类型的样式值: ${key}:`, value);
-                    return false;
-                }
-                
-                return true;
-            })
-            .map(([key, value]) => {
-                // 转换驼峰式为连字符式
-                const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
-                
-                // 如果值是数字但不是特定属性，添加px
-                let cssValue = value;
-                if (typeof value === 'number' &&
-                    !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
-                    cssValue = `${value}px`;
-                }
-                
-                return `${cssKey}: ${cssValue}`;
-            })
-            .join('; ');
     };
 
     // 获取各元素的样式字符串和className
@@ -1310,9 +1431,12 @@ function renderChartElement(element) {
         const className = element.layout && element.layout.className ? element.layout.className : '';
         const classAttr = className ? `class="${className}"` : '';
 
+        // 应用图表子元素样式到SVG内容
+        const styledSvgContent = applyChartStyles(svgContent, element);
+
         return `
       <div id="${element.id || ''}" ${classAttr} data-element-type="chart" data-chart-type="${element.chartType || ''}" ${containerStyleAttr}>
-        ${svgContent}
+        ${styledSvgContent}
       </div>
     `;
     } catch (error) {
@@ -1324,6 +1448,71 @@ function renderChartElement(element) {
       </div>
     `;
     }
+}
+
+/**
+ * 应用图表子元素样式到SVG内容
+ * @param {string} svgContent - 原始SVG内容
+ * @param {Object} element - 图表元素
+ * @returns {string} - 应用样式后的SVG内容
+ */
+function applyChartStyles(svgContent, element) {
+    if (!element.layout) return svgContent;
+
+    let styledSvg = svgContent;
+
+    // 应用标题样式
+    if (element.layout.title && element.layout.title.className && element.layout.title.classStyle) {
+        const titleClassName = element.layout.title.className;
+        const titleStyle = element.layout.title.classStyle;
+        const titleStyleStr = generateInlineStyle(titleStyle);
+        
+        if (titleStyleStr) {
+            // 为SVG中的标题元素添加样式
+            styledSvg = styledSvg.replace(
+                /<text[^>]*class="[^"]*title[^"]*"[^>]*>/g,
+                `<text class="${titleClassName}" style="${titleStyleStr}">`
+            );
+        }
+    }
+
+    // 应用图例样式
+    if (element.layout.legend && element.layout.legend.className && element.layout.legend.classStyle) {
+        const legendClassName = element.layout.legend.className;
+        const legendStyle = element.layout.legend.classStyle;
+        const legendStyleStr = generateInlineStyle(legendStyle);
+        
+        if (legendStyleStr) {
+            // 为SVG中的图例元素添加样式
+            styledSvg = styledSvg.replace(
+                /<text[^>]*class="[^"]*legend-label[^"]*"[^>]*>/g,
+                `<text class="${legendClassName}" style="${legendStyleStr}">`
+            );
+        }
+    }
+
+    // 应用坐标轴样式
+    if (element.layout.axis && element.layout.axis.className && element.layout.axis.classStyle) {
+        const axisClassName = element.layout.axis.className;
+        const axisStyle = element.layout.axis.classStyle;
+        const axisStyleStr = generateInlineStyle(axisStyle);
+        
+        if (axisStyleStr) {
+            // 为SVG中的坐标轴标签添加样式
+            styledSvg = styledSvg.replace(
+                /<text[^>]*class="[^"]*axis-label[^"]*"[^>]*>/g,
+                `<text class="${axisClassName}" style="${axisStyleStr}">`
+            );
+            
+            // 为SVG中的坐标轴标题添加样式
+            styledSvg = styledSvg.replace(
+                /<text[^>]*class="[^"]*axis-title[^"]*"[^>]*>/g,
+                `<text class="${axisClassName}" style="${axisStyleStr}">`
+            );
+        }
+    }
+
+    return styledSvg;
 }
 
 /**

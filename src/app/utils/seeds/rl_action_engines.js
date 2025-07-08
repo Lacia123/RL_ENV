@@ -380,10 +380,6 @@ export function calculateLevelChange(baseValue, delta, levels, tokenType, defaul
     ? Math.min(levels.length - 1, baseIndex + offset)
     : Math.max(0, baseIndex - offset);
 
-  console.log(`       强度: ${delta}, 偏移量: ${offset}, 方向: ${isIncrease ? '增加' : '减少'}`);
-  console.log(`       新索引: ${baseIndex} → ${newIndex}`);
-  console.log(`       新级别: "${levels[newIndex]}"`);
-
   return levels[newIndex];
 }
 
@@ -533,7 +529,7 @@ export const RL_ACTIONS = {
     },
     // 品牌色占比
     styleMapping: {
-      color: (current, intensity, elementType, variant) => { 
+      color: (current, intensity, elementType, variant) => {
         console.log(`🎯 品牌色占比调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
@@ -549,10 +545,10 @@ export const RL_ACTIONS = {
           }
 
           // 对于其他文字元素，需要基于背景色智能选择onSurface颜色
-          
+
           // 1. 首先确定当前的背景色
           let backgroundColor = DESIGN_TOKEN_MAPPING.color.surface.grey1; // 默认背景
-          
+
           // 根据元素类型和强度推断背景色
           if (intensity <= 0.2) {
             backgroundColor = DESIGN_TOKEN_MAPPING.color.surface.grey1;
@@ -589,8 +585,6 @@ export const RL_ACTIONS = {
           // 2. 使用智能颜色选择函数，确保透明度最小76%
           const adjustedIntensity = Math.max(intensity, 0.6); // 确保至少76%不透明
           const smartTextColor = getContrastTextColor(backgroundColor, adjustedIntensity);
-          
-
 
           return smartTextColor;
         } catch (error) {
@@ -598,18 +592,79 @@ export const RL_ACTIONS = {
           return DESIGN_TOKEN_MAPPING.color.onSurface.black88; // 安全回退
         }
       },
+      fill: (current, intensity, elementType, variant) => {
+        console.log(`🎯 品牌色占比调控(fill): 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
+
+        try {
+          // 图表子元素的fill字段特殊处理
+          if ((elementType === 'chart' && (variant === 'legend' || variant === 'axis')) || 
+              (elementType === 'chart' && variant === 'title')) {
+            
+            // 1. 首先确定当前的背景色（图表背景）
+            let backgroundColor = DESIGN_TOKEN_MAPPING.color.surface.grey1; // 默认图表背景
+
+            // 根据强度推断图表背景色
+            if (intensity <= 0.2) {
+              backgroundColor = DESIGN_TOKEN_MAPPING.color.surface.grey1;
+            } else if (intensity <= 0.4) {
+              backgroundColor = DESIGN_TOKEN_MAPPING.color.primaryContainer.brand1;
+            } else if (intensity <= 0.6) {
+              backgroundColor = DESIGN_TOKEN_MAPPING.color.primaryContainer.brand2;
+            } else if (intensity <= 0.8) {
+              backgroundColor = DESIGN_TOKEN_MAPPING.color.primary.brand3;
+            } else {
+              backgroundColor = DESIGN_TOKEN_MAPPING.color.primary.brand4;
+            }
+
+            // 2. 使用智能颜色选择函数，确保透明度最小76%
+            const adjustedIntensity = Math.max(intensity, 0.6); // 确保至少76%不透明
+            const smartFillColor = getContrastTextColor(backgroundColor, adjustedIntensity);
+
+            return smartFillColor;
+          }
+
+          // 对于其他元素的fill字段，使用默认的颜色逻辑
+          return current;
+        } catch (error) {
+          console.error('❌ 品牌色fill颜色映射错误:', error.message, '强度:', intensity);
+          return DESIGN_TOKEN_MAPPING.color.onSurface.black88; // 安全回退
+        }
+      },
+      '&:hover.backgroundColor': (current, intensity, elementType, variant) => {
+        console.log(`🎯 品牌色 hover 背景调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
+
+        try {
+          // 🔧 专门处理表格行的 hover 效果 - 使用更明显的对比色
+          if (elementType === 'table' && variant === 'tr') {     
+            if (intensity <= 0.2) {
+              return DESIGN_TOKEN_MAPPING.color.surface.grey1; // 轻微高亮，比容器背景稍深
+            } else if (intensity <= 0.4) {
+              return DESIGN_TOKEN_MAPPING.color.primary.brand1; // 淡品牌色，比容器更明显
+            } else if (intensity <= 0.6) {
+              return DESIGN_TOKEN_MAPPING.color.primary.brand2; // 中等品牌色，明显对比
+            } else if (intensity <= 0.8) {
+              return DESIGN_TOKEN_MAPPING.color.primary.brand3; // 较强品牌色，强烈对比
+            } else {
+              return DESIGN_TOKEN_MAPPING.color.primary.brand4; // 最强品牌色，最大对比
+            }
+          }
+        } catch (error) {
+          console.error('❌ 品牌色背景颜色映射错误:', error.message, '强度:', intensity);
+          return current;
+        }
+      },
       backgroundColor: (current, intensity, elementType, variant) => {
         console.log(`🎯 品牌色背景调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
-        
+
         try {
           // 创建分层背景色系统：layout > container/table > surface
-          
+
           if (intensity <= 0.2) {
             // 0.0-0.2: 中性背景色系
             if (elementType === 'layout' && variant === 'root') {
-              return DESIGN_TOKEN_MAPPING.color.surface.grey1; // 主背景层
-            } else if (elementType === 'container' || elementType === 'table') {
-              return DESIGN_TOKEN_MAPPING.color.surface.grey0; // 容器层比主背景浅一级
+              return DESIGN_TOKEN_MAPPING.color.surface.grey0; // 主背景层
+            } else if (elementType === 'container' || elementType === 'table' || elementType === 'math' || elementType === 'chart' || (elementType === 'text' && variant === 'codeBlock') || (elementType === 'text' && variant === 'quote') ) {
+              return DESIGN_TOKEN_MAPPING.color.surface.grey1; // 容器层比主背景浅一级
             } else {
               return current; // 保持原有背景
             }
@@ -617,7 +672,7 @@ export const RL_ACTIONS = {
             // 0.2-0.4: 轻微品牌色背景
             if (elementType === 'layout' && variant === 'root') {
               return DESIGN_TOKEN_MAPPING.color.primaryContainer.brand1; // 主背景层
-            } else if (elementType === 'container' || elementType === 'table') {
+            } else if (elementType === 'container' || elementType === 'table' || elementType === 'chart' || elementType === 'math' || (elementType === 'text' && variant === 'codeBlock') || (elementType === 'text' && variant === 'quote')) {
               return DESIGN_TOKEN_MAPPING.color.primaryContainer.brand0; // 容器层浅一级
             } else if (elementType === 'button') {
               return DESIGN_TOKEN_MAPPING.color.primaryContainer.brand1; // 按钮与主背景同级
@@ -628,7 +683,7 @@ export const RL_ACTIONS = {
             // 0.4-0.6: 中等品牌色背景
             if (elementType === 'layout' && variant === 'root') {
               return DESIGN_TOKEN_MAPPING.color.primaryContainer.brand2; // 主背景层
-            } else if (elementType === 'container' || elementType === 'table') {
+            } else if (elementType === 'container' || elementType === 'table' || elementType === 'chart' || elementType === 'math' || (elementType === 'text' && variant === 'codeBlock') || (elementType === 'text' && variant === 'quote')) {
               return DESIGN_TOKEN_MAPPING.color.primaryContainer.brand1; // 容器层浅一级
             } else if (elementType === 'button') {
               return DESIGN_TOKEN_MAPPING.color.primary.brand3; // 按钮开始使用更明显的品牌色
@@ -639,7 +694,7 @@ export const RL_ACTIONS = {
             // 0.6-0.8: 增强品牌色背景
             if (elementType === 'layout' && variant === 'root') {
               return DESIGN_TOKEN_MAPPING.color.primary.brand3; // 主背景层开始使用主要品牌色
-            } else if (elementType === 'container' || elementType === 'table') {
+            } else if (elementType === 'container' || elementType === 'table' || elementType === 'chart' || elementType === 'math' || (elementType === 'text' && variant === 'codeBlock') || (elementType === 'text' && variant === 'quote')) {
               return DESIGN_TOKEN_MAPPING.color.primaryContainer.brand2; // 容器层使用容器品牌色
             } else if (elementType === 'button') {
               return DESIGN_TOKEN_MAPPING.color.primary.brand4; // 按钮使用更深的品牌色
@@ -650,7 +705,7 @@ export const RL_ACTIONS = {
             // 0.8-1.0: 最大品牌色背景
             if (elementType === 'layout' && variant === 'root') {
               return DESIGN_TOKEN_MAPPING.color.primary.brand4; // 主背景层使用深品牌色
-            } else if (elementType === 'container' || elementType === 'table') {
+            } else if (elementType === 'container' || elementType === 'table' || elementType === 'chart' || elementType === 'math' || (elementType === 'text' && variant === 'codeBlock')  || (elementType === 'text' && variant === 'quote')) {
               return DESIGN_TOKEN_MAPPING.color.primary.brand3; // 容器层比主背景浅一级
             } else if (elementType === 'button') {
               return DESIGN_TOKEN_MAPPING.color.primary.brand5; // 按钮使用最深的品牌色
@@ -1561,98 +1616,92 @@ export const RL_ACTIONS = {
 
   // ==================== 高级动画动作 (Animation Actions) ====================
 
-  // 28. 增加微动效 TODO：增加微动效和移除动画效果可以合并成一个
-  // addMicroInteractions: {
-  //   category: 'animation',
-  //   name: '增加微动效',
-  //   intensity: 'subtle',
-  //   effects: {
-  //     transition: 'smooth',
-  //     hoverEffects: 'enhance',
-  //     microAnimations: 'enable'
-  //   },
-  //   styleMapping: {
-  //     transition: (current, delta) => {
-  //       if (delta > 0.7) return 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-  //       if (delta > 0.4) return 'all 0.2s ease';
-  //       return 'all 0.1s ease';
-  //     },
-  //     '&:hover': {
-  //       transform: (current, delta) => {
-  //         if (delta > 0.6) return 'translateY(-2px) scale(1.02)';
-  //         if (delta > 0.3) return 'translateY(-1px)';
-  //         return 'none';
-  //       },
-  //       boxShadow: (current, delta) => {
-  //         if (delta > 0.5) return DESIGN_TOKEN_MAPPING.material.hierarchy['2f'];
-  //         return DESIGN_TOKEN_MAPPING.material.hierarchy.main;
-  //       }
-  //     }
-  //   },
-  //   conflicts: ['removeAnimations']
-  // },
+  // 28. 增加微动效 - 现在支持嵌套属性
+  addMicroInteractions: {
+    category: 'animation',
+    name: '增加微动效',
+    intensity: 'subtle',
+    effects: {
+      transition: 'smooth',
+      hoverEffects: 'enhance',
+      microAnimations: 'enable'
+    },
+    styleMapping: {
+      transition: (current, delta) => {
+        if (delta > 0.7) return 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        if (delta > 0.4) return 'all 0.2s ease';
+        return 'all 0.1s ease';
+      },
+      '&:hover.transform': (current, delta) => {
+        if (delta > 0.6) return 'translateY(-2px) scale(1.02)';
+        if (delta > 0.3) return 'translateY(-1px)';
+        return 'none';
+      },
+      '&:hover.boxShadow': (current, delta) => {
+        if (delta > 0.5) return DESIGN_TOKEN_MAPPING.material.hierarchy['2f'];
+        return DESIGN_TOKEN_MAPPING.material.hierarchy.main;
+      }
+    },
+    conflicts: ['removeAnimations']
+  },
 
-  // 29. 移除动画效果
-  // removeAnimations: {
-  //   category: 'animation',
-  //   name: '移除动画效果',
-  //   intensity: 'moderate',
-  //   effects: {
-  //     transition: 'none',
-  //     hoverEffects: 'disable',
-  //     animations: 'remove'
-  //   },
-  //   styleMapping: {
-  //     transition: () => 'none',
-  //     animation: () => 'none',
-  //     '&:hover': {
-  //       transform: () => 'none',
-  //       boxShadow: (current) => current
-  //     }
-  //   },
-  //   conflicts: ['addMicroInteractions']
-  // },
+  // 29. 移除动画效果 - 现在支持嵌套属性
+  removeAnimations: {
+    category: 'animation',
+    name: '移除动画效果',
+    intensity: 'moderate',
+    effects: {
+      transition: 'none',
+      hoverEffects: 'disable',
+      animations: 'remove'
+    },
+    styleMapping: {
+      transition: () => 'none',
+      animation: () => 'none',
+      '&:hover.transform': () => 'none',
+      '&:hover.boxShadow': (current) => current
+    },
+    conflicts: ['addMicroInteractions']
+  },
 
   // ==================== 可访问性动作 (Accessibility Actions) ====================
 
-  // 30. 增强可访问性
-  // enhanceAccessibility: {
-  //   category: 'accessibility',
-  //   name: '增强可访问性',
-  //   intensity: 'strong',
-  //   effects: {
-  //     contrast: 'enhance',
-  //     focusVisible: 'improve',
-  //     textReadability: 'optimize'
-  //   },
-  //   styleMapping: {
-  //     // 增强对比度
-  //     color: (current, delta, elementType) => {
-  //       if (elementType === 'text' && delta > 0.5) {
-  //         return DESIGN_TOKEN_MAPPING.color.onSurface.black100;
-  //       }
-  //       return current;
-  //     },
-  //     // 改善焦点可见性
-  //     '&:focus': {
-  //       outline: (current, delta) => {
-  //         if (delta > 0.6) return `3px solid ${DESIGN_TOKEN_MAPPING.color.primary.brand5}`;
-  //         return `2px solid ${DESIGN_TOKEN_MAPPING.color.primary.brand4}`;
-  //       },
-  //       outlineOffset: () => '2px'
-  //     },
-  //     // 优化字体大小
-  //     fontSize: (baseValue, delta) => {
-  //       if (delta > 0.7) {
-  //         const levels = ['medium', 'large', 'xl'];
-  //         const newLevel = calculateLevelChange(baseValue, delta, levels, 'size', 'medium', true);
-  //         return DESIGN_TOKEN_MAPPING.font.size[newLevel];
-  //       }
-  //       return baseValue;
-  //     }
-  //   },
-  //   conflicts: []
-  // }
+  // 30. 增强可访问性 - 现在支持嵌套属性
+  enhanceAccessibility: {
+    category: 'accessibility',
+    name: '增强可访问性',
+    intensity: 'strong',
+    effects: {
+      contrast: 'enhance',
+      focusVisible: 'improve',
+      textReadability: 'optimize'
+    },
+    styleMapping: {
+      // 增强对比度
+      color: (current, delta, elementType) => {
+        if (elementType === 'text' && delta > 0.5) {
+          return DESIGN_TOKEN_MAPPING.color.onSurface.black100;
+        }
+        return current;
+      },
+      // 改善焦点可见性
+      '&:focus.outline': (current, delta) => {
+        if (delta > 0.6) return `3px solid ${DESIGN_TOKEN_MAPPING.color.primary.brand5}`;
+        return `2px solid ${DESIGN_TOKEN_MAPPING.color.primary.brand4}`;
+      },
+      '&:focus.outlineOffset': () => '2px',
+      // 优化字体大小
+      fontSize: (baseValue, delta) => {
+        if (delta > 0.7) {
+          const levels = ['medium', 'large', 'xl'];
+          const newLevel = calculateLevelChange(baseValue, delta, levels, 'size', 'medium', true);
+          return DESIGN_TOKEN_MAPPING.font.size[newLevel];
+        }
+        return baseValue;
+      }
+    },
+    conflicts: []
+  }
 };
 
 /**
@@ -1816,11 +1865,58 @@ export class ActionConflictResolver {
     const tokenChanges = []; // 记录所有token变化
 
     if (action.styleMapping) {
+      console.log(`🔍 [DEBUG] 动作 ${actionName} 的 styleMapping 包含属性:`, Object.keys(action.styleMapping));
+      
       Object.entries(action.styleMapping).forEach(([property, mappingFunc]) => {
+        console.log(`🔍 [DEBUG] 正在处理属性: "${property}"`);
         try {
+          // 🔧 新增：处理嵌套属性的函数
+          const setNestedProperty = (obj, path, value) => {
+            // 🔧 特殊处理：如果路径包含 '&:' 开头的伪类，直接设置完整键名
+            if (path.includes('&:')) {
+              obj[path] = value;
+              return;
+            }
+            
+            // 原有的点号分割逻辑
+            const keys = path.split('.');
+            let current = obj;
+
+            for (let i = 0; i < keys.length - 1; i++) {
+              const key = keys[i];
+              if (!(key in current) || typeof current[key] !== 'object') {
+                current[key] = {};
+              }
+              current = current[key];
+            }
+
+            current[keys[keys.length - 1]] = value;
+          };
+
+          const getNestedProperty = (obj, path) => {
+            // 🔧 特殊处理：如果路径包含 '&:' 开头的伪类，直接作为完整键名查找
+            if (path.includes('&:')) {
+              return obj[path];
+            }
+            
+            // 原有的点号分割逻辑
+            const keys = path.split('.');
+            let current = obj;
+
+            for (const key of keys) {
+              if (current && typeof current === 'object' && key in current) {
+                current = current[key];
+              } else {
+                return undefined;
+              }
+            }
+
+            return current;
+          };
+
           // 使用基准值作为相对调节的起点，如果基准值不存在则使用当前值
-          const baseValue = effectiveBaseStyles[property] || updatedStyles[property];
-          const currentValue = updatedStyles[property];
+          const baseValue = getNestedProperty(effectiveBaseStyles, property) || getNestedProperty(updatedStyles, property);
+          const currentValue = getNestedProperty(updatedStyles, property);
 
           // 确保有基准值可用
           if (baseValue === undefined) {
@@ -1863,7 +1959,8 @@ export class ActionConflictResolver {
               changed: true
             });
 
-            updatedStyles[property] = finalValue;
+            // 🔧 新增：使用嵌套属性设置函数
+            setNestedProperty(updatedStyles, property, finalValue);
           } else {
             tokenChanges.push({
               property,
@@ -2304,37 +2401,53 @@ function extractTokensFromElementConfig(elementConfig) {
     return baseTokens;
   }
 
-  // 遍历配置中的所有样式属性
-  Object.entries(elementConfig).forEach(([cssProperty, value]) => {
-    if (typeof value === 'string') {
-      if (value.startsWith('{') && value.endsWith('}')) {
-        // 这是一个token引用，提取实际的token
-        const tokenPath = value.slice(1, -1); // 去掉大括号
-        const [category, subcategory, level] = tokenPath.split('.');
+  // 递归处理嵌套对象的辅助函数
+  function processNestedObject(obj, prefix = '') {
+    Object.entries(obj).forEach(([key, value]) => {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
 
-        if (category && subcategory && level) {
-          // 映射CSS属性到对应的token
-          baseTokens[cssProperty] = value;
+      if (typeof value === 'string') {
+        if (value.startsWith('{') && value.endsWith('}')) {
+          // 这是一个token引用，提取实际的token
+          const tokenPath = value.slice(1, -1); // 去掉大括号
+          const [category, subcategory, level] = tokenPath.split('.');
 
-          // 同时建立逆向索引，方便按token类型查找
-          if (!baseTokens._tokens) baseTokens._tokens = {};
-          if (!baseTokens._tokens[category]) baseTokens._tokens[category] = {};
-          if (!baseTokens._tokens[category][subcategory]) baseTokens._tokens[category][subcategory] = {};
-          baseTokens._tokens[category][subcategory][level] = {
-            cssProperty,
-            tokenValue: value
-          };
+          if (category && subcategory && level) {
+            // 映射CSS属性到对应的token
+            baseTokens[fullKey] = value;
+
+            // 同时建立逆向索引，方便按token类型查找
+            if (!baseTokens._tokens) baseTokens._tokens = {};
+            if (!baseTokens._tokens[category]) baseTokens._tokens[category] = {};
+            if (!baseTokens._tokens[category][subcategory]) baseTokens._tokens[category][subcategory] = {};
+            baseTokens._tokens[category][subcategory][level] = {
+              cssProperty: fullKey,
+              tokenValue: value
+            };
+          }
+        } else {
+          // 🔧 对于非token的直接CSS值，也添加到baseTokens中
+          // 这样动作系统能够正确检测对这些属性的影响
+          baseTokens[fullKey] = value;
         }
-      } else {
-        // 🔧 新增：对于非token的直接CSS值，也添加到baseTokens中
-        // 这样动作系统能够正确检测对这些属性的影响
-        baseTokens[cssProperty] = value;
+      } else if (typeof value === 'number') {
+        // 🔧 对于数值类型的CSS属性，也添加到baseTokens中
+        baseTokens[fullKey] = value;
+      } else if (typeof value === 'object' && value !== null) {
+        // 🔧 新增：处理嵌套对象（如 &:hover, &:last-child 等）
+        if (key.startsWith('&:') || key.startsWith('@media') || key.startsWith('&.')) {
+          // 这是伪类、伪元素或媒体查询，递归处理其子属性
+          processNestedObject(value, fullKey);
+        } else {
+          // 其他嵌套对象也进行递归处理
+          processNestedObject(value, fullKey);
+        }
       }
-    } else if (typeof value === 'number') {
-      // 🔧 新增：对于数值类型的CSS属性，也添加到baseTokens中
-      baseTokens[cssProperty] = value;
-    }
-  });
+    });
+  }
+
+  // 开始处理根层级的属性
+  processNestedObject(elementConfig);
 
   return baseTokens;
 }
@@ -2566,7 +2679,7 @@ export class ActionSystemManager {
    * 获取可用动作列表
    */
   getAvailableActions() {
-    // 🔧 过滤掉废弃的构图动作
+    // 🔧 过滤掉废弃的构图动作，包含现在已启用的动画和可访问性动作
     return Object.keys(RL_ACTIONS).filter(actionName => {
       const action = RL_ACTIONS[actionName];
       return action.category !== 'composition'; // 排除构图动作
@@ -2587,7 +2700,7 @@ export class ActionSystemManager {
   getActionCategories() {
     const categories = {};
     Object.entries(RL_ACTIONS).forEach(([actionName, action]) => {
-      // 🔧 过滤掉废弃的构图动作类别
+      // 🔧 过滤掉废弃的构图动作类别，现在包含动画和可访问性动作
       if (action.category === 'composition') {
         return; // 跳过构图动作，因为已被新的布局调控系统替代
       }

@@ -7,7 +7,7 @@
  */
 
 import * as d3 from 'd3';
-import { COLOR_CONSTANTS, DEFAULT_STYLE_CONFIG } from './styleConfig.js';
+import { COLOR_CONSTANTS, DEFAULT_STYLE_CONFIG,  } from './styleConfig.js';
 import resolveToken from '../tokens/resolveToken.js';
 import { JSDOM } from 'jsdom';
 
@@ -34,6 +34,12 @@ function createJsdomEnv(width = 800, height = 500) {
   const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
   const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
   const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
+
+
+  // .axis text {
+    //   fill: #666;
+    //   font-size: 12px;
+    // }
   
   // 添加样式
   const defs = svg.append('defs');
@@ -42,10 +48,7 @@ function createJsdomEnv(width = 800, height = 500) {
       stroke: #bdbdbd;
       shape-rendering: crispEdges;
     }
-    .axis text {
-      fill: #666;
-      font-size: 12px;
-    }
+
     .grid line {
       stroke: #e0e0e0;
       stroke-opacity: 0.7;
@@ -125,9 +128,10 @@ function resolveColor(color) {
  * 从表格数据生成折线图
  * @param {Array} tableData - 二维数组表格数据
  * @param {string} chartType - 图表类型
+ * @param {Object} chartStyleConfig - 图表样式配置（包含title、legend、axis的className和classStyle）
  * @returns {string} - SVG图表的HTML字符串
  */
-export function generateChartFromTableData(tableData, chartType) {
+export function generateChartFromTableData(tableData, chartType, chartStyleConfig = null) {
   try {
     console.log('生成图表，类型:', chartType, '数据行数:', tableData.length);
     
@@ -178,14 +182,14 @@ export function generateChartFromTableData(tableData, chartType) {
     // 根据图表类型生成不同的图表
     switch(chartType) {
       case 'grouped_line':
-        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin);
+        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig);
       case 'bar':
-        return generateBarChart(chartData, dateField, valueFields, width, height, margin);
+        return generateBarChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig);
       case 'barh':
-        return generateBarHChart(chartData, dateField, valueFields, width, height, margin);
+        return generateBarHChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig);
       default:
         // 默认使用分组折线图
-        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin);
+        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig);
     }
   } catch (error) {
     console.error('生成图表时发生错误:', error);
@@ -201,9 +205,10 @@ export function generateChartFromTableData(tableData, chartType) {
  * @param {number} width - 图表宽度
  * @param {number} height - 图表高度
  * @param {Object} margin - 图表边距
+ * @param {Object} chartStyleConfig - 图表样式配置
  * @returns {string} - SVG图表的HTML字符串
  */
-function generateGroupedLineChart(data, dateField, valueFields, width, height, margin) {
+function generateGroupedLineChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null) {
   try {
     console.log('生成分组折线图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
@@ -512,12 +517,16 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       .attr('class', 'axis x-axis')
       .attr('transform', `translate(0,${innerHeight})`);
     
+    // 获取轴样式配置
+    const axisClassName = chartStyleConfig?.axis?.className || 'axis-label';
+    
     xAxis.selectAll('g')
       .data(xValues)
       .enter()
       .append('g')
       .attr('transform', d => `translate(${xScale(d)},0)`)
       .append('text')
+      .attr('class', axisClassName)
       .attr('y', 9)
       .attr('dy', '.71em')
       .attr('transform', 'rotate(45)')
@@ -539,6 +548,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
           .attr('x2', -6)
           .attr('stroke', '#666');
         g.append('text')
+          .attr('class', axisClassName)
           .attr('x', -9)
           .attr('dy', '.32em')
           .attr('text-anchor', 'end')
@@ -590,8 +600,12 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
         .attr('stroke', '#fff')
         .attr('stroke-width', 1);
       
+      // 获取图例样式配置
+      const legendClassName = chartStyleConfig?.legend?.className || 'legend-label';
+      
       // 减小图例文字大小，截断过长的文字
       const text = legendItem.append('text')
+        .attr('class', legendClassName)
         .attr('x', 20)
         .attr('y', 9)
         .attr('font-size', '10px') // 缩小字体大小
@@ -631,9 +645,10 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
  * @param {number} width - 图表宽度
  * @param {number} height - 图表高度
  * @param {Object} margin - 图表边距
+ * @param {Object} chartStyleConfig - 图表样式配置
  * @returns {string} - SVG图表的HTML字符串
  */
-function generateBarChart(data, dateField, valueFields, width, height, margin) {
+function generateBarChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null) {
   try {
     console.log('生成柱状图，使用d3和jsdom');
     
@@ -681,9 +696,10 @@ function generateBarChart(data, dateField, valueFields, width, height, margin) {
  * @param {number} width - 图表宽度
  * @param {number} height - 图表高度
  * @param {Object} margin - 图表边距
+ * @param {Object} chartStyleConfig - 图表样式配置
  * @returns {string} - SVG图表的HTML字符串
  */
-function generateBarHChart(data, dateField, valueFields, width, height, margin) {
+function generateBarHChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null) {
   try {
     console.log('生成水平柱状图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
@@ -801,8 +817,12 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin) 
       .text(d => d[valueField]);
     
     
+    // 获取轴样式配置
+    const axisClassName = chartStyleConfig?.axis?.className || 'axis-title';
+    
     // 添加X轴标题
     g.append('text')
+      .attr('class', axisClassName)
       .attr('x', innerWidth / 2)
       .attr('y', innerHeight + 40)
       .attr('text-anchor', 'middle')
@@ -811,6 +831,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin) 
     
     // 添加Y轴标题
     g.append('text')
+      .attr('class', axisClassName)
       .attr('transform', `rotate(-90)`)
       .attr('x', -innerHeight / 2)
       .attr('y', -60)
