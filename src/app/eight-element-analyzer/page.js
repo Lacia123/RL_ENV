@@ -69,6 +69,14 @@ const MARKDOWN_TEMPLATES = {
 
 [技术白皮书](https://example.com/tech)
 </card>
+<card:custom>
+  <title>MOST POPULAR</title>
+  <content>
+    <title>Profesional</title>
+    <segment>Best for growing startups and growth companies</segment>
+    <segment>Best for growing startups and growth companies</segment>
+  </content>
+</card:custom>
 </layout:row>
 
 ### 核心优势

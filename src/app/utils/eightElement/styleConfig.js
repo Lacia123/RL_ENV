@@ -4,6 +4,8 @@
  * 提供了对不同元素类型样式的完整配置
  */
 
+import fontweight from "../tokens/font/fontweight.js";
+
 
 // CSS变量系统
 export const CSS_VARIABLE_SYSTEM = {
@@ -445,7 +447,7 @@ export const DEFAULT_STYLE_CONFIG = {
       margin: DIMENSION_CONSTANTS.MARGIN.base,
       backgroundColor: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
       borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.large,
-      
+
       // 🔧 新增：布局动作所需的默认属性
       display: 'flex',
       flexDirection: 'column',
@@ -453,7 +455,7 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyContent: 'flex-start',
       alignItems: 'stretch',
       gap: DIMENSION_CONSTANTS.GAP.none,
-            
+
       // 网格布局属性（默认不启用，由动作激活）
       gridTemplateColumns: 'none',
       gridTemplateAreas: 'none',
@@ -464,7 +466,7 @@ export const DEFAULT_STYLE_CONFIG = {
       padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
       margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
       backgroundColor: "none",
-      
+
       // 🔧 新增：布局动作所需的默认属性
       display: 'flex',
       flexDirection: 'column',
@@ -472,7 +474,7 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyContent: 'flex-start',
       alignItems: 'flex-start',
       gap: DIMENSION_CONSTANTS.GAP.none,
-            
+
       // 网格布局属性（默认不启用，由动作激活）
       gridTemplateColumns: 'none',
       gridTemplateAreas: 'none',
@@ -526,7 +528,7 @@ export const DEFAULT_STYLE_CONFIG = {
       // marginRight: "auto",
       position: 'relative',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      
+
       // '&::after': {
       //   content: "''",
       //   position: 'absolute',
@@ -652,7 +654,7 @@ export const DEFAULT_STYLE_CONFIG = {
 
       opacity: '1.0',
       backdropFilter: 'none',
-      
+
       '&::before': {
         content: '"""',
         fontSize: '3rem',
@@ -720,6 +722,20 @@ export const DEFAULT_STYLE_CONFIG = {
       padding: "{dimension.padding.supertight} {dimension.padding.extratight}",
       borderRadius: "{dimension.borderradius.xs}",
       boxShadow: "{material.hierarchy.B1}"
+    },
+    cardTitle: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onprimary.white100}",
+      fontSize: "{font.size.medium}",
+    },
+    cardSubtitle: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onprimary.white88}",
+      fontSize: "{font.size.medium}",
+    },
+    cardSegment: {
+      color: "{color.onprimary.white76}",
+      fontSize: "{font.size.small}",
     }
   },
 
@@ -849,14 +865,14 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyContent: 'center',
       gap: "{dimension.gap.tight}",
       margin: "{dimension.margin.tight}",
-      
+
       // 🆕 通透程度动作所需的默认属性
       opacity: '1.0',
       backdropFilter: 'none',
-      
+
       // 🆕 视觉重量动作所需的默认属性
       transform: 'scale(1.0)',
-      
+
       '&:hover': {
         transform: 'translateY(-2px)',
         boxShadow: "{material.hierarchy.4f}",
@@ -885,14 +901,14 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyContent: 'center',
       gap: "{dimension.gap.tight}",
       margin: "{dimension.margin.tight}",
-      
+
       // 🆕 通透程度动作所需的默认属性
       opacity: '0.98',
       backdropFilter: 'none',
-      
+
       // 🆕 视觉重量动作所需的默认属性
       transform: 'scale(0.98)',
-      
+
       '&:hover': {
         backgroundColor: "{color.secondarycontainer.violet2}",
         color: "{color.onsecondarycontainer.violet8}",
@@ -992,14 +1008,14 @@ export const DEFAULT_STYLE_CONFIG = {
       alignItems: 'center',
       justifyContent: 'center',
       gap: "{dimension.gap.tight}",
-      
+
       // 🆕 通透程度动作所需的默认属性 - ghost 按钮天然适合透明效果
       opacity: '0.9',
       backdropFilter: 'blur(2px)',
-      
+
       // 🆕 视觉重量动作所需的默认属性 - ghost 按钮较轻
       transform: 'scale(0.95)',
-      
+
       '&:hover': {
         backgroundColor: "{color.primarycontainer.brand1}",
         color: "{color.primary.brand6}",
@@ -1118,11 +1134,11 @@ export const DEFAULT_STYLE_CONFIG = {
       borderStyle: "solid",
       color: "{color.success.green8}",
       borderLeft: `{dimension.borderwidth.wide} solid {color.success.green5}`,
-      
+
       // 🆕 通透程度动作所需的默认属性
       opacity: '0.95',
       backdropFilter: 'none',
-      
+
       // 🆕 视觉重量动作所需的默认属性 - 成功提示正常大小
       transform: 'scale(1.0)'
     },
@@ -1144,11 +1160,11 @@ export const DEFAULT_STYLE_CONFIG = {
       borderLeftWidth: "{dimension.borderwidth.wide}",
       borderLeftColor: "{color.warning.orange5}",
       borderLeftStyle: "solid",
-      
+
       // 🆕 通透程度动作所需的默认属性
       opacity: '0.95',
       backdropFilter: 'none',
-      
+
       // 🆕 视觉重量动作所需的默认属性 - 警告提示稍大
       transform: 'scale(1.01)'
     },
@@ -1170,11 +1186,11 @@ export const DEFAULT_STYLE_CONFIG = {
       borderLeftWidth: "{dimension.borderwidth.wide}",
       borderLeftColor: "{color.error.red5}",
       borderLeftStyle: "solid",
-      
+
       // 🆕 通透程度动作所需的默认属性
       opacity: '0.95',
       backdropFilter: 'none',
-      
+
       // 🆕 视觉重量动作所需的默认属性 - 错误提示更大（最紧急）
       transform: 'scale(1.03)'
     },
@@ -1196,11 +1212,11 @@ export const DEFAULT_STYLE_CONFIG = {
       borderLeftWidth: "{dimension.borderwidth.wide}",
       borderLeftColor: "{color.primary.brand5}",
       borderLeftStyle: "solid",
-      
+
       // 🆕 通透程度动作所需的默认属性
       opacity: '0.95',
       backdropFilter: 'none',
-      
+
       // 🆕 视觉重量动作所需的默认属性 - 信息提示正常大小
       transform: 'scale(1.0)'
     }
@@ -1220,14 +1236,14 @@ export const DEFAULT_STYLE_CONFIG = {
       margin: "{dimension.margin.loose} 0",
       backgroundImage: 'none',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
-      
+
       // 🆕 通透程度动作所需的默认属性
       opacity: '1.0',
       backdropFilter: 'none',
-      
+
       // 🆕 视觉重量动作所需的默认属性
       transform: 'scale(1.0)',
-      
+
       '&:hover': {
         boxShadow: "{material.hierarchy.2f}",
         transform: 'translateY(-2px)'
@@ -1244,14 +1260,14 @@ export const DEFAULT_STYLE_CONFIG = {
       margin: "{dimension.margin.loose} 0",
       backgroundImage: 'none',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
-      
+
       // 🆕 通透程度动作所需的默认属性 - 高级卡片稍微透明营造层次感
       opacity: '0.98',
       backdropFilter: 'blur(1px)',
-      
+
       // 🆕 视觉重量动作所需的默认属性 - 高级卡片稍大
       transform: 'scale(1.02)',
-      
+
       '&:hover': {
         boxShadow: "{material.hierarchy.4f}",
         transform: 'translateY(-4px)'
@@ -1269,18 +1285,62 @@ export const DEFAULT_STYLE_CONFIG = {
       padding: "{dimension.padding.loose}",
       margin: "{dimension.margin.base} 0",
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
-      
+
       // 🆕 通透程度动作所需的默认属性 - 轮廓卡片适合透明效果
       opacity: '0.95',
       backdropFilter: 'none',
-      
+
       // 🆕 视觉重量动作所需的默认属性 - 轮廓卡片较轻
       transform: 'scale(0.98)',
-      
+
       '&:hover': {
         borderColor: "{color.primarycontainer.brand2}",
         backgroundColor: "{color.surface.grey0}"
       }
+    },
+
+    custom: {
+      type: 'template',
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.large}",
+        padding: "{dimension.padding.base} {dimension.padding.tight}",
+        background: `linear-gradient(to top right, #975af4, #2f7cf8 40%, #78aafa 65%, #934cff 100%)`,
+      },
+      title: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: "{dimension.padding.base} {dimension.padding.loose}",
+          justifyContent: 'space-between',
+        },
+        metaType: 'text',
+        variant: 'cardTitle',
+      },
+      content: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          borderRadius: "{dimension.borderradius.xxl}",
+          background: "{color.surfacecontainer.black100}",
+          padding: "{dimension.padding.loose}",
+          gap: "{dimension.gap.base}",
+          color: "{color.onprimary.white100}",
+        },
+        title: {
+          metaType: 'text',
+          variant: 'cardSubtitle',
+        },
+        segment: {
+          metaType: 'text',
+          variant: 'cardSegment',
+        }
+      },
     }
   },
 
@@ -1297,7 +1357,7 @@ export const DEFAULT_STYLE_CONFIG = {
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       maxWidth: "100%",
       height: "auto",
-            
+
       '&:hover': {
         boxShadow: "{material.hierarchy.2f}",
         transform: "scale(1.02)"

@@ -525,6 +525,250 @@ function isCardTag(line) {
   return { isCardTag: false };
 }
 
+// 解析模板卡片内容
+function parseTemplateCardContent(content, cardStyleConfig) {
+  console.log(`解析模板卡片内容，长度: ${content.length}`);
+  
+  const lines = content.split('\n');
+  const children = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    
+    if (!line) {
+      i++;
+      continue;
+    }
+
+    // 检查是否为内联模板标签（如 <title>内容</title>）
+    const inlineTemplateTagMatch = line.match(/^<(\w+)>(.*?)<\/\1>$/);
+    if (inlineTemplateTagMatch) {
+      const tagName = inlineTemplateTagMatch[1];
+      const tagContent = inlineTemplateTagMatch[2];
+      console.log(`发现内联模板标签: ${tagName}, 内容: "${tagContent}"`);
+      
+      // 创建模板标签元素
+      const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig);
+      if (templateElement) {
+        children.push(templateElement);
+      }
+      
+      i++;
+    } else {
+      // 检查是否为块级模板标签（如 <content>...多行内容...</content>）
+      const templateTagMatch = line.match(/^<(\w+)>$/);
+      if (templateTagMatch) {
+        const tagName = templateTagMatch[1];
+        console.log(`发现块级模板标签: ${tagName}`);
+        
+        // 提取标签内容
+        const { tagContent, endIndex } = extractTemplateTag(lines, i, tagName);
+        
+        // 创建模板标签元素
+        const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig);
+        if (templateElement) {
+          children.push(templateElement);
+        }
+        
+        i = endIndex + 1;
+      } else {
+        // 普通文本内容，作为文本元素处理
+        const textElement = createTextElement(line);
+        children.push(textElement);
+        i++;
+      }
+    }
+  }
+
+  return children;
+}
+
+// 提取模板标签内容
+function extractTemplateTag(lines, startIndex, tagName) {
+  console.log(`提取模板标签 ${tagName}，从第${startIndex}行开始`);
+  
+  const contentLines = [];
+  let i = startIndex + 1;
+  let foundEnd = false;
+  
+  while (i < lines.length) {
+    const line = lines[i];
+    const closingTagMatch = line.trim().match(new RegExp(`^</${tagName}>$`));
+    
+    if (closingTagMatch) {
+      foundEnd = true;
+      break;
+    }
+    
+    contentLines.push(line);
+    i++;
+  }
+  
+  if (!foundEnd) {
+    console.warn(`警告: 未找到模板标签 ${tagName} 的结束标签`);
+  }
+  
+  const tagContent = contentLines.join('\n').trim();
+  console.log(`模板标签 ${tagName} 提取完成，内容长度: ${tagContent.length}，结束索引: ${i}`);
+  
+  return {
+    tagContent,
+    endIndex: i
+  };
+}
+
+// 创建模板标签元素
+function createTemplateTagElement(tagName, content, cardStyleConfig) {
+  const id = generateUUID();
+  const uniqueClassName = `template-${tagName}-${id}`;
+  
+  // 获取标签配置
+  const tagConfig = cardStyleConfig[tagName];
+  if (!tagConfig) {
+    console.warn(`警告: 未找到模板标签 ${tagName} 的配置`);
+    return null;
+  }
+
+  // 检查是否为元件引用
+  if (tagConfig.metaType && tagConfig.variant) {
+    console.log(`创建元件引用: ${tagConfig.metaType}.${tagConfig.variant}`);
+    
+    // 根据 metaType 创建对应的元件
+    let elementInstance = null;
+    if (tagConfig.metaType === 'text') {
+      elementInstance = createTextElement(content, tagConfig.variant);
+    }
+    // 可以在这里添加其他元件类型的支持
+    
+    if (!elementInstance) {
+      return null;
+    }
+    
+    // 如果标签配置中有 style，需要创建容器来包装元件并应用样式
+    if (tagConfig.style) {
+      console.log(`为元件引用创建样式容器: ${tagName}`);
+      
+      // 创建容器来包装元件实例
+      const containerElement = {
+        dataKeys: [],
+        name: "layout",
+        "name-zh": `模板标签容器-${tagName}`,
+        "file-type": "template",
+        theme: "default",
+        _metadata: {
+          actualType: 'templateTag',
+          tagName: tagName,
+          isTemplateTag: true,
+          isLayout: true,
+          isElementContainer: true,
+          containedElementType: tagConfig.metaType,
+          containedElementVariant: tagConfig.variant,
+          tagContent: content
+        },
+        layout: {
+          style: {
+            display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+            layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+            layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
+            primaryAxisSizingMode: "fixed",
+            counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
+            primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+            counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
+            layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+            boxSizing: "border-box",
+            "border-style": "solid",
+            "border-width": "0",
+            "border-color": "initial",
+            height: "auto",
+            width: "100%",
+            "box-sizing": "border-box",
+            "back-width": "100%",
+            "back-height": "auto",
+            position: "relative",
+            ...(tagConfig.style || {}) // 应用标签样式
+          },
+          classStyle: {
+            ...(tagConfig.style || {})
+          },
+          className: uniqueClassName,
+          children: [elementInstance] // 包装元件实例
+        },
+        description: `模板标签容器 - ${tagName}`,
+        id,
+        events: [{}]
+      };
+      
+      return containerElement;
+    } else {
+      // 没有样式，直接返回元件实例
+      return elementInstance;
+    }
+  }
+
+  // 解析嵌套内容
+  let children = [];
+  if (content && content.trim()) {
+    if (tagConfig.type === 'template') {
+      // 递归解析嵌套的模板标签
+      children = parseTemplateCardContent(content, tagConfig);
+    } else {
+      // 解析为普通内容
+      const parsedContent = parseMarkdown(content);
+      children = parsedContent;
+    }
+  }
+
+  // 创建模板标签元素
+  const templateElement = {
+    dataKeys: [],
+    name: "layout",
+    "name-zh": `模板标签-${tagName}`,
+    "file-type": "template",
+    theme: "default",
+    _metadata: {
+      actualType: 'templateTag',
+      tagName: tagName,
+      isTemplateTag: true,
+      isLayout: true,
+      tagContent: content
+    },
+    layout: {
+      style: {
+        display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+        layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+        layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
+        primaryAxisSizingMode: "fixed",
+        counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
+        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
+        layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+        boxSizing: "border-box",
+        "border-style": "solid",
+        "border-width": "0",
+        "border-color": "initial",
+        height: "auto",
+        width: "100%",
+        "box-sizing": "border-box",
+        "back-width": "100%",
+        "back-height": "auto",
+        position: "relative",
+        ...(tagConfig.style || {}) // 应用标签样式
+      },
+      classStyle: {
+        ...(tagConfig.style || {})
+      },
+      className: uniqueClassName,
+      children: children
+    },
+    description: `模板标签元素 - ${tagName}`,
+    id,
+    events: [{}]
+  };
+
+  return templateElement;
+}
+
 // 提取完整的引用块
 function extractQuoteBlock(lines, startIndex) {
   console.log(`开始提取引用块，从第${startIndex}行开始`);
@@ -728,56 +972,114 @@ function createCardElement(content, variant = 'standard') {
   // 生成唯一的className
   const uniqueClassName = `card-${id}`;
 
-  // 解析卡片内容为子元素
+  // 检查是否为模板类型的卡片
+  const isTemplateCard = cardStyleConfig && cardStyleConfig.type === 'template';
+
   let cardChildren = [];
   if (content && content.trim()) {
-    // 递归解析卡片内容
-    const parsedContent = parseMarkdown(content);
-    cardChildren = parsedContent;
+    if (isTemplateCard) {
+      // 对于模板类型的卡片，解析嵌套的模板标签
+      cardChildren = parseTemplateCardContent(content, cardStyleConfig);
+    } else {
+      // 对于普通卡片，递归解析内容
+      const parsedContent = parseMarkdown(content);
+      cardChildren = parsedContent;
+    }
   }
 
-  // 创建基础布局结构
-  const baseLayout = createBaseLayout(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, {
-    width: "100%",
-    height: "auto",
-    alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN
-  });
-
-  // 应用卡片样式到布局
-  Object.entries(cardStyleConfig).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      baseLayout.style[key] = value;
-    }
-  });
-
-  const cardElement = {
-    dataKeys: [],
-    name: "layout", // 使用 layout 名称，让它作为容器渲染
-    "name-zh": "卡片",
-    "file-type": "template", // 使用 template 类型
-    theme: "default",
-    // 🔍 保存元数据用于分析
-    _metadata: {
-      actualType: 'card',
-      variant: variant,
-      isCard: true,
-      isLayout: true, // 标记为布局容器
-      cardContent: content
-    },
-    layout: {
-      ...baseLayout,
-      classStyle: {
-        ...cardStyleConfig
+  if (isTemplateCard) {
+    // 模板类型卡片的结构
+    const cardElement = {
+      dataKeys: [],
+      name: "layout",
+      "name-zh": "卡片",
+      "file-type": "template",
+      theme: "default",
+      _metadata: {
+        actualType: 'card',
+        variant: variant,
+        isCard: true,
+        isLayout: true,
+        isTemplateCard: true,
+        cardContent: content
       },
-      className: uniqueClassName,
-      children: cardChildren
-    },
-    description: `卡片元素 - ${variant}`,
-    id,
-    events: [{}]
-  };
+      layout: {
+        style: {
+          display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+          layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+          layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
+          primaryAxisSizingMode: "fixed",
+          counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
+          primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+          counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
+          layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+          boxSizing: "border-box",
+          "border-style": "solid",
+          "border-width": "0",
+          "border-color": "initial",
+          height: "auto",
+          width: "100%",
+          "box-sizing": "border-box",
+          "back-width": "100%",
+          "back-height": "auto",
+          position: "relative",
+          ...cardStyleConfig.style // 应用模板样式
+        },
+        classStyle: {
+          ...cardStyleConfig.style
+        },
+        className: uniqueClassName,
+        children: cardChildren
+      },
+      description: `模板卡片元素 - ${variant}`,
+      id,
+      events: [{}]
+    };
 
-  return cardElement;
+    return cardElement;
+  } else {
+    // 普通卡片的结构（保持原有逻辑）
+    const baseLayout = createBaseLayout(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, {
+      width: "100%",
+      height: "auto",
+      alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN
+    });
+
+    // 应用卡片样式到布局
+    Object.entries(cardStyleConfig).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        baseLayout.style[key] = value;
+      }
+    });
+
+    const cardElement = {
+      dataKeys: [],
+      name: "layout",
+      "name-zh": "卡片",
+      "file-type": "template",
+      theme: "default",
+      _metadata: {
+        actualType: 'card',
+        variant: variant,
+        isCard: true,
+        isLayout: true,
+        cardContent: content
+      },
+      layout: {
+        ...baseLayout,
+        classStyle: {
+          ...cardStyleConfig
+        },
+        className: uniqueClassName,
+        children: cardChildren
+      },
+      description: `卡片元素 - ${variant}`,
+      id,
+      events: [{}]
+    };
+
+    return cardElement;
+  }
 }
 
 // 创建按钮元素（用于超链接）
