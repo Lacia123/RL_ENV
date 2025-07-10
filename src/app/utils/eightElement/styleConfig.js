@@ -730,11 +730,11 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     cardSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onprimary.white88}",
+      color: "{color.onprimary.black88}",
       fontSize: "{font.size.medium}",
     },
     cardSegment: {
-      color: "{color.onprimary.white76}",
+      color: "{color.onprimary.black88}",
       fontSize: "{font.size.small}",
     }
   },
@@ -1304,8 +1304,8 @@ export const DEFAULT_STYLE_CONFIG = {
       style: {
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: "{dimension.borderradius.large}",
-        padding: "{dimension.padding.base} {dimension.padding.tight}",
+        borderRadius: "{dimension.borderradius.xl}",
+        padding: "{dimension.padding.tight}",
         background: `linear-gradient(to top right, #975af4, #2f7cf8 40%, #78aafa 65%, #934cff 100%)`,
       },
       title: {
@@ -1326,8 +1326,8 @@ export const DEFAULT_STYLE_CONFIG = {
           flexDirection: 'column',
           width: '100%',
           height: '100%',
-          borderRadius: "{dimension.borderradius.xxl}",
-          background: "{color.surfacecontainer.black100}",
+          borderRadius: "{dimension.borderradius.large}",
+          background: "{color.surfacecontainer.white88}",
           padding: "{dimension.padding.loose}",
           gap: "{dimension.gap.base}",
           color: "{color.onprimary.white100}",

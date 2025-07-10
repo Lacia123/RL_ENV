@@ -355,6 +355,11 @@ function preProcessEightElement(element) {
         processImageElement(processedElement, element);
     }
 
+    // 处理图标元素
+    else if (element.name === 'icon') {
+        processIconElement(processedElement, element);
+    }
+
     // 处理表格元素
     else if (element.name === 'table') {
         processTableElement(processedElement, element);
@@ -633,6 +638,40 @@ function processImageElement(processedElement, originalElement) {
         processedElement.imageUrl = originalElement.material.image.default.resource || '';
     } else if (originalElement.src) {
         processedElement.imageUrl = originalElement.src;
+    }
+}
+
+/**
+ * 处理图标元素的内容和样式引用
+ * @param {Object} processedElement - 要修改的处理元素
+ * @param {Object} originalElement - 原始元素
+ */
+function processIconElement(processedElement, originalElement) {
+    // 处理图标名称
+    if (originalElement._metadata && originalElement._metadata.iconName) {
+        processedElement.iconName = originalElement._metadata.iconName;
+    } else if (originalElement.color && originalElement.color.icon_color && originalElement.color.icon_color.default) {
+        processedElement.iconName = originalElement.color.icon_color.default.resource || '';
+    }
+
+    // 处理图标样式引用
+    if (originalElement.layout && originalElement.layout.style) {
+        processStyleReferences(processedElement, originalElement, originalElement.layout.style);
+    }
+
+    // 处理图标颜色引用
+    if (originalElement.color && originalElement.color.icon_color) {
+        const iconColorConfig = originalElement.color.icon_color.default;
+        if (iconColorConfig && iconColorConfig.style && iconColorConfig.style.icon_color) {
+            const iconColor = iconColorConfig.style.icon_color.value;
+            if (iconColor) {
+                const resolvedColor = resolveToken(iconColor) || iconColor;
+                if (!processedElement.computedStyle) {
+                    processedElement.computedStyle = {};
+                }
+                processedElement.computedStyle.color = resolvedColor;
+            }
+        }
     }
 }
 
@@ -1030,6 +1069,8 @@ function renderElement(element) {
         case 'background':
         case 'image':
             return renderImageElement(element);
+        case 'icon':
+            return renderIconElement(element);
         case 'table':
             return renderTableElement(element);
         case 'code':
@@ -1157,6 +1198,92 @@ function renderImageElement(element) {
       </div>
     `;
     }
+}
+
+/**
+ * 渲染图标元素
+ * @param {Object} element - 图标元素
+ * @returns {string} - 渲染的HTML字符串
+ */
+function renderIconElement(element) {
+    const styleAttr = generateStyleAttribute(element.computedStyle);
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
+
+    // 获取图标名称
+    let iconName = '';
+    
+    // 从不同位置获取图标名称
+    if (element._metadata && element._metadata.iconName) {
+        iconName = element._metadata.iconName;
+    } else if (element.color && element.color.icon_color && element.color.icon_color.default && element.color.icon_color.default.resource) {
+        iconName = element.color.icon_color.default.resource;
+    }
+
+    if (!iconName) {
+        // 没有图标名称时显示占位符
+        return `
+      <div id="${element.id || ''}" ${classAttr} data-element-type="icon" ${styleAttr} style="display:flex;align-items:center;justify-content:center;color:#999;">
+        Icon Placeholder
+      </div>
+    `;
+    }
+
+    // 生成SVG图标
+    const svgContent = generateSVGIcon(iconName);
+
+    return `
+    <div id="${element.id || ''}" ${classAttr} data-element-type="icon" ${styleAttr}>
+      ${svgContent}
+    </div>
+  `;
+}
+
+/**
+ * 生成SVG图标
+ * @param {string} iconName - 图标名称
+ * @returns {string} - SVG图标HTML
+ */
+function generateSVGIcon(iconName) {
+    // 这里可以根据图标名称生成对应的SVG
+    // 为了简化，我们使用一个基本的SVG图标映射
+    const iconMap = {
+        'send': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                 </svg>`,
+        'home': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z" fill="currentColor"/>
+                 </svg>`,
+        'user': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="currentColor"/>
+                 </svg>`,
+        'star': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+                 </svg>`,
+        'heart': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.3879 3.14052 17.6725 2.99817 16.95 2.99817C16.2275 2.99817 15.5121 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.5783 8.50903 2.9987 7.05 2.9987C5.59096 2.9987 4.19169 3.5783 3.16 4.61C2.1283 5.6417 1.5487 7.04097 1.5487 8.5C1.5487 9.95903 2.1283 11.3583 3.16 12.39L12 21.23L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93789 22.4518 9.22248 22.4518 8.5C22.4518 7.77752 22.3095 7.06211 22.0329 6.39457C21.7563 5.72703 21.351 5.12063 20.84 4.61Z" fill="currentColor"/>
+                  </svg>`,
+        'menu': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M3 18H21V16H3V18ZM3 13H21V11H3V13ZM3 6V8H21V6H3Z" fill="currentColor"/>
+                 </svg>`,
+        'close': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"/>
+                  </svg>`,
+        'search': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z" fill="currentColor"/>
+                   </svg>`,
+        'arrow-right': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z" fill="currentColor"/>
+                        </svg>`,
+        'arrow-left': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <path d="M15.41 16.59L10.83 12L15.41 7.41L14 6L8 12L14 18L15.41 16.59Z" fill="currentColor"/>
+                       </svg>`
+    };
+
+    // 返回对应的SVG图标，如果没有找到则返回默认图标
+    return iconMap[iconName] || iconMap['star'] || `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                      <circle cx="12" cy="12" r="10" fill="currentColor"/>
+                                                    </svg>`;
 }
 
 /**

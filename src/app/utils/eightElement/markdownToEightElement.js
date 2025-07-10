@@ -500,6 +500,20 @@ function isLayoutTag(line) {
   return { isLayoutTag: false };
 }
 
+// 检测是否为图标标签
+function isIconTag(line) {
+  // 匹配 <icon>iconname</icon> 格式
+  const iconMatch = line.match(/^<icon>([^<>]+)<\/icon>$/);
+  if (iconMatch) {
+    return {
+      isIconTag: true,
+      iconName: iconMatch[1].trim()
+    };
+  }
+  
+  return { isIconTag: false };
+}
+
 // 检测是否为卡片标签
 function isCardTag(line) {
   // 匹配 <card> 或 <card:variant>
@@ -1666,6 +1680,339 @@ function createButtonElement(text, url, variant = 'primary') {
   };
 
   return buttonElement;
+}
+
+// 创建图标元素
+function createIconElement(iconName, variant = 'line') {
+  const id = generateUUID();
+  
+  // 获取图标元素的样式配置
+  const iconStyleConfig = getElementStyleConfig('icon', variant);
+  
+  // 生成唯一的className
+  const uniqueClassName = `icon-${variant}-${id}`;
+  
+  // 创建图标元素结构
+  const iconElement = {
+    dataKeys: [],
+    id: id,
+    name: "icon",
+    "name-zh": "图标",
+    "file-type": "cell-element",
+    // 🔍 保存图标元数据用于分析
+    _metadata: {
+      actualType: 'icon',
+      variant: variant,
+      iconName: iconName,
+      sampleContent: iconName
+    },
+    layout: {
+      classStyle: {
+        ...iconStyleConfig // 应用图标样式配置到classStyle
+      },
+      className: uniqueClassName,
+      style: {
+        "background-color": [],
+        "font": [],
+        "border": [],
+        "scale": [],
+        "box-sizing": "border-box"
+      },
+      icon_line: {
+        type: "container",
+        content: [],
+        resource: "",
+        data: [],
+        style: {
+          display: "{layout.state.display.flex}",
+          layoutMode: "{layout.direction.NONE}",
+          layoutWrap: "{layout.wrap.NO_WRAP}",
+          primaryAxisSizingMode: "{layout.sizing.AUTO}",
+          counterAxisSizingMode: "{layout.sizing.FIXED}",
+          primaryAxisAlignItems: "{layout.align.x.CENTER}",
+          counterAxisAlignItems: "{layout.align.y.items.CENTER}",
+          layoutAlign: "{layout.align.y.self.INHERIT}",
+          layoutGrow: "{layout.grow.0}",
+          height: {
+            element: "scale",
+            value: "icon_height",
+            prop: "default",
+            token: "icon_height"
+          },
+          width: {
+            element: "scale",
+            value: "icon_width",
+            prop: "default",
+            token: "icon_width"
+          },
+          iconColor: {
+            element: "color",
+            value: "icon_color",
+            prop: "default",
+            token: "icon_color"
+          },
+          icon: {
+            element: "color",
+            value: "icon_color"
+          }
+        },
+        children: [
+          {
+            content: [
+              {
+                element: "color",
+                value: "icon_color"
+              }
+            ],
+            data: [],
+            style: {
+              layoutAlign: "{layout.align.y.self.INHERIT}",
+              layoutGrow: "{layout.grow.1}",
+              iconColor: {
+                element: "color",
+                value: "icon_color",
+                prop: "default",
+                token: "icon_color"
+              },
+              height: {
+                element: "scale",
+                value: "icon_height",
+                prop: "default",
+                token: "icon_height"
+              },
+              width: {
+                element: "scale",
+                value: "icon_width",
+                prop: "default",
+                token: "icon_width"
+              }
+            },
+            children: []
+          }
+        ]
+      }
+    },
+    color: {
+      bg: {
+        default: {
+          "data-key": "",
+          style: {
+            bg: {
+              value: "{color.basic.brand.5}",
+              type: "color",
+              key: "color-bg"
+            }
+          },
+          resource: "{color.basic.brand.5}"
+        }
+      },
+      border: {
+        default: {
+          "data-key": "",
+          style: {
+            border: {
+              value: "{color.basic.brand.5}",
+              type: "color",
+              key: "color-border"
+            }
+          },
+          resource: "{color.basic.brand.5}"
+        }
+      },
+      icon_color: {
+        default: {
+          "data-key": "",
+          style: {
+            icon_color: {
+              value: "{color.basic.brand.5}",
+              type: "color",
+              key: "color-icon_color"
+            },
+            height: {
+              element: "scale",
+              value: "icon_height",
+              prop: "default",
+              token: "icon_height"
+            },
+            width: {
+              element: "scale",
+              value: "icon_width",
+              prop: "default",
+              token: "icon_width"
+            }
+          },
+          type: "icon",
+          resource: iconName // 使用传入的图标名称
+        },
+        hover: {
+          "data-key": "",
+          style: {
+            icon_color: {
+              value: "{color.basic.opacity.white.100}",
+              type: "color",
+              key: "color-icon_color"
+            },
+            height: {
+              element: "scale",
+              value: "icon_height",
+              prop: "default",
+              token: "icon_height"
+            },
+            width: {
+              element: "scale",
+              value: "icon_width",
+              prop: "default",
+              token: "icon_width"
+            }
+          },
+          type: "icon",
+          resource: iconName
+        },
+        active: {
+          "data-key": "",
+          style: {
+            icon_color: {
+              value: "{color.basic.opacity.white.100}",
+              type: "color",
+              key: "color-icon_color"
+            },
+            height: {
+              element: "scale",
+              value: "icon_height",
+              prop: "default",
+              token: "icon_height"
+            },
+            width: {
+              element: "scale",
+              value: "icon_width",
+              prop: "default",
+              token: "icon_width"
+            }
+          },
+          type: "icon",
+          resource: iconName
+        },
+        pressed: {
+          "data-key": "",
+          style: {
+            icon_color: {
+              value: "{color.basic.opacity.white.100}",
+              type: "color",
+              key: "color-icon_color"
+            },
+            height: {
+              element: "scale",
+              value: "icon_height",
+              prop: "default",
+              token: "icon_height"
+            },
+            width: {
+              element: "scale",
+              value: "icon_width",
+              prop: "default",
+              token: "icon_width"
+            }
+          },
+          type: "icon",
+          resource: iconName
+        },
+        loading: {
+          "data-key": "",
+          style: {
+            icon_color: {
+              value: "{color.basic.opacity.white.100}",
+              type: "color",
+              key: "color-icon_color"
+            },
+            height: {
+              element: "scale",
+              value: "icon_height",
+              prop: "default",
+              token: "icon_height"
+            },
+            width: {
+              element: "scale",
+              value: "icon_width",
+              prop: "default",
+              token: "icon_width"
+            }
+          },
+          type: "icon",
+          resource: iconName
+        },
+        disable: {
+          "data-key": "",
+          style: {
+            icon_color: {
+              value: "{color.basic.opacity.white.100}",
+              type: "color",
+              key: "color-icon_color"
+            },
+            height: {
+              element: "scale",
+              value: "icon_height",
+              prop: "default",
+              token: "icon_height"
+            },
+            width: {
+              element: "scale",
+              value: "icon_width",
+              prop: "default",
+              token: "icon_width"
+            }
+          },
+          type: "icon",
+          resource: iconName
+        }
+      }
+    },
+    scale: {
+      icon_width: {
+        default: {
+          "data-key": "",
+          style: {
+            icon_width: {
+              value: "{dimension.basic.dimension.56}",
+              type: "sizing",
+              key: "scale-icon_width"
+            }
+          },
+          resource: "{dimension.basic.dimension.56}"
+        }
+      },
+      icon_height: {
+        default: {
+          "data-key": "",
+          style: {
+            icon_height: {
+              value: "{dimension.basic.dimension.56}",
+              type: "sizing",
+              key: "scale-icon_height"
+            }
+          },
+          resource: "{dimension.basic.dimension.56}"
+        }
+      }
+    },
+    shape: {
+      borderwidth: {
+        default: {
+          "data-key": "",
+          style: {
+            borderwidth: {
+              value: "{dimension.borderwidth.4}",
+              type: "borderWidth",
+              key: "shape-borderwidth"
+            }
+          },
+          resource: "{dimension.borderwidth.4}"
+        }
+      }
+    },
+    events: [{}]
+  };
+  
+  return iconElement;
 }
 
 // 创建背景元素（用于图片）
@@ -3272,6 +3619,40 @@ function parseMarkdown(markdown, options = {}) {
           continue;
         }
       }
+    }
+
+    // 检测图标标签
+    const iconTagInfo = isIconTag(trimmedLine);
+    if (iconTagInfo.isIconTag) {
+      console.log(`发现图标标签，行号: ${i}，图标名称: ${iconTagInfo.iconName}`);
+      
+      // 处理之前累积的内容
+      flushTextBlock();
+      flushConsecutiveButtons();
+
+      // 如果正在处理列表，先结束列表
+      if (inList && listItems.length > 0) {
+        const listLayout = createLayoutElement(
+          LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+          listItems,
+          {
+            alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+            counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+          }
+        );
+        stack[stack.length - 1].elements.push(listLayout);
+        inList = false;
+        listItems = [];
+      }
+
+      // 创建图标元素
+      const iconElement = createIconElement(iconTagInfo.iconName, 'line');
+      
+      console.log(`🔧 创建图标元素: ID=${iconElement.id}, 图标名称=${iconTagInfo.iconName}`);
+
+      stack[stack.length - 1].elements.push(iconElement);
+
+      continue;
     }
 
     // 普通文本行
