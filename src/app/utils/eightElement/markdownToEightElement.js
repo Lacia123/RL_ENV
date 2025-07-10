@@ -500,6 +500,31 @@ function isLayoutTag(line) {
   return { isLayoutTag: false };
 }
 
+// 检测是否为卡片标签
+function isCardTag(line) {
+  // 匹配 <card> 或 <card:variant>
+  const cardTagMatch = line.trim().match(/^<card(?::(\w+))?>$/);
+  if (cardTagMatch) {
+    return {
+      isCardTag: true,
+      variant: cardTagMatch[1] || 'standard', // 默认为 standard
+      isClosing: false
+    };
+  }
+  
+  // 匹配 </card> 或 </card:variant>
+  const closingTagMatch = line.trim().match(/^<\/card(?::(\w+))?>$/);
+  if (closingTagMatch) {
+    return {
+      isCardTag: true,
+      variant: closingTagMatch[1] || 'standard',
+      isClosing: true
+    };
+  }
+  
+  return { isCardTag: false };
+}
+
 // 提取完整的引用块
 function extractQuoteBlock(lines, startIndex) {
   console.log(`开始提取引用块，从第${startIndex}行开始`);
@@ -585,6 +610,51 @@ function extractLayoutBlock(lines, startIndex) {
   };
 }
 
+// 提取完整的卡片标签块
+function extractCardBlock(lines, startIndex) {
+  console.log(`开始提取卡片标签块，从第${startIndex}行开始`);
+  
+  const startLine = lines[startIndex];
+  const startTagInfo = isCardTag(startLine);
+  
+  if (!startTagInfo.isCardTag || startTagInfo.isClosing) {
+    console.error('无效的卡片标签起始行');
+    return { cardContent: '', variant: 'standard', endIndex: startIndex };
+  }
+  
+  const variant = startTagInfo.variant;
+  const contentLines = [];
+  let i = startIndex + 1;
+  let foundEnd = false;
+  
+  // 查找对应的结束标签
+  while (i < lines.length) {
+    const line = lines[i];
+    const tagInfo = isCardTag(line);
+    
+    if (tagInfo.isCardTag && tagInfo.isClosing && tagInfo.variant === variant) {
+      foundEnd = true;
+      i++;
+      break;
+    }
+    
+    contentLines.push(line);
+    i++;
+  }
+  
+  if (!foundEnd) {
+    console.warn(`警告: 未找到卡片标签 ${variant} 的结束标签`);
+  }
+  
+  console.log(`卡片标签块提取完成，变体: ${variant}，内容行数: ${contentLines.length}，结束索引: ${i - 1}`);
+  
+  return {
+    cardContent: contentLines.join('\n').trim(),
+    variant: variant,
+    endIndex: i - 1
+  };
+}
+
 // 处理列表项和富文本 - 简化版本，避免拆分文本
 function processListItemAndRichText(line) {
   // 首先检查是否为列表项
@@ -647,6 +717,67 @@ function parseButtonVariant(text) {
   }
   
   return { hasVariant: false };
+}
+
+// 创建卡片元素
+function createCardElement(content, variant = 'standard') {
+  const id = generateUUID();
+  // 获取卡片元素的样式配置
+  const cardStyleConfig = getElementStyleConfig('card', variant);
+
+  // 生成唯一的className
+  const uniqueClassName = `card-${id}`;
+
+  // 解析卡片内容为子元素
+  let cardChildren = [];
+  if (content && content.trim()) {
+    // 递归解析卡片内容
+    const parsedContent = parseMarkdown(content);
+    cardChildren = parsedContent;
+  }
+
+  // 创建基础布局结构
+  const baseLayout = createBaseLayout(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, {
+    width: "100%",
+    height: "auto",
+    alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN
+  });
+
+  // 应用卡片样式到布局
+  Object.entries(cardStyleConfig).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      baseLayout.style[key] = value;
+    }
+  });
+
+  const cardElement = {
+    dataKeys: [],
+    name: "layout", // 使用 layout 名称，让它作为容器渲染
+    "name-zh": "卡片",
+    "file-type": "template", // 使用 template 类型
+    theme: "default",
+    // 🔍 保存元数据用于分析
+    _metadata: {
+      actualType: 'card',
+      variant: variant,
+      isCard: true,
+      isLayout: true, // 标记为布局容器
+      cardContent: content
+    },
+    layout: {
+      ...baseLayout,
+      classStyle: {
+        ...cardStyleConfig
+      },
+      className: uniqueClassName,
+      children: cardChildren
+    },
+    description: `卡片元素 - ${variant}`,
+    id,
+    events: [{}]
+  };
+
+  return cardElement;
 }
 
 // 创建按钮元素（用于超链接）
@@ -2502,6 +2633,48 @@ function parseMarkdown(markdown, options = {}) {
       }
 
       // 跳过已处理的布局标签行
+      i = endIndex;
+      continue;
+    }
+
+    // 处理卡片标签
+    const cardTagInfo = isCardTag(trimmedLine);
+    if (cardTagInfo.isCardTag && !cardTagInfo.isClosing) {
+      console.log(`发现卡片标签，行号: ${i}，变体: ${cardTagInfo.variant}`);
+      
+      // 处理之前累积的内容
+      flushTextBlock();
+      flushConsecutiveButtons();
+
+      // 如果正在处理列表，先结束列表
+      if (inList && listItems.length > 0) {
+        const listLayout = createLayoutElement(
+          LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+          listItems,
+          {
+            alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+            counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+          }
+        );
+        stack[stack.length - 1].elements.push(listLayout);
+        inList = false;
+        listItems = [];
+      }
+
+      // 提取卡片标签内容
+      const { cardContent, variant, endIndex } = extractCardBlock(
+        markedLines.map(item => item.line),
+        i
+      );
+
+      // 创建卡片元素
+      const cardElement = createCardElement(cardContent, variant);
+      
+      console.log(`🔧 创建卡片元素: ID=${cardElement.id}, variant=${variant}, 内容长度=${cardContent.length}`);
+
+      stack[stack.length - 1].elements.push(cardElement);
+
+      // 跳过已处理的卡片标签行
       i = endIndex;
       continue;
     }

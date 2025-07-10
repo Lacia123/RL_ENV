@@ -453,7 +453,7 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyContent: 'flex-start',
       alignItems: 'stretch',
       gap: DIMENSION_CONSTANTS.GAP.none,
-      
+            
       // 网格布局属性（默认不启用，由动作激活）
       gridTemplateColumns: 'none',
       gridTemplateAreas: 'none',
@@ -472,7 +472,7 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyContent: 'flex-start',
       alignItems: 'flex-start',
       gap: DIMENSION_CONSTANTS.GAP.none,
-      
+            
       // 网格布局属性（默认不启用，由动作激活）
       gridTemplateColumns: 'none',
       gridTemplateAreas: 'none',
@@ -507,7 +507,7 @@ export const DEFAULT_STYLE_CONFIG = {
       lineHeight: "1.7",
       letterSpacing: "{font.letterspacing.base}",
       color: "{color.onsurface.black76}",
-      marginBottom: "{dimension.margin.base}",
+      margin: "0 0 {dimension.margin.base} 0",
       textAlign: "justify",
       textJustify: "inter-word"
     },
@@ -546,11 +546,11 @@ export const DEFAULT_STYLE_CONFIG = {
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
       color: "{color.onsurface.black88}",
-      marginTop: "{dimension.margin.extraloose}",
-      marginBottom: "{dimension.margin.base}",
+      margin: "{dimension.margin.extraloose} 0 {dimension.margin.base} 0",
       padding: "{dimension.padding.base} {dimension.padding.semiloose}",
       borderLeft: `4px solid {color.primary.brand5}`,
       background: `linear-gradient(90deg, {color.primarycontainer.brand1} 0%, transparent 100%)`,
+      backgroundImage: 'none',
       borderRadius: "{dimension.borderradius.small}",
       boxShadow: "{material.hierarchy.main}"
     },
@@ -563,8 +563,7 @@ export const DEFAULT_STYLE_CONFIG = {
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
       color: "{color.onsurface.black76}",
-      marginTop: "{dimension.margin.loose}",
-      marginBottom: "{dimension.margin.base}",
+      margin: "{dimension.margin.loose} 0 {dimension.margin.base} 0",
       position: 'relative',
       // '&::before': {
       //   content: "'#'",
@@ -581,10 +580,9 @@ export const DEFAULT_STYLE_CONFIG = {
       letterSpacing: "{font.letterspacing.base}",
       color: "{color.onsurface.black76}",
       justifyContent: "center",
-      marginTop: "{dimension.margin.semiloose}",
-      marginBottom: "{dimension.margin.tight}",
+      margin: "{dimension.margin.semiloose} 0 {dimension.margin.tight} 0",
+      padding: "0 0 {dimension.padding.extratight} 0",
       textTransform: "capitalize",
-      paddingBottom: "{dimension.padding.extratight}",
       borderBottom: `2px solid {color.surfacecontainer.black12}`
     },
     h5: {
@@ -594,8 +592,7 @@ export const DEFAULT_STYLE_CONFIG = {
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
       color: "{color.onsurface.black64}",
-      marginTop: "{dimension.margin.base}",
-      marginBottom: "{dimension.margin.tight}",
+      margin: "{dimension.margin.base} 0 {dimension.margin.tight} 0",
       textDecoration: "underline",
       textDecorationColor: "{color.primarycontainer.brand2}",
       textUnderlineOffset: "4px"
@@ -608,12 +605,11 @@ export const DEFAULT_STYLE_CONFIG = {
       lineHeight: "{font.lineheight.base}",
       letterSpacing: "{font.letterspacing.base}",
       color: "{color.onsurface.black48}",
-      marginTop: "{dimension.margin.base}",
-      marginBottom: "{dimension.margin.tight}",
+      margin: "{dimension.margin.base} 0 {dimension.margin.tight} 0",
+      padding: "{dimension.padding.supertight} {dimension.padding.tight}",
       textTransform: "uppercase",
       letterSpacing: "1px",
       background: "{color.surfacecontainer.black4}",
-      padding: "{dimension.padding.supertight} {dimension.padding.tight}",
       borderRadius: "{dimension.borderradius.xs}"
     },
 
@@ -653,6 +649,10 @@ export const DEFAULT_STYLE_CONFIG = {
       backgroundSize: 'auto',
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center',
+
+      opacity: '1.0',
+      backdropFilter: 'none',
+      
       '&::before': {
         content: '"""',
         fontSize: '3rem',
@@ -789,7 +789,6 @@ export const DEFAULT_STYLE_CONFIG = {
     container: {
       width: '100%',
       borderCollapse: 'collapse',
-      margin: "{dimension.margin.loose} 0",
       backgroundColor: "{color.surfacecontainer.white100}",
       borderRadius: "{dimension.borderradius.large}",
       overflow: 'hidden',
@@ -806,6 +805,7 @@ export const DEFAULT_STYLE_CONFIG = {
       padding: "{dimension.padding.base} {dimension.padding.semiloose}",
       textAlign: 'left',
       borderBottom: `{dimension.borderwidth.base} solid {color.surfacecontainer.black20}`,
+      backgroundImage: 'none',
       textTransform: 'uppercase',
       letterSpacing: '0.5px'
     },
@@ -849,6 +849,14 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyContent: 'center',
       gap: "{dimension.gap.tight}",
       margin: "{dimension.margin.tight}",
+      
+      // 🆕 通透程度动作所需的默认属性
+      opacity: '1.0',
+      backdropFilter: 'none',
+      
+      // 🆕 视觉重量动作所需的默认属性
+      transform: 'scale(1.0)',
+      
       '&:hover': {
         transform: 'translateY(-2px)',
         boxShadow: "{material.hierarchy.4f}",
@@ -877,6 +885,14 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyContent: 'center',
       gap: "{dimension.gap.tight}",
       margin: "{dimension.margin.tight}",
+      
+      // 🆕 通透程度动作所需的默认属性
+      opacity: '0.98',
+      backdropFilter: 'none',
+      
+      // 🆕 视觉重量动作所需的默认属性
+      transform: 'scale(0.98)',
+      
       '&:hover': {
         backgroundColor: "{color.secondarycontainer.violet2}",
         color: "{color.onsecondarycontainer.violet8}",
@@ -976,6 +992,14 @@ export const DEFAULT_STYLE_CONFIG = {
       alignItems: 'center',
       justifyContent: 'center',
       gap: "{dimension.gap.tight}",
+      
+      // 🆕 通透程度动作所需的默认属性 - ghost 按钮天然适合透明效果
+      opacity: '0.9',
+      backdropFilter: 'blur(2px)',
+      
+      // 🆕 视觉重量动作所需的默认属性 - ghost 按钮较轻
+      transform: 'scale(0.95)',
+      
       '&:hover': {
         backgroundColor: "{color.primarycontainer.brand1}",
         color: "{color.primary.brand6}",
@@ -1093,7 +1117,14 @@ export const DEFAULT_STYLE_CONFIG = {
       borderColor: "{color.success.green3}",
       borderStyle: "solid",
       color: "{color.success.green8}",
-      borderLeft: `{dimension.borderwidth.wide} solid {color.success.green5}`
+      borderLeft: `{dimension.borderwidth.wide} solid {color.success.green5}`,
+      
+      // 🆕 通透程度动作所需的默认属性
+      opacity: '0.95',
+      backdropFilter: 'none',
+      
+      // 🆕 视觉重量动作所需的默认属性 - 成功提示正常大小
+      transform: 'scale(1.0)'
     },
 
     // 警告提示  
@@ -1112,7 +1143,14 @@ export const DEFAULT_STYLE_CONFIG = {
       color: "{color.warning.orange8}",
       borderLeftWidth: "{dimension.borderwidth.wide}",
       borderLeftColor: "{color.warning.orange5}",
-      borderLeftStyle: "solid"
+      borderLeftStyle: "solid",
+      
+      // 🆕 通透程度动作所需的默认属性
+      opacity: '0.95',
+      backdropFilter: 'none',
+      
+      // 🆕 视觉重量动作所需的默认属性 - 警告提示稍大
+      transform: 'scale(1.01)'
     },
 
     // 错误提示  
@@ -1131,7 +1169,14 @@ export const DEFAULT_STYLE_CONFIG = {
       color: "{color.error.red8}",
       borderLeftWidth: "{dimension.borderwidth.wide}",
       borderLeftColor: "{color.error.red5}",
-      borderLeftStyle: "solid"
+      borderLeftStyle: "solid",
+      
+      // 🆕 通透程度动作所需的默认属性
+      opacity: '0.95',
+      backdropFilter: 'none',
+      
+      // 🆕 视觉重量动作所需的默认属性 - 错误提示更大（最紧急）
+      transform: 'scale(1.03)'
     },
 
     // 信息提示  
@@ -1150,7 +1195,14 @@ export const DEFAULT_STYLE_CONFIG = {
       color: "{color.onprimarycontainer.brand8}",
       borderLeftWidth: "{dimension.borderwidth.wide}",
       borderLeftColor: "{color.primary.brand5}",
-      borderLeftStyle: "solid"
+      borderLeftStyle: "solid",
+      
+      // 🆕 通透程度动作所需的默认属性
+      opacity: '0.95',
+      backdropFilter: 'none',
+      
+      // 🆕 视觉重量动作所需的默认属性 - 信息提示正常大小
+      transform: 'scale(1.0)'
     }
   },
 
@@ -1164,9 +1216,18 @@ export const DEFAULT_STYLE_CONFIG = {
       borderColor: "{color.surfacecontainer.black12}",
       borderStyle: "solid",
       boxShadow: "{material.hierarchy.1f}",
-      padding: "{dimension.padding.extraloose}",
+      padding: "{dimension.padding.loose}",
       margin: "{dimension.margin.loose} 0",
+      backgroundImage: 'none',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      
+      // 🆕 通透程度动作所需的默认属性
+      opacity: '1.0',
+      backdropFilter: 'none',
+      
+      // 🆕 视觉重量动作所需的默认属性
+      transform: 'scale(1.0)',
+      
       '&:hover': {
         boxShadow: "{material.hierarchy.2f}",
         transform: 'translateY(-2px)'
@@ -1181,7 +1242,16 @@ export const DEFAULT_STYLE_CONFIG = {
       boxShadow: "{material.hierarchy.3f}",
       padding: "{dimension.padding.extraloose}",
       margin: "{dimension.margin.loose} 0",
+      backgroundImage: 'none',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      
+      // 🆕 通透程度动作所需的默认属性 - 高级卡片稍微透明营造层次感
+      opacity: '0.98',
+      backdropFilter: 'blur(1px)',
+      
+      // 🆕 视觉重量动作所需的默认属性 - 高级卡片稍大
+      transform: 'scale(1.02)',
+      
       '&:hover': {
         boxShadow: "{material.hierarchy.4f}",
         transform: 'translateY(-4px)'
@@ -1199,6 +1269,14 @@ export const DEFAULT_STYLE_CONFIG = {
       padding: "{dimension.padding.loose}",
       margin: "{dimension.margin.base} 0",
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      
+      // 🆕 通透程度动作所需的默认属性 - 轮廓卡片适合透明效果
+      opacity: '0.95',
+      backdropFilter: 'none',
+      
+      // 🆕 视觉重量动作所需的默认属性 - 轮廓卡片较轻
+      transform: 'scale(0.98)',
+      
       '&:hover': {
         borderColor: "{color.primarycontainer.brand2}",
         backgroundColor: "{color.surface.grey0}"
@@ -1219,6 +1297,7 @@ export const DEFAULT_STYLE_CONFIG = {
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       maxWidth: "100%",
       height: "auto",
+            
       '&:hover': {
         boxShadow: "{material.hierarchy.2f}",
         transform: "scale(1.02)"

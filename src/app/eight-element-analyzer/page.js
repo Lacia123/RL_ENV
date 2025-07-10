@@ -47,6 +47,7 @@ const MARKDOWN_TEMPLATES = {
 </layout:row>
 
 <layout:row>
+<card>
 ### 产品特性
 我们的产品具有强大的功能和优异的性能，满足各种业务需求
 
@@ -56,7 +57,8 @@ const MARKDOWN_TEMPLATES = {
 - ✅ 多端同步支持
 
 [查看功能详情](https://example.com/features)
-
+</card>
+<card>
 ### 技术优势
 采用最新的技术架构，确保系统的稳定性和可扩展性
 
@@ -66,6 +68,7 @@ const MARKDOWN_TEMPLATES = {
 - 🔧 负载均衡
 
 [技术白皮书](https://example.com/tech)
+</card>
 </layout:row>
 
 ### 核心优势

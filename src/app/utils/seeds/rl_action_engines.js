@@ -1216,6 +1216,12 @@ export const RL_ACTIONS = {
     },
     styleMapping: {
       padding: (baseValue, intensity, elementType, variant) => {
+        // 🚫 布局元素（row/column）不调整 padding，保持容器嵌套的一致性
+        if (elementType === 'layout' && (variant === 'row' || variant === 'column')) {
+          console.log(`🎯 呼吸感调控(padding): 跳过布局元素 ${elementType}.${variant}，保持原值`);
+          return baseValue; // 保持原有的 padding 值
+        }
+
         // 定义空间级别数组
         const spacingLevels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
 
@@ -1233,8 +1239,6 @@ export const RL_ACTIONS = {
           // 直接返回对应的 token 值
           const tokenValue = DESIGN_TOKEN_MAPPING.dimension.padding[selectedLevel];
 
-          console.log(`   📍 选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue}`);
-
           return tokenValue;
         } catch (error) {
           console.error('❌ 呼吸感padding映射错误:', error.message, '强度:', intensity);
@@ -1242,6 +1246,12 @@ export const RL_ACTIONS = {
         }
       },
       margin: (baseValue, intensity, elementType, variant) => {
+        // 🚫 布局元素（row/column）不调整 margin，保持容器嵌套的一致性
+        if (elementType === 'layout' && (variant === 'row' || variant === 'column')) {
+          console.log(`🎯 呼吸感调控(margin): 跳过布局元素 ${elementType}.${variant}，保持原值`);
+          return baseValue; // 保持原有的 margin 值
+        }
+
         const spacingLevels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
 
         console.log(`🎯 呼吸感调控(margin): 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
@@ -1252,8 +1262,6 @@ export const RL_ACTIONS = {
           const levelIndex = Math.max(0, Math.min(maxIndex, targetIndex));
           const selectedLevel = spacingLevels[levelIndex];
           const tokenValue = DESIGN_TOKEN_MAPPING.dimension.margin[selectedLevel];
-
-          console.log(`   📍 选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue}`);
 
           return tokenValue;
         } catch (error) {
@@ -1424,145 +1432,145 @@ export const RL_ACTIONS = {
   // ==================== 状态指示动作 (State Actions) ====================
 
   // 21. 应用成功状态
-  applySuccessState: {
-    category: 'state',
-    name: '应用成功状态',
-    intensity: 'moderate',
-    effects: {
-      backgroundColor: 'success',
-      borderColor: 'success',
-      textColor: 'success'
-    },
-    styleMapping: {
-      backgroundColor: (current, delta) => {
-        const levels = ['green0', 'green1', 'green2', 'green3', 'green4', 'green5'];
-        const index = Math.floor(delta * levels.length);
-        return DESIGN_TOKEN_MAPPING.color.success[levels[Math.min(index, levels.length - 1)]];
-      },
-      borderColor: (current, delta) => {
-        const level = delta > 0.5 ? 'green5' : 'green3';
-        return DESIGN_TOKEN_MAPPING.color.success[level];
-      },
-      color: (current, delta) => {
-        const level = delta > 0.7 ? 'green8' : 'green6';
-        return DESIGN_TOKEN_MAPPING.color.success[level];
-      }
-    },
-    conflicts: ['applyErrorState', 'applyWarningState', 'applyDisableState']
-  },
+  // applySuccessState: {
+  //   category: 'state',
+  //   name: '应用成功状态',
+  //   intensity: 'moderate',
+  //   effects: {
+  //     backgroundColor: 'success',
+  //     borderColor: 'success',
+  //     textColor: 'success'
+  //   },
+  //   styleMapping: {
+  //     backgroundColor: (current, delta) => {
+  //       const levels = ['green0', 'green1', 'green2', 'green3', 'green4', 'green5'];
+  //       const index = Math.floor(delta * levels.length);
+  //       return DESIGN_TOKEN_MAPPING.color.success[levels[Math.min(index, levels.length - 1)]];
+  //     },
+  //     borderColor: (current, delta) => {
+  //       const level = delta > 0.5 ? 'green5' : 'green3';
+  //       return DESIGN_TOKEN_MAPPING.color.success[level];
+  //     },
+  //     color: (current, delta) => {
+  //       const level = delta > 0.7 ? 'green8' : 'green6';
+  //       return DESIGN_TOKEN_MAPPING.color.success[level];
+  //     }
+  //   },
+  //   conflicts: ['applyErrorState', 'applyWarningState', 'applyDisableState']
+  // },
 
-  // 22. 应用错误状态
-  applyErrorState: {
-    category: 'state',
-    name: '应用错误状态',
-    intensity: 'moderate',
-    effects: {
-      backgroundColor: 'error',
-      borderColor: 'error',
-      textColor: 'error'
-    },
-    styleMapping: {
-      backgroundColor: (current, delta) => {
-        const levels = ['red0', 'red1', 'red2', 'red3', 'red4', 'red5'];
-        const index = Math.floor(delta * levels.length);
-        return DESIGN_TOKEN_MAPPING.color.error[levels[Math.min(index, levels.length - 1)]];
-      },
-      borderColor: (current, delta) => {
-        const level = delta > 0.5 ? 'red5' : 'red3';
-        return DESIGN_TOKEN_MAPPING.color.error[level];
-      },
-      color: (current, delta) => {
-        const level = delta > 0.7 ? 'red8' : 'red6';
-        return DESIGN_TOKEN_MAPPING.color.error[level];
-      }
-    },
-    conflicts: ['applySuccessState', 'applyWarningState', 'applyDisableState']
-  },
+  // // 22. 应用错误状态
+  // applyErrorState: {
+  //   category: 'state',
+  //   name: '应用错误状态',
+  //   intensity: 'moderate',
+  //   effects: {
+  //     backgroundColor: 'error',
+  //     borderColor: 'error',
+  //     textColor: 'error'
+  //   },
+  //   styleMapping: {
+  //     backgroundColor: (current, delta) => {
+  //       const levels = ['red0', 'red1', 'red2', 'red3', 'red4', 'red5'];
+  //       const index = Math.floor(delta * levels.length);
+  //       return DESIGN_TOKEN_MAPPING.color.error[levels[Math.min(index, levels.length - 1)]];
+  //     },
+  //     borderColor: (current, delta) => {
+  //       const level = delta > 0.5 ? 'red5' : 'red3';
+  //       return DESIGN_TOKEN_MAPPING.color.error[level];
+  //     },
+  //     color: (current, delta) => {
+  //       const level = delta > 0.7 ? 'red8' : 'red6';
+  //       return DESIGN_TOKEN_MAPPING.color.error[level];
+  //     }
+  //   },
+  //   conflicts: ['applySuccessState', 'applyWarningState', 'applyDisableState']
+  // },
 
-  // 23. 应用警告状态
-  applyWarningState: {
-    category: 'state',
-    name: '应用警告状态',
-    intensity: 'moderate',
-    effects: {
-      backgroundColor: 'warning',
-      borderColor: 'warning',
-      textColor: 'warning'
-    },
-    styleMapping: {
-      backgroundColor: (current, delta) => {
-        const levels = ['orange0', 'orange1', 'orange2', 'orange3', 'orange4', 'orange5'];
-        const index = Math.floor(delta * levels.length);
-        return DESIGN_TOKEN_MAPPING.color.warning[levels[Math.min(index, levels.length - 1)]];
-      },
-      borderColor: (current, delta) => {
-        const level = delta > 0.5 ? 'orange5' : 'orange3';
-        return DESIGN_TOKEN_MAPPING.color.warning[level];
-      },
-      color: (current, delta) => {
-        const level = delta > 0.7 ? 'orange8' : 'orange6';
-        return DESIGN_TOKEN_MAPPING.color.warning[level];
-      }
-    },
-    conflicts: ['applySuccessState', 'applyErrorState', 'applyDisableState']
-  },
+  // // 23. 应用警告状态
+  // applyWarningState: {
+  //   category: 'state',
+  //   name: '应用警告状态',
+  //   intensity: 'moderate',
+  //   effects: {
+  //     backgroundColor: 'warning',
+  //     borderColor: 'warning',
+  //     textColor: 'warning'
+  //   },
+  //   styleMapping: {
+  //     backgroundColor: (current, delta) => {
+  //       const levels = ['orange0', 'orange1', 'orange2', 'orange3', 'orange4', 'orange5'];
+  //       const index = Math.floor(delta * levels.length);
+  //       return DESIGN_TOKEN_MAPPING.color.warning[levels[Math.min(index, levels.length - 1)]];
+  //     },
+  //     borderColor: (current, delta) => {
+  //       const level = delta > 0.5 ? 'orange5' : 'orange3';
+  //       return DESIGN_TOKEN_MAPPING.color.warning[level];
+  //     },
+  //     color: (current, delta) => {
+  //       const level = delta > 0.7 ? 'orange8' : 'orange6';
+  //       return DESIGN_TOKEN_MAPPING.color.warning[level];
+  //     }
+  //   },
+  //   conflicts: ['applySuccessState', 'applyErrorState', 'applyDisableState']
+  // },
 
-  // 24. 应用禁用状态
-  applyDisableState: {
-    category: 'state',
-    name: '应用禁用状态',
-    intensity: 'moderate',
-    effects: {
-      backgroundColor: 'disable',
-      borderColor: 'disable',
-      textColor: 'disable',
-      opacity: 'reduce'
-    },
-    styleMapping: {
-      backgroundColor: (current, delta) => {
-        const levels = ['grey0', 'grey1', 'grey2', 'grey3', 'grey4'];
-        const index = Math.floor(delta * levels.length);
-        return DESIGN_TOKEN_MAPPING.color.disable[levels[Math.min(index, levels.length - 1)]];
-      },
-      borderColor: (current, delta) => {
-        return DESIGN_TOKEN_MAPPING.color.disable.grey3;
-      },
-      color: (current, delta) => {
-        const level = delta > 0.5 ? 'grey6' : 'grey5';
-        return DESIGN_TOKEN_MAPPING.color.disable[level];
-      },
-      opacity: (current, delta) => Math.max(0.4, 1 - delta * 0.4),
-      cursor: () => 'not-allowed'
-    },
-    conflicts: ['applySuccessState', 'applyErrorState', 'applyWarningState']
-  },
+  // // 24. 应用禁用状态
+  // applyDisableState: {
+  //   category: 'state',
+  //   name: '应用禁用状态',
+  //   intensity: 'moderate',
+  //   effects: {
+  //     backgroundColor: 'disable',
+  //     borderColor: 'disable',
+  //     textColor: 'disable',
+  //     opacity: 'reduce'
+  //   },
+  //   styleMapping: {
+  //     backgroundColor: (current, delta) => {
+  //       const levels = ['grey0', 'grey1', 'grey2', 'grey3', 'grey4'];
+  //       const index = Math.floor(delta * levels.length);
+  //       return DESIGN_TOKEN_MAPPING.color.disable[levels[Math.min(index, levels.length - 1)]];
+  //     },
+  //     borderColor: (current, delta) => {
+  //       return DESIGN_TOKEN_MAPPING.color.disable.grey3;
+  //     },
+  //     color: (current, delta) => {
+  //       const level = delta > 0.5 ? 'grey6' : 'grey5';
+  //       return DESIGN_TOKEN_MAPPING.color.disable[level];
+  //     },
+  //     opacity: (current, delta) => Math.max(0.4, 1 - delta * 0.4),
+  //     cursor: () => 'not-allowed'
+  //   },
+  //   conflicts: ['applySuccessState', 'applyErrorState', 'applyWarningState']
+  // },
 
-  // 25. 应用信息状态
-  applyInfoState: {
-    category: 'state',
-    name: '应用信息状态',
-    intensity: 'moderate',
-    effects: {
-      backgroundColor: 'info',
-      borderColor: 'info',
-      textColor: 'info'
-    },
-    styleMapping: {
-      backgroundColor: (current, delta) => {
-        const level = delta > 0.5 ? 'blue1' : 'blue0';
-        return DESIGN_TOKEN_MAPPING.color.info[level];
-      },
-      borderColor: (current, delta) => {
-        const level = delta > 0.5 ? 'blue5' : 'blue3';
-        return DESIGN_TOKEN_MAPPING.color.info[level];
-      },
-      color: (current, delta) => {
-        const level = delta > 0.7 ? 'blue9' : 'blue7';
-        return DESIGN_TOKEN_MAPPING.color.info[level];
-      }
-    },
-    conflicts: []
-  },
+  // // 25. 应用信息状态
+  // applyInfoState: {
+  //   category: 'state',
+  //   name: '应用信息状态',
+  //   intensity: 'moderate',
+  //   effects: {
+  //     backgroundColor: 'info',
+  //     borderColor: 'info',
+  //     textColor: 'info'
+  //   },
+  //   styleMapping: {
+  //     backgroundColor: (current, delta) => {
+  //       const level = delta > 0.5 ? 'blue1' : 'blue0';
+  //       return DESIGN_TOKEN_MAPPING.color.info[level];
+  //     },
+  //     borderColor: (current, delta) => {
+  //       const level = delta > 0.5 ? 'blue5' : 'blue3';
+  //       return DESIGN_TOKEN_MAPPING.color.info[level];
+  //     },
+  //     color: (current, delta) => {
+  //       const level = delta > 0.7 ? 'blue9' : 'blue7';
+  //       return DESIGN_TOKEN_MAPPING.color.info[level];
+  //     }
+  //   },
+  //   conflicts: []
+  // },
 
 
 
@@ -1640,52 +1648,52 @@ export const RL_ACTIONS = {
   // ==================== 高级动画动作 (Animation Actions) ====================
 
   // 28. 增加微动效 - 现在支持嵌套属性
-  addMicroInteractions: {
-    category: 'animation',
-    name: '增加微动效',
-    intensity: 'subtle',
-    effects: {
-      transition: 'smooth',
-      hoverEffects: 'enhance',
-      microAnimations: 'enable'
-    },
-    styleMapping: {
-      transition: (current, delta) => {
-        if (delta > 0.7) return 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        if (delta > 0.4) return 'all 0.2s ease';
-        return 'all 0.1s ease';
-      },
-      '&:hover.transform': (current, delta) => {
-        if (delta > 0.6) return 'translateY(-2px) scale(1.02)';
-        if (delta > 0.3) return 'translateY(-1px)';
-        return 'none';
-      },
-      '&:hover.boxShadow': (current, delta) => {
-        if (delta > 0.5) return DESIGN_TOKEN_MAPPING.material.hierarchy['2f'];
-        return DESIGN_TOKEN_MAPPING.material.hierarchy.main;
-      }
-    },
-    conflicts: ['removeAnimations']
-  },
+  // addMicroInteractions: {
+  //   category: 'animation',
+  //   name: '增加微动效',
+  //   intensity: 'subtle',
+  //   effects: {
+  //     transition: 'smooth',
+  //     hoverEffects: 'enhance',
+  //     microAnimations: 'enable'
+  //   },
+  //   styleMapping: {
+  //     transition: (current, delta) => {
+  //       if (delta > 0.7) return 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+  //       if (delta > 0.4) return 'all 0.2s ease';
+  //       return 'all 0.1s ease';
+  //     },
+  //     '&:hover.transform': (current, delta) => {
+  //       if (delta > 0.6) return 'translateY(-2px) scale(1.02)';
+  //       if (delta > 0.3) return 'translateY(-1px)';
+  //       return 'none';
+  //     },
+  //     '&:hover.boxShadow': (current, delta) => {
+  //       if (delta > 0.5) return DESIGN_TOKEN_MAPPING.material.hierarchy['2f'];
+  //       return DESIGN_TOKEN_MAPPING.material.hierarchy.main;
+  //     }
+  //   },
+  //   conflicts: ['removeAnimations']
+  // },
 
-  // 29. 移除动画效果 - 现在支持嵌套属性
-  removeAnimations: {
-    category: 'animation',
-    name: '移除动画效果',
-    intensity: 'moderate',
-    effects: {
-      transition: 'none',
-      hoverEffects: 'disable',
-      animations: 'remove'
-    },
-    styleMapping: {
-      transition: () => 'none',
-      animation: () => 'none',
-      '&:hover.transform': () => 'none',
-      '&:hover.boxShadow': (current) => current
-    },
-    conflicts: ['addMicroInteractions']
-  },
+  // // 29. 移除动画效果 - 现在支持嵌套属性
+  // removeAnimations: {
+  //   category: 'animation',
+  //   name: '移除动画效果',
+  //   intensity: 'moderate',
+  //   effects: {
+  //     transition: 'none',
+  //     hoverEffects: 'disable',
+  //     animations: 'remove'
+  //   },
+  //   styleMapping: {
+  //     transition: () => 'none',
+  //     animation: () => 'none',
+  //     '&:hover.transform': () => 'none',
+  //     '&:hover.boxShadow': (current) => current
+  //   },
+  //   conflicts: ['addMicroInteractions']
+  // },
 
   // ==================== 可访问性动作 (Accessibility Actions) ====================
 
