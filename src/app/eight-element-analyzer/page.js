@@ -37,9 +37,10 @@ const MARKDOWN_TEMPLATES = {
 ![企业Logo](https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=300)
 
 ## 创新科技，引领未来
-
+<layout:row>
+<icon:small>send</icon:small>
 我们致力于为企业提供最先进的数字化解决方案，助力业务增长和数字化转型。
-
+</layout:row>
 <layout:row>
 [免费试用](https://example.com/trial)
 [了解更多](https://example.com/learn)
@@ -59,8 +60,6 @@ const MARKDOWN_TEMPLATES = {
 [查看功能详情](https://example.com/features)
 </card>
 <card>
-
-<icon>send</icon>
 
 ### 技术优势
 采用最新的技术架构，确保系统的稳定性和可扩展性
@@ -785,6 +784,8 @@ const EightElementAnalyzer = () => {
       }
 
       // 🆕 4. 如果有布局调控设置，应用到八要素结构上
+      // 🔧 临时注释：先解决动作调控问题，布局调控稍后处理
+      /*
       const layoutControlsList = Object.entries(currentLayoutControls)
         .filter(([layoutIndexStr, intensity]) => intensity !== undefined)
         .map(([layoutIndexStr, intensity]) => ({
@@ -815,6 +816,8 @@ const EightElementAnalyzer = () => {
       } else {
         console.log(`\n⚪ 跳过布局调控 - 没有设置布局调控`);
       }
+      */
+      console.log(`\n⚪ 布局调控已临时禁用 - 专注解决动作调控问题`);
 
       // 4. 保存处理后的八要素结构
       setEightElement(eightElementObj);

@@ -597,9 +597,9 @@ export const RL_ACTIONS = {
 
         try {
           // 图表子元素的fill字段特殊处理
-          if ((elementType === 'chart' && (variant === 'legend' || variant === 'axis')) || 
-              (elementType === 'chart' && variant === 'title')) {
-            
+          if ((elementType === 'chart' && (variant === 'legend' || variant === 'axis')) ||
+            (elementType === 'chart' && variant === 'title')) {
+
             // 1. 首先确定当前的背景色（图表背景）
             let backgroundColor = DESIGN_TOKEN_MAPPING.color.surface.grey1; // 默认图表背景
 
@@ -635,7 +635,7 @@ export const RL_ACTIONS = {
 
         try {
           // 🔧 专门处理表格行的 hover 效果 - 使用更明显的对比色
-          if (elementType === 'table' && variant === 'tr') {     
+          if (elementType === 'table' && variant === 'tr') {
             if (intensity <= 0.2) {
               return DESIGN_TOKEN_MAPPING.color.surface.grey1; // 轻微高亮，比容器背景稍深
             } else if (intensity <= 0.4) {
@@ -663,7 +663,7 @@ export const RL_ACTIONS = {
             // 0.0-0.2: 中性背景色系
             if (elementType === 'layout' && variant === 'root') {
               return DESIGN_TOKEN_MAPPING.color.surface.grey0; // 主背景层
-            } else if (elementType === 'container' || elementType === 'table' || elementType === 'math' || elementType === 'chart' || (elementType === 'text' && variant === 'codeBlock') || (elementType === 'text' && variant === 'quote') ) {
+            } else if (elementType === 'container' || elementType === 'table' || elementType === 'math' || elementType === 'chart' || (elementType === 'text' && variant === 'codeBlock') || (elementType === 'text' && variant === 'quote')) {
               return DESIGN_TOKEN_MAPPING.color.surface.grey1; // 容器层比主背景浅一级
             } else {
               return current; // 保持原有背景
@@ -705,7 +705,7 @@ export const RL_ACTIONS = {
             // 0.8-1.0: 最大品牌色背景
             if (elementType === 'layout' && variant === 'root') {
               return DESIGN_TOKEN_MAPPING.color.primary.brand4; // 主背景层使用深品牌色
-            } else if (elementType === 'container' || elementType === 'table' || elementType === 'chart' || elementType === 'math' || (elementType === 'text' && variant === 'codeBlock')  || (elementType === 'text' && variant === 'quote')) {
+            } else if (elementType === 'container' || elementType === 'table' || elementType === 'chart' || elementType === 'math' || (elementType === 'text' && variant === 'codeBlock') || (elementType === 'text' && variant === 'quote')) {
               return DESIGN_TOKEN_MAPPING.color.primary.brand3; // 容器层比主背景浅一级
             } else if (elementType === 'button') {
               return DESIGN_TOKEN_MAPPING.color.primary.brand5; // 按钮使用最深的品牌色
@@ -1005,7 +1005,7 @@ export const RL_ACTIONS = {
       },
       textAlign: (baseValue, intensity, elementType, variant) => {
         console.log(`🎯 板式重心文本对齐: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
-        
+
         try {
           // 对文本元素应用文本对齐调整
           if (elementType === 'text' || elementType === 'math' || elementType === 'list') {
@@ -1084,7 +1084,7 @@ export const RL_ACTIONS = {
       backgroundSize: 'adaptive',
       opacity: 'adaptive'
     },
-    styleMapping: {
+    styleMapping: { 
       backgroundImage: (baseValue, intensity, elementType, variant) => {
         console.log(`🎯 表面肌理调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
@@ -1096,10 +1096,10 @@ export const RL_ACTIONS = {
             textureValue = 'none';
           } else if (intensity <= 0.3) {
             // 0.1-0.3: 微细纹理，轻微点状
-            textureValue = 'radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px)';
+            textureValue = 'repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 0.5px, transparent 0.5px, transparent 2px)';
           } else if (intensity <= 0.5) {
             // 0.3-0.5: 细腻纹理，规律点状
-            textureValue = 'radial-gradient(rgba(0,0,0,0.05) 2px, transparent 2px)';
+            textureValue = 'repeating-linear-gradient(0deg, rgba(0,0,0,0.18), rgba(0,0,0,0.18) 1px, transparent 1px, transparent 3px)';
           } else if (intensity <= 0.7) {
             // 0.5-0.7: 中等纹理，条纹图案
             textureValue = 'repeating-linear-gradient(0deg, rgba(0,0,0,0.08), rgba(0,0,0,0.08) 1px, transparent 1px, transparent 3px)';
@@ -1897,7 +1897,7 @@ export class ActionConflictResolver {
 
     if (action.styleMapping) {
       console.log(`🔍 [DEBUG] 动作 ${actionName} 的 styleMapping 包含属性:`, Object.keys(action.styleMapping));
-      
+
       Object.entries(action.styleMapping).forEach(([property, mappingFunc]) => {
         console.log(`🔍 [DEBUG] 正在处理属性: "${property}"`);
         try {
@@ -1908,7 +1908,7 @@ export class ActionConflictResolver {
               obj[path] = value;
               return;
             }
-            
+
             // 原有的点号分割逻辑
             const keys = path.split('.');
             let current = obj;
@@ -1929,7 +1929,7 @@ export class ActionConflictResolver {
             if (path.includes('&:')) {
               return obj[path];
             }
-            
+
             // 原有的点号分割逻辑
             const keys = path.split('.');
             let current = obj;

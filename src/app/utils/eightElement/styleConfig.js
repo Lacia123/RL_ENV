@@ -648,10 +648,6 @@ export const DEFAULT_STYLE_CONFIG = {
       position: 'relative',
       // 🆕 纹理动作所需的默认属性
       backgroundImage: 'none',
-      backgroundSize: 'auto',
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center',
-
       opacity: '1.0',
       backdropFilter: 'none',
 
@@ -1456,6 +1452,7 @@ export const DEFAULT_STYLE_CONFIG = {
       width: "16px",
       height: "16px",
       color: "{color.onsurface.black48}",
+      margin: "0 0 {dimension.margin.base} 0",
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
     },
 

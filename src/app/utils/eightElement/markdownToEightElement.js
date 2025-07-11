@@ -502,12 +502,13 @@ function isLayoutTag(line) {
 
 // 检测是否为图标标签
 function isIconTag(line) {
-  // 匹配 <icon>iconname</icon> 格式
-  const iconMatch = line.match(/^<icon>([^<>]+)<\/icon>$/);
+  // 匹配 <icon>iconname</icon> 或 <icon:variant>iconname</icon:variant> 格式
+  const iconMatch = line.match(/^<icon(?::(\w+))?>([^<>]+)<\/icon(?::\w+)?>$/);
   if (iconMatch) {
     return {
       isIconTag: true,
-      iconName: iconMatch[1].trim()
+      variant: iconMatch[1] || 'medium', // 默认为 medium 变体
+      iconName: iconMatch[2].trim()
     };
   }
   
@@ -1683,7 +1684,7 @@ function createButtonElement(text, url, variant = 'primary') {
 }
 
 // 创建图标元素
-function createIconElement(iconName, variant = 'line') {
+function createIconElement(iconName, variant = 'medium') {
   const id = generateUUID();
   
   // 获取图标元素的样式配置
@@ -1691,6 +1692,8 @@ function createIconElement(iconName, variant = 'line') {
   
   // 生成唯一的className
   const uniqueClassName = `icon-${variant}-${id}`;
+  
+  console.log(`🔧 创建图标元素: 图标名称=${iconName}, 变体=${variant}, 样式配置=`, iconStyleConfig);
   
   // 创建图标元素结构
   const iconElement = {
@@ -1823,23 +1826,23 @@ function createIconElement(iconName, variant = 'line') {
         default: {
           "data-key": "",
           style: {
-            icon_color: {
-              value: "{color.basic.brand.5}",
-              type: "color",
-              key: "color-icon_color"
-            },
-            height: {
-              element: "scale",
-              value: "icon_height",
-              prop: "default",
-              token: "icon_height"
-            },
-            width: {
-              element: "scale",
-              value: "icon_width",
-              prop: "default",
-              token: "icon_width"
-            }
+            // icon_color: {
+            //   value: "{color.basic.brand.5}",
+            //   type: "color",
+            //   key: "color-icon_color"
+            // },
+            // height: {
+            //   element: "scale",
+            //   value: "icon_height",
+            //   prop: "default",
+            //   token: "icon_height"
+            // },
+            // width: {
+            //   element: "scale",
+            //   value: "icon_width",
+            //   prop: "default",
+            //   token: "icon_width"
+            // }
           },
           type: "icon",
           resource: iconName // 使用传入的图标名称
@@ -3624,7 +3627,7 @@ function parseMarkdown(markdown, options = {}) {
     // 检测图标标签
     const iconTagInfo = isIconTag(trimmedLine);
     if (iconTagInfo.isIconTag) {
-      console.log(`发现图标标签，行号: ${i}，图标名称: ${iconTagInfo.iconName}`);
+      console.log(`发现图标标签，行号: ${i}，图标名称: ${iconTagInfo.iconName}，变体: ${iconTagInfo.variant}`);
       
       // 处理之前累积的内容
       flushTextBlock();
@@ -3645,10 +3648,10 @@ function parseMarkdown(markdown, options = {}) {
         listItems = [];
       }
 
-      // 创建图标元素
-      const iconElement = createIconElement(iconTagInfo.iconName, 'line');
+      // 创建图标元素，使用从标签解析出的变体
+      const iconElement = createIconElement(iconTagInfo.iconName, iconTagInfo.variant);
       
-      console.log(`🔧 创建图标元素: ID=${iconElement.id}, 图标名称=${iconTagInfo.iconName}`);
+      console.log(`🔧 创建图标元素: ID=${iconElement.id}, 图标名称=${iconTagInfo.iconName}, 变体=${iconTagInfo.variant}`);
 
       stack[stack.length - 1].elements.push(iconElement);
 
