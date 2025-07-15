@@ -503,7 +503,7 @@ export const DEFAULT_STYLE_CONFIG = {
   // 文本元素配置
   text: {
     // 正文文本
-    normal: {
+    p: {
       fontSize: "{font.size.medium}",
       fontWeight: "400",
       lineHeight: "1.7",
@@ -1297,6 +1297,16 @@ export const DEFAULT_STYLE_CONFIG = {
 
     custom: {
       type: 'template',
+      // Markdown 转换映射规则
+      markdownMapping: {
+        // H2 (##) 映射到 title
+        h2: 'title',
+        // H3 (###) 映射到 content.title
+        h3: 'content.title',
+        // 普通文本段落映射到 content.segment
+        p: 'content.segment',
+        
+      },
       style: {
         display: 'flex',
         flexDirection: 'column',
@@ -1633,7 +1643,7 @@ export function getElementStyleConfig(elementType, variant = 'normal') {
 
   if (!activeStyleConfig[elementType][variant]) {
     console.warn(`未找到元素类型 "${elementType}" 的变体 "${variant}"`);
-    return activeStyleConfig[elementType]['normal'] || {};
+    return activeStyleConfig[elementType]['p'] || {};
   }
 
   return activeStyleConfig[elementType][variant];

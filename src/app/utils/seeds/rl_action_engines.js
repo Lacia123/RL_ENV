@@ -1606,7 +1606,7 @@ export const RL_ACTIONS = {
   //         return DESIGN_TOKEN_MAPPING.font.size.xxxl;
   //       }
   //       // 检查是否为正文类型（text元素的normal变体或无变体）
-  //       if (elementType === 'text' && (!variant || variant === 'normal') && delta > 0.4) {
+  //       if (elementType === 'text' && (!variant || variant === 'p') && delta > 0.4) {
   //         return DESIGN_TOKEN_MAPPING.font.size.large;
   //       }
   //       return current;
@@ -1862,7 +1862,7 @@ export class ActionConflictResolver {
 
     // 检查动作是否适用于当前元件类型
     const elementType = currentStyles.elementType || 'general';
-    const variant = currentStyles.variant || 'normal';
+    const variant = currentStyles.variant || 'p';
     console.log(`🔍 [DEBUG] 元件类型: ${elementType}.${variant}, 动作类别: ${action.category}`);
 
     if (!this.isActionApplicableToElement(action, elementType, variant)) {
@@ -2054,7 +2054,7 @@ export class ActionConflictResolver {
    * @param {string} elementType - 元件类型
    * @returns {boolean} 是否适用
    */
-  isActionApplicableToElement(action, elementType, variant = 'normal') {
+  isActionApplicableToElement(action, elementType, variant = 'p') {
     // 🔧 新增：基于动作的 applicableToElements 属性判断
     if (action.applicableToElements && Array.isArray(action.applicableToElements)) {
       return action.applicableToElements.some(target => {
@@ -2490,7 +2490,7 @@ function extractTokensFromElementConfig(elementConfig) {
  * @param {string} variant - 变体名称 (normal, primary, h1, h2, etc.)
  * @returns {Object} 该元件形态的基准token值和元数据
  */
-export function getElementBaseTokens(styleConfig, elementType = 'text', variant = 'normal') {
+export function getElementBaseTokens(styleConfig, elementType = 'text', variant = 'p') {
 
   const elementConfig = styleConfig[elementType];
   if (!elementConfig) {
@@ -2581,7 +2581,7 @@ export class ActionSystemManager {
    * @param {string} variant - 变体名称
    * @returns {RLStyleEnvironment} RL环境实例
    */
-  getOrCreateEnvironment(elementType = 'text', variant = 'normal') {
+  getOrCreateEnvironment(elementType = 'text', variant = 'p') {
     const envKey = `${elementType}.${variant}`;
 
     if (!this.environments.has(envKey)) {
@@ -2614,7 +2614,7 @@ export class ActionSystemManager {
    * @param {string} variant - 变体名称
    * @returns {Object} 执行结果
    */
-  executeAction(actionName, intensity = 0.5, elementType = 'text', variant = 'normal') {
+  executeAction(actionName, intensity = 0.5, elementType = 'text', variant = 'p') {
     const environment = this.getOrCreateEnvironment(elementType, variant);
 
     if (!environment) {
@@ -2638,7 +2638,7 @@ export class ActionSystemManager {
    * @param {string} variant - 变体名称
    * @returns {Object} 执行结果
    */
-  executeActions(actions, elementType = 'text', variant = 'normal') {
+  executeActions(actions, elementType = 'text', variant = 'p') {
     if (!Array.isArray(actions) || actions.length === 0) {
       return {
         success: false,
@@ -2668,7 +2668,7 @@ export class ActionSystemManager {
    * @param {string} elementType - 元件类型
    * @param {string} variant - 变体名称
    */
-  resetEnvironment(elementType = 'text', variant = 'normal') {
+  resetEnvironment(elementType = 'text', variant = 'p') {
     const envKey = `${elementType}.${variant}`;
     const environment = this.environments.get(envKey);
 
@@ -2693,7 +2693,7 @@ export class ActionSystemManager {
    * @param {string} elementType - 元件类型
    * @param {string} variant - 变体名称
    */
-  getCurrentState(elementType = 'text', variant = 'normal') {
+  getCurrentState(elementType = 'text', variant = 'p') {
     const environment = this.getOrCreateEnvironment(elementType, variant);
 
     if (!environment) {
@@ -2771,7 +2771,7 @@ export class ActionSystemManager {
    * @param {string} elementType - 元件类型
    * @param {string} variant - 变体名称
    */
-  getBaseTokens(elementType = 'text', variant = 'normal') {
+  getBaseTokens(elementType = 'text', variant = 'p') {
     const { baseTokens, metadata } = getElementBaseTokens(this.styleConfig, elementType, variant);
     return { baseTokens, metadata };
   }

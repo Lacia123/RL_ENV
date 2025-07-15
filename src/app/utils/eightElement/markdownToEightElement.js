@@ -548,12 +548,32 @@ function parseTemplateCardContent(content, cardStyleConfig) {
   const children = [];
   let i = 0;
 
+  // 🆕 检查是否有 markdownMapping 配置
+  const hasMarkdownMapping = cardStyleConfig.markdownMapping && Object.keys(cardStyleConfig.markdownMapping).length > 0;
+  
+  // 🆕 用于跟踪容器，确保相同容器的子元素被合并
+  const containerMap = new Map(); // key: containerName, value: containerElement
+  
   while (i < lines.length) {
     const line = lines[i].trim();
     
     if (!line) {
       i++;
       continue;
+    }
+
+    // 🆕 优先检查 markdown 格式（如果有 markdownMapping 配置）
+    if (hasMarkdownMapping) {
+      const markdownResult = parseMarkdownToTemplate(line, cardStyleConfig.markdownMapping);
+      if (markdownResult) {
+        console.log(`发现 markdown 格式: ${markdownResult.type} -> ${markdownResult.templatePath}, 内容: "${markdownResult.content}"`);
+        
+        // 🆕 检查是否需要合并到现有容器
+        const templateElement = createOrMergeTemplateElement(markdownResult.templatePath, markdownResult.content, cardStyleConfig, containerMap, children);
+        
+        i++;
+        continue;
+      }
     }
 
     // 检查是否为内联模板标签（如 <title>内容</title>）
@@ -588,15 +608,200 @@ function parseTemplateCardContent(content, cardStyleConfig) {
         
         i = endIndex + 1;
       } else {
-        // 普通文本内容，作为文本元素处理
-        const textElement = createTextElement(line);
-        children.push(textElement);
+        // 🆕 如果有 markdownMapping 且是普通文本，尝试作为段落处理
+        if (hasMarkdownMapping && cardStyleConfig.markdownMapping.p) {
+          console.log(`将普通文本作为段落处理: "${line}"`);
+          // 🆕 使用合并逻辑处理段落
+          createOrMergeTemplateElement(cardStyleConfig.markdownMapping.p, line, cardStyleConfig, containerMap, children);
+        } else {
+          // 普通文本内容，作为文本元素处理
+          const textElement = createTextElement(line);
+          children.push(textElement);
+        }
         i++;
       }
     }
   }
 
   return children;
+}
+
+// 🆕 解析 markdown 格式并映射到模板路径
+function parseMarkdownToTemplate(line, markdownMapping) {
+  // 检查标题格式
+  const h2Match = line.match(/^##\s+(.+)$/);
+  if (h2Match && markdownMapping.h2) {
+    return {
+      type: 'h2',
+      templatePath: markdownMapping.h2,
+      content: h2Match[1].trim()
+    };
+  }
+  
+  const h3Match = line.match(/^###\s+(.+)$/);
+  if (h3Match && markdownMapping.h3) {
+    return {
+      type: 'h3',
+      templatePath: markdownMapping.h3,
+      content: h3Match[1].trim()
+    };
+  }
+  
+  // 可以扩展支持更多 markdown 格式
+  const h4Match = line.match(/^####\s+(.+)$/);
+  if (h4Match && markdownMapping.h4) {
+    return {
+      type: 'h4',
+      templatePath: markdownMapping.h4,
+      content: h4Match[1].trim()
+    };
+  }
+  
+  const h5Match = line.match(/^#####\s+(.+)$/);
+  if (h5Match && markdownMapping.h5) {
+    return {
+      type: 'h5',
+      templatePath: markdownMapping.h5,
+      content: h5Match[1].trim()
+    };
+  }
+  
+  const h6Match = line.match(/^######\s+(.+)$/);
+  if (h6Match && markdownMapping.h6) {
+    return {
+      type: 'h6',
+      templatePath: markdownMapping.h6,
+      content: h6Match[1].trim()
+    };
+  }
+  
+  // 如果没有匹配到任何 markdown 格式，返回 null
+  return null;
+}
+
+// 🆕 创建或合并到现有容器的模板元素
+function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, containerMap, children) {
+  console.log(`创建或合并模板元素，路径: ${templatePath}, 内容: "${content}"`);
+  
+  // 解析路径（支持嵌套路径如 'content.title'）
+  const pathParts = templatePath.split('.');
+  
+  if (pathParts.length === 1) {
+    // 简单路径，直接创建元素并添加到children
+    const tagName = pathParts[0];
+    const templateElement = createTemplateTagElement(tagName, content, cardStyleConfig);
+    if (templateElement) {
+      children.push(templateElement);
+    }
+    return templateElement;
+  } else if (pathParts.length === 2) {
+    // 嵌套路径，需要处理容器合并
+    const parentTagName = pathParts[0];
+    const childTagName = pathParts[1];
+    
+    // 检查父级配置是否存在
+    const parentConfig = cardStyleConfig[parentTagName];
+    if (!parentConfig) {
+      console.warn(`警告: 未找到父级模板标签 ${parentTagName} 的配置`);
+      return null;
+    }
+    
+    // 检查子级配置是否存在
+    const childConfig = parentConfig[childTagName];
+    if (!childConfig) {
+      console.warn(`警告: 未找到子级模板标签 ${parentTagName}.${childTagName} 的配置`);
+      return null;
+    }
+    
+    // 创建子元素
+    const childElement = createTemplateTagElement(childTagName, content, parentConfig);
+    if (!childElement) {
+      return null;
+    }
+    
+    // 检查是否已经存在该容器
+    let parentElement = containerMap.get(parentTagName);
+    if (!parentElement) {
+      // 创建新的父容器
+      parentElement = createTemplateTagElement(parentTagName, '', cardStyleConfig);
+      if (!parentElement) {
+        return null;
+      }
+      
+      // 将父容器添加到children并记录到containerMap
+      children.push(parentElement);
+      containerMap.set(parentTagName, parentElement);
+      console.log(`创建新的容器: ${parentTagName}`);
+    } else {
+      console.log(`使用现有容器: ${parentTagName}`);
+    }
+    
+    // 将子元素添加到父容器中
+    if (parentElement.layout && parentElement.layout.children) {
+      parentElement.layout.children.push(childElement);
+      console.log(`将 ${childTagName} 添加到容器 ${parentTagName} 中，当前子元素数量: ${parentElement.layout.children.length}`);
+    }
+    
+    return childElement;
+  } else {
+    console.warn(`警告: 不支持的模板路径深度: ${templatePath}`);
+    return null;
+  }
+}
+
+// 🆕 根据模板路径创建对应的元素（兼容函数）
+function createTemplateElementFromPath(templatePath, content, cardStyleConfig) {
+  console.log(`创建模板元素，路径: ${templatePath}, 内容: "${content}"`);
+  
+  // 解析路径（支持嵌套路径如 'content.title'）
+  const pathParts = templatePath.split('.');
+  
+  if (pathParts.length === 1) {
+    // 简单路径，直接创建元素
+    const tagName = pathParts[0];
+    return createTemplateTagElement(tagName, content, cardStyleConfig);
+  } else if (pathParts.length === 2) {
+    // 嵌套路径，需要创建嵌套结构
+    const parentTagName = pathParts[0];
+    const childTagName = pathParts[1];
+    
+    // 检查父级配置是否存在
+    const parentConfig = cardStyleConfig[parentTagName];
+    if (!parentConfig) {
+      console.warn(`警告: 未找到父级模板标签 ${parentTagName} 的配置`);
+      return null;
+    }
+    
+    // 检查子级配置是否存在
+    const childConfig = parentConfig[childTagName];
+    if (!childConfig) {
+      console.warn(`警告: 未找到子级模板标签 ${parentTagName}.${childTagName} 的配置`);
+      return null;
+    }
+    
+    // 先创建子元素
+    const childElement = createTemplateTagElement(childTagName, content, parentConfig);
+    if (!childElement) {
+      return null;
+    }
+    
+    // 然后创建父元素，将子元素作为其内容
+    const parentElement = createTemplateTagElement(parentTagName, '', cardStyleConfig);
+    if (!parentElement) {
+      return null;
+    }
+    
+    // 将子元素添加到父元素的 children 中
+    if (parentElement.layout && parentElement.layout.children) {
+      parentElement.layout.children.push(childElement);
+    }
+    
+    console.log(`创建嵌套模板元素: ${parentTagName} > ${childTagName}`);
+    return parentElement;
+  } else {
+    console.warn(`警告: 不支持的模板路径深度: ${templatePath}`);
+    return null;
+  }
 }
 
 // 提取模板标签内容
@@ -4458,13 +4663,13 @@ export function analyzeElementsInEightElement(eightElement) {
     children.forEach((child, index) => {
       let itemContent = '';
       let itemType = child.name;
-      let itemVariant = 'normal';
+      let itemVariant = 'p';
       
       // 使用元数据确定实际类型和形态
       if (child._metadata) {
         const metadata = child._metadata;
         itemType = metadata.actualType || child.name;
-        itemVariant = metadata.variant || 'normal';
+        itemVariant = metadata.variant || 'p';
         
         // 对于layout元素，特别处理
         if (itemType === 'layout' && metadata.isRoot !== undefined) {
@@ -4526,13 +4731,13 @@ export function analyzeElementsInEightElement(eightElement) {
         const firstChild = child.layout.children[0];
         if (firstChild && firstChild.name) {
           let firstElementType = firstChild.name;
-          let firstElementVariant = 'normal';
+          let firstElementVariant = 'p';
           
           // 使用元数据确定第一个子元素的实际类型
           if (firstChild._metadata) {
             const metadata = firstChild._metadata;
             firstElementType = metadata.actualType || firstChild.name;
-            firstElementVariant = metadata.variant || 'normal';
+            firstElementVariant = metadata.variant || 'p';
           } else {
             // 回退到基于名称的判断
             if (firstElementType === 'background') {
