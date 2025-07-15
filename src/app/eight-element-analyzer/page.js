@@ -693,34 +693,9 @@ const EightElementAnalyzer = () => {
         setLayoutAnalysis(pageElementsList.layoutAnalysis);
         console.log(`🏗️ 识别到 ${pageElementsList.layoutAnalysis.length} 个可调控的布局`);
 
-        // 🔧 修复：基于索引初始化布局调控，保持现有调控设置不变
+        // 🔧 修复：不再自动设置默认值，只保持用户已经设置的调控
         const layoutControlsToUpdate = { ...currentLayoutControls };
-        let hasNewLayouts = false;
-
-        pageElementsList.layoutAnalysis.forEach(layout => {
-          if (!(layout.index in layoutControlsToUpdate)) {
-            // 只对真正新发现的布局设置默认值
-            const isCurrentlyRow = layout.variant === 'row' ||
-              layout.layoutDirection === 'HORIZONTAL' ||
-              (layout.element._metadata?.originalVariant === 'row') ||
-              (layout.element._metadata?.isLayoutTag && layout.variant === 'row'); // 🆕 特别检查layout标签
-
-            // 🆕 对于来自layout标签的布局，使用更明显的默认强度
-            if (layout.element._metadata?.isLayoutTag) {
-              layoutControlsToUpdate[layout.index] = isCurrentlyRow ? 0.9 : 0.1; // 更明显的强度
-              console.log(`🎯 检测到layout标签: 索引=${layout.index}, 变体=${layout.variant}, 设置明显强度=${layoutControlsToUpdate[layout.index]}`);
-            } else {
-              layoutControlsToUpdate[layout.index] = isCurrentlyRow ? 0.8 : 0.2;
-              console.log(`🔧 初始化常规布局: 索引=${layout.index}, 默认强度=${layoutControlsToUpdate[layout.index]}`);
-            }
-
-            hasNewLayouts = true;
-            console.log(`🔧 初始化新布局 索引=${layout.index}: 方向=${layout.layoutDirection}, 变体=${layout.variant}, 原始变体=${layout.element._metadata?.originalVariant}, 来自标签=${!!layout.element._metadata?.isLayoutTag}, 默认强度=${layoutControlsToUpdate[layout.index]}`);
-          } else {
-            console.log(`🔍 保持现有布局调控 索引=${layout.index}: 当前强度=${layoutControlsToUpdate[layout.index]}`);
-          }
-        });
-
+        
         // 🔧 清理不存在的布局索引（布局可能被删除或修改）
         const validLayoutIndices = new Set(pageElementsList.layoutAnalysis.map(layout => layout.index));
         Object.keys(layoutControlsToUpdate).forEach(layoutIndexStr => {
@@ -731,17 +706,12 @@ const EightElementAnalyzer = () => {
           }
         });
 
-        // 只在有变化时更新状态
-        if (hasNewLayouts || Object.keys(layoutControlsToUpdate).length !== Object.keys(currentLayoutControls).length) {
+        // 🔧 修复：只在调控设置有变化时才更新状态
+        if (Object.keys(layoutControlsToUpdate).length !== Object.keys(currentLayoutControls).length) {
           setLayoutControls(layoutControlsToUpdate);
-          console.log('🔧 更新布局调控设置：新布局数量=' + (hasNewLayouts ? '有' : '无') + ', 当前总数=' + Object.keys(layoutControlsToUpdate).length);
-
-          // 🆕 如果有新的布局调控且当前没有强制传入的布局调控，使用新的布局调控设置
-          if (hasNewLayouts && forceLayoutControls === null) {
-            console.log('🎯 检测到新布局，将使用更新后的布局调控设置');
-            // 更新当前使用的布局调控设置
-            currentLayoutControls = layoutControlsToUpdate;
-          }
+          console.log('🔧 更新布局调控设置：清理了不存在的布局，当前总数=' + Object.keys(layoutControlsToUpdate).length);
+        } else {
+          console.log('🔍 布局调控设置无变化，保持现有设置');
         }
       } else {
         setLayoutAnalysis([]);
@@ -784,8 +754,6 @@ const EightElementAnalyzer = () => {
       }
 
       // 🆕 4. 如果有布局调控设置，应用到八要素结构上
-      // 🔧 临时注释：先解决动作调控问题，布局调控稍后处理
-      /*
       const layoutControlsList = Object.entries(currentLayoutControls)
         .filter(([layoutIndexStr, intensity]) => intensity !== undefined)
         .map(([layoutIndexStr, intensity]) => ({
@@ -816,8 +784,6 @@ const EightElementAnalyzer = () => {
       } else {
         console.log(`\n⚪ 跳过布局调控 - 没有设置布局调控`);
       }
-      */
-      console.log(`\n⚪ 布局调控已临时禁用 - 专注解决动作调控问题`);
 
       // 4. 保存处理后的八要素结构
       setEightElement(eightElementObj);
@@ -934,6 +900,18 @@ const EightElementAnalyzer = () => {
     }, 100);
   };
 
+  // 🆕 根据布局的原始方向计算默认显示强度
+  const getLayoutDefaultIntensity = (layout) => {
+    // 判断布局的原始方向
+    const isOriginallyRow = layout.variant === 'row' ||
+      layout.layoutDirection === 'HORIZONTAL' ||
+      (layout.element._metadata?.originalVariant === 'row') ||
+      (layout.element._metadata?.isLayoutTag && layout.variant === 'row');
+    
+    // 如果原本是row，默认显示0.8；如果原本是column，默认显示0.2
+    return isOriginallyRow ? 0.8 : 0.2;
+  };
+
   // 🆕 布局调控处理函数 - 改为基于索引
   const handleLayoutControlChange = (layoutIndex, intensity) => {
     setLayoutControls(prev => ({
@@ -942,18 +920,10 @@ const EightElementAnalyzer = () => {
     }));
   };
 
-  // 🆕 重置布局调控 - 改为基于索引
+  // 🆕 重置布局调控 - 改为基于索引，完全清空所有调控
   const resetLayoutControls = () => {
-    const resetControls = {};
-    layoutAnalysis.forEach(layout => {
-      // 🔧 修复：正确判断原始布局方向来设置重置强度
-      const isCurrentlyRow = layout.variant === 'row' ||
-        layout.layoutDirection === 'HORIZONTAL' ||
-        (layout.element._metadata?.originalVariant === 'row');
-      resetControls[layout.index] = isCurrentlyRow ? 0.8 : 0.2;
-      console.log(`🔄 重置布局 索引=${layout.index}: 方向=${layout.layoutDirection}, 变体=${layout.variant}, 原始变体=${layout.element._metadata?.originalVariant}, 重置强度=${resetControls[layout.index]}`);
-    });
-    setLayoutControls(resetControls);
+    console.log('🔄 重置布局调控：清空所有调控设置');
+    setLayoutControls({});
   };
 
   // 测量iframe内容时使用通用函数替换内联逻辑
@@ -1426,43 +1396,49 @@ const EightElementAnalyzer = () => {
 
                 {!isLayoutControlsCollapsed && (
                   <div className="space-y-3 max-h-60 overflow-y-auto">
-                    {layoutAnalysis.map((layout) => {
-                      const currentIntensity = layoutControls[layout.index] || 0.5;
-                      const currentVariant = currentIntensity <= 0.5 ? 'column' : 'row';
-                      // 🔧 修复：正确判断原始布局方向
-                      const originallyRow = layout.variant === 'row' ||
-                        layout.layoutDirection === 'HORIZONTAL' ||
-                        (layout.element._metadata?.originalVariant === 'row');
-                      const originalIntensity = originallyRow ? 0.8 : 0.2;
-                      const isChanged = Math.abs(currentIntensity - originalIntensity) > 0.1;
+                                            {layoutAnalysis.map((layout) => {
+                          // 🔧 修复：使用原始方向计算默认强度，如果用户没有设置调控则显示原始状态
+                          const defaultIntensity = getLayoutDefaultIntensity(layout);
+                          const currentIntensity = layoutControls[layout.index] !== undefined ? layoutControls[layout.index] : defaultIntensity;
+                          const currentVariant = currentIntensity <= 0.5 ? 'column' : 'row';
+                          // 🔧 修复：检查是否用户主动设置了调控
+                          const hasUserControl = layoutControls[layout.index] !== undefined;
 
-                      return (
-                        <div key={layout.index} className={`p-3 rounded border ${isChanged ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-200'}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center space-x-2">
-                              <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">
-                                {layout.isRoot ? 'root' : 'layout'}
-                              </span>
-                              <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">
-                                索引:{layout.index}
-                              </span>
-                              <span className={`text-xs px-2 py-1 rounded font-mono ${currentVariant === 'row' ? 'bg-orange-200 text-orange-800' : 'bg-green-200 text-green-800'
-                                }`}>
-                                {currentVariant}
-                              </span>
-                              <span className="text-xs text-gray-600">
-                                {layout.childrenCount}子
-                              </span>
-                            </div>
-                            {isChanged && (
-                              <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
-                                已调整
-                              </span>
-                            )}
-                          </div>
+                          return (
+                            <div key={layout.index} className={`p-3 rounded border ${hasUserControl ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-200'}`}>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">
+                                    {layout.isRoot ? 'root' : 'layout'}
+                                  </span>
+                                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">
+                                    索引:{layout.index}
+                                  </span>
+                                  <span className={`text-xs px-2 py-1 rounded font-mono ${currentVariant === 'row' ? 'bg-orange-200 text-orange-800' : 'bg-green-200 text-green-800'
+                                    }`}>
+                                    {currentVariant}
+                                  </span>
+                                  <span className="text-xs text-gray-600">
+                                    {layout.childrenCount}子
+                                  </span>
+                                </div>
+                                {hasUserControl && (
+                                  <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
+                                    已调整
+                                  </span>
+                                )}
+                              </div>
 
                           <div className="text-xs text-gray-700 mb-2">
                             <span className="font-medium">内容:</span> {layout.content.preview}
+                          </div>
+
+                          {/* 🆕 显示布局的原始状态 */}
+                          <div className="text-xs text-gray-600 mb-2">
+                            <span className="font-medium">原始方向:</span> 
+                            <span className={`ml-1 px-2 py-1 rounded font-mono ${getLayoutDefaultIntensity(layout) > 0.5 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
+                              {getLayoutDefaultIntensity(layout) > 0.5 ? 'row' : 'column'}
+                            </span>
                           </div>
 
                           <div className="flex items-center space-x-2">
@@ -1696,24 +1672,20 @@ const EightElementAnalyzer = () => {
                       <div className="mt-1">
                         <div className="text-xs">当前调控:</div>
                         {layoutAnalysis.map(layout => {
-                          const currentIntensity = layoutControls[layout.index];
-                          if (currentIntensity === undefined) return null;
+                          const userSetIntensity = layoutControls[layout.index];
+                          if (userSetIntensity === undefined) return null;
 
-                          const currentVariant = currentIntensity <= 0.5 ? 'column' : 'row';
-                          // 🔧 修复：正确判断原始布局方向
-                          const originallyRow = layout.variant === 'row' ||
-                            layout.layoutDirection === 'HORIZONTAL' ||
-                            (layout.element._metadata?.originalVariant === 'row');
-                          const originalIntensity = originallyRow ? 0.8 : 0.2;
-                          const isChanged = Math.abs(currentIntensity - originalIntensity) > 0.1;
+                          const currentVariant = userSetIntensity <= 0.5 ? 'column' : 'row';
+                          // 🔧 修复：任何设置的调控都视为用户主动修改
+                          const hasUserControl = true;
 
                           return (
                             <div key={layout.index} className="flex justify-between items-center">
                               <span className="text-xs">
                                 索引{layout.index} ({layout.childrenCount}子)
                               </span>
-                              <span className={`font-mono ${isChanged ? 'text-blue-600 font-bold' : ''}`}>
-                                {currentVariant} ({currentIntensity.toFixed(1)})
+                              <span className={`font-mono ${hasUserControl ? 'text-blue-600 font-bold' : ''}`}>
+                                {currentVariant} ({userSetIntensity.toFixed(1)})
                               </span>
                             </div>
                           );

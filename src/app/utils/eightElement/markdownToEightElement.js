@@ -4282,12 +4282,18 @@ export function analyzeElementsInEightElement(eightElement) {
       }
     }
     
-    // 🆕 Layout专门分析：识别所有有子元素的layout，但排除根布局
+    // 🆕 Layout专门分析：识别所有有子元素的layout，但排除根布局和template类型布局
     if (elementType === 'layout' && element.layout && element.layout.children) {
       const childrenCount = element.layout.children.length;
       
-      // 🔧 修复：排除根布局，只识别有多个子元素的非根布局
-      if (childrenCount > 1 && variant !== 'root') {
+      // 🔧 修复：排除根布局、template类型布局（如card:custom），只识别有多个子元素的可调控布局
+      const isTemplateLayout = element._metadata?.isTemplateCard || 
+                               element._metadata?.isTemplateTag || 
+                               element._metadata?.isCard ||
+                               element._metadata?.actualType === 'templateTag' ||
+                               element._metadata?.actualType === 'card';
+      
+      if (childrenCount > 1 && variant !== 'root' && !isTemplateLayout) {
         // 🆕 为layout分配唯一索引
         const layoutIndex = layoutIndexCounter++;
         
@@ -4321,6 +4327,8 @@ export function analyzeElementsInEightElement(eightElement) {
         console.log(`   📋 内容预览: ${layoutContent.preview}`);
       } else if (variant === 'root') {
         console.log(`🚫 跳过根布局: ID=${element.id}, 深度=${depth} (根布局不可调控)`);
+      } else if (isTemplateLayout) {
+        console.log(`🚫 跳过template布局: ID=${element.id}, 深度=${depth}, 类型=${element._metadata?.actualType || 'unknown'} (template布局不可调控)`);
       }
     }
     
@@ -4989,13 +4997,21 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
       const childrenCount = element.layout.children.length;
       const isRoot = depth === 0;
       
-      // 🔧 修复：排除根布局，只映射非根布局
-      if (childrenCount > 1 && !isRoot) {
+      // 🔧 修复：排除根布局和template类型布局，只映射可调控的布局
+      const isTemplateLayout = element._metadata?.isTemplateCard || 
+                               element._metadata?.isTemplateTag || 
+                               element._metadata?.isCard ||
+                               element._metadata?.actualType === 'templateTag' ||
+                               element._metadata?.actualType === 'card';
+      
+      if (childrenCount > 1 && !isRoot && !isTemplateLayout) {
         const layoutIndex = layoutIndexCounter++;
         indexToLayoutMap.set(layoutIndex, element);
         console.log(`     📍 索引 ${layoutIndex} → Layout ID ${element.id} (layout)`);
       } else if (isRoot) {
         console.log(`     🚫 跳过根布局: ID=${element.id} (根布局不可调控)`);
+      } else if (isTemplateLayout) {
+        console.log(`     🚫 跳过template布局: ID=${element.id}, 类型=${element._metadata?.actualType || 'unknown'} (template布局不可调控)`);
       }
     }
     
