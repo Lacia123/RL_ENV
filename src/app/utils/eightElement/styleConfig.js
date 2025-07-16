@@ -1335,7 +1335,7 @@ export const DEFAULT_STYLE_CONFIG = {
         h3: 'content.title',
         // 普通文本段落映射到 content.segment
         p: 'content.segment',
-        
+
       },
       style: {
         display: 'flex',
@@ -1377,7 +1377,265 @@ export const DEFAULT_STYLE_CONFIG = {
           variant: 'cardSegment',
         }
       },
+    },
+    // 新拟态风格卡片模板
+    neomorphism: {
+      type: 'template',
+      // Markdown 转换映射规则
+      markdownMapping: {
+        // H2 (##) 映射到 title
+        h2: 'title',
+        // H3 (###) 映射到 content.title  
+        h3: 'content.title',
+        // 普通文本段落映射到 content.segment
+        p: 'content.segment',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xxl}",
+        padding: "{dimension.padding.base}",
+        background: "{color.surface.grey1}",
+        boxShadow: `inset {material.hierarchy.B2}, {material.hierarchy.3f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        position: 'relative',
+        overflow: 'hidden',
+        // 新拟态特有的凹凸效果
+        '&::before': {
+          content: "''",
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          right: '0',
+          bottom: '0',
+          background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey2} 100%)`,
+          opacity: '0.1',
+          borderRadius: "{dimension.borderradius.xxl}",
+        }
+      },
+      title: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: "{dimension.padding.semiloose} {dimension.padding.loose}",
+          justifyContent: 'center',
+          borderRadius: "{dimension.borderradius.large}",
+          background: "{color.surfacecontainer.white100}",
+          boxShadow: `{material.hierarchy.B1}`,
+          marginBottom: "{dimension.margin.base}",
+        },
+        metaType: 'text',
+        variant: 'cardTitle',
+      },
+      content: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          borderRadius: "{dimension.borderradius.large}",
+          background: "{color.surface.grey0}",
+          padding: "{dimension.padding.loose}",
+          gap: "{dimension.gap.base}",
+          boxShadow: `inset {material.hierarchy.B1}`,
+          position: 'relative',
+        },
+        title: {
+          metaType: 'text',
+          variant: 'cardSubtitle',
+        },
+        segment: {
+          metaType: 'text',
+          variant: 'cardSegment',
+        }
+      },
+    },
+
+    // 渐变科技风格卡片模板  
+    techGradient: {
+      type: 'template',
+      // Markdown 转换映射规则
+      markdownMapping: {
+        // H2 (##) 映射到 title
+        h2: 'title',
+        // H3 (###) 映射到 content.title
+        h3: 'content.title',
+        // 普通文本段落映射到 content.segment
+        p: 'content.segment',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xl}",
+        padding: "{dimension.padding.tight}",
+        background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.secondary.violet5} 35%, {color.primary.brand6} 100%)`,
+        boxShadow: `{material.hierarchy.4f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.primarycontainer.brand2}`,
+        position: 'relative',
+        overflow: 'hidden',
+        // 科技感光效
+        '&::after': {
+          content: "''",
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: `conic-gradient(from 0deg at 50% 50%, transparent 0deg, {color.surfacecontainer.white32} 60deg, transparent 120deg)`,
+          opacity: '0.3',
+          animation: 'rotate 8s linear infinite',
+        }
+      },
+      title: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: "{dimension.padding.base} {dimension.padding.loose}",
+          justifyContent: 'space-between',
+          borderRadius: "{dimension.borderradius.medium}",
+          background: `linear-gradient(90deg, {color.surfacecontainer.white88} 0%, {color.surfacecontainer.white76} 100%)`,
+          backdropFilter: 'blur(10px)',
+          boxShadow: `{material.hierarchy.2f}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
+          color: "{color.primary.brand6}", // 深蓝色文字，确保在浅色背景上可读
+        },
+        metaType: 'text',
+        variant: 'cardTitle',
+      },
+      content: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          borderRadius: "{dimension.borderradius.medium}",
+          background: `linear-gradient(180deg, {color.surfacecontainer.white88} 0%, {color.surfacecontainer.white76} 100%)`,
+          padding: "{dimension.padding.loose}",
+          gap: "{dimension.gap.base}",
+          backdropFilter: 'blur(10px)',
+          boxShadow: `inset {material.hierarchy.B1}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
+          position: 'relative',
+        },
+        title: {
+          metaType: 'text',
+          variant: 'cardSubtitle',
+        },
+        segment: {
+          metaType: 'text',
+          variant: 'cardSegment',
+        }
+      },
+    },
+
+    // 温暖卡片风格模板
+    warm: {
+      type: 'template',
+      // Markdown 转换映射规则
+      markdownMapping: {
+        // H2 (##) 映射到 title
+        h2: 'title',
+        // H3 (###) 映射到 content.title
+        h3: 'content.title',
+        // 普通文本段落映射到 content.segment  
+        p: 'content.segment',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xxxl}",
+        padding: "{dimension.padding.semiloose}",
+        background: `linear-gradient(145deg, {color.warning.orange1} 0%, {color.warning.orange2} 50%, {color.success.green1} 100%)`,
+        boxShadow: `{material.hierarchy.2f}`,
+        border: `{dimension.borderwidth.base} solid {color.warning.orange3}`,
+        position: 'relative',
+        overflow: 'hidden',
+        // 温暖的纹理效果
+        '&::before': {
+          content: "''",
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          right: '0',
+          bottom: '0',
+          backgroundImage: `radial-gradient(circle at 25% 25%, {color.warning.orange2} 0%, transparent 50%), 
+                       radial-gradient(circle at 75% 75%, {color.success.green2} 0%, transparent 50%)`,
+          opacity: '0.4',
+          borderRadius: "{dimension.borderradius.xxxl}",
+        }
+      },
+      title: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: "{dimension.padding.base} {dimension.padding.semiloose}",
+          justifyContent: 'flex-start',
+          borderRadius: "{dimension.borderradius.xl}",
+          background: `linear-gradient(90deg, {color.surfacecontainer.white100} 0%, {color.warning.orange0} 100%)`,
+          boxShadow: `{material.hierarchy.1f}`,
+          marginBottom: "{dimension.margin.tight}",
+          border: `{dimension.borderwidth.narrow} solid {color.warning.orange4}`,
+          position: 'relative',
+          '&::after': {
+            content: "''",
+            position: 'absolute',
+            left: "{dimension.padding.tight}",
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '4px',
+            height: '60%',
+            background: `linear-gradient(180deg, {color.warning.orange5} 0%, {color.warning.orange6} 100%)`,
+            borderRadius: "{dimension.borderradius.xs}",
+          }
+        },
+        metaType: 'text',
+        variant: 'cardTitle',
+      },
+      content: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          borderRadius: "{dimension.borderradius.xl}",
+          background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
+          padding: "{dimension.padding.semiloose}",
+          gap: "{dimension.gap.tight}",
+          boxShadow: `inset {material.hierarchy.B1}, {material.hierarchy.main}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+          position: 'relative',
+          // 内容区域的装饰点
+          '&::before': {
+            content: "''",
+            position: 'absolute',
+            top: "{dimension.padding.tight}",
+            right: "{dimension.padding.tight}",
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.success.green4} 0%, {color.success.green6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+          }
+        },
+        title: {
+          metaType: 'text',
+          variant: 'cardSubtitle',
+        },
+        segment: {
+          metaType: 'text',
+          variant: 'cardSegment',
+        }
+      },
     }
+
+
+
   },
 
   // ==================== 图像元件 ====================

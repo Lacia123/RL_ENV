@@ -637,11 +637,12 @@ function parseTemplateCardContent(content, cardStyleConfig) {
           console.log(`将普通文本作为段落处理: "${line}"`);
           // 🆕 使用合并逻辑处理段落
           createOrMergeTemplateElement(cardStyleConfig.markdownMapping.p, line, cardStyleConfig, containerMap, children);
-        } else {
-          // 普通文本内容，作为文本元素处理
+        } else if (!hasMarkdownMapping) {
+          // 如果没有 markdownMapping，按普通卡片处理
           const textElement = createTextElement(line);
           children.push(textElement);
         }
+        // 🆕 如果有 markdownMapping 但没有 p 映射，且没有 others 映射，则跳过不处理
         i++;
       }
     }

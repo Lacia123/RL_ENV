@@ -21,7 +21,88 @@ import collectEightElementMeasurements from '../utils/eightElement/collectElemen
 // - 表格、代码块、引用等标准 markdown 语法
 const MARKDOWN_TEMPLATES = {
 
+  cardShowcase: {
+    name: '🎨 卡片模板展示',
+    description: '展示各种风格的卡片模板设计',
+    markdown: `# 卡片模板设计系统
 
+## 设计理念
+现代化的卡片设计，满足不同场景和风格需求
+
+<layout:row>
+
+<card:neomorphism>
+## 新拟态风格
+### Neomorphism Design
+柔和的阴影和高光效果，营造出元素从背景中"浮出"的立体感
+创造简洁而富有层次的现代化视觉体验
+</card:neomorphism>
+
+<card:techGradient>
+## 科技渐变风格
+### Tech Gradient
+动态渐变背景配合科技感光效，展现前沿技术实力
+适用于科技产品、创新服务等需要体现技术感的场景
+</card:techGradient>
+
+</layout:row>
+
+<layout:row>
+
+<card:warm>
+## 温暖亲和风格
+### Warm & Friendly
+温馨的色调搭配柔和的设计元素，营造舒适友好的氛围
+使用渐变橙色背景和圆润边框，适合教育、生活服务类产品
+</card:warm>
+
+<card:highlight>
+## 高亮突出风格
+### Highlight & Emphasis
+强烈的品牌色对比，让重要信息快速抓住用户注意力
+
+\`\`\`css
+.highlight-card {
+  background: linear-gradient(brand-color);
+  color: white;
+  border-radius: 12px;
+}
+\`\`\`
+
+适用于重要通知、促销活动、核心功能介绍等需要强调的内容
+</card:highlight>
+
+</layout:row>
+
+## 模板特性
+
+
+**🎯 智能映射**
+H2 标题自动映射为卡片标题，H3 和段落文本映射为内容区域
+
+**🎨 风格多样**
+四种预设风格，满足不同品牌调性和使用场景需求
+
+
+
+**⚡ 灵活配置**
+支持 Markdown 语法，包括代码块、列表、链接等丰富格式
+
+**📱 响应式设计**
+自适应布局，在不同屏幕尺寸下都能保持良好的视觉效果
+
+
+### 使用指南
+
+\`\`\`markdown
+<card:neomorphism>
+## 卡片标题
+### 子标题
+这里是卡片内容，支持 **粗体** 和 *斜体* 等格式
+</card:neomorphism>
+\`\`\`
+`,
+  },
 
   landing: {
     name: '🏢 企业官网',
