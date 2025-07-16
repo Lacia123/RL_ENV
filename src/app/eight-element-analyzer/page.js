@@ -49,12 +49,12 @@ const MARKDOWN_TEMPLATES = {
 
 <layout:row>
 
-<card:warm>
-## 温暖亲和风格
+<card:elegant>
+## 优雅青蓝风格
 ### Warm & Friendly
 温馨的色调搭配柔和的设计元素，营造舒适友好的氛围
 使用渐变橙色背景和圆润边框，适合教育、生活服务类产品
-</card:warm>
+</card:elegant>
 
 <card:highlight>
 ## 高亮突出风格

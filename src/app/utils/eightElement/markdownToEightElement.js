@@ -5,7 +5,8 @@ import {
   LAYOUT_CONSTANTS,
   COLOR_CONSTANTS,
   DIMENSION_CONSTANTS,
-  FONT_CONSTANTS
+  FONT_CONSTANTS,
+  CSS_VARIABLE_SYSTEM
 } from './styleConfig.js';
 import { generateChartFromTableData } from './chartGenerator.js';
 // 导入Markdown和KaTeX处理库

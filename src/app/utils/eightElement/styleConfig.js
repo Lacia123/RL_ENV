@@ -732,7 +732,58 @@ export const DEFAULT_STYLE_CONFIG = {
     cardSegment: {
       color: "{color.onprimary.black88}",
       fontSize: "{font.size.small}",
-    }
+    },
+
+    // 新拟态风格文字样式
+    neomorphismTitle: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onprimary.white100}",
+      fontSize: "{font.size.medium}",
+    },
+    neomorphismSubtitle: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onprimary.black88}",
+      fontSize: "{font.size.small}",
+    },
+    neomorphismSegment: {
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.onprimary.black88}",
+      fontSize: "{font.size.small}",
+    },
+
+    // 科技渐变风格文字样式
+    techGradientTitle: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.primary.brand6}", // 深蓝色确保可读性
+      fontSize: "{font.size.medium}",
+    },
+    techGradientSubtitle: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onprimary.black88}",
+      fontSize: "{font.size.small}",
+    },
+    techGradientSegment: {
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.onprimary.black88}",
+      fontSize: "{font.size.small}",
+    },
+
+    // 优雅青蓝卡片风格文字样式
+    elegantCardTitle: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.primary.brand6}", // 深青蓝色确保可读性
+      fontSize: "{font.size.medium}",
+    },
+    elegantCardSubtitle: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onprimary.black88}",
+      fontSize: "{font.size.small}",
+    },
+    elegantCardSegment: {
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.onprimary.black88}",
+      fontSize: "{font.size.small}",
+    },
   },
 
   // ==================== 数学公式元件 ==================== (新增)
@@ -1378,6 +1429,7 @@ export const DEFAULT_STYLE_CONFIG = {
         }
       },
     },
+
     // 新拟态风格卡片模板
     neomorphism: {
       type: 'template',
@@ -1396,7 +1448,7 @@ export const DEFAULT_STYLE_CONFIG = {
         borderRadius: "{dimension.borderradius.xxl}",
         padding: "{dimension.padding.base}",
         background: "{color.surface.grey1}",
-        boxShadow: `inset {material.hierarchy.B2}, {material.hierarchy.3f}`,
+        boxShadow: `{material.hierarchy.B2}, {material.hierarchy.3f}`,
         border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
         position: 'relative',
         overflow: 'hidden',
@@ -1421,12 +1473,12 @@ export const DEFAULT_STYLE_CONFIG = {
           padding: "{dimension.padding.semiloose} {dimension.padding.loose}",
           justifyContent: 'center',
           borderRadius: "{dimension.borderradius.large}",
-          background: "{color.surfacecontainer.white100}",
+          background: "{color.primary.brand5}", // 深蓝色背景
           boxShadow: `{material.hierarchy.B1}`,
           marginBottom: "{dimension.margin.base}",
         },
         metaType: 'text',
-        variant: 'cardTitle',
+        variant: 'neomorphismTitle', // 使用自定义variant
       },
       content: {
         type: 'template',
@@ -1439,16 +1491,16 @@ export const DEFAULT_STYLE_CONFIG = {
           background: "{color.surface.grey0}",
           padding: "{dimension.padding.loose}",
           gap: "{dimension.gap.base}",
-          boxShadow: `inset {material.hierarchy.B1}`,
+          boxShadow: `{material.hierarchy.B1}`,
           position: 'relative',
         },
         title: {
           metaType: 'text',
-          variant: 'cardSubtitle',
+          variant: 'neomorphismSubtitle', // 使用自定义variant
         },
         segment: {
           metaType: 'text',
-          variant: 'cardSegment',
+          variant: 'neomorphismSegment', // 使用自定义variant
         }
       },
     },
@@ -1500,10 +1552,10 @@ export const DEFAULT_STYLE_CONFIG = {
           backdropFilter: 'blur(10px)',
           boxShadow: `{material.hierarchy.2f}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
-          color: "{color.primary.brand6}", // 深蓝色文字，确保在浅色背景上可读
+          marginBottom: "{dimension.margin.base}", // 添加与内容的间距
         },
         metaType: 'text',
-        variant: 'cardTitle',
+        variant: 'techGradientTitle', // 使用自定义variant
       },
       content: {
         type: 'template',
@@ -1517,23 +1569,23 @@ export const DEFAULT_STYLE_CONFIG = {
           padding: "{dimension.padding.loose}",
           gap: "{dimension.gap.base}",
           backdropFilter: 'blur(10px)',
-          boxShadow: `inset {material.hierarchy.B1}`,
+          boxShadow: `{material.hierarchy.B1}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
           position: 'relative',
         },
         title: {
           metaType: 'text',
-          variant: 'cardSubtitle',
+          variant: 'techGradientSubtitle', // 使用自定义variant
         },
         segment: {
           metaType: 'text',
-          variant: 'cardSegment',
+          variant: 'techGradientSegment', // 使用自定义variant
         }
       },
     },
 
-    // 温暖卡片风格模板
-    warm: {
+    // 优雅青蓝卡片风格模板
+    elegant: {
       type: 'template',
       // Markdown 转换映射规则
       markdownMapping: {
@@ -1549,12 +1601,12 @@ export const DEFAULT_STYLE_CONFIG = {
         flexDirection: 'column',
         borderRadius: "{dimension.borderradius.xxxl}",
         padding: "{dimension.padding.semiloose}",
-        background: `linear-gradient(145deg, {color.warning.orange1} 0%, {color.warning.orange2} 50%, {color.success.green1} 100%)`,
+        background: `linear-gradient(145deg, {color.primarycontainer.brand1} 0%, {color.primarycontainer.brand2} 50%, {color.secondarycontainer.violet1} 100%)`,
         boxShadow: `{material.hierarchy.2f}`,
-        border: `{dimension.borderwidth.base} solid {color.warning.orange3}`,
+        border: `{dimension.borderwidth.base} solid {color.info.blue3}`,
         position: 'relative',
         overflow: 'hidden',
-        // 温暖的纹理效果
+        // 优雅的纹理效果
         '&::before': {
           content: "''",
           position: 'absolute',
@@ -1562,8 +1614,8 @@ export const DEFAULT_STYLE_CONFIG = {
           left: '0',
           right: '0',
           bottom: '0',
-          backgroundImage: `radial-gradient(circle at 25% 25%, {color.warning.orange2} 0%, transparent 50%), 
-                       radial-gradient(circle at 75% 75%, {color.success.green2} 0%, transparent 50%)`,
+          backgroundImage: `radial-gradient(circle at 25% 25%, {color.info.blue2} 0%, transparent 50%), 
+                       radial-gradient(circle at 75% 75%, {color.secondary.violet2} 0%, transparent 50%)`,
           opacity: '0.4',
           borderRadius: "{dimension.borderradius.xxxl}",
         }
@@ -1574,27 +1626,40 @@ export const DEFAULT_STYLE_CONFIG = {
           flexDirection: 'row',
           alignItems: 'center',
           padding: "{dimension.padding.base} {dimension.padding.semiloose}",
-          justifyContent: 'flex-start',
+          justifyContent: 'center', // 文字居中
           borderRadius: "{dimension.borderradius.xl}",
-          background: `linear-gradient(90deg, {color.surfacecontainer.white100} 0%, {color.warning.orange0} 100%)`,
+          background: `linear-gradient(90deg, {color.surfacecontainer.white100} 0%, {color.secondarycontainer.violet0} 100%)`,
           boxShadow: `{material.hierarchy.1f}`,
           marginBottom: "{dimension.margin.tight}",
-          border: `{dimension.borderwidth.narrow} solid {color.warning.orange4}`,
+          border: `{dimension.borderwidth.narrow} solid {color.primary.brand4}`,
           position: 'relative',
+          // 左侧竖线 - 增加距离
+          '&::before': {
+            content: "''",
+            position: 'absolute',
+            left: "{dimension.padding.base}", // 增加距离
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '3px',
+            height: '50%', // 减少高度避免过于突出
+            background: `linear-gradient(180deg, {color.primary.brand5} 0%, {color.primary.brand6} 100%)`,
+            borderRadius: "{dimension.borderradius.xs}",
+          },
+          // 右侧竖线 - 增加距离
           '&::after': {
             content: "''",
             position: 'absolute',
-            left: "{dimension.padding.tight}",
+            right: "{dimension.padding.base}", // 增加距离
             top: '50%',
             transform: 'translateY(-50%)',
-            width: '4px',
-            height: '60%',
-            background: `linear-gradient(180deg, {color.warning.orange5} 0%, {color.warning.orange6} 100%)`,
+            width: '3px',
+            height: '50%', // 减少高度避免过于突出
+            background: `linear-gradient(180deg, {color.primary.brand5} 0%, {color.primary.brand6} 100%)`,
             borderRadius: "{dimension.borderradius.xs}",
           }
         },
         metaType: 'text',
-        variant: 'cardTitle',
+        variant: 'elegantCardTitle', // 使用自定义variant
       },
       content: {
         type: 'template',
@@ -1607,293 +1672,331 @@ export const DEFAULT_STYLE_CONFIG = {
           background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
           padding: "{dimension.padding.semiloose}",
           gap: "{dimension.gap.tight}",
-          boxShadow: `inset {material.hierarchy.B1}, {material.hierarchy.main}`,
+          boxShadow: `{material.hierarchy.B1}, {material.hierarchy.main}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
           position: 'relative',
-          // 内容区域的装饰点
+          // 左上角圆点 - 增加距离
           '&::before': {
             content: "''",
             position: 'absolute',
-            top: "{dimension.padding.tight}",
-            right: "{dimension.padding.tight}",
-            width: '8px',
-            height: '8px',
+            top: "{dimension.padding.base}", // 增加距离
+            left: "{dimension.padding.base}", // 增加距离
+            width: '6px',
+            height: '6px',
             borderRadius: '50%',
-            background: `linear-gradient(135deg, {color.success.green4} 0%, {color.success.green6} 100%)`,
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+          },
+          // 右下角圆点 - 增加距离
+          '&::after': {
+            content: "''",
+            position: 'absolute',
+            bottom: "{dimension.padding.base}", // 增加距离
+            right: "{dimension.padding.base}", // 增加距离
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
           }
         },
         title: {
+          style: {
+            position: 'relative',
+            // 右上角圆点 - 通过 title 元素实现
+            '&::before': {
+              content: "''",
+              position: 'absolute',
+              top: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`, // 相对于content容器的位置
+              right: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`, // 相对于content容器的位置
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+              boxShadow: `{material.hierarchy.main}`,
+            }
+          },
           metaType: 'text',
-          variant: 'cardSubtitle',
+          variant: 'elegantCardSubtitle', // 使用自定义variant
         },
         segment: {
+          style: {
+            position: 'relative',
+            // 最后一个segment添加左下角圆点
+            '&:last-child::after': {
+              content: "''",
+              position: 'absolute',
+              bottom: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`, // 相对于content容器的位置
+              left: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`, // 相对于content容器的位置
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+              boxShadow: `{material.hierarchy.main}`,
+            }
+          },
           metaType: 'text',
-          variant: 'cardSegment',
+          variant: 'elegantCardSegment', // 使用自定义variant
         }
-      },
+      }
     }
-
-
-
   },
 
   // ==================== 图像元件 ====================
   image: {
-    // 普通图片  
-    normal: {
-      borderRadius: "{dimension.borderradius.medium}",
-      borderWidth: "{dimension.borderwidth.narrow}",
-      borderColor: "{color.surfacecontainer.black16}",
-      borderStyle: "solid",
-      boxShadow: "{material.hierarchy.main}",
-      clipPath: "none",
-      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
-      maxWidth: "100%",
-      height: "auto",
-
-      '&:hover': {
-        boxShadow: "{material.hierarchy.2f}",
-        transform: "scale(1.02)"
-      }
-    },
-
-    // 圆角图片 TODO: 需要确定解析的规则
-    rounded: {
-      borderRadius: "{dimension.borderradius.xl}",
-      borderWidth: "{dimension.borderwidth.base}",
-      borderColor: "{color.surfacecontainer.black12}",
-      borderStyle: "solid",
-      boxShadow: "{material.hierarchy.1f}",
-      clipPath: "none",
-      maxWidth: "100%",
-      height: "auto",
-      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
-      '&:hover': {
-        borderColor: "{color.primarycontainer.brand2}",
-        boxShadow: "{material.hierarchy.3f}"
-      }
-    },
-
-    // 圆形图片（头像） TODO: 需要确定解析的规则
-    circle: {
-      borderRadius: "50%",
-      borderWidth: "{dimension.borderwidth.base}",
-      borderColor: "{color.primarycontainer.brand2}",
-      borderStyle: "solid",
-      boxShadow: "{material.hierarchy.2f}",
-      clipPath: "none",
-      aspectRatio: "1",
-      objectFit: "cover",
-      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
-      '&:hover': {
-        borderColor: "{color.primary.brand4}",
-        boxShadow: "{material.hierarchy.4f}",
-        transform: "scale(1.05)"
-      }
-    },
-
-    // 带边框图片 TODO: 需要确定解析的规则
-    framed: {
-      borderRadius: "{dimension.borderradius.large}",
-      borderWidth: "{dimension.borderwidth.wide}",
-      borderColor: "{color.surfacecontainer.white100}",
-      borderStyle: "solid",
-      boxShadow: "{material.hierarchy.3f}",
-      clipPath: "none",
-      maxWidth: "100%",
-      height: "auto",
-      position: "relative",
-      '&::after': {
-        content: "''",
-        position: "absolute",
-        top: "-4px",
-        left: "-4px",
-        right: "-4px",
-        bottom: "-4px",
+      // 普通图片  
+      normal: {
+        borderRadius: "{dimension.borderradius.medium}",
         borderWidth: "{dimension.borderwidth.narrow}",
-        borderColor: "{color.surfacecontainer.black20}",
+        borderColor: "{color.surfacecontainer.black16}",
         borderStyle: "solid",
+        boxShadow: "{material.hierarchy.main}",
+        clipPath: "none",
+        transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+        maxWidth: "100%",
+        height: "auto",
+
+        '&:hover': {
+          boxShadow: "{material.hierarchy.2f}",
+          transform: "scale(1.02)"
+        }
+      },
+
+      // 圆角图片 TODO: 需要确定解析的规则
+      rounded: {
         borderRadius: "{dimension.borderradius.xl}",
-        pointerEvents: "none"
+        borderWidth: "{dimension.borderwidth.base}",
+        borderColor: "{color.surfacecontainer.black12}",
+        borderStyle: "solid",
+        boxShadow: "{material.hierarchy.1f}",
+        clipPath: "none",
+        maxWidth: "100%",
+        height: "auto",
+        transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+        '&:hover': {
+          borderColor: "{color.primarycontainer.brand2}",
+          boxShadow: "{material.hierarchy.3f}"
+        }
+      },
+
+      // 圆形图片（头像） TODO: 需要确定解析的规则
+      circle: {
+        borderRadius: "50%",
+        borderWidth: "{dimension.borderwidth.base}",
+        borderColor: "{color.primarycontainer.brand2}",
+        borderStyle: "solid",
+        boxShadow: "{material.hierarchy.2f}",
+        clipPath: "none",
+        aspectRatio: "1",
+        objectFit: "cover",
+        transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+        '&:hover': {
+          borderColor: "{color.primary.brand4}",
+          boxShadow: "{material.hierarchy.4f}",
+          transform: "scale(1.05)"
+        }
+      },
+
+      // 带边框图片 TODO: 需要确定解析的规则
+      framed: {
+        borderRadius: "{dimension.borderradius.large}",
+        borderWidth: "{dimension.borderwidth.wide}",
+        borderColor: "{color.surfacecontainer.white100}",
+        borderStyle: "solid",
+        boxShadow: "{material.hierarchy.3f}",
+        clipPath: "none",
+        maxWidth: "100%",
+        height: "auto",
+        position: "relative",
+        '&::after': {
+          content: "''",
+          position: "absolute",
+          top: "-4px",
+          left: "-4px",
+          right: "-4px",
+          bottom: "-4px",
+          borderWidth: "{dimension.borderwidth.narrow}",
+          borderColor: "{color.surfacecontainer.black20}",
+          borderStyle: "solid",
+          borderRadius: "{dimension.borderradius.xl}",
+          pointerEvents: "none"
+        }
+      },
+
+      // 英雄图片 TODO: 需要确定解析的规则
+      hero: {
+        borderRadius: "{dimension.borderradius.xxl}",
+        boxShadow: "{material.hierarchy.5f}",
+        width: "100%",
+        height: "400px",
+        objectFit: "cover",
+        clipPath: "none",
+        background: `linear-gradient(135deg, {color.surface.grey1} 0%, {color.surface.grey2} 100%)`,
+        position: "relative",
+        '&::after': {
+          content: "''",
+          position: "absolute",
+          top: "0",
+          left: "0",
+          right: "0",
+          bottom: "0",
+          background: `linear-gradient(45deg, {color.surfacecontainer.black16} 0%, transparent 50%)`,
+          borderRadius: "{dimension.borderradius.xxl}"
+        }
       }
     },
 
-    // 英雄图片 TODO: 需要确定解析的规则
-    hero: {
-      borderRadius: "{dimension.borderradius.xxl}",
-      boxShadow: "{material.hierarchy.5f}",
-      width: "100%",
-      height: "400px",
-      objectFit: "cover",
-      clipPath: "none",
-      background: `linear-gradient(135deg, {color.surface.grey1} 0%, {color.surface.grey2} 100%)`,
-      position: "relative",
-      '&::after': {
-        content: "''",
-        position: "absolute",
-        top: "0",
-        left: "0",
-        right: "0",
-        bottom: "0",
-        background: `linear-gradient(45deg, {color.surfacecontainer.black16} 0%, transparent 50%)`,
-        borderRadius: "{dimension.borderradius.xxl}"
-      }
-    }
-  },
-
-  // ==================== 图标元件 ====================
-  // TODO: 暂无应用
-  icon: {
-    // 小图标  
-    small: {
-      width: "16px",
-      height: "16px",
-      color: "{color.onsurface.black48}",
-      margin: "0 0 {dimension.margin.base} 0",
-      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
-    },
-
-    // 中等图标  
-    medium: {
-      width: "24px",
-      height: "24px",
-      color: "{color.onsurface.black64}",
-      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
-    },
-
-    // 大图标  
-    large: {
-      width: "32px",
-      height: "32px",
-      color: "{color.onsurface.black76}",
-      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
-    },
-
-    // 可交互图标  
-    interactive: {
-      width: "24px",
-      height: "24px",
-      color: "{color.primary.brand5}",
-      cursor: "pointer",
-      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SPRING,
-      '&:hover': {
-        color: "{color.primary.brand6}",
-        transform: "scale(1.1)"
-      }
-    },
-
-    // 状态图标  
-    status: {
-      success: {
-        width: "20px",
-        height: "20px",
-        color: "{color.success.green6}",
+    // ==================== 图标元件 ====================
+    icon: {
+      // 小图标  
+      small: {
+        width: "16px",
+        height: "16px",
+        color: "{color.onsurface.black48}",
+        margin: "0 0 {dimension.margin.base} 0",
         transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
       },
-      warning: {
-        width: "20px",
-        height: "20px",
-        color: "{color.warning.orange6}",
+
+      // 中等图标  
+      medium: {
+        width: "24px",
+        height: "24px",
+        color: "{color.onsurface.black64}",
         transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
       },
-      error: {
-        width: "20px",
-        height: "20px",
-        color: "{color.error.red6}",
+
+      // 大图标  
+      large: {
+        width: "32px",
+        height: "32px",
+        color: "{color.onsurface.black76}",
         transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
-      }
-    }
-  },
+      },
 
-  // ==================== 功能性元件 ==================== (新增)
-  // TODO: 暂无应用
-  utility: {
-    // 复制按钮  
-    copyButton: {
-      position: 'absolute',
-      top: '12px',
-      right: '12px',
-      background: "{color.surfacecontainer.black20}",
-      borderWidth: "{dimension.borderwidth.none}",
-      borderRadius: "{dimension.borderradius.small}",
-      padding: "{dimension.padding.tight}",
-      color: "{color.onsurface.white88}",
-      cursor: 'pointer',
-      opacity: '0',
-      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
-      '&:hover': {
-        background: "{color.primary.brand5}"
-      }
-    },
+      // 可交互图标  
+      interactive: {
+        width: "24px",
+        height: "24px",
+        color: "{color.primary.brand5}",
+        cursor: "pointer",
+        transition: CSS_VARIABLE_SYSTEM.ANIMATION.SPRING,
+        '&:hover': {
+          color: "{color.primary.brand6}",
+          transform: "scale(1.1)"
+        }
+      },
 
-    // 波纹效果动画  
-    ripple: {
-      position: 'absolute',
-      borderRadius: "50%",
-      background: 'rgba(255, 255, 255, 0.3)',
-      transform: 'scale(0)',
-      animation: 'ripple 0.6s ease-out',
-      pointerEvents: 'none'
-    }
-  },
-
-  // ==================== 响应式断点 ==================== (新增)
-  // TODO: 暂无应用
-  responsive: {
-    // 移动端断点
-    mobile: {
-      '@media (max-width: 768px)': {
-        '.markdown-container': {
-          fontSize: "{font.size.small}"
+      // 状态图标  
+      status: {
+        success: {
+          width: "20px",
+          height: "20px",
+          color: "{color.success.green6}",
+          transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
         },
-        '.markdown-h1': {
-          fontSize: '28px !important'
+        warning: {
+          width: "20px",
+          height: "20px",
+          color: "{color.warning.orange6}",
+          transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
         },
-        '.markdown-h2': {
-          fontSize: '24px !important'
+        error: {
+          width: "20px",
+          height: "20px",
+          color: "{color.error.red6}",
+          transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
         }
       }
     },
 
-    // 平板端断点
-    tablet: {
-      '@media (max-width: 1024px)': {
-        '.app-container': {
-          gridTemplateColumns: '1fr',
-          gap: "{dimension.gap.loose}"
+    // ==================== 功能性元件 ==================== (新增)
+    // TODO: 暂无应用
+    utility: {
+      // 复制按钮  
+      copyButton: {
+        position: 'absolute',
+        top: '12px',
+        right: '12px',
+        background: "{color.surfacecontainer.black20}",
+        borderWidth: "{dimension.borderwidth.none}",
+        borderRadius: "{dimension.borderradius.small}",
+        padding: "{dimension.padding.tight}",
+        color: "{color.onsurface.white88}",
+        cursor: 'pointer',
+        opacity: '0',
+        transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
+        '&:hover': {
+          background: "{color.primary.brand5}"
         }
-      }
-    }
-  },
+      },
 
-  // ==================== 动画关键帧 ==================== (新增)
-  // TODO: 暂无应用
-  animations: {
-    // 波纹动画
-    ripple: {
-      '@keyframes ripple': {
-        'to': {
-          transform: 'scale(2)',
-          opacity: '0'
+      // 波纹效果动画  
+      ripple: {
+        position: 'absolute',
+        borderRadius: "50%",
+        background: 'rgba(255, 255, 255, 0.3)',
+        transform: 'scale(0)',
+        animation: 'ripple 0.6s ease-out',
+        pointerEvents: 'none'
+      }
+    },
+
+    // ==================== 响应式断点 ==================== (新增)
+    // TODO: 暂无应用
+    responsive: {
+      // 移动端断点
+      mobile: {
+        '@media (max-width: 768px)': {
+          '.markdown-container': {
+            fontSize: "{font.size.small}"
+          },
+          '.markdown-h1': {
+            fontSize: '28px !important'
+          },
+          '.markdown-h2': {
+            fontSize: '24px !important'
+          }
+        }
+      },
+
+      // 平板端断点
+      tablet: {
+        '@media (max-width: 1024px)': {
+          '.app-container': {
+            gridTemplateColumns: '1fr',
+            gap: "{dimension.gap.loose}"
+          }
         }
       }
     },
 
-    // 淡入动画
-    fadeIn: {
-      '@keyframes fadeIn': {
-        'from': {
-          opacity: '0',
-          transform: 'translateY(20px)'
-        },
-        'to': {
-          opacity: '1',
-          transform: 'translateY(0)'
+    // ==================== 动画关键帧 ==================== (新增)
+    // TODO: 暂无应用
+    animations: {
+      // 波纹动画
+      ripple: {
+        '@keyframes ripple': {
+          'to': {
+            transform: 'scale(2)',
+            opacity: '0'
+          }
+        }
+      },
+
+      // 淡入动画
+      fadeIn: {
+        '@keyframes fadeIn': {
+          'from': {
+            opacity: '0',
+            transform: 'translateY(20px)'
+          },
+          'to': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          }
         }
       }
     }
-  }
 };
 
 /**
@@ -1931,7 +2034,40 @@ export function getElementStyleConfig(elementType, variant = 'normal') {
 
   if (!activeStyleConfig[elementType][variant]) {
     console.warn(`未找到元素类型 "${elementType}" 的变体 "${variant}"`);
-    return activeStyleConfig[elementType]['p'] || {};
+    
+    // 为不同元素类型提供合适的默认变体
+    let defaultVariant = null;
+    switch(elementType) {
+      case 'text':
+        defaultVariant = 'p';
+        break;
+      case 'icon':
+        defaultVariant = 'medium';
+        break;
+      case 'button':
+        defaultVariant = 'primary';
+        break;
+      case 'card':
+        defaultVariant = 'standard';
+        break;
+      case 'layout':
+        defaultVariant = 'column';
+        break;
+      case 'image':
+        defaultVariant = 'normal';
+        break;
+      default:
+        // 尝试获取第一个可用的变体
+        const availableVariants = Object.keys(activeStyleConfig[elementType]);
+        defaultVariant = availableVariants.length > 0 ? availableVariants[0] : null;
+    }
+    
+    if (defaultVariant && activeStyleConfig[elementType][defaultVariant]) {
+      console.warn(`使用默认变体 "${defaultVariant}" 替代 "${variant}"`);
+      return activeStyleConfig[elementType][defaultVariant];
+    }
+    
+    return {};
   }
 
   return activeStyleConfig[elementType][variant];
@@ -1973,6 +2109,7 @@ function isObject(item) {
 }
 
 export default {
+  CSS_VARIABLE_SYSTEM,
   LAYOUT_CONSTANTS,
   COLOR_CONSTANTS,
   DIMENSION_CONSTANTS,
