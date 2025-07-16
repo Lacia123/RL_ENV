@@ -290,6 +290,67 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
         // 从根元素开始收集测量数据
         collectMeasurements(processedEightElement);
         
+        // 🆕 专门收集card元素的测量数据
+        function collectCardMeasurements(element) {
+          const cardMeasurements = [];
+          
+          function findCards(el) {
+            if (!el) return;
+            
+            // 检查是否为card元素
+            if (el._metadata && el._metadata.actualType === 'card') {
+              const cardId = el.id;
+              const domElement = getElementById(cardId);
+              
+              if (domElement) {
+                const rect = domElement.getBoundingClientRect();
+                const computedStyle = getComputedStyle(domElement);
+                
+                cardMeasurements.push({
+                  id: cardId,
+                  type: 'card',
+                  variant: el._metadata.variant || 'standard',
+                  x: rect.left,
+                  y: rect.top,
+                  width: rect.width,
+                  height: rect.height,
+                  style: {
+                    backgroundColor: computedStyle.backgroundColor,
+                    borderRadius: computedStyle.borderRadius,
+                    padding: {
+                      top: parseStyleValue(computedStyle.paddingTop),
+                      right: parseStyleValue(computedStyle.paddingRight),
+                      bottom: parseStyleValue(computedStyle.paddingBottom),
+                      left: parseStyleValue(computedStyle.paddingLeft)
+                    },
+                    margin: {
+                      top: parseStyleValue(computedStyle.marginTop),
+                      right: parseStyleValue(computedStyle.marginRight),
+                      bottom: parseStyleValue(computedStyle.marginBottom),
+                      left: parseStyleValue(computedStyle.marginLeft)
+                    }
+                  },
+                  content: {
+                    textContent: domElement.textContent?.substring(0, 100) || '', // 限制文本长度
+                    childCount: domElement.children.length
+                  }
+                });
+              }
+            }
+            
+            // 递归处理子元素
+            if (el.layout && el.layout.children) {
+              el.layout.children.forEach(child => findCards(child));
+            }
+          }
+          
+          findCards(element);
+          return cardMeasurements;
+        }
+        
+        // 收集card测量数据
+        const cardMeasurements = collectCardMeasurements(processedEightElement);
+        
         // 确保至少添加根容器元素
         if (measurements.elements.length === 0) {
           measurements.elements.push({
@@ -303,6 +364,9 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
             style: {}
           });
         }
+        
+        // 将card测量数据添加到结果中
+        measurements.cards = cardMeasurements;
         
         return measurements;
       };
@@ -390,7 +454,16 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
 
   await browser.close();
 
-  return { measurements, screenshotPath, aims, base64Image };
+  // 提取card测量数据到顶层
+  const cardMeasurements = measurements && measurements.cards ? measurements.cards : [];
+
+  return { 
+    measurements, 
+    screenshotPath, 
+    aims, 
+    base64Image,
+    cardMeasurements  // 新增：将card测量数据提取到顶层
+  };
 }
 
 function resolveMetrics(aims) {

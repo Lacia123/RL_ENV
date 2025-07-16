@@ -51,12 +51,35 @@ export async function POST(request) {
       }
     }
     
+    // 🆕 检查是否有card测量数据
+    const cardMeasurements = result.measurements.cards || [];
+    const hasCards = cardMeasurements.length > 0;
+    
     // 返回评分结果
     return NextResponse.json({
       success: true,
       score: result.score,
       aims: result.aims,
       base64Image: result.base64Image,
+      // 🆕 在非aims评分时返回card的渲染尺寸
+      cards: !useAims && hasCards ? {
+        count: cardMeasurements.length,
+        measurements: cardMeasurements.map(card => ({
+          id: card.id,
+          variant: card.variant,
+          width: Math.round(card.width * 100) / 100, // 保留2位小数
+          height: Math.round(card.height * 100) / 100, // 保留2位小数
+          x: Math.round(card.x * 100) / 100,
+          y: Math.round(card.y * 100) / 100,
+          style: {
+            backgroundColor: card.style.backgroundColor,
+            borderRadius: card.style.borderRadius,
+            padding: card.style.padding,
+            margin: card.style.margin
+          },
+          content: card.content
+        }))
+      } : undefined,
       // 确保scoreDetails与result.score.categories保持一致
       // scoreDetails: result.score.categories,
       // 如果使用了自定义设计令牌，返回相关信息

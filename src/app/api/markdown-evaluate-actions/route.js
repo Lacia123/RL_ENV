@@ -144,8 +144,8 @@ export async function POST(request) {
       takeScreenshot 
     });
     
-    // 返回评分结果
-    return NextResponse.json({
+    // 6. 检查是否有card测量数据并添加到响应中
+    const responseData = {
       success: true,
       score: result.score,
       aims: result.aims,
@@ -158,7 +158,32 @@ export async function POST(request) {
       // 保持与原接口的兼容性
       tokensApplied: false, // 使用动作系统，不使用tokens
       designTokens: null
-    }, { status: 200 });
+    };
+
+    // 如果不使用AIMS且有card测量数据，添加到响应中
+    if (!useAims && result.measurements.cards && result.measurements.cards.length > 0) {
+      responseData.cards = {
+        count: result.measurements.cards.length,
+        measurements: result.measurements.cards.map(card => ({
+          id: card.id,
+          variant: card.variant,
+          width: Math.round(card.width * 100) / 100, // 保留2位小数
+          height: Math.round(card.height * 100) / 100, // 保留2位小数
+          x: Math.round(card.x * 100) / 100,
+          y: Math.round(card.y * 100) / 100,
+          style: {
+            backgroundColor: card.style.backgroundColor,
+            borderRadius: card.style.borderRadius,
+            padding: card.style.padding,
+            margin: card.style.margin
+          },
+          content: card.content
+        }))
+      };
+    }
+    
+    // 返回评分结果
+    return NextResponse.json(responseData, { status: 200 });
     
   } catch (error) {
     console.error('基于动作的Markdown评分失败:', error);
