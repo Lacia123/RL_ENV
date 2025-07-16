@@ -1295,6 +1295,36 @@ export const DEFAULT_STYLE_CONFIG = {
       }
     },
 
+    highlight: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        others: 'content'
+      },
+      style: {
+        borderRadius: "{dimension.borderradius.xl}",
+        borderWidth: "{dimension.borderwidth.narrow}",
+        borderColor: "{color.surfacecontainer.black12}",
+        borderStyle: "solid",
+        boxShadow: "{material.hierarchy.1f}",
+        padding: "0 0 {dimension.padding.base}",
+        overflow: 'hidden',
+      },
+      title: {
+        style: {
+          padding: "{dimension.padding.base}",
+          background: "{color.primary.brand5}",
+        },
+        metaType: 'text',
+        variant: 'cardTitle',
+      },
+      content: {
+        style: {
+          padding: "{dimension.padding.base}",
+        }
+      }
+    },
+
     custom: {
       type: 'template',
       // Markdown 转换映射规则

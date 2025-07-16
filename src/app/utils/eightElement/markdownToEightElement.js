@@ -574,6 +574,30 @@ function parseTemplateCardContent(content, cardStyleConfig) {
         i++;
         continue;
       }
+      
+      // 🆕 检查是否有 others 映射，用于处理未匹配的内容
+      if (cardStyleConfig.markdownMapping.others) {
+        console.log(`发现未映射的内容，开始收集连续的未映射内容，起始行: ${i}`);
+        
+        // 收集连续的未映射内容
+        const collectResult = collectUnmappedMarkdownContent(lines, i, cardStyleConfig.markdownMapping);
+        
+        if (collectResult.content.trim()) {
+          console.log(`收集到未映射内容 (${collectResult.lineCount} 行):\n${collectResult.content}`);
+          
+          // 使用标准 parseMarkdown 解析整块内容
+          const parsedElements = parseMarkdown(collectResult.content);
+          
+          // 将解析后的元素放到 others 指定的容器中
+          for (const element of parsedElements) {
+            createOrMergeTemplateElement(cardStyleConfig.markdownMapping.others, '', cardStyleConfig, containerMap, children, element);
+          }
+        }
+        
+        // 跳过已处理的行
+        i = collectResult.endIndex;
+        continue;
+      }
     }
 
     // 检查是否为内联模板标签（如 <title>内容</title>）
@@ -624,6 +648,59 @@ function parseTemplateCardContent(content, cardStyleConfig) {
   }
 
   return children;
+}
+
+// 🆕 收集连续的未映射 markdown 内容
+function collectUnmappedMarkdownContent(lines, startIndex, markdownMapping) {
+  console.log(`开始收集未映射内容，起始行: ${startIndex}`);
+  
+  const contentLines = [];
+  let i = startIndex;
+  
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    
+    // 跳过空行
+    if (!line) {
+      i++;
+      continue;
+    }
+    
+    // 检查是否为已映射的 markdown 格式
+    const mappedResult = parseMarkdownToTemplate(line, markdownMapping);
+    if (mappedResult) {
+      // 遇到已映射的内容，停止收集
+      console.log(`在第${i}行遇到已映射内容，停止收集: ${mappedResult.type}`);
+      break;
+    }
+    
+    // 检查是否为内联模板标签
+    const inlineTemplateTagMatch = line.match(/^<(\w+)>(.*?)<\/\1>$/);
+    if (inlineTemplateTagMatch) {
+      console.log(`在第${i}行遇到内联模板标签，停止收集: ${inlineTemplateTagMatch[1]}`);
+      break;
+    }
+    
+    // 检查是否为块级模板标签
+    const templateTagMatch = line.match(/^<(\w+)>$/);
+    if (templateTagMatch) {
+      console.log(`在第${i}行遇到块级模板标签，停止收集: ${templateTagMatch[1]}`);
+      break;
+    }
+    
+    // 将此行添加到未映射内容中
+    contentLines.push(lines[i]); // 保留原始行（包括缩进）
+    i++;
+  }
+  
+  const content = contentLines.join('\n');
+  console.log(`收集完成，共 ${contentLines.length} 行，结束行: ${i - 1}`);
+  
+  return {
+    content: content,
+    lineCount: contentLines.length,
+    endIndex: i // 下一行的索引
+  };
 }
 
 // 🆕 解析 markdown 格式并映射到模板路径
@@ -679,21 +756,55 @@ function parseMarkdownToTemplate(line, markdownMapping) {
   return null;
 }
 
+
+
 // 🆕 创建或合并到现有容器的模板元素
-function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, containerMap, children) {
-  console.log(`创建或合并模板元素，路径: ${templatePath}, 内容: "${content}"`);
+function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, containerMap, children, existingElement = null) {
+  console.log(`创建或合并模板元素，路径: ${templatePath}, 内容: "${content}", 已有元素: ${existingElement ? existingElement.type : 'null'}`);
   
   // 解析路径（支持嵌套路径如 'content.title'）
   const pathParts = templatePath.split('.');
   
   if (pathParts.length === 1) {
-    // 简单路径，直接创建元素并添加到children
+    // 简单路径，需要检查是否需要创建容器
     const tagName = pathParts[0];
-    const templateElement = createTemplateTagElement(tagName, content, cardStyleConfig);
-    if (templateElement) {
-      children.push(templateElement);
+    
+    if (existingElement) {
+      // 如果传入了已解析的元素，需要创建容器来包裹它
+      console.log(`为已解析元素创建容器: ${tagName}`);
+      
+      // 检查是否已经存在该容器
+      let containerElement = containerMap.get(tagName);
+      if (!containerElement) {
+        // 创建新的容器
+        containerElement = createTemplateTagElement(tagName, '', cardStyleConfig);
+        if (!containerElement) {
+          return null;
+        }
+        
+        // 将容器添加到children并记录到containerMap
+        children.push(containerElement);
+        containerMap.set(tagName, containerElement);
+        console.log(`创建新的容器: ${tagName}`);
+      } else {
+        console.log(`使用现有容器: ${tagName}`);
+      }
+      
+      // 将已解析的元素添加到容器中
+      if (containerElement.layout && containerElement.layout.children) {
+        containerElement.layout.children.push(existingElement);
+        console.log(`将元素添加到容器 ${tagName} 中，当前子元素数量: ${containerElement.layout.children.length}`);
+      }
+      
+      return existingElement;
+    } else {
+      // 否则创建新的模板元素，直接添加到children
+      const templateElement = createTemplateTagElement(tagName, content, cardStyleConfig);
+      if (templateElement) {
+        children.push(templateElement);
+      }
+      return templateElement;
     }
-    return templateElement;
   } else if (pathParts.length === 2) {
     // 嵌套路径，需要处理容器合并
     const parentTagName = pathParts[0];
@@ -714,9 +825,16 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
     }
     
     // 创建子元素
-    const childElement = createTemplateTagElement(childTagName, content, parentConfig);
-    if (!childElement) {
-      return null;
+    let childElement;
+    if (existingElement) {
+      // 如果传入了已解析的元素，直接使用
+      childElement = existingElement;
+    } else {
+      // 否则创建新的模板元素
+      childElement = createTemplateTagElement(childTagName, content, parentConfig);
+      if (!childElement) {
+        return null;
+      }
     }
     
     // 检查是否已经存在该容器
