@@ -4,9 +4,6 @@
  * 提供了对不同元素类型样式的完整配置
  */
 
-import fontweight from "../tokens/font/fontweight.js";
-
-
 // CSS变量系统
 export const CSS_VARIABLE_SYSTEM = {
   // 字体系统
@@ -443,29 +440,31 @@ export const DEFAULT_STYLE_CONFIG = {
   layout: {
     // 根布局元素
     root: {
-      padding: `${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.loose}`,
-      margin: DIMENSION_CONSTANTS.MARGIN.base,
-      backgroundColor: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
-      borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.large,
+      style: {
+        padding: `${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.loose}`,
+        margin: DIMENSION_CONSTANTS.MARGIN.base,
+        backgroundColor: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
+        borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.large,
 
-      // 🔧 新增：布局动作所需的默认属性
-      display: 'flex',
-      flexDirection: 'column',
-      flexWrap: 'nowrap',
-      justifyContent: 'flex-start',
-      alignItems: 'stretch',
-      gap: DIMENSION_CONSTANTS.GAP.none,
+        // 🔧 新增：布局动作所需的默认属性
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'nowrap',
+        justifyContent: 'flex-start',
+        alignItems: 'stretch',
+        gap: DIMENSION_CONSTANTS.GAP.none,
 
+        backgroundImage: 'none',
+        backgroundSize: '100% auto',
+        backgroundPosition: '0 0',
+        backgroundRepeat: 'no-repeat',
 
-      backgroundImage: 'none',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-
-      // 网格布局属性（默认不启用，由动作激活）
-      gridTemplateColumns: 'none',
-      gridTemplateAreas: 'none',
-      justifyItems: 'stretch',
+        // 网格布局属性（默认不启用，由动作激活）
+        gridTemplateColumns: 'none',
+        gridTemplateAreas: 'none',
+        justifyItems: 'stretch',
+      },
+      supportedAttributes: ['backgroundImage']
     },
     // 列布局元素（默认垂直布局）
     column: {
@@ -2030,9 +2029,10 @@ export function resetStyleConfig() {
  * 获取特定元素类型的样式配置
  * @param {string} elementType - 元素类型 (layout, text, button, image)
  * @param {string} variant - 变体名称
+ * @param {Object} attributes - 要应用的属性（可选）
  * @returns {Object} 样式配置对象
  */
-export function getElementStyleConfig(elementType, variant = 'normal') {
+export function getElementStyleConfig(elementType, variant = 'normal', attributes = {}) {
   if (!activeStyleConfig[elementType]) {
     console.warn(`未找到元素类型 "${elementType}" 的样式配置`);
     return {};
@@ -2070,13 +2070,40 @@ export function getElementStyleConfig(elementType, variant = 'normal') {
 
     if (defaultVariant && activeStyleConfig[elementType][defaultVariant]) {
       console.warn(`使用默认变体 "${defaultVariant}" 替代 "${variant}"`);
-      return activeStyleConfig[elementType][defaultVariant];
+      return getElementStyleConfig(elementType, defaultVariant, attributes);
     }
 
     return {};
   }
 
-  return activeStyleConfig[elementType][variant];
+  const variantConfig = activeStyleConfig[elementType][variant];
+  
+  // 🆕 处理新格式：有 style 键和 supportedAttributes 键
+  if (variantConfig.style && variantConfig.supportedAttributes) {
+    console.log(`🎨 使用新格式样式配置: ${elementType}.${variant}`);
+    
+    // 复制基础样式
+    let finalStyle = { ...variantConfig.style };
+    
+    // 应用支持的属性
+    if (attributes && Object.keys(attributes).length > 0) {
+      console.log(`🔧 应用属性到 ${elementType}.${variant}:`, attributes);
+      
+      Object.entries(attributes).forEach(([attrName, attrValue]) => {
+        if (variantConfig.supportedAttributes.includes(attrName)) {
+          console.log(`   ✅ 应用支持的属性: ${attrName} = "${attrValue}"`);
+          finalStyle[attrName] = attrValue;
+        } else {
+          console.warn(`   ⚠️ 属性 "${attrName}" 不在支持列表中:`, variantConfig.supportedAttributes);
+        }
+      });
+    }
+    
+    return finalStyle;
+  }
+  
+  // 🔧 处理旧格式：直接返回样式对象（向后兼容）
+  return variantConfig;
 }
 
 /**

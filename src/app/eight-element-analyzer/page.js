@@ -357,6 +357,9 @@ RESTful API，快速集成现有系统
 </layout:row>`
   },
 
+
+  // <layout:root backgroundImage="url(https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)"> 
+
   article: {
     name: '📖 技术文档',
     description: '原始的技术文档风格，包含各种元素类型',
@@ -514,7 +517,6 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 8. **高斯率（Integral Form）**  
    - 电场的环流量等于包围的净电荷量：  
      $$ \\oint \\mathbf{E} \\cdot d\\mathbf{l} = 4\\pi k_e Q_{enc} $$
-
 `
   },
   jd: {

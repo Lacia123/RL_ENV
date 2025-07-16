@@ -478,13 +478,40 @@ function isQuoteText(line) {
   return line.trim().match(/^>\s*(.*)$/);
 }
 
-// 检测是否为布局标签
+// 检测是否为布局标签（支持属性）
 function isLayoutTag(line) {
+  // 匹配带属性的开始标签: <layout:variant attr1="value1" attr2="value2">
+  const layoutTagWithAttrsMatch = line.trim().match(/^<layout:(\w+)([^>]*)>$/);
+  if (layoutTagWithAttrsMatch) {
+    const variant = layoutTagWithAttrsMatch[1];
+    const attributesStr = layoutTagWithAttrsMatch[2].trim();
+    
+    // 解析属性
+    const attributes = {};
+    if (attributesStr) {
+      // 匹配 key="value" 格式的属性
+      const attrRegex = /(\w+)=["']([^"']*?)["']/g;
+      let attrMatch;
+      while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
+        attributes[attrMatch[1]] = attrMatch[2];
+      }
+    }
+    
+    return {
+      isLayoutTag: true,
+      variant: variant,
+      attributes: attributes,
+      isClosing: false
+    };
+  }
+  
+  // 匹配简单的开始标签: <layout:variant>
   const layoutTagMatch = line.trim().match(/^<layout:(\w+)>$/);
   if (layoutTagMatch) {
     return {
       isLayoutTag: true,
       variant: layoutTagMatch[1],
+      attributes: {},
       isClosing: false
     };
   }
@@ -494,6 +521,7 @@ function isLayoutTag(line) {
     return {
       isLayoutTag: true,
       variant: closingTagMatch[1],
+      attributes: {},
       isClosing: true
     };
   }
@@ -1158,10 +1186,11 @@ function extractLayoutBlock(lines, startIndex) {
   
   if (!startTagInfo.isLayoutTag || startTagInfo.isClosing) {
     console.error('无效的布局标签起始行');
-    return { layoutContent: '', variant: '', endIndex: startIndex };
+    return { layoutContent: '', variant: '', attributes: {}, endIndex: startIndex };
   }
   
   const variant = startTagInfo.variant;
+  const attributes = startTagInfo.attributes || {};
   const contentLines = [];
   let i = startIndex + 1;
   let foundEnd = false;
@@ -1185,11 +1214,12 @@ function extractLayoutBlock(lines, startIndex) {
     console.warn(`警告: 未找到布局标签 ${variant} 的结束标签`);
   }
   
-  console.log(`布局标签块提取完成，变体: ${variant}，内容行数: ${contentLines.length}，结束索引: ${i - 1}`);
+  console.log(`布局标签块提取完成，变体: ${variant}，属性:`, attributes, `内容行数: ${contentLines.length}，结束索引: ${i - 1}`);
   
   return {
     layoutContent: contentLines.join('\n').trim(),
     variant: variant,
+    attributes: attributes,
     endIndex: i - 1
   };
 }
@@ -2520,7 +2550,7 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
 // 创建布局元素，支持自定义选项
 function createLayoutElement(direction, children = [], options = {}) {
   const { width, height, gap, variant = 'column', isRoot = false,
-    alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN } = options;
+    alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN, attributes = {} } = options;
   
   // 使用随机UUID生成ID
   const layoutId = generateUUID();
@@ -2532,8 +2562,8 @@ function createLayoutElement(direction, children = [], options = {}) {
       LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER :
       LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN);
 
-  // 获取布局元素的样式配置
-  const layoutStyleConfig = getElementStyleConfig('layout', isRoot ? 'root' : variant);
+  // 🆕 获取布局元素的样式配置，传入属性
+  const layoutStyleConfig = getElementStyleConfig('layout', isRoot ? 'root' : variant, attributes);
 
   // 创建基础布局
   const baseLayout = createBaseLayout(direction, { width, height, alignItems });
@@ -2583,7 +2613,9 @@ function createLayoutElement(direction, children = [], options = {}) {
       actualType: 'layout',
       variant: isRoot ? 'root' : variant,
       isLayout: true,
-      isRoot: isRoot
+      isRoot: isRoot,
+      // 🆕 保存应用的属性信息
+      appliedAttributes: attributes
     },
     layout: {
       ...baseLayout,
@@ -3530,7 +3562,7 @@ function parseMarkdown(markdown, options = {}) {
     // 处理布局标签
     const layoutTagInfo = isLayoutTag(trimmedLine);
     if (layoutTagInfo.isLayoutTag && !layoutTagInfo.isClosing) {
-      console.log(`发现布局标签，行号: ${i}，变体: ${layoutTagInfo.variant}`);
+      console.log(`发现布局标签，行号: ${i}，变体: ${layoutTagInfo.variant}，属性:`, layoutTagInfo.attributes);
       
       // 处理之前累积的内容
       flushTextBlock();
@@ -3552,61 +3584,90 @@ function parseMarkdown(markdown, options = {}) {
       }
 
       // 提取布局标签内容
-      const { layoutContent, variant, endIndex } = extractLayoutBlock(
+      const { layoutContent, variant, attributes, endIndex } = extractLayoutBlock(
         markedLines.map(item => item.line),
         i
       );
 
-      // 递归解析布局标签内的内容
-      if (layoutContent.trim()) {
-        console.log(`递归解析布局内容，变体: ${variant}`);
-        const layoutChildren = parseMarkdown(layoutContent, { 
-          disableButtonGrouping: true,
-          disableSiblingGrouping: variant === 'row'  // 🔧 只在 row 布局中禁用同级标题分组
-        });
-
-        // 根据变体确定布局方向
-        let direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL; // 默认垂直
-        let alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
-        let counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
-
-        if (variant === 'row') {
-          direction = LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL;
-          alignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
-          counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER;
-        } else if (variant === 'column') {
-          direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL;
-          alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
-          counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
-        }
-
-        // 🔧 创建稳定的内容种子用于生成稳定ID
-        const contentSeed = `${variant}-${layoutContent}`;
-        const position = `line-${i}`;
+      // 🆕 特殊处理根layout标签
+      if (variant === 'root') {
+        console.log(`🌱 发现根layout标签，属性:`, attributes);
         
-        // 创建布局容器
-        const layoutContainer = createLayoutElement(
-          direction,
-          layoutChildren,
-          {
-            variant: variant,
-            alignItems: alignItems,
-            counterAxisAlign: counterAxisAlign,
-            contentSeed: contentSeed,
-            position: position
+        // 对于根layout，我们需要应用属性到现有的根布局
+        // 递归解析根布局内的内容（如果有）
+        if (layoutContent.trim()) {
+          console.log(`递归解析根布局内容`);
+          const rootChildren = parseMarkdown(layoutContent, { 
+            disableButtonGrouping: true,
+            disableSiblingGrouping: false
+          });
+          
+          // 将解析的内容添加到当前堆栈
+          rootChildren.forEach(child => {
+            stack[stack.length - 1].elements.push(child);
+          });
+        }
+        
+        // 🆕 保存根layout的属性信息，在创建根对象时会用到
+        if (!options.rootAttributes) {
+          options.rootAttributes = {};
+        }
+        Object.assign(options.rootAttributes, attributes);
+        
+        console.log(`🌱 根layout属性已保存:`, options.rootAttributes);
+      } else {
+        // 递归解析布局标签内的内容
+        if (layoutContent.trim()) {
+          console.log(`递归解析布局内容，变体: ${variant}，属性:`, attributes);
+          const layoutChildren = parseMarkdown(layoutContent, { 
+            disableButtonGrouping: true,
+            disableSiblingGrouping: variant === 'row'  // 🔧 只在 row 布局中禁用同级标题分组
+          });
+
+          // 根据变体确定布局方向
+          let direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL; // 默认垂直
+          let alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
+          let counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
+
+          if (variant === 'row') {
+            direction = LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL;
+            alignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
+            counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER;
+          } else if (variant === 'column') {
+            direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL;
+            alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
+            counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
           }
-        );
-        
-        // 🔧 确保元数据正确保存了variant信息
-        if (layoutContainer._metadata) {
-          layoutContainer._metadata.variant = variant;
-          layoutContainer._metadata.originalVariant = variant; // 保存原始variant
-          layoutContainer._metadata.isLayoutTag = true; // 标记这是来自layout标签的
-        }
-        
-        console.log(`🔧 创建layout标签容器: ID=${layoutContainer.id}, variant=${variant}, 内容长度=${layoutContent.length}`);
 
-        stack[stack.length - 1].elements.push(layoutContainer);
+          // 🔧 创建稳定的内容种子用于生成稳定ID
+          const contentSeed = `${variant}-${layoutContent}`;
+          const position = `line-${i}`;
+          
+          // 创建布局容器，传递属性
+          const layoutContainer = createLayoutElement(
+            direction,
+            layoutChildren,
+            {
+              variant: variant,
+              alignItems: alignItems,
+              counterAxisAlign: counterAxisAlign,
+              contentSeed: contentSeed,
+              position: position,
+              attributes: attributes // 🆕 传递属性
+            }
+          );
+          
+          // 🔧 确保元数据正确保存了variant信息
+          if (layoutContainer._metadata) {
+            layoutContainer._metadata.variant = variant;
+            layoutContainer._metadata.originalVariant = variant; // 保存原始variant
+            layoutContainer._metadata.isLayoutTag = true; // 标记这是来自layout标签的
+          }
+          
+          console.log(`🔧 创建layout标签容器: ID=${layoutContainer.id}, variant=${variant}, 属性:`, attributes, `内容长度=${layoutContent.length}`);
+
+          stack[stack.length - 1].elements.push(layoutContainer);
+        }
       }
 
       // 跳过已处理的布局标签行
@@ -4327,12 +4388,12 @@ function parseMarkdown(markdown, options = {}) {
 }
 
 // 创建八要素根对象
-function createEightElementRoot(markdownElements) {
+function createEightElementRoot(markdownElements, rootAttributes = {}) {
   // 使用随机UUID生成根布局ID
   const rootId = generateUUID();
 
-  // 获取根布局的样式配置
-  const rootStyleConfig = getElementStyleConfig('layout', 'root');
+  // 🆕 获取根布局的样式配置，传入根layout属性
+  const rootStyleConfig = getElementStyleConfig('layout', 'root', rootAttributes);
 
   // 生成唯一的className
   const uniqueClassName = `layout-root-${rootId}`;
@@ -4349,11 +4410,13 @@ function createEightElementRoot(markdownElements) {
       actualType: 'layout',
       variant: 'root',
       isLayout: true,
-      isRoot: true
+      isRoot: true,
+      // 🆕 保存根layout的属性信息
+      appliedAttributes: rootAttributes
     },
     layout: {
       classStyle: {
-        ...rootStyleConfig // 应用根布局样式配置到classStyle
+        ...rootStyleConfig // 应用根布局样式配置到classStyle（包含属性）
       },
       className: uniqueClassName,
       style: {
@@ -4372,11 +4435,15 @@ function createEightElementRoot(markdownElements) {
         "back-width": "auto",
         "back-height": "100px",
         "box-sizing": "border-box",
+        // 🆕 应用根布局样式配置中的属性样式
+        ...rootStyleConfig
       },
       children: markdownElements
     },
     events: [{}]
   };
+
+  console.log(`🌱 创建根布局，应用属性:`, rootAttributes);
 
   return rootLayout;
 }
@@ -4416,12 +4483,15 @@ function markdownToEightElement(markdown, styleConfig) {
 
   console.log(`处理Markdown文本，长度: ${processedMarkdown.length}`);
 
+  // 🆕 创建解析选项对象，用于收集根layout属性
+  const parseOptions = { rootAttributes: {} };
+  
   // 直接使用parseMarkdown函数解析Markdown为元素数组
-  const parsedElements = parseMarkdown(processedMarkdown);
+  const parsedElements = parseMarkdown(processedMarkdown, parseOptions);
   console.log(`解析得到的元素数量: ${parsedElements.length}`);
 
-  // 使用createEightElementRoot创建八要素根结构
-  const eightElementRoot = createEightElementRoot(parsedElements);
+  // 🆕 使用createEightElementRoot创建八要素根结构，传递根layout属性
+  const eightElementRoot = createEightElementRoot(parsedElements, parseOptions.rootAttributes);
 
   // 重置为默认配置
   try {
