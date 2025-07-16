@@ -360,7 +360,8 @@ RESTful API，快速集成现有系统
   article: {
     name: '📖 技术文档',
     description: '原始的技术文档风格，包含各种元素类型',
-    markdown: `# 八要素测试文档
+    markdown: `
+# 八要素测试文档
 
 ## 基本元素
 <layout:row>
@@ -512,7 +513,69 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 
 8. **高斯率（Integral Form）**  
    - 电场的环流量等于包围的净电荷量：  
-     $$ \\oint \\mathbf{E} \\cdot d\\mathbf{l} = 4\\pi k_e Q_{enc} $$`
+     $$ \\oint \\mathbf{E} \\cdot d\\mathbf{l} = 4\\pi k_e Q_{enc} $$
+
+`
+  },
+  jd: {
+    name: '招聘',
+    description: '招聘页面风格',
+    markdown: `
+    <card:neomorphism>
+# 算法工程师招聘JD
+### 加入我们的算法团队
+</card:neomorphism>
+<layout:row>
+[在线申请](https://example.com/apply)
+[了解更多](https://example.com/about)
+[联系我们](https://example.com/contact)
+</layout:row>
+<layout:row>
+<card:techGradient>
+## 职位详情
+### 算法工程师
+**薪资范围**：200K - 300K CNY  
+**工作地点**：北京/上海/深圳（可选）  
+**招聘人数**：5人  
+**工作类型**：全职
+</card:techGradient>
+<card:techGradient>
+## 公司简介
+### 创新科技公司
+我们是一家专注于人工智能和大数据领域的创新科技公司，致力于为企业提供最先进的数字化解决方案，助力业务增长和数字化转型。我们拥有一支充满活力和创新精神的技术团队，平均从业经验8年以上。我们拥有一支充满活力和创新精神的技术团队，平均从业经验8年以上。我们拥有一支充满活力和创新精神的技术团队，平均从业经验8年以上。
+</card:techGradient>
+</layout:row>
+## 职位描述
+### 岗位职责
+1. 设计和实现高效的算法解决方案，解决实际业务问题  
+2. 参与前沿技术研究，包括但不限于机器学习、深度学习、自然语言处理等领域  
+3. 优化现有算法模型，提升系统性能和用户体验  
+4. 撰写技术文档，分享研究成果，参与技术交流
+### 任职要求
+**必备技能**：  
+- 计算机科学、数学或相关专业本科及以上学历  
+- 熟悉Python/C++/Java等至少一种编程语言  
+- 扎实的数据结构和算法基础，熟悉常见的算法优化技巧  
+- 具有良好的数学分析能力和逻辑思维能力  
+**加分项**：  
+- 有机器学习、深度学习、自然语言处理等领域的实践经验  
+- 熟悉分布式系统、大数据处理或高性能计算  
+- 有顶会论文发表或开源项目贡献  
+- 具备良好的团队协作能力和沟通能力
+## 公司福利
+### 我们提供
+- **薪资待遇**：行业内有竞争力的薪资，优秀者薪资不设上限  
+- **职业发展**：完善的晋升体系，支持个人成长和职业发展  
+- **工作环境**：开放自由的工作氛围，舒适的工作空间  
+- **团队活动**：丰富的团队建设活动和节日福利
+
+<card:elegant>
+### 加入我们
+成为我们团队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长，共同打造行业领先的解决方案。如果你对算法充满热情，渴望挑战，欢迎加入我们！
+### 应聘方式
+[在线申请](https://example.com/apply) [了解更多](https://example.com/about) [联系我们](https://example.com/contact)
+</card:elegant>
+    `
   }
 };
 
@@ -791,7 +854,7 @@ const EightElementAnalyzer = () => {
 
         // 🔧 修复：不再自动设置默认值，只保持用户已经设置的调控
         const layoutControlsToUpdate = { ...currentLayoutControls };
-        
+
         // 🔧 清理不存在的布局索引（布局可能被删除或修改）
         const validLayoutIndices = new Set(pageElementsList.layoutAnalysis.map(layout => layout.index));
         Object.keys(layoutControlsToUpdate).forEach(layoutIndexStr => {
@@ -1003,7 +1066,7 @@ const EightElementAnalyzer = () => {
       layout.layoutDirection === 'HORIZONTAL' ||
       (layout.element._metadata?.originalVariant === 'row') ||
       (layout.element._metadata?.isLayoutTag && layout.variant === 'row');
-    
+
     // 如果原本是row，默认显示0.8；如果原本是column，默认显示0.2
     return isOriginallyRow ? 0.8 : 0.2;
   };
@@ -1166,12 +1229,12 @@ const EightElementAnalyzer = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <h1 className="text-2xl font-bold mb-4">八要素结构分析工具</h1>
+    <div className="h-screen bg-gray-50 p-4 flex flex-col">
+      <h1 className="text-2xl font-bold mb-4 flex-shrink-0">八要素结构分析工具</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
         {/* 左侧编辑器区域 */}
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-white rounded-lg shadow p-4 overflow-y-auto">
           <h2 className="text-lg font-medium mb-4">Markdown编辑器</h2>
 
           {/* 🆕 模板选择Tab */}
@@ -1492,38 +1555,38 @@ const EightElementAnalyzer = () => {
 
                 {!isLayoutControlsCollapsed && (
                   <div className="space-y-3 max-h-60 overflow-y-auto">
-                                            {layoutAnalysis.map((layout) => {
-                          // 🔧 修复：使用原始方向计算默认强度，如果用户没有设置调控则显示原始状态
-                          const defaultIntensity = getLayoutDefaultIntensity(layout);
-                          const currentIntensity = layoutControls[layout.index] !== undefined ? layoutControls[layout.index] : defaultIntensity;
-                          const currentVariant = currentIntensity <= 0.5 ? 'column' : 'row';
-                          // 🔧 修复：检查是否用户主动设置了调控
-                          const hasUserControl = layoutControls[layout.index] !== undefined;
+                    {layoutAnalysis.map((layout) => {
+                      // 🔧 修复：使用原始方向计算默认强度，如果用户没有设置调控则显示原始状态
+                      const defaultIntensity = getLayoutDefaultIntensity(layout);
+                      const currentIntensity = layoutControls[layout.index] !== undefined ? layoutControls[layout.index] : defaultIntensity;
+                      const currentVariant = currentIntensity <= 0.5 ? 'column' : 'row';
+                      // 🔧 修复：检查是否用户主动设置了调控
+                      const hasUserControl = layoutControls[layout.index] !== undefined;
 
-                          return (
-                            <div key={layout.index} className={`p-3 rounded border ${hasUserControl ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-200'}`}>
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">
-                                    {layout.isRoot ? 'root' : 'layout'}
-                                  </span>
-                                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">
-                                    索引:{layout.index}
-                                  </span>
-                                  <span className={`text-xs px-2 py-1 rounded font-mono ${currentVariant === 'row' ? 'bg-orange-200 text-orange-800' : 'bg-green-200 text-green-800'
-                                    }`}>
-                                    {currentVariant}
-                                  </span>
-                                  <span className="text-xs text-gray-600">
-                                    {layout.childrenCount}子
-                                  </span>
-                                </div>
-                                {hasUserControl && (
-                                  <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
-                                    已调整
-                                  </span>
-                                )}
-                              </div>
+                      return (
+                        <div key={layout.index} className={`p-3 rounded border ${hasUserControl ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-200'}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">
+                                {layout.isRoot ? 'root' : 'layout'}
+                              </span>
+                              <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">
+                                索引:{layout.index}
+                              </span>
+                              <span className={`text-xs px-2 py-1 rounded font-mono ${currentVariant === 'row' ? 'bg-orange-200 text-orange-800' : 'bg-green-200 text-green-800'
+                                }`}>
+                                {currentVariant}
+                              </span>
+                              <span className="text-xs text-gray-600">
+                                {layout.childrenCount}子
+                              </span>
+                            </div>
+                            {hasUserControl && (
+                              <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
+                                已调整
+                              </span>
+                            )}
+                          </div>
 
                           <div className="text-xs text-gray-700 mb-2">
                             <span className="font-medium">内容:</span> {layout.content.preview}
@@ -1531,7 +1594,7 @@ const EightElementAnalyzer = () => {
 
                           {/* 🆕 显示布局的原始状态 */}
                           <div className="text-xs text-gray-600 mb-2">
-                            <span className="font-medium">原始方向:</span> 
+                            <span className="font-medium">原始方向:</span>
                             <span className={`ml-1 px-2 py-1 rounded font-mono ${getLayoutDefaultIntensity(layout) > 0.5 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
                               {getLayoutDefaultIntensity(layout) > 0.5 ? 'row' : 'column'}
                             </span>
@@ -1625,7 +1688,7 @@ const EightElementAnalyzer = () => {
         </div>
 
         {/* 右侧预览区域 */}
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-white rounded-lg shadow p-4 overflow-y-auto">
           <div className="flex border-b mb-4">
             <button
               className={`px-4 py-2 ${visibleTab === 'html' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}

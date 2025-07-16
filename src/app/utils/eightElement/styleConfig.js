@@ -456,10 +456,16 @@ export const DEFAULT_STYLE_CONFIG = {
       alignItems: 'stretch',
       gap: DIMENSION_CONSTANTS.GAP.none,
 
+
+      backgroundImage: 'none',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+
       // 网格布局属性（默认不启用，由动作激活）
       gridTemplateColumns: 'none',
       gridTemplateAreas: 'none',
-      justifyItems: 'stretch'
+      justifyItems: 'stretch',
     },
     // 列布局元素（默认垂直布局）
     column: {
@@ -1603,7 +1609,7 @@ export const DEFAULT_STYLE_CONFIG = {
         padding: "{dimension.padding.semiloose}",
         background: `linear-gradient(145deg, {color.primarycontainer.brand1} 0%, {color.primarycontainer.brand2} 50%, {color.secondarycontainer.violet1} 100%)`,
         boxShadow: `{material.hierarchy.2f}`,
-        border: `{dimension.borderwidth.base} solid {color.info.blue3}`,
+        border: `{dimension.borderwidth.base} solid {color.primary.brand3}`,
         position: 'relative',
         overflow: 'hidden',
         // 优雅的纹理效果
@@ -1614,8 +1620,8 @@ export const DEFAULT_STYLE_CONFIG = {
           left: '0',
           right: '0',
           bottom: '0',
-          backgroundImage: `radial-gradient(circle at 25% 25%, {color.info.blue2} 0%, transparent 50%), 
-                       radial-gradient(circle at 75% 75%, {color.secondary.violet2} 0%, transparent 50%)`,
+          backgroundImage: `radial-gradient(circle at 25% 25%, {color.primarycontainer.brand2} 0%, transparent 50%), 
+                       radial-gradient(circle at 75% 75%, {color.secondarycontainer.violet2} 0%, transparent 50%)`,
           opacity: '0.4',
           borderRadius: "{dimension.borderradius.xxxl}",
         }
@@ -1670,7 +1676,7 @@ export const DEFAULT_STYLE_CONFIG = {
           height: '100%',
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
-          padding: "{dimension.padding.semiloose}",
+          padding: "{dimension.padding.extraloose}",
           gap: "{dimension.gap.tight}",
           boxShadow: `{material.hierarchy.B1}, {material.hierarchy.main}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
@@ -1707,8 +1713,8 @@ export const DEFAULT_STYLE_CONFIG = {
             '&::before': {
               content: "''",
               position: 'absolute',
-              top: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`, // 相对于content容器的位置
-              right: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`, // 相对于content容器的位置
+              top: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
+              right: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
               width: '6px',
               height: '6px',
               borderRadius: '50%',
@@ -1726,8 +1732,8 @@ export const DEFAULT_STYLE_CONFIG = {
             '&:last-child::after': {
               content: "''",
               position: 'absolute',
-              bottom: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`, // 相对于content容器的位置
-              left: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`, // 相对于content容器的位置
+              bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
+              left: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
               width: '6px',
               height: '6px',
               borderRadius: '50%',
@@ -1744,259 +1750,259 @@ export const DEFAULT_STYLE_CONFIG = {
 
   // ==================== 图像元件 ====================
   image: {
-      // 普通图片  
-      normal: {
-        borderRadius: "{dimension.borderradius.medium}",
-        borderWidth: "{dimension.borderwidth.narrow}",
-        borderColor: "{color.surfacecontainer.black16}",
-        borderStyle: "solid",
-        boxShadow: "{material.hierarchy.main}",
-        clipPath: "none",
-        transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
-        maxWidth: "100%",
-        height: "auto",
+    // 普通图片  
+    normal: {
+      borderRadius: "{dimension.borderradius.medium}",
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.surfacecontainer.black16}",
+      borderStyle: "solid",
+      boxShadow: "{material.hierarchy.main}",
+      clipPath: "none",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      maxWidth: "100%",
+      height: "auto",
 
-        '&:hover': {
-          boxShadow: "{material.hierarchy.2f}",
-          transform: "scale(1.02)"
-        }
-      },
-
-      // 圆角图片 TODO: 需要确定解析的规则
-      rounded: {
-        borderRadius: "{dimension.borderradius.xl}",
-        borderWidth: "{dimension.borderwidth.base}",
-        borderColor: "{color.surfacecontainer.black12}",
-        borderStyle: "solid",
-        boxShadow: "{material.hierarchy.1f}",
-        clipPath: "none",
-        maxWidth: "100%",
-        height: "auto",
-        transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
-        '&:hover': {
-          borderColor: "{color.primarycontainer.brand2}",
-          boxShadow: "{material.hierarchy.3f}"
-        }
-      },
-
-      // 圆形图片（头像） TODO: 需要确定解析的规则
-      circle: {
-        borderRadius: "50%",
-        borderWidth: "{dimension.borderwidth.base}",
-        borderColor: "{color.primarycontainer.brand2}",
-        borderStyle: "solid",
+      '&:hover': {
         boxShadow: "{material.hierarchy.2f}",
-        clipPath: "none",
-        aspectRatio: "1",
-        objectFit: "cover",
-        transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
-        '&:hover': {
-          borderColor: "{color.primary.brand4}",
-          boxShadow: "{material.hierarchy.4f}",
-          transform: "scale(1.05)"
-        }
-      },
+        transform: "scale(1.02)"
+      }
+    },
 
-      // 带边框图片 TODO: 需要确定解析的规则
-      framed: {
-        borderRadius: "{dimension.borderradius.large}",
-        borderWidth: "{dimension.borderwidth.wide}",
-        borderColor: "{color.surfacecontainer.white100}",
+    // 圆角图片 TODO: 需要确定解析的规则
+    rounded: {
+      borderRadius: "{dimension.borderradius.xl}",
+      borderWidth: "{dimension.borderwidth.base}",
+      borderColor: "{color.surfacecontainer.black12}",
+      borderStyle: "solid",
+      boxShadow: "{material.hierarchy.1f}",
+      clipPath: "none",
+      maxWidth: "100%",
+      height: "auto",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      '&:hover': {
+        borderColor: "{color.primarycontainer.brand2}",
+        boxShadow: "{material.hierarchy.3f}"
+      }
+    },
+
+    // 圆形图片（头像） TODO: 需要确定解析的规则
+    circle: {
+      borderRadius: "50%",
+      borderWidth: "{dimension.borderwidth.base}",
+      borderColor: "{color.primarycontainer.brand2}",
+      borderStyle: "solid",
+      boxShadow: "{material.hierarchy.2f}",
+      clipPath: "none",
+      aspectRatio: "1",
+      objectFit: "cover",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      '&:hover': {
+        borderColor: "{color.primary.brand4}",
+        boxShadow: "{material.hierarchy.4f}",
+        transform: "scale(1.05)"
+      }
+    },
+
+    // 带边框图片 TODO: 需要确定解析的规则
+    framed: {
+      borderRadius: "{dimension.borderradius.large}",
+      borderWidth: "{dimension.borderwidth.wide}",
+      borderColor: "{color.surfacecontainer.white100}",
+      borderStyle: "solid",
+      boxShadow: "{material.hierarchy.3f}",
+      clipPath: "none",
+      maxWidth: "100%",
+      height: "auto",
+      position: "relative",
+      '&::after': {
+        content: "''",
+        position: "absolute",
+        top: "-4px",
+        left: "-4px",
+        right: "-4px",
+        bottom: "-4px",
+        borderWidth: "{dimension.borderwidth.narrow}",
+        borderColor: "{color.surfacecontainer.black20}",
         borderStyle: "solid",
-        boxShadow: "{material.hierarchy.3f}",
-        clipPath: "none",
-        maxWidth: "100%",
-        height: "auto",
-        position: "relative",
-        '&::after': {
-          content: "''",
-          position: "absolute",
-          top: "-4px",
-          left: "-4px",
-          right: "-4px",
-          bottom: "-4px",
-          borderWidth: "{dimension.borderwidth.narrow}",
-          borderColor: "{color.surfacecontainer.black20}",
-          borderStyle: "solid",
-          borderRadius: "{dimension.borderradius.xl}",
-          pointerEvents: "none"
-        }
-      },
-
-      // 英雄图片 TODO: 需要确定解析的规则
-      hero: {
-        borderRadius: "{dimension.borderradius.xxl}",
-        boxShadow: "{material.hierarchy.5f}",
-        width: "100%",
-        height: "400px",
-        objectFit: "cover",
-        clipPath: "none",
-        background: `linear-gradient(135deg, {color.surface.grey1} 0%, {color.surface.grey2} 100%)`,
-        position: "relative",
-        '&::after': {
-          content: "''",
-          position: "absolute",
-          top: "0",
-          left: "0",
-          right: "0",
-          bottom: "0",
-          background: `linear-gradient(45deg, {color.surfacecontainer.black16} 0%, transparent 50%)`,
-          borderRadius: "{dimension.borderradius.xxl}"
-        }
+        borderRadius: "{dimension.borderradius.xl}",
+        pointerEvents: "none"
       }
     },
 
-    // ==================== 图标元件 ====================
-    icon: {
-      // 小图标  
-      small: {
-        width: "16px",
-        height: "16px",
-        color: "{color.onsurface.black48}",
-        margin: "0 0 {dimension.margin.base} 0",
+    // 英雄图片 TODO: 需要确定解析的规则
+    hero: {
+      borderRadius: "{dimension.borderradius.xxl}",
+      boxShadow: "{material.hierarchy.5f}",
+      width: "100%",
+      height: "400px",
+      objectFit: "cover",
+      clipPath: "none",
+      background: `linear-gradient(135deg, {color.surface.grey1} 0%, {color.surface.grey2} 100%)`,
+      position: "relative",
+      '&::after': {
+        content: "''",
+        position: "absolute",
+        top: "0",
+        left: "0",
+        right: "0",
+        bottom: "0",
+        background: `linear-gradient(45deg, {color.surfacecontainer.black16} 0%, transparent 50%)`,
+        borderRadius: "{dimension.borderradius.xxl}"
+      }
+    }
+  },
+
+  // ==================== 图标元件 ====================
+  icon: {
+    // 小图标  
+    small: {
+      width: "16px",
+      height: "16px",
+      color: "{color.onsurface.black48}",
+      margin: "0 0 {dimension.margin.base} 0",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+    },
+
+    // 中等图标  
+    medium: {
+      width: "24px",
+      height: "24px",
+      color: "{color.onsurface.black64}",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+    },
+
+    // 大图标  
+    large: {
+      width: "32px",
+      height: "32px",
+      color: "{color.onsurface.black76}",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+    },
+
+    // 可交互图标  
+    interactive: {
+      width: "24px",
+      height: "24px",
+      color: "{color.primary.brand5}",
+      cursor: "pointer",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SPRING,
+      '&:hover': {
+        color: "{color.primary.brand6}",
+        transform: "scale(1.1)"
+      }
+    },
+
+    // 状态图标  
+    status: {
+      success: {
+        width: "20px",
+        height: "20px",
+        color: "{color.success.green6}",
         transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
       },
-
-      // 中等图标  
-      medium: {
-        width: "24px",
-        height: "24px",
-        color: "{color.onsurface.black64}",
+      warning: {
+        width: "20px",
+        height: "20px",
+        color: "{color.warning.orange6}",
         transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
       },
-
-      // 大图标  
-      large: {
-        width: "32px",
-        height: "32px",
-        color: "{color.onsurface.black76}",
+      error: {
+        width: "20px",
+        height: "20px",
+        color: "{color.error.red6}",
         transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
-      },
+      }
+    }
+  },
 
-      // 可交互图标  
-      interactive: {
-        width: "24px",
-        height: "24px",
-        color: "{color.primary.brand5}",
-        cursor: "pointer",
-        transition: CSS_VARIABLE_SYSTEM.ANIMATION.SPRING,
-        '&:hover': {
-          color: "{color.primary.brand6}",
-          transform: "scale(1.1)"
-        }
-      },
+  // ==================== 功能性元件 ==================== (新增)
+  // TODO: 暂无应用
+  utility: {
+    // 复制按钮  
+    copyButton: {
+      position: 'absolute',
+      top: '12px',
+      right: '12px',
+      background: "{color.surfacecontainer.black20}",
+      borderWidth: "{dimension.borderwidth.none}",
+      borderRadius: "{dimension.borderradius.small}",
+      padding: "{dimension.padding.tight}",
+      color: "{color.onsurface.white88}",
+      cursor: 'pointer',
+      opacity: '0',
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
+      '&:hover': {
+        background: "{color.primary.brand5}"
+      }
+    },
 
-      // 状态图标  
-      status: {
-        success: {
-          width: "20px",
-          height: "20px",
-          color: "{color.success.green6}",
-          transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+    // 波纹效果动画  
+    ripple: {
+      position: 'absolute',
+      borderRadius: "50%",
+      background: 'rgba(255, 255, 255, 0.3)',
+      transform: 'scale(0)',
+      animation: 'ripple 0.6s ease-out',
+      pointerEvents: 'none'
+    }
+  },
+
+  // ==================== 响应式断点 ==================== (新增)
+  // TODO: 暂无应用
+  responsive: {
+    // 移动端断点
+    mobile: {
+      '@media (max-width: 768px)': {
+        '.markdown-container': {
+          fontSize: "{font.size.small}"
         },
-        warning: {
-          width: "20px",
-          height: "20px",
-          color: "{color.warning.orange6}",
-          transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+        '.markdown-h1': {
+          fontSize: '28px !important'
         },
-        error: {
-          width: "20px",
-          height: "20px",
-          color: "{color.error.red6}",
-          transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST
+        '.markdown-h2': {
+          fontSize: '24px !important'
         }
       }
     },
 
-    // ==================== 功能性元件 ==================== (新增)
-    // TODO: 暂无应用
-    utility: {
-      // 复制按钮  
-      copyButton: {
-        position: 'absolute',
-        top: '12px',
-        right: '12px',
-        background: "{color.surfacecontainer.black20}",
-        borderWidth: "{dimension.borderwidth.none}",
-        borderRadius: "{dimension.borderradius.small}",
-        padding: "{dimension.padding.tight}",
-        color: "{color.onsurface.white88}",
-        cursor: 'pointer',
-        opacity: '0',
-        transition: CSS_VARIABLE_SYSTEM.ANIMATION.FAST,
-        '&:hover': {
-          background: "{color.primary.brand5}"
-        }
-      },
-
-      // 波纹效果动画  
-      ripple: {
-        position: 'absolute',
-        borderRadius: "50%",
-        background: 'rgba(255, 255, 255, 0.3)',
-        transform: 'scale(0)',
-        animation: 'ripple 0.6s ease-out',
-        pointerEvents: 'none'
-      }
-    },
-
-    // ==================== 响应式断点 ==================== (新增)
-    // TODO: 暂无应用
-    responsive: {
-      // 移动端断点
-      mobile: {
-        '@media (max-width: 768px)': {
-          '.markdown-container': {
-            fontSize: "{font.size.small}"
-          },
-          '.markdown-h1': {
-            fontSize: '28px !important'
-          },
-          '.markdown-h2': {
-            fontSize: '24px !important'
-          }
-        }
-      },
-
-      // 平板端断点
-      tablet: {
-        '@media (max-width: 1024px)': {
-          '.app-container': {
-            gridTemplateColumns: '1fr',
-            gap: "{dimension.gap.loose}"
-          }
-        }
-      }
-    },
-
-    // ==================== 动画关键帧 ==================== (新增)
-    // TODO: 暂无应用
-    animations: {
-      // 波纹动画
-      ripple: {
-        '@keyframes ripple': {
-          'to': {
-            transform: 'scale(2)',
-            opacity: '0'
-          }
-        }
-      },
-
-      // 淡入动画
-      fadeIn: {
-        '@keyframes fadeIn': {
-          'from': {
-            opacity: '0',
-            transform: 'translateY(20px)'
-          },
-          'to': {
-            opacity: '1',
-            transform: 'translateY(0)'
-          }
+    // 平板端断点
+    tablet: {
+      '@media (max-width: 1024px)': {
+        '.app-container': {
+          gridTemplateColumns: '1fr',
+          gap: "{dimension.gap.loose}"
         }
       }
     }
+  },
+
+  // ==================== 动画关键帧 ==================== (新增)
+  // TODO: 暂无应用
+  animations: {
+    // 波纹动画
+    ripple: {
+      '@keyframes ripple': {
+        'to': {
+          transform: 'scale(2)',
+          opacity: '0'
+        }
+      }
+    },
+
+    // 淡入动画
+    fadeIn: {
+      '@keyframes fadeIn': {
+        'from': {
+          opacity: '0',
+          transform: 'translateY(20px)'
+        },
+        'to': {
+          opacity: '1',
+          transform: 'translateY(0)'
+        }
+      }
+    }
+  }
 };
 
 /**
@@ -2034,10 +2040,10 @@ export function getElementStyleConfig(elementType, variant = 'normal') {
 
   if (!activeStyleConfig[elementType][variant]) {
     console.warn(`未找到元素类型 "${elementType}" 的变体 "${variant}"`);
-    
+
     // 为不同元素类型提供合适的默认变体
     let defaultVariant = null;
-    switch(elementType) {
+    switch (elementType) {
       case 'text':
         defaultVariant = 'p';
         break;
@@ -2061,12 +2067,12 @@ export function getElementStyleConfig(elementType, variant = 'normal') {
         const availableVariants = Object.keys(activeStyleConfig[elementType]);
         defaultVariant = availableVariants.length > 0 ? availableVariants[0] : null;
     }
-    
+
     if (defaultVariant && activeStyleConfig[elementType][defaultVariant]) {
       console.warn(`使用默认变体 "${defaultVariant}" 替代 "${variant}"`);
       return activeStyleConfig[elementType][defaultVariant];
     }
-    
+
     return {};
   }
 
