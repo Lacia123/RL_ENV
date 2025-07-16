@@ -1710,7 +1710,7 @@ export const DEFAULT_STYLE_CONFIG = {
           style: {
             position: 'relative',
             // 右上角圆点 - 通过 title 元素实现
-            '&::before': {
+            '&:first-child:before': {
               content: "''",
               position: 'absolute',
               top: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
