@@ -454,7 +454,7 @@ export const DEFAULT_STYLE_CONFIG = {
         alignItems: 'stretch',
         gap: DIMENSION_CONSTANTS.GAP.none,
 
-        backgroundImage: 'none', 
+        backgroundImage: 'none',
         backgroundPosition: '50% 0',
         backgroundRepeat: 'no-repeat',
         backgroundSize: '100vw 140px',
@@ -739,7 +739,6 @@ export const DEFAULT_STYLE_CONFIG = {
       fontSize: "{font.size.small}",
     },
 
-    // 新拟态风格文字样式
     neomorphismTitle: {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.white100}",
@@ -747,47 +746,115 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     neomorphismSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onprimary.black88}",
+      color: "{color.onsurface.black88}",
       fontSize: "{font.size.small}",
     },
     neomorphismSegment: {
-      fontWeight: "{font.fontweight.medium}",
-      color: "{color.onprimary.black88}",
+      fontWeight: "{font.fontweight.normal}",
+      color: "{color.onsurface.black76}",
       fontSize: "{font.size.small}",
     },
 
-    // 科技渐变风格文字样式
+    // 科技渐变风格文字样式 (修正token引用)
     techGradientTitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.primary.brand6}", // 深蓝色确保可读性
+      color: "{color.primary.brand6}",
       fontSize: "{font.size.medium}",
     },
     techGradientSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onprimary.black88}",
+      color: "{color.onsurface.black88}",
       fontSize: "{font.size.small}",
     },
     techGradientSegment: {
-      fontWeight: "{font.fontweight.medium}",
-      color: "{color.onprimary.black88}",
+      fontWeight: "{font.fontweight.normal}",
+      color: "{color.onsurface.black76}",
       fontSize: "{font.size.small}",
     },
 
-    // 优雅青蓝卡片风格文字样式
+    // 优雅青蓝卡片风格文字样式 (修正token引用)
     elegantCardTitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.primary.brand6}", // 深青蓝色确保可读性
+      color: "{color.secondary.violet6}",
       fontSize: "{font.size.medium}",
     },
     elegantCardSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onprimary.black88}",
+      color: "{color.onsurface.black88}",
       fontSize: "{font.size.small}",
     },
     elegantCardSegment: {
-      fontWeight: "{font.fontweight.medium}",
-      color: "{color.onprimary.black88}",
+      fontWeight: "{font.fontweight.normal}",
+      color: "{color.onsurface.black76}",
       fontSize: "{font.size.small}",
+    },
+
+    // 产品卡片文字样式
+    productCardTitle: {
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.onsurface.black88}",
+      fontSize: "{font.size.large}",
+    },
+    productCardPrice: {
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.primary.brand5}",
+      fontSize: "{font.size.xl}",
+    },
+    productCardDescription: {
+      fontWeight: "{font.fontweight.normal}",
+      color: "{color.onsurface.black64}",
+      fontSize: "{font.size.medium}",
+    },
+
+    // 统计卡片文字样式
+    statCardNumber: {
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.primary.brand5}",
+      fontSize: "{font.size.xxxl}",
+    },
+    statCardLabel: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onsurface.black76}",
+      fontSize: "{font.size.small}",
+    },
+    statCardTrend: {
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.success.green6}",
+      fontSize: "{font.size.small}",
+    },
+
+    // 用户卡片文字样式
+    userCardName: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onsurface.black88}",
+      fontSize: "{font.size.large}",
+    },
+    userCardRole: {
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.onsurface.black64}",
+      fontSize: "{font.size.small}",
+    },
+    userCardBio: {
+      fontWeight: "{font.fontweight.normal}",
+      color: "{color.onsurface.black76}",
+      fontSize: "{font.size.medium}",
+    },
+
+    // 通知卡片文字样式
+    notificationTitle: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onsurface.black88}",
+      fontSize: "{font.size.medium}",
+    },
+    notificationMessage: {
+      fontWeight: "{font.fontweight.normal}",
+      color: "{color.onsurface.black76}",
+      fontSize: "{font.size.small}",
+    },
+    notificationTime: {
+      fontWeight: "{font.fontweight.normal}",
+      color: "{color.onsurface.black48}",
+      fontSize: "{font.size.tiny}",
     },
   },
 
@@ -1434,8 +1501,9 @@ export const DEFAULT_STYLE_CONFIG = {
         }
       },
     },
-
+    // Copy Start
     // 新拟态风格卡片模板
+    // 1. 新拟态风格卡片模板 (基于原版，增加按钮支持)
     neomorphism: {
       type: 'template',
       // Markdown 转换映射规则
@@ -1446,6 +1514,8 @@ export const DEFAULT_STYLE_CONFIG = {
         h3: 'content.title',
         // 普通文本段落映射到 content.segment
         p: 'content.segment',
+        // 链接映射到按钮 (新增)
+        a: 'actions.button',
       },
       style: {
         display: 'flex',
@@ -1453,7 +1523,7 @@ export const DEFAULT_STYLE_CONFIG = {
         borderRadius: "{dimension.borderradius.xxl}",
         padding: "{dimension.padding.base}",
         background: "{color.surface.grey1}",
-        boxShadow: `{material.hierarchy.B2}, {material.hierarchy.3f}`,
+        boxShadow: `inset {material.hierarchy.B2}, {material.hierarchy.3f}`,
         border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
         position: 'relative',
         overflow: 'hidden',
@@ -1478,12 +1548,12 @@ export const DEFAULT_STYLE_CONFIG = {
           padding: "{dimension.padding.semiloose} {dimension.padding.loose}",
           justifyContent: 'center',
           borderRadius: "{dimension.borderradius.large}",
-          background: "{color.primary.brand5}", // 深蓝色背景
+          background: "{color.primary.brand5}",
           boxShadow: `{material.hierarchy.B1}`,
           marginBottom: "{dimension.margin.base}",
         },
         metaType: 'text',
-        variant: 'neomorphismTitle', // 使用自定义variant
+        variant: 'neomorphismTitle',
       },
       content: {
         type: 'template',
@@ -1496,21 +1566,38 @@ export const DEFAULT_STYLE_CONFIG = {
           background: "{color.surface.grey0}",
           padding: "{dimension.padding.loose}",
           gap: "{dimension.gap.base}",
-          boxShadow: `{material.hierarchy.B1}`,
+          boxShadow: `inset {material.hierarchy.B1}`,
           position: 'relative',
+          marginBottom: "{dimension.margin.base}",
         },
         title: {
           metaType: 'text',
-          variant: 'neomorphismSubtitle', // 使用自定义variant
+          variant: 'neomorphismSubtitle',
         },
         segment: {
           metaType: 'text',
-          variant: 'neomorphismSegment', // 使用自定义variant
+          variant: 'neomorphismSegment',
+        }
+      },
+      // 新增按钮区域
+      actions: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: "{dimension.gap.base}",
+          padding: "{dimension.padding.base}",
+        },
+        button: {
+          metaType: 'button',
+          variant: 'secondary',
         }
       },
     },
 
-    // 渐变科技风格卡片模板  
+    // 2. 渐变科技风格卡片模板 (基于原版，增加按钮支持)
     techGradient: {
       type: 'template',
       // Markdown 转换映射规则
@@ -1521,6 +1608,8 @@ export const DEFAULT_STYLE_CONFIG = {
         h3: 'content.title',
         // 普通文本段落映射到 content.segment
         p: 'content.segment',
+        // 链接映射到按钮 (新增)
+        a: 'actions.button',
       },
       style: {
         display: 'flex',
@@ -1557,10 +1646,10 @@ export const DEFAULT_STYLE_CONFIG = {
           backdropFilter: 'blur(10px)',
           boxShadow: `{material.hierarchy.2f}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
-          marginBottom: "{dimension.margin.base}", // 添加与内容的间距
+          marginBottom: "{dimension.margin.base}",
         },
         metaType: 'text',
-        variant: 'techGradientTitle', // 使用自定义variant
+        variant: 'techGradientTitle',
       },
       content: {
         type: 'template',
@@ -1574,23 +1663,40 @@ export const DEFAULT_STYLE_CONFIG = {
           padding: "{dimension.padding.loose}",
           gap: "{dimension.gap.base}",
           backdropFilter: 'blur(10px)',
-          boxShadow: `{material.hierarchy.B1}`,
+          boxShadow: `inset {material.hierarchy.B1}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
           position: 'relative',
+          marginBottom: "{dimension.margin.base}",
         },
         title: {
           metaType: 'text',
-          variant: 'techGradientSubtitle', // 使用自定义variant
+          variant: 'techGradientSubtitle',
         },
         segment: {
           metaType: 'text',
-          variant: 'techGradientSegment', // 使用自定义variant
+          variant: 'techGradientSegment',
+        }
+      },
+      // 新增按钮区域
+      actions: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          gap: "{dimension.gap.base}",
+          padding: "{dimension.padding.base}",
+        },
+        button: {
+          metaType: 'button',
+          variant: 'primary',
         }
       },
     },
 
-    // 优雅青蓝卡片风格模板
-    elegant: {
+    // 3. 优雅青蓝卡片风格模板 (基于原版，增加按钮支持)
+    elegantCard: {
       type: 'template',
       // Markdown 转换映射规则
       markdownMapping: {
@@ -1600,15 +1706,17 @@ export const DEFAULT_STYLE_CONFIG = {
         h3: 'content.title',
         // 普通文本段落映射到 content.segment  
         p: 'content.segment',
+        // 链接映射到按钮 (新增)
+        a: 'actions.button',
       },
       style: {
         display: 'flex',
         flexDirection: 'column',
         borderRadius: "{dimension.borderradius.xxxl}",
         padding: "{dimension.padding.semiloose}",
-        background: `linear-gradient(145deg, {color.primarycontainer.brand1} 0%, {color.primarycontainer.brand2} 50%, {color.secondarycontainer.violet1} 100%)`,
+        background: `linear-gradient(145deg, {color.secondarycontainer.violet1} 0%, {color.primarycontainer.brand1} 50%, {color.secondarycontainer.violet1} 100%)`,
         boxShadow: `{material.hierarchy.2f}`,
-        border: `{dimension.borderwidth.base} solid {color.primary.brand3}`,
+        border: `{dimension.borderwidth.base} solid {color.secondary.violet3}`,
         position: 'relative',
         overflow: 'hidden',
         // 优雅的纹理效果
@@ -1619,8 +1727,8 @@ export const DEFAULT_STYLE_CONFIG = {
           left: '0',
           right: '0',
           bottom: '0',
-          backgroundImage: `radial-gradient(circle at 25% 25%, {color.primarycontainer.brand2} 0%, transparent 50%), 
-                       radial-gradient(circle at 75% 75%, {color.secondarycontainer.violet2} 0%, transparent 50%)`,
+          backgroundImage: `radial-gradient(circle at 25% 25%, {color.secondarycontainer.violet2} 0%, transparent 50%), 
+                       radial-gradient(circle at 75% 75%, {color.primarycontainer.brand2} 0%, transparent 50%)`,
           opacity: '0.4',
           borderRadius: "{dimension.borderradius.xxxl}",
         }
@@ -1631,40 +1739,40 @@ export const DEFAULT_STYLE_CONFIG = {
           flexDirection: 'row',
           alignItems: 'center',
           padding: "{dimension.padding.base} {dimension.padding.semiloose}",
-          justifyContent: 'center', // 文字居中
+          justifyContent: 'center',
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(90deg, {color.surfacecontainer.white100} 0%, {color.secondarycontainer.violet0} 100%)`,
           boxShadow: `{material.hierarchy.1f}`,
           marginBottom: "{dimension.margin.tight}",
-          border: `{dimension.borderwidth.narrow} solid {color.primary.brand4}`,
+          border: `{dimension.borderwidth.narrow} solid {color.secondary.violet4}`,
           position: 'relative',
-          // 左侧竖线 - 增加距离
+          // 左侧竖线
           '&::before': {
             content: "''",
             position: 'absolute',
-            left: "{dimension.padding.base}", // 增加距离
+            left: "{dimension.padding.base}",
             top: '50%',
             transform: 'translateY(-50%)',
             width: '3px',
-            height: '50%', // 减少高度避免过于突出
-            background: `linear-gradient(180deg, {color.primary.brand5} 0%, {color.primary.brand6} 100%)`,
+            height: '50%',
+            background: `linear-gradient(180deg, {color.secondary.violet5} 0%, {color.secondary.violet6} 100%)`,
             borderRadius: "{dimension.borderradius.xs}",
           },
-          // 右侧竖线 - 增加距离
+          // 右侧竖线
           '&::after': {
             content: "''",
             position: 'absolute',
-            right: "{dimension.padding.base}", // 增加距离
+            right: "{dimension.padding.base}",
             top: '50%',
             transform: 'translateY(-50%)',
             width: '3px',
-            height: '50%', // 减少高度避免过于突出
-            background: `linear-gradient(180deg, {color.primary.brand5} 0%, {color.primary.brand6} 100%)`,
+            height: '50%',
+            background: `linear-gradient(180deg, {color.secondary.violet5} 0%, {color.secondary.violet6} 100%)`,
             borderRadius: "{dimension.borderradius.xs}",
           }
         },
         metaType: 'text',
-        variant: 'elegantCardTitle', // 使用自定义variant
+        variant: 'elegantCardTitle',
       },
       content: {
         type: 'template',
@@ -1675,29 +1783,30 @@ export const DEFAULT_STYLE_CONFIG = {
           height: '100%',
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
-          padding: "{dimension.padding.extraloose}",
+          padding: "{dimension.padding.semiloose}",
           gap: "{dimension.gap.tight}",
-          boxShadow: `{material.hierarchy.B1}, {material.hierarchy.main}`,
+          boxShadow: `inset {material.hierarchy.B1}, {material.hierarchy.main}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
           position: 'relative',
-          // 左上角圆点 - 增加距离
+          marginBottom: "{dimension.margin.base}",
+          // 左上角圆点
           '&::before': {
             content: "''",
             position: 'absolute',
-            top: "{dimension.padding.base}", // 增加距离
-            left: "{dimension.padding.base}", // 增加距离
+            top: "{dimension.padding.base}",
+            left: "{dimension.padding.base}",
             width: '6px',
             height: '6px',
             borderRadius: '50%',
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
           },
-          // 右下角圆点 - 增加距离
+          // 右下角圆点
           '&::after': {
             content: "''",
             position: 'absolute',
-            bottom: "{dimension.padding.base}", // 增加距离
-            right: "{dimension.padding.base}", // 增加距离
+            bottom: "{dimension.padding.base}",
+            right: "{dimension.padding.base}",
             width: '6px',
             height: '6px',
             borderRadius: '50%',
@@ -1709,11 +1818,11 @@ export const DEFAULT_STYLE_CONFIG = {
           style: {
             position: 'relative',
             // 右上角圆点 - 通过 title 元素实现
-            '&:first-child:before': {
+            '&::before': {
               content: "''",
               position: 'absolute',
-              top: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
-              right: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
+              top: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`,
+              right: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`,
               width: '6px',
               height: '6px',
               borderRadius: '50%',
@@ -1722,7 +1831,7 @@ export const DEFAULT_STYLE_CONFIG = {
             }
           },
           metaType: 'text',
-          variant: 'elegantCardSubtitle', // 使用自定义variant
+          variant: 'elegantCardSubtitle',
         },
         segment: {
           style: {
@@ -1731,8 +1840,8 @@ export const DEFAULT_STYLE_CONFIG = {
             '&:last-child::after': {
               content: "''",
               position: 'absolute',
-              bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
-              left: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
+              bottom: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`,
+              left: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`,
               width: '6px',
               height: '6px',
               borderRadius: '50%',
@@ -1741,10 +1850,479 @@ export const DEFAULT_STYLE_CONFIG = {
             }
           },
           metaType: 'text',
-          variant: 'elegantCardSegment', // 使用自定义variant
+          variant: 'elegantCardSegment',
         }
-      }
-    }
+      },
+      // 新增按钮区域
+      actions: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: "{dimension.gap.base}",
+          padding: "{dimension.padding.base}",
+        },
+        button: {
+          metaType: 'button',
+          variant: 'ghost',
+        }
+      },
+    },
+
+    // 4. 产品展示卡片模板 (全新)
+    productCard: {
+      type: 'template',
+      markdownMapping: {
+        img: 'image',
+        h2: 'header.title',
+        h3: 'header.price',
+        p: 'content.description',
+        a: 'actions.button',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xl}",
+        background: "{color.surfacecontainer.white100}",
+        boxShadow: `{material.hierarchy.2f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        overflow: 'hidden',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: `{material.hierarchy.4f}`,
+        }
+      },
+      image: {
+        style: {
+          width: '100%',
+          height: '200px',
+          objectFit: 'cover',
+          borderRadius: "{dimension.borderradius.large} {dimension.borderradius.large} 0 0",
+          background: `linear-gradient(135deg, {color.surface.grey1} 0%, {color.surface.grey2} 100%)`,
+        },
+        metaType: 'image',
+        variant: 'normal',
+      },
+      header: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          padding: "{dimension.padding.loose}",
+          gap: "{dimension.gap.base}",
+        },
+        title: {
+          style: {
+            flex: '1',
+          },
+          metaType: 'text',
+          variant: 'productCardTitle',
+        },
+        price: {
+          style: {
+            textAlign: 'right',
+          },
+          metaType: 'text',
+          variant: 'productCardPrice',
+        }
+      },
+      content: {
+        type: 'template',
+        style: {
+          padding: "0 {dimension.padding.loose} {dimension.padding.base}",
+        },
+        description: {
+          metaType: 'text',
+          variant: 'productCardDescription',
+        }
+      },
+      actions: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: "{dimension.padding.loose}",
+          gap: "{dimension.gap.base}",
+          borderTop: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+          background: "{color.surface.grey0}",
+        },
+        button: {
+          metaType: 'button',
+          variant: 'primary',
+        }
+      },
+    },
+
+    // 5. 统计数据卡片模板 (全新)
+    statisticsCard: {
+      type: 'template',
+      markdownMapping: {
+        h1: 'stats.number',
+        h2: 'stats.label',
+        h3: 'stats.trend',
+        p: 'content.description',
+        a: 'actions.button',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xl}",
+        background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.primarycontainer.brand0} 100%)`,
+        boxShadow: `{material.hierarchy.1f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.primarycontainer.brand2}`,
+        padding: "{dimension.padding.loose}",
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: "''",
+          position: 'absolute',
+          top: '0',
+          right: '0',
+          width: '60px',
+          height: '60px',
+          background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.primary.brand6} 100%)`,
+          borderRadius: "0 {dimension.borderradius.xl} 0 100%",
+          opacity: '0.1',
+        }
+      },
+      stats: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+          gap: "{dimension.gap.tight}",
+          marginBottom: "{dimension.margin.base}",
+        },
+        number: {
+          metaType: 'text',
+          variant: 'statCardNumber',
+        },
+        label: {
+          metaType: 'text',
+          variant: 'statCardLabel',
+        },
+        trend: {
+          style: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: "{dimension.gap.tight}",
+            padding: "{dimension.padding.tight} {dimension.padding.base}",
+            background: "{color.success.green1}",
+            borderRadius: "{dimension.borderradius.large}",
+            border: `{dimension.borderwidth.narrow} solid {color.success.green3}`,
+          },
+          metaType: 'text',
+          variant: 'statCardTrend',
+        }
+      },
+      content: {
+        type: 'template',
+        style: {
+          textAlign: 'center',
+          marginBottom: "{dimension.margin.base}",
+        },
+        description: {
+          metaType: 'text',
+          variant: 'neomorphismSegment',
+        }
+      },
+      actions: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          justifyContent: 'center',
+        },
+        button: {
+          metaType: 'button',
+          variant: 'ghost',
+        }
+      },
+    },
+
+    // 6. 用户信息卡片模板 (全新)
+    userCard: {
+      type: 'template',
+      markdownMapping: {
+        img: 'avatar',
+        h2: 'info.name',
+        h3: 'info.role',
+        p: 'info.bio',
+        a: 'actions.button',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xl}",
+        background: "{color.surfacecontainer.white100}",
+        boxShadow: `{material.hierarchy.2f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        padding: "{dimension.padding.loose}",
+        alignItems: 'center',
+        textAlign: 'center',
+        position: 'relative',
+      },
+      avatar: {
+        style: {
+          width: '80px',
+          height: '80px',
+          borderRadius: '50%',
+          objectFit: 'cover',
+          border: `{dimension.borderwidth.wide} solid {color.primarycontainer.brand2}`,
+          boxShadow: `{material.hierarchy.2f}`,
+          marginBottom: "{dimension.margin.base}",
+        },
+        metaType: 'image',
+        variant: 'circle',
+      },
+      info: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: "{dimension.gap.tight}",
+          marginBottom: "{dimension.margin.base}",
+        },
+        name: {
+          metaType: 'text',
+          variant: 'userCardName',
+        },
+        role: {
+          style: {
+            padding: "{dimension.padding.tight} {dimension.padding.base}",
+            background: "{color.secondarycontainer.violet1}",
+            borderRadius: "{dimension.borderradius.large}",
+            border: `{dimension.borderwidth.narrow} solid {color.secondary.violet3}`,
+          },
+          metaType: 'text',
+          variant: 'userCardRole',
+        },
+        bio: {
+          style: {
+            marginTop: "{dimension.margin.base}",
+          },
+          metaType: 'text',
+          variant: 'userCardBio',
+        }
+      },
+      actions: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          gap: "{dimension.gap.base}",
+          width: '100%',
+        },
+        button: {
+          style: {
+            flex: '1',
+          },
+          metaType: 'button',
+          variant: 'secondary',
+        }
+      },
+    },
+
+    // 7. 通知提醒卡片模板 (全新)
+    notificationCard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'header.title',
+        h3: 'header.timestamp',
+        p: 'content.message',
+        a: 'actions.button',
+        blockquote: 'alert',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.large}",
+        background: "{color.surfacecontainer.white100}",
+        boxShadow: `{material.hierarchy.1f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        borderLeft: `{dimension.borderwidth.wide} solid {color.primary.brand5}`,
+        overflow: 'hidden',
+      },
+      header: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: "{dimension.padding.loose}",
+          background: "{color.surface.grey0}",
+          borderBottom: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        },
+        title: {
+          metaType: 'text',
+          variant: 'notificationTitle',
+        },
+        timestamp: {
+          metaType: 'text',
+          variant: 'notificationTime',
+        }
+      },
+      content: {
+        type: 'template',
+        style: {
+          padding: "{dimension.padding.loose}",
+        },
+        message: {
+          metaType: 'text',
+          variant: 'notificationMessage',
+        }
+      },
+      alert: {
+        style: {
+          margin: "{dimension.margin.base} {dimension.padding.loose}",
+          padding: "{dimension.padding.base}",
+          background: "{color.warning.orange1}",
+          borderRadius: "{dimension.borderradius.medium}",
+          border: `{dimension.borderwidth.narrow} solid {color.warning.orange3}`,
+        },
+        metaType: 'text',
+        variant: 'notificationMessage',
+      },
+      actions: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          gap: "{dimension.gap.base}",
+          padding: "{dimension.padding.loose}",
+          background: "{color.surface.grey0}",
+          borderTop: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        },
+        button: {
+          metaType: 'button',
+          variant: 'ghost',
+        }
+      },
+    },
+
+    // 8. 操作选择卡片模板 (全新)
+    actionCard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        p: 'content.description',
+        a: 'actions.button',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xl}",
+        background: `linear-gradient(135deg, {color.surface.grey0} 0%, {color.surface.grey1} 100%)`,
+        boxShadow: `{material.hierarchy.1f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        padding: "{dimension.padding.loose}",
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          boxShadow: `{material.hierarchy.3f}`,
+          background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
+        }
+      },
+      title: {
+        style: {
+          textAlign: 'center',
+          marginBottom: "{dimension.margin.base}",
+          padding: "{dimension.padding.base}",
+          background: `linear-gradient(90deg, {color.primary.brand4} 0%, {color.secondary.violet5} 100%)`,
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          color: 'transparent',
+        },
+        metaType: 'text',
+        variant: 'productCardTitle',
+      },
+      content: {
+        type: 'template',
+        style: {
+          textAlign: 'center',
+          marginBottom: "{dimension.margin.loose}",
+        },
+        description: {
+          metaType: 'text',
+          variant: 'productCardDescription',
+        }
+      },
+      actions: {
+        type: 'template',
+        style: {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+          gap: "{dimension.gap.base}",
+        },
+        button: {
+          metaType: 'button',
+          variant: 'secondary',
+        }
+      },
+    },
+
+    // 9. 轻量级信息卡片模板 (全新)
+    lightCard: {
+      type: 'template',
+      markdownMapping: {
+        h3: 'title',
+        p: 'content',
+        a: 'action',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: "{dimension.borderradius.large}",
+        background: "{color.surfacecontainer.white100}",
+        boxShadow: `{material.hierarchy.main}`,
+        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        padding: "{dimension.padding.base}",
+        gap: "{dimension.gap.base}",
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          transform: 'translateX(4px)',
+          boxShadow: `{material.hierarchy.2f}`,
+        }
+      },
+      title: {
+        style: {
+          flex: '1',
+          fontWeight: "{font.fontweight.semibold}",
+          color: "{color.onsurface.black88}",
+        },
+        metaType: 'text',
+        variant: 'neomorphismSubtitle',
+      },
+      content: {
+        style: {
+          flex: '2',
+          color: "{color.onsurface.black64}",
+        },
+        metaType: 'text',
+        variant: 'neomorphismSegment',
+      },
+      action: {
+        style: {
+          minWidth: '80px',
+        },
+        metaType: 'button',
+        variant: 'ghost',
+      },
+    },
+
+    // Copy End
   },
 
   // ==================== 图像元件 ====================
@@ -2077,18 +2655,18 @@ export function getElementStyleConfig(elementType, variant = 'normal', attribute
   }
 
   const variantConfig = activeStyleConfig[elementType][variant];
-  
+
   // 🆕 处理新格式：有 style 键和 supportedAttributes 键
   if (variantConfig.style && variantConfig.supportedAttributes) {
     console.log(`🎨 使用新格式样式配置: ${elementType}.${variant}`);
-    
+
     // 复制基础样式
     let finalStyle = { ...variantConfig.style };
-    
+
     // 应用支持的属性
     if (attributes && Object.keys(attributes).length > 0) {
       console.log(`🔧 应用属性到 ${elementType}.${variant}:`, attributes);
-      
+
       Object.entries(attributes).forEach(([attrName, attrValue]) => {
         if (variantConfig.supportedAttributes.includes(attrName)) {
           console.log(`   ✅ 应用支持的属性: ${attrName} = "${attrValue}"`);
@@ -2098,10 +2676,10 @@ export function getElementStyleConfig(elementType, variant = 'normal', attribute
         }
       });
     }
-    
+
     return finalStyle;
   }
-  
+
   // 🔧 处理旧格式：直接返回样式对象（向后兼容）
   return variantConfig;
 }
