@@ -2062,7 +2062,7 @@ export const DEFAULT_STYLE_CONFIG = {
           backdropFilter: 'blur(10px)',
           boxShadow: `{material.hierarchy.2f}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
-          marginBottom: "{dimension.margin.base}",
+          
         },
         title: {
           metaType: 'text',
@@ -2092,6 +2092,7 @@ export const DEFAULT_STYLE_CONFIG = {
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
+          marginTop: "{dimension.margin.base}",
           borderRadius: "{dimension.borderradius.medium}",
           background: `linear-gradient(180deg, {color.surfacecontainer.white88} 0%, {color.surfacecontainer.white76} 100%)`,
           padding: "{dimension.padding.loose}",
@@ -2752,7 +2753,7 @@ export const DEFAULT_STYLE_CONFIG = {
           '& > *:first-child::before': {
             content: "''",
             position: 'absolute',
-            top: "-{dimension.padding.base}",
+            top: "calc(-({dimension.padding.base} - 6px))",
             right: "-{dimension.padding.base}",
             width: '6px',
             height: '6px',
