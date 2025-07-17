@@ -356,14 +356,12 @@ RESTful API，快速集成现有系统
 **📍 地址**: 北京市朝阳区科技园
 </layout:row>`
   },
-
-
-  // <layout:root backgroundImage="url(https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)"> 
-
+// <layout:root backgroundImage="url(https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)">
   article: {
     name: '📖 技术文档',
     description: '原始的技术文档风格，包含各种元素类型',
     markdown: `
+ 
 # 八要素测试文档
 
 ## 基本元素
@@ -520,7 +518,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 `
   },
   jd: {
-    name: '招聘',
+    name: '🧑‍💼招聘',
     description: '招聘页面风格',
     markdown: `
     <card:neomorphism>

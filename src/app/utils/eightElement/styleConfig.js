@@ -454,10 +454,10 @@ export const DEFAULT_STYLE_CONFIG = {
         alignItems: 'stretch',
         gap: DIMENSION_CONSTANTS.GAP.none,
 
-        backgroundImage: 'none',
-        backgroundSize: '100% auto',
-        backgroundPosition: '0 0',
+        backgroundImage: 'none', 
+        backgroundPosition: '50% 0',
         backgroundRepeat: 'no-repeat',
+        backgroundSize: '100vw 200px',
 
         // 网格布局属性（默认不启用，由动作激活）
         gridTemplateColumns: 'none',
