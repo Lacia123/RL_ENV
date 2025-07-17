@@ -1441,8 +1441,8 @@ export const DEFAULT_STYLE_CONFIG = {
         h2: 'title',
         h3: 'content.title',
         p: 'content.segment',
-        'button:primary': 'content.button',
-        'button:secondary': 'content.secondaryButton',
+        'button:primary': 'content.buttonContainer.button',
+        'button:secondary': 'content.buttonContainer.secondaryButton',
         img: 'content.image',
         ul: 'content.list',
         table: 'content.table',
@@ -1455,7 +1455,7 @@ export const DEFAULT_STYLE_CONFIG = {
         borderRadius: "{dimension.borderradius.xxl}",
         padding: "{dimension.padding.base}",
         background: "{color.surface.grey1}",
-        boxShadow: `inset {material.hierarchy.B2}, {material.hierarchy.3f}`,
+        boxShadow: `{material.hierarchy.B2}, {material.hierarchy.3f}`,
         border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
         position: 'relative',
         overflow: 'hidden',
@@ -1496,7 +1496,7 @@ export const DEFAULT_STYLE_CONFIG = {
           background: "{color.surface.grey0}",
           padding: "{dimension.padding.loose}",
           gap: "{dimension.gap.base}",
-          boxShadow: `inset {material.hierarchy.B1}`,
+          boxShadow: `{material.hierarchy.B1}`,
           position: 'relative',
         },
         title: {
@@ -1507,20 +1507,27 @@ export const DEFAULT_STYLE_CONFIG = {
           metaType: 'text',
           variant: 'neomorphismSegment',
         },
-        button: {
-          metaType: 'button',
-          variant: 'primary',
+        buttonContainer: {
+          type: 'template',
           style: {
-            alignSelf: 'flex-start',
-            marginTop: "{dimension.margin.base}"
-          }
-        },
-        secondaryButton: {
-          metaType: 'button',
-          variant: 'secondary',
-          style: {
-            alignSelf: 'flex-start'
-          }
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'row',
+          },
+          button: {
+            metaType: 'button',
+            variant: 'primary',
+            style: {
+              alignSelf: 'flex-start',
+            }
+          },
+          secondaryButton: {
+            metaType: 'button',
+            variant: 'secondary',
+            style: {
+              alignSelf: 'flex-start'
+            }
+          },
         },
         image: {
           metaType: 'image',
@@ -1566,7 +1573,7 @@ export const DEFAULT_STYLE_CONFIG = {
         borderRadius: "{dimension.borderradius.xxl}",
         padding: "{dimension.padding.base}",
         background: "{color.surface.grey1}",
-        boxShadow: `inset {material.hierarchy.B2}, {material.hierarchy.3f}`,
+        boxShadow: `{material.hierarchy.B2}, {material.hierarchy.3f}`,
         border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
         position: 'relative',
         overflow: 'hidden',
@@ -1607,7 +1614,7 @@ export const DEFAULT_STYLE_CONFIG = {
           background: "{color.surface.grey0}",
           padding: "{dimension.padding.loose}",
           gap: "{dimension.gap.base}",
-          boxShadow: `inset {material.hierarchy.B1}`,
+          boxShadow: `{material.hierarchy.B1}`,
           position: 'relative',
           marginBottom: "{dimension.margin.base}",
         },
@@ -1638,7 +1645,7 @@ export const DEFAULT_STYLE_CONFIG = {
           padding: "{dimension.padding.base} {dimension.padding.loose}",
           background: "{color.surface.grey0}",
           borderRadius: "{dimension.borderradius.large}",
-          boxShadow: `inset {material.hierarchy.B1}`,
+          boxShadow: `{material.hierarchy.B1}`,
         },
         primaryButton: {
           metaType: 'button',
@@ -1669,7 +1676,7 @@ export const DEFAULT_STYLE_CONFIG = {
         borderRadius: "{dimension.borderradius.xxl}",
         padding: "{dimension.padding.base}",
         background: "{color.surface.grey1}",
-        boxShadow: `inset {material.hierarchy.B2}, {material.hierarchy.3f}`,
+        boxShadow: `{material.hierarchy.B2}, {material.hierarchy.3f}`,
         border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
         position: 'relative',
         overflow: 'hidden',
@@ -1708,7 +1715,7 @@ export const DEFAULT_STYLE_CONFIG = {
           gap: "{dimension.gap.base}",
           background: "{color.surface.grey0}",
           borderRadius: "{dimension.borderradius.large}",
-          boxShadow: `inset {material.hierarchy.B1}`,
+          boxShadow: `{material.hierarchy.B1}`,
           overflow: 'hidden'
         },
         main: {
@@ -1783,7 +1790,7 @@ export const DEFAULT_STYLE_CONFIG = {
         borderRadius: "{dimension.borderradius.xxl}",
         padding: "{dimension.padding.base}",
         background: "{color.surface.grey1}",
-        boxShadow: `inset {material.hierarchy.B2}, {material.hierarchy.3f}`,
+        boxShadow: `{material.hierarchy.B2}, {material.hierarchy.3f}`,
         border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
         position: 'relative',
         overflow: 'hidden',
@@ -1825,7 +1832,7 @@ export const DEFAULT_STYLE_CONFIG = {
           background: "{color.surface.grey0}",
           borderRadius: "{dimension.borderradius.large}",
           padding: "{dimension.padding.loose}",
-          boxShadow: `inset {material.hierarchy.B1}`,
+          boxShadow: `{material.hierarchy.B1}`,
         },
         metrics: {
           type: 'template',
@@ -1890,8 +1897,8 @@ export const DEFAULT_STYLE_CONFIG = {
         h2: 'title',
         h3: 'content.title',
         p: 'content.segment',
-        'button:primary': 'content.button',
-        'button:secondary': 'content.secondaryButton',
+        'button:primary': 'content.buttonContainer.button',
+        'button:secondary': 'content.buttonContainer.secondaryButton',
         img: 'content.image',
         ul: 'content.list',
         table: 'content.table',
@@ -1948,7 +1955,7 @@ export const DEFAULT_STYLE_CONFIG = {
           padding: "{dimension.padding.loose}",
           gap: "{dimension.gap.base}",
           backdropFilter: 'blur(10px)',
-          boxShadow: `inset {material.hierarchy.B1}`,
+          boxShadow: `{material.hierarchy.B1}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
           position: 'relative',
         },
@@ -1960,20 +1967,27 @@ export const DEFAULT_STYLE_CONFIG = {
           metaType: 'text',
           variant: 'techGradientSegment',
         },
-        button: {
-          metaType: 'button',
-          variant: 'primary',
+        buttonContainer: {
+          type: 'template',
           style: {
-            alignSelf: 'flex-start',
-            marginTop: "{dimension.margin.base}"
-          }
-        },
-        secondaryButton: {
-          metaType: 'button',
-          variant: 'secondary',
-          style: {
-            alignSelf: 'flex-start'
-          }
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'row',
+          },
+          button: {
+            metaType: 'button',
+            variant: 'primary',
+            style: {
+              alignSelf: 'flex-start',
+            }
+          },
+          secondaryButton: {
+            metaType: 'button',
+            variant: 'secondary',
+            style: {
+              alignSelf: 'flex-start'
+            }
+          },
         },
         image: {
           metaType: 'image',
@@ -2006,8 +2020,8 @@ export const DEFAULT_STYLE_CONFIG = {
       type: 'template',
       markdownMapping: {
         h2: 'header.title',
-        'button:primary': 'header.primaryAction',
-        'button:secondary': 'header.secondaryAction',
+        'button:primary': 'header.actions.primaryAction',
+        'button:secondary': 'header.actions.secondaryAction',
         h3: 'content.title',
         p: 'content.segment',
         img: 'content.image',
@@ -2058,6 +2072,8 @@ export const DEFAULT_STYLE_CONFIG = {
           type: 'template',
           style: {
             display: 'flex',
+            flexDirection: 'row',
+            width: 'auto',
             gap: "{dimension.gap.tight}"
           },
           primaryAction: {
@@ -2081,7 +2097,7 @@ export const DEFAULT_STYLE_CONFIG = {
           padding: "{dimension.padding.loose}",
           gap: "{dimension.gap.base}",
           backdropFilter: 'blur(10px)',
-          boxShadow: `inset {material.hierarchy.B1}`,
+          boxShadow: `{material.hierarchy.B1}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
           position: 'relative',
         },
@@ -2165,7 +2181,7 @@ export const DEFAULT_STYLE_CONFIG = {
           padding: "{dimension.padding.loose}",
           gap: "{dimension.gap.base}",
           backdropFilter: 'blur(10px)',
-          boxShadow: `inset {material.hierarchy.B1}`,
+          boxShadow: `{material.hierarchy.B1}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
         },
         title: {
@@ -2320,19 +2336,50 @@ export const DEFAULT_STYLE_CONFIG = {
             borderRadius: '50%',
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
-          }
+          },
+          '& > *:first-child::before': {
+            content: "''",
+            position: 'absolute',
+            top: "-{dimension.padding.base}",
+            right: "-{dimension.padding.base}",
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+            zIndex: 10,
+          },
+          '& > *:last-child::after': {
+            content: "''",
+            position: 'absolute',
+            bottom: "-{dimension.padding.base}",
+            left: "-{dimension.padding.base}",
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+            zIndex: 10,
+          },
         },
         title: {
+          style: {
+            position: 'relative',
+          },
           metaType: 'text',
           variant: 'elegantCardSubtitle',
         },
         segment: {
+          style: {
+            position: 'relative',
+          },
           metaType: 'text',
           variant: 'elegantCardSegment',
         },
         buttonContainer: {
           type: 'template',
           style: {
+            position: 'relative',
             display: 'flex',
             flexDirection: 'row',
           },
@@ -2486,9 +2533,36 @@ export const DEFAULT_STYLE_CONFIG = {
             borderRadius: '50%',
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
-          }
+          },
+          '& > *:first-child::before': {
+            content: "''",
+            position: 'absolute',
+            top: "-{dimension.padding.base}",
+            right: "-{dimension.padding.base}",
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+            zIndex: 10,
+          },
+          '& > *:last-child::after': {
+            content: "''",
+            position: 'absolute',
+            bottom: "-{dimension.padding.base}",
+            left: "-{dimension.padding.base}",
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+            zIndex: 10,
+          },
         },
         listTitle: {
+          style: {
+            position: 'relative',
+          },
           metaType: 'text',
           variant: 'elegantCardSubtitle',
         },
@@ -2498,7 +2572,8 @@ export const DEFAULT_STYLE_CONFIG = {
             display: 'flex',
             flexDirection: 'column',
             gap: "{dimension.gap.tight}",
-            marginTop: "{dimension.margin.base}"
+            marginTop: "{dimension.margin.base}",
+            position: 'relative',
           },
           item1: {
             metaType: 'text',
@@ -2673,16 +2748,44 @@ export const DEFAULT_STYLE_CONFIG = {
             borderRadius: '50%',
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
-          }
+          },
+          '& > *:first-child::before': {
+            content: "''",
+            position: 'absolute',
+            top: "-{dimension.padding.base}",
+            right: "-{dimension.padding.base}",
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+            zIndex: 10,
+          },
+          '& > *:last-child::after': {
+            content: "''",
+            position: 'absolute',
+            bottom: "-{dimension.padding.base}",
+            left: "-{dimension.padding.base}",
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+            zIndex: 10,
+          },
         },
         tableTitle: {
+          style: {
+            position: 'relative',
+          },
           metaType: 'text',
           variant: 'elegantCardSubtitle',
         },
         dataTable: {
           metaType: 'table',
           style: {
-            marginTop: "{dimension.margin.base}"
+            marginTop: "{dimension.margin.base}",
+            position: 'relative',
           }
         }
       },

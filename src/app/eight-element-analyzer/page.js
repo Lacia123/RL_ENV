@@ -21,6 +21,175 @@ import collectEightElementMeasurements from '../utils/eightElement/collectElemen
 // - 表格、代码块、引用等标准 markdown 语法
 const MARKDOWN_TEMPLATES = {
 
+  errorSeries: {
+    name: '🚨 错误卡片系列',
+    description: '有问题的卡片',
+    markdown: `
+    # 优雅青蓝卡片系列展示
+
+## 设计特点
+优雅青蓝卡片系列采用渐变背景、精致装饰和层次化设计，提供三种专业的内容展示方式。
+<layout:row>
+<card:techGradientStandard>
+## 标准布局卡片
+### 设计理念
+优雅青蓝标准布局采用渐变背景和装饰性元素，营造出高端、专业的视觉效果。适用于重要内容展示、产品介绍等场景。
+
+**主要特色：**
+- 🎨 渐变背景：多层次青蓝色渐变
+- ✨ 装饰元素：对称的装饰线条和圆点
+- 📱 响应式设计：适配各种屏幕尺寸
+- 🔍 层次清晰：标题和内容区域明确分离
+
+![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
+
+这种设计风格特别适合商务场景、品牌展示和高端产品介绍。
+[了解更多](https://example.com/elegant)
+[secondary][了解更多](https://example.com/elegant)
+</card:techGradientStandard>
+
+<card:techGradientHeaderActions>
+## 列表布局卡片
+[了解更多](https://example.com/elegant)
+[secondary][了解更多](https://example.com/elegant)
+### 核心功能
+专为列表内容优化的布局，每个列表项都有独特的视觉样式和左侧装饰线。
+
+- ✅ 模块化设计架构
+- ✅ 智能内容自适应
+- ✅ 多层级信息展示  
+- ✅ 统一视觉语言
+- ✅ 无障碍访问支持
+
+完美适配功能介绍、特性列表、优势展示等内容组织方式。
+
+</card:techGradientHeaderActions>
+
+</layout:row>
+
+<layout:row>
+
+<card:techGradientGallery>
+## 表格布局卡片
+### 数据展示
+![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
+![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
+![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
+
+专业的表格数据展示布局，保持优雅青蓝风格的同时确保数据的清晰可读。
+
+| 功能模块 | 完成度 | 优先级 |
+|---------|--------|--------|
+| 卡片系统 | 100% | 高 |
+| 布局引擎 | 95% | 高 |
+| 主题配置 | 88% | 中 |
+| 动画效果 | 75% | 中 |
+| 响应式设计 | 92% | 高 |
+
+这种布局特别适合数据报告、功能对比、进度跟踪等需要表格化展示的内容。
+</card:techGradientGallery>
+
+<card:elegantStandard>
+## 混合内容展示
+### 综合应用
+优雅青蓝标准布局支持各种内容类型的混合展示，包括文本、图片、按钮、代码等。
+
+**代码示例：**
+\`\`\`javascript
+const a = 1;
+\`\`\`
+
+> "优雅的设计不是添加更多，而是去除不必要的元素，直到每个细节都有其存在的理由。" —— 设计哲学
+
+[查看源码](https://github.com/example/elegant-cards)
+[设计指南](https://example.com/design-guide)
+</card:elegantStandard>
+
+</layout:row>
+
+
+<card:highlight>
+## 高亮突出风格
+### Highlight & Emphasis
+强烈的品牌色对比，让重要信息快速抓住用户注意力
+
+\`\`\`css
+.highlight-card {
+  background: linear-gradient(brand-color);
+  color: white;
+  border-radius: 12px;
+}
+\`\`\`
+
+适用于重要通知、促销活动、核心功能介绍等需要强调的内容
+</card:highlight>
+
+[查看源码](https://github.com/example/elegant-cards)
+
+## 使用指南
+
+### 基本语法
+\`\`\`markdown
+<card:elegantStandard>
+## 卡片标题
+### 子标题
+内容段落支持 **粗体** 和 *斜体* 格式
+![图片](url)
+[按钮链接](url)
+</card:elegantStandard>
+\`\`\`
+
+### 列表卡片语法
+\`\`\`markdown
+<card:elegantList>
+## 列表标题
+### 子标题
+- 列表项1
+- 列表项2
+- 列表项3
+总结段落
+</card:elegantList>
+\`\`\`
+
+### 表格卡片语法
+\`\`\`markdown
+<card:elegantTable>
+## 表格标题
+### 子标题
+| 列1 | 列2 | 列3 |
+|-----|-----|-----|
+| 数据1 | 数据2 | 数据3 |
+说明文字
+</card:elegantTable>
+\`\`\`
+
+
+
+
+## 应用场景
+
+<layout:row>
+**商务展示**
+企业介绍、产品发布、品牌宣传
+
+**数据报告**  
+业务指标、项目进度、统计分析
+
+**功能说明**
+产品特性、服务介绍、使用教程
+</layout:row>
+
+### 设计原则
+
+1. **视觉层次**：通过颜色、大小、间距建立清晰的信息层级
+2. **一致性**：所有卡片保持统一的设计语言和视觉风格  
+3. **可读性**：确保在各种背景和设备上都有良好的可读性
+4. **互动性**：合理使用阴影、渐变等效果提升用户体验
+
+优雅青蓝卡片系列为您的内容提供专业、精致的展示方式。
+     `
+  },
+
   elegantCardSeries: {
     name: '🌟 优雅卡片系列',
     description: '展示新增的优雅青蓝风格卡片系列：标准、列表、表格三种布局',
