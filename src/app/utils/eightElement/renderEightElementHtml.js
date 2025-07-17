@@ -531,6 +531,9 @@ function processTextElement(processedElement, originalElement) {
 
     // 🔧 修复：检查内容是否已经是HTML格式，避免重复处理
     if (rawTextContent && typeof rawTextContent === 'string') {
+        // 🔧 修复：清理段落符号
+        rawTextContent = rawTextContent.replace(/§PARAGRAPH§/g, '');
+        
         // 如果内容已经包含HTML标签（如<p>, <math>, <span>等），说明已经被处理过了
         if (rawTextContent.includes('<') && (rawTextContent.includes('<p>') || rawTextContent.includes('<math') || rawTextContent.includes('<span') || rawTextContent.includes('<li>'))) {
             // 直接使用已处理的HTML内容
@@ -1116,10 +1119,18 @@ function renderTextElement(element) {
     // 1. 优先使用经过KaTeX和Markdown处理的内容
     if (element.katexProcessedContent) {
         contentHtml = element.katexProcessedContent;
+        // 🔧 修复：确保清理段落符号
+        if (typeof contentHtml === 'string') {
+            contentHtml = contentHtml.replace(/§PARAGRAPH§/g, '');
+        }
     }
     // 2. 回退到原始font内容
     else if (element.font && element.font.fontsize && element.font.fontsize.default) {
         contentHtml = element.font.fontsize.default.content || '';
+        // 🔧 修复：清理段落符号
+        if (typeof contentHtml === 'string') {
+            contentHtml = contentHtml.replace(/§PARAGRAPH§/g, '');
+        }
 
         // 如果content不是HTML格式（老格式或纯文本），则进行简单的HTML转义和换行处理
         if (contentHtml && !contentHtml.includes('<')) {
@@ -1485,6 +1496,40 @@ function applyTableStyles(tableHtml, tableStyleConfig, thStyleConfig, trStyleCon
 }
 
 /**
+ * 生成代码容器专用的样式属性（排除会影响hljs高亮的属性）
+ * @param {Object} styleObject - 样式对象
+ * @returns {string} - 样式属性字符串
+ */
+function generateCodeContainerStyleAttribute(styleObject) {
+    if (!styleObject || typeof styleObject !== 'object') {
+        return '';
+    }
+
+    // 创建样式副本，排除会影响hljs高亮的属性
+    const codeContainerStyle = { ...styleObject };
+    
+    // 删除会影响hljs语法高亮的颜色属性
+    delete codeContainerStyle.color;
+    
+    // 将样式对象转换为样式字符串
+    const styleString = Object.entries(codeContainerStyle)
+        .map(([key, value]) => {
+            // 如果值是数字，且不是特定属性，添加px单位
+            if (typeof value === 'number' &&
+                !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
+                value = `${value}px`;
+            }
+
+            // 转换驼峰式属性名为连字符式
+            const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+            return `${cssKey}: ${value}`;
+        })
+        .join('; ');
+
+    return styleString ? `style="${styleString}"` : '';
+}
+
+/**
  * 渲染代码元素
  * @param {Object} element - 代码元素
  * @returns {string} - 渲染的HTML字符串
@@ -1494,8 +1539,8 @@ function renderCodeElement(element) {
         return '<div>代码元素结构不完整</div>';
     }
 
-    // 生成容器样式
-    const containerStyleAttr = generateStyleAttribute(element.computedStyle || {});
+    // 🆕 使用专门的代码容器样式生成函数，避免覆盖hljs颜色
+    const containerStyleAttr = generateCodeContainerStyleAttribute(element.computedStyle || {});
 
     // 使用预处理好的高亮HTML
     let html = element.highlightedCode || '';

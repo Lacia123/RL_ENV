@@ -21,40 +21,84 @@ import collectEightElementMeasurements from '../utils/eightElement/collectElemen
 // - 表格、代码块、引用等标准 markdown 语法
 const MARKDOWN_TEMPLATES = {
 
-  cardShowcase: {
-    name: '🎨 经典卡片展示',
-    description: '展示经典风格的卡片模板设计',
-    markdown: `# 卡片模板设计系统
+  elegantCardSeries: {
+    name: '🌟 优雅卡片系列',
+    description: '展示新增的优雅青蓝风格卡片系列：标准、列表、表格三种布局',
+    markdown: `# 优雅青蓝卡片系列展示
 
-## 设计理念
-现代化的卡片设计，满足不同场景和风格需求
-
+## 设计特点
+优雅青蓝卡片系列采用渐变背景、精致装饰和层次化设计，提供三种专业的内容展示方式。
 <layout:row>
+<card:elegantStandard>
+## 标准布局卡片
+### 设计理念
+优雅青蓝标准布局采用渐变背景和装饰性元素，营造出高端、专业的视觉效果。适用于重要内容展示、产品介绍等场景。
 
-<card:neomorphism>
-## 新拟态风格
-### Neomorphism Design
-柔和的阴影和高光效果，营造出元素从背景中"浮出"的立体感
-创造简洁而富有层次的现代化视觉体验
-</card:neomorphism>
+**主要特色：**
+- 🎨 渐变背景：多层次青蓝色渐变
+- ✨ 装饰元素：对称的装饰线条和圆点
+- 📱 响应式设计：适配各种屏幕尺寸
+- 🔍 层次清晰：标题和内容区域明确分离
 
-<card:techGradient>
-## 科技渐变风格
-### Tech Gradient
-动态渐变背景配合科技感光效，展现前沿技术实力
-适用于科技产品、创新服务等需要体现技术感的场景
-</card:techGradient>
+![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
+
+这种设计风格特别适合商务场景、品牌展示和高端产品介绍。
+[了解更多](https://example.com/elegant)
+[secondary][了解更多](https://example.com/elegant)
+</card:elegantStandard>
+
+<card:elegantList>
+## 列表布局卡片
+### 核心功能
+专为列表内容优化的布局，每个列表项都有独特的视觉样式和左侧装饰线。
+
+- ✅ 模块化设计架构
+- ✅ 智能内容自适应
+- ✅ 多层级信息展示  
+- ✅ 统一视觉语言
+- ✅ 无障碍访问支持
+
+完美适配功能介绍、特性列表、优势展示等内容组织方式。
+</card:elegantList>
 
 </layout:row>
 
 <layout:row>
 
-<card:elegant>
-## 优雅青蓝风格
-### Warm & Friendly
-温馨的色调搭配柔和的设计元素，营造舒适友好的氛围
-使用渐变橙色背景和圆润边框，适合教育、生活服务类产品
-</card:elegant>
+<card:elegantTable>
+## 表格布局卡片
+### 数据展示
+专业的表格数据展示布局，保持优雅青蓝风格的同时确保数据的清晰可读。
+
+| 功能模块 | 完成度 | 优先级 |
+|---------|--------|--------|
+| 卡片系统 | 100% | 高 |
+| 布局引擎 | 95% | 高 |
+| 主题配置 | 88% | 中 |
+| 动画效果 | 75% | 中 |
+| 响应式设计 | 92% | 高 |
+
+这种布局特别适合数据报告、功能对比、进度跟踪等需要表格化展示的内容。
+</card:elegantTable>
+
+<card:elegantStandard>
+## 混合内容展示
+### 综合应用
+优雅青蓝标准布局支持各种内容类型的混合展示，包括文本、图片、按钮、代码等。
+
+**代码示例：**
+\`\`\`javascript
+const a = 1;
+\`\`\`
+
+> "优雅的设计不是添加更多，而是去除不必要的元素，直到每个细节都有其存在的理由。" —— 设计哲学
+
+[查看源码](https://github.com/example/elegant-cards)
+[设计指南](https://example.com/design-guide)
+</card:elegantStandard>
+
+</layout:row>
+
 
 <card:highlight>
 ## 高亮突出风格
@@ -72,36 +116,69 @@ const MARKDOWN_TEMPLATES = {
 适用于重要通知、促销活动、核心功能介绍等需要强调的内容
 </card:highlight>
 
-</layout:row>
+[查看源码](https://github.com/example/elegant-cards)
 
-## 模板特性
+## 使用指南
 
-
-**🎯 智能映射**
-H2 标题自动映射为卡片标题，H3 和段落文本映射为内容区域
-
-**🎨 风格多样**
-四种预设风格，满足不同品牌调性和使用场景需求
-
-
-
-**⚡ 灵活配置**
-支持 Markdown 语法，包括代码块、列表、链接等丰富格式
-
-**📱 响应式设计**
-自适应布局，在不同屏幕尺寸下都能保持良好的视觉效果
-
-
-### 使用指南
-
+### 基本语法
 \`\`\`markdown
-<card:neomorphism>
+<card:elegantStandard>
 ## 卡片标题
 ### 子标题
-这里是卡片内容，支持 **粗体** 和 *斜体* 等格式
-</card:neomorphism>
+内容段落支持 **粗体** 和 *斜体* 格式
+![图片](url)
+[按钮链接](url)
+</card:elegantStandard>
 \`\`\`
-`,
+
+### 列表卡片语法
+\`\`\`markdown
+<card:elegantList>
+## 列表标题
+### 子标题
+- 列表项1
+- 列表项2
+- 列表项3
+总结段落
+</card:elegantList>
+\`\`\`
+
+### 表格卡片语法
+\`\`\`markdown
+<card:elegantTable>
+## 表格标题
+### 子标题
+| 列1 | 列2 | 列3 |
+|-----|-----|-----|
+| 数据1 | 数据2 | 数据3 |
+说明文字
+</card:elegantTable>
+\`\`\`
+
+
+
+
+## 应用场景
+
+<layout:row>
+**商务展示**
+企业介绍、产品发布、品牌宣传
+
+**数据报告**  
+业务指标、项目进度、统计分析
+
+**功能说明**
+产品特性、服务介绍、使用教程
+</layout:row>
+
+### 设计原则
+
+1. **视觉层次**：通过颜色、大小、间距建立清晰的信息层级
+2. **一致性**：所有卡片保持统一的设计语言和视觉风格  
+3. **可读性**：确保在各种背景和设备上都有良好的可读性
+4. **互动性**：合理使用阴影、渐变等效果提升用户体验
+
+优雅青蓝卡片系列为您的内容提供专业、精致的展示方式。`
   },
 
   landing: {
@@ -580,8 +657,8 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 
 const EightElementAnalyzer = () => {
   // 🆕 新增模板相关状态
-  const [currentTemplate, setCurrentTemplate] = useState('buttonTest');
-  const [markdown, setMarkdown] = useState(MARKDOWN_TEMPLATES.buttonTest.markdown);
+  const [currentTemplate, setCurrentTemplate] = useState('elegantCardSeries');
+  const [markdown, setMarkdown] = useState(MARKDOWN_TEMPLATES.elegantCardSeries.markdown);
   // 动作系统状态
   const [actionManager, setActionManager] = useState(null);
   const [selectedActions, setSelectedActions] = useState([]); // 已选择的动作

@@ -739,6 +739,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontSize: "{font.size.small}",
     },
 
+    // 新拟态风格文字样式
     neomorphismTitle: {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.white100}",
@@ -746,115 +747,47 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     neomorphismSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onsurface.black88}",
+      color: "{color.onprimary.black88}",
       fontSize: "{font.size.small}",
     },
     neomorphismSegment: {
-      fontWeight: "{font.fontweight.normal}",
-      color: "{color.onsurface.black76}",
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.onprimary.black88}",
       fontSize: "{font.size.small}",
     },
 
-    // 科技渐变风格文字样式 (修正token引用)
+    // 科技渐变风格文字样式
     techGradientTitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.primary.brand6}",
+      color: "{color.primary.brand6}", // 深蓝色确保可读性
       fontSize: "{font.size.medium}",
     },
     techGradientSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onsurface.black88}",
+      color: "{color.onprimary.black88}",
       fontSize: "{font.size.small}",
     },
     techGradientSegment: {
-      fontWeight: "{font.fontweight.normal}",
-      color: "{color.onsurface.black76}",
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.onprimary.black88}",
       fontSize: "{font.size.small}",
     },
 
-    // 优雅青蓝卡片风格文字样式 (修正token引用)
+    // 优雅青蓝卡片风格文字样式
     elegantCardTitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.secondary.violet6}",
+      color: "{color.primary.brand6}", // 深青蓝色确保可读性
       fontSize: "{font.size.medium}",
     },
     elegantCardSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onsurface.black88}",
+      color: "{color.onprimary.black88}",
       fontSize: "{font.size.small}",
     },
     elegantCardSegment: {
-      fontWeight: "{font.fontweight.normal}",
-      color: "{color.onsurface.black76}",
-      fontSize: "{font.size.small}",
-    },
-
-    // 产品卡片文字样式
-    productCardTitle: {
-      fontWeight: "{font.fontweight.bold}",
-      color: "{color.onsurface.black88}",
-      fontSize: "{font.size.large}",
-    },
-    productCardPrice: {
-      fontWeight: "{font.fontweight.bold}",
-      color: "{color.primary.brand5}",
-      fontSize: "{font.size.xl}",
-    },
-    productCardDescription: {
-      fontWeight: "{font.fontweight.normal}",
-      color: "{color.onsurface.black64}",
-      fontSize: "{font.size.medium}",
-    },
-
-    // 统计卡片文字样式
-    statCardNumber: {
-      fontWeight: "{font.fontweight.bold}",
-      color: "{color.primary.brand5}",
-      fontSize: "{font.size.xxxl}",
-    },
-    statCardLabel: {
-      fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onsurface.black76}",
-      fontSize: "{font.size.small}",
-    },
-    statCardTrend: {
       fontWeight: "{font.fontweight.medium}",
-      color: "{color.success.green6}",
+      color: "{color.onprimary.black88}",
       fontSize: "{font.size.small}",
-    },
-
-    // 用户卡片文字样式
-    userCardName: {
-      fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onsurface.black88}",
-      fontSize: "{font.size.large}",
-    },
-    userCardRole: {
-      fontWeight: "{font.fontweight.medium}",
-      color: "{color.onsurface.black64}",
-      fontSize: "{font.size.small}",
-    },
-    userCardBio: {
-      fontWeight: "{font.fontweight.normal}",
-      color: "{color.onsurface.black76}",
-      fontSize: "{font.size.medium}",
-    },
-
-    // 通知卡片文字样式
-    notificationTitle: {
-      fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onsurface.black88}",
-      fontSize: "{font.size.medium}",
-    },
-    notificationMessage: {
-      fontWeight: "{font.fontweight.normal}",
-      color: "{color.onsurface.black76}",
-      fontSize: "{font.size.small}",
-    },
-    notificationTime: {
-      fontWeight: "{font.fontweight.normal}",
-      color: "{color.onsurface.black48}",
-      fontSize: "{font.size.tiny}",
     },
   },
 
@@ -1502,20 +1435,19 @@ export const DEFAULT_STYLE_CONFIG = {
       },
     },
     // Copy Start
-    // 新拟态风格卡片模板
-    // 1. 新拟态风格卡片模板 (基于原版，增加按钮支持)
-    neomorphism: {
+    neomorphismStandard: {
       type: 'template',
-      // Markdown 转换映射规则
       markdownMapping: {
-        // H2 (##) 映射到 title
         h2: 'title',
-        // H3 (###) 映射到 content.title  
         h3: 'content.title',
-        // 普通文本段落映射到 content.segment
         p: 'content.segment',
-        // 链接映射到按钮 (新增)
-        a: 'actions.button',
+        'button:primary': 'content.button',
+        'button:secondary': 'content.secondaryButton',
+        img: 'content.image',
+        ul: 'content.list',
+        table: 'content.table',
+        blockquote: 'content.quote',
+        code: 'content.codeBlock'
       },
       style: {
         display: 'flex',
@@ -1527,7 +1459,6 @@ export const DEFAULT_STYLE_CONFIG = {
         border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
         position: 'relative',
         overflow: 'hidden',
-        // 新拟态特有的凹凸效果
         '&::before': {
           content: "''",
           position: 'absolute',
@@ -1561,7 +1492,117 @@ export const DEFAULT_STYLE_CONFIG = {
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
-          height: '100%',
+          borderRadius: "{dimension.borderradius.large}",
+          background: "{color.surface.grey0}",
+          padding: "{dimension.padding.loose}",
+          gap: "{dimension.gap.base}",
+          boxShadow: `inset {material.hierarchy.B1}`,
+          position: 'relative',
+        },
+        title: {
+          metaType: 'text',
+          variant: 'neomorphismSubtitle',
+        },
+        segment: {
+          metaType: 'text',
+          variant: 'neomorphismSegment',
+        },
+        button: {
+          metaType: 'button',
+          variant: 'primary',
+          style: {
+            alignSelf: 'flex-start',
+            marginTop: "{dimension.margin.base}"
+          }
+        },
+        secondaryButton: {
+          metaType: 'button',
+          variant: 'secondary',
+          style: {
+            alignSelf: 'flex-start'
+          }
+        },
+        image: {
+          metaType: 'image',
+          variant: 'rounded',
+          style: {
+            marginTop: "{dimension.margin.base}"
+          }
+        },
+        list: {
+          metaType: 'list',
+          variant: 'unordered'
+        },
+        table: {
+          metaType: 'table',
+          variant: 'container'
+        },
+        quote: {
+          metaType: 'text',
+          variant: 'quote'
+        },
+        codeBlock: {
+          metaType: 'text',
+          variant: 'codeBlock'
+        }
+      },
+    },
+
+    // 2. 新拟态底部按钮布局
+    neomorphismFooterActions: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        h3: 'content.title',
+        p: 'content.segment',
+        img: 'content.image',
+        ul: 'content.list',
+        'button:primary': 'footer.primaryButton',
+        'button:secondary': 'footer.secondaryButton',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xxl}",
+        padding: "{dimension.padding.base}",
+        background: "{color.surface.grey1}",
+        boxShadow: `inset {material.hierarchy.B2}, {material.hierarchy.3f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: "''",
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          right: '0',
+          bottom: '0',
+          background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey2} 100%)`,
+          opacity: '0.1',
+          borderRadius: "{dimension.borderradius.xxl}",
+        }
+      },
+      title: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: "{dimension.padding.semiloose} {dimension.padding.loose}",
+          justifyContent: 'center',
+          borderRadius: "{dimension.borderradius.large}",
+          background: "{color.primary.brand5}",
+          boxShadow: `{material.hierarchy.B1}`,
+          marginBottom: "{dimension.margin.base}",
+        },
+        metaType: 'text',
+        variant: 'neomorphismTitle',
+      },
+      content: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
           borderRadius: "{dimension.borderradius.large}",
           background: "{color.surface.grey0}",
           padding: "{dimension.padding.loose}",
@@ -1577,39 +1618,285 @@ export const DEFAULT_STYLE_CONFIG = {
         segment: {
           metaType: 'text',
           variant: 'neomorphismSegment',
+        },
+        image: {
+          metaType: 'image',
+          variant: 'rounded'
+        },
+        list: {
+          metaType: 'list',
+          variant: 'unordered'
         }
       },
-      // 新增按钮区域
-      actions: {
+      footer: {
         type: 'template',
         style: {
           display: 'flex',
           flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
+          justifyContent: 'flex-end',
           gap: "{dimension.gap.base}",
-          padding: "{dimension.padding.base}",
+          padding: "{dimension.padding.base} {dimension.padding.loose}",
+          background: "{color.surface.grey0}",
+          borderRadius: "{dimension.borderradius.large}",
+          boxShadow: `inset {material.hierarchy.B1}`,
         },
-        button: {
+        primaryButton: {
           metaType: 'button',
-          variant: 'secondary',
+          variant: 'primary'
+        },
+        secondaryButton: {
+          metaType: 'button',
+          variant: 'secondary'
         }
-      },
+      }
     },
 
-    // 2. 渐变科技风格卡片模板 (基于原版，增加按钮支持)
-    techGradient: {
+    // 3. 新拟态侧边布局
+    neomorphismSidebar: {
       type: 'template',
-      // Markdown 转换映射规则
       markdownMapping: {
-        // H2 (##) 映射到 title
         h2: 'title',
-        // H3 (###) 映射到 content.title
+        h3: 'main.title',
+        p: 'main.segment',
+        img: 'main.image',
+        'button:primary': 'sidebar.primaryButton',
+        'button:secondary': 'sidebar.secondaryButton',
+        ul: 'sidebar.list'
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xxl}",
+        padding: "{dimension.padding.base}",
+        background: "{color.surface.grey1}",
+        boxShadow: `inset {material.hierarchy.B2}, {material.hierarchy.3f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: "''",
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          right: '0',
+          bottom: '0',
+          background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey2} 100%)`,
+          opacity: '0.1',
+          borderRadius: "{dimension.borderradius.xxl}",
+        }
+      },
+      title: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: "{dimension.padding.semiloose} {dimension.padding.loose}",
+          justifyContent: 'center',
+          borderRadius: "{dimension.borderradius.large}",
+          background: "{color.primary.brand5}",
+          boxShadow: `{material.hierarchy.B1}`,
+          marginBottom: "{dimension.margin.base}",
+        },
+        metaType: 'text',
+        variant: 'neomorphismTitle',
+      },
+      container: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          gap: "{dimension.gap.base}",
+          background: "{color.surface.grey0}",
+          borderRadius: "{dimension.borderradius.large}",
+          boxShadow: `inset {material.hierarchy.B1}`,
+          overflow: 'hidden'
+        },
+        main: {
+          type: 'template',
+          style: {
+            flex: '1',
+            padding: "{dimension.padding.loose}",
+            display: 'flex',
+            flexDirection: 'column',
+            gap: "{dimension.gap.base}"
+          },
+          title: {
+            metaType: 'text',
+            variant: 'neomorphismSubtitle',
+          },
+          segment: {
+            metaType: 'text',
+            variant: 'neomorphismSegment',
+          },
+          image: {
+            metaType: 'image',
+            variant: 'rounded'
+          }
+        },
+        sidebar: {
+          type: 'template',
+          style: {
+            width: '200px',
+            padding: "{dimension.padding.base}",
+            background: "{color.surface.grey1}",
+            display: 'flex',
+            flexDirection: 'column',
+            gap: "{dimension.gap.tight}",
+            borderLeft: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`
+          },
+          primaryButton: {
+            metaType: 'button',
+            variant: 'primary',
+            style: {
+              width: '100%'
+            }
+          },
+          secondaryButton: {
+            metaType: 'button',
+            variant: 'secondary',
+            style: {
+              width: '100%'
+            }
+          },
+          list: {
+            metaType: 'list',
+            variant: 'unordered'
+          }
+        }
+      }
+    },
+
+    // 4. 新拟态仪表板布局
+    neomorphismDashboard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        h3: 'metrics.title',
+        'chart:line': 'charts.lineChart',
+        'chart:bar': 'charts.barChart',
+        table: 'data.table',
+        p: 'summary.text'
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xxl}",
+        padding: "{dimension.padding.base}",
+        background: "{color.surface.grey1}",
+        boxShadow: `inset {material.hierarchy.B2}, {material.hierarchy.3f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        position: 'relative',
+        overflow: 'hidden',
+        minHeight: '400px',
+        '&::before': {
+          content: "''",
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          right: '0',
+          bottom: '0',
+          background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey2} 100%)`,
+          opacity: '0.1',
+          borderRadius: "{dimension.borderradius.xxl}",
+        }
+      },
+      title: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: "{dimension.padding.semiloose} {dimension.padding.loose}",
+          justifyContent: 'center',
+          borderRadius: "{dimension.borderradius.large}",
+          background: "{color.primary.brand5}",
+          boxShadow: `{material.hierarchy.B1}`,
+          marginBottom: "{dimension.margin.base}",
+        },
+        metaType: 'text',
+        variant: 'neomorphismTitle',
+      },
+      dashboard: {
+        type: 'template',
+        style: {
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gridTemplateRows: 'auto auto',
+          gap: "{dimension.gap.base}",
+          background: "{color.surface.grey0}",
+          borderRadius: "{dimension.borderradius.large}",
+          padding: "{dimension.padding.loose}",
+          boxShadow: `inset {material.hierarchy.B1}`,
+        },
+        metrics: {
+          type: 'template',
+          style: {
+            gridColumn: '1 / -1',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: "{dimension.gap.tight}"
+          },
+          title: {
+            metaType: 'text',
+            variant: 'neomorphismSubtitle',
+          }
+        },
+        charts: {
+          type: 'template',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: "{dimension.gap.base}"
+          },
+          lineChart: {
+            metaType: 'chart',
+            variant: 'container'
+          },
+          barChart: {
+            metaType: 'chart',
+            variant: 'container'
+          }
+        },
+        data: {
+          type: 'template',
+          style: {
+            display: 'flex',
+            flexDirection: 'column'
+          },
+          table: {
+            metaType: 'table',
+            variant: 'container'
+          }
+        },
+        summary: {
+          type: 'template',
+          style: {
+            gridColumn: '1 / -1',
+            marginTop: "{dimension.margin.base}"
+          },
+          text: {
+            metaType: 'text',
+            variant: 'neomorphismSegment'
+          }
+        }
+      }
+    },
+
+    // ==================== 科技渐变风格卡片系列 ====================
+
+    // 1. 科技渐变标准布局
+    techGradientStandard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
         h3: 'content.title',
-        // 普通文本段落映射到 content.segment
         p: 'content.segment',
-        // 链接映射到按钮 (新增)
-        a: 'actions.button',
+        'button:primary': 'content.button',
+        'button:secondary': 'content.secondaryButton',
+        img: 'content.image',
+        ul: 'content.list',
+        table: 'content.table',
+        blockquote: 'content.quote',
+        code: 'content.codeBlock'
       },
       style: {
         display: 'flex',
@@ -1621,7 +1908,6 @@ export const DEFAULT_STYLE_CONFIG = {
         border: `{dimension.borderwidth.narrow} solid {color.primarycontainer.brand2}`,
         position: 'relative',
         overflow: 'hidden',
-        // 科技感光效
         '&::after': {
           content: "''",
           position: 'absolute',
@@ -1657,7 +1943,6 @@ export const DEFAULT_STYLE_CONFIG = {
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
-          height: '100%',
           borderRadius: "{dimension.borderradius.medium}",
           background: `linear-gradient(180deg, {color.surfacecontainer.white88} 0%, {color.surfacecontainer.white76} 100%)`,
           padding: "{dimension.padding.loose}",
@@ -1666,7 +1951,6 @@ export const DEFAULT_STYLE_CONFIG = {
           boxShadow: `inset {material.hierarchy.B1}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
           position: 'relative',
-          marginBottom: "{dimension.margin.base}",
         },
         title: {
           metaType: 'text',
@@ -1675,51 +1959,281 @@ export const DEFAULT_STYLE_CONFIG = {
         segment: {
           metaType: 'text',
           variant: 'techGradientSegment',
-        }
-      },
-      // 新增按钮区域
-      actions: {
-        type: 'template',
-        style: {
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          gap: "{dimension.gap.base}",
-          padding: "{dimension.padding.base}",
         },
         button: {
           metaType: 'button',
           variant: 'primary',
+          style: {
+            alignSelf: 'flex-start',
+            marginTop: "{dimension.margin.base}"
+          }
+        },
+        secondaryButton: {
+          metaType: 'button',
+          variant: 'secondary',
+          style: {
+            alignSelf: 'flex-start'
+          }
+        },
+        image: {
+          metaType: 'image',
+          variant: 'rounded',
+          style: {
+            marginTop: "{dimension.margin.base}"
+          }
+        },
+        list: {
+          metaType: 'list',
+          variant: 'unordered'
+        },
+        table: {
+          metaType: 'table',
+          variant: 'container'
+        },
+        quote: {
+          metaType: 'text',
+          variant: 'quote'
+        },
+        codeBlock: {
+          metaType: 'text',
+          variant: 'codeBlock'
         }
       },
     },
 
-    // 3. 优雅青蓝卡片风格模板 (基于原版，增加按钮支持)
-    elegantCard: {
+    // 2. 科技渐变头部操作布局
+    techGradientHeaderActions: {
       type: 'template',
-      // Markdown 转换映射规则
       markdownMapping: {
-        // H2 (##) 映射到 title
-        h2: 'title',
-        // H3 (###) 映射到 content.title
+        h2: 'header.title',
+        'button:primary': 'header.primaryAction',
+        'button:secondary': 'header.secondaryAction',
         h3: 'content.title',
-        // 普通文本段落映射到 content.segment  
         p: 'content.segment',
-        // 链接映射到按钮 (新增)
-        a: 'actions.button',
+        img: 'content.image',
+        ul: 'content.list'
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xl}",
+        padding: "{dimension.padding.tight}",
+        background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.secondary.violet5} 35%, {color.primary.brand6} 100%)`,
+        boxShadow: `{material.hierarchy.4f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.primarycontainer.brand2}`,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::after': {
+          content: "''",
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: `conic-gradient(from 0deg at 50% 50%, transparent 0deg, {color.surfacecontainer.white32} 60deg, transparent 120deg)`,
+          opacity: '0.3',
+          animation: 'rotate 8s linear infinite',
+        }
+      },
+      header: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: "{dimension.padding.base} {dimension.padding.loose}",
+          borderRadius: "{dimension.borderradius.medium}",
+          background: `linear-gradient(90deg, {color.surfacecontainer.white88} 0%, {color.surfacecontainer.white76} 100%)`,
+          backdropFilter: 'blur(10px)',
+          boxShadow: `{material.hierarchy.2f}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
+          marginBottom: "{dimension.margin.base}",
+        },
+        title: {
+          metaType: 'text',
+          variant: 'techGradientTitle',
+        },
+        actions: {
+          type: 'template',
+          style: {
+            display: 'flex',
+            gap: "{dimension.gap.tight}"
+          },
+          primaryAction: {
+            metaType: 'button',
+            variant: 'primary'
+          },
+          secondaryAction: {
+            metaType: 'button',
+            variant: 'secondary'
+          }
+        }
+      },
+      content: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          borderRadius: "{dimension.borderradius.medium}",
+          background: `linear-gradient(180deg, {color.surfacecontainer.white88} 0%, {color.surfacecontainer.white76} 100%)`,
+          padding: "{dimension.padding.loose}",
+          gap: "{dimension.gap.base}",
+          backdropFilter: 'blur(10px)',
+          boxShadow: `inset {material.hierarchy.B1}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
+          position: 'relative',
+        },
+        title: {
+          metaType: 'text',
+          variant: 'techGradientSubtitle',
+        },
+        segment: {
+          metaType: 'text',
+          variant: 'techGradientSegment',
+        },
+        image: {
+          metaType: 'image',
+          variant: 'rounded'
+        },
+        list: {
+          metaType: 'list',
+          variant: 'unordered'
+        }
+      }
+    },
+
+    // 3. 科技渐变画廊布局
+    techGradientGallery: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        h3: 'gallery.title',
+        'img:1': 'gallery.images.image1',
+        'img:2': 'gallery.images.image2',
+        'img:3': 'gallery.images.image3',
+        'img:4': 'gallery.images.image4',
+        p: 'gallery.description'
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xl}",
+        padding: "{dimension.padding.tight}",
+        background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.secondary.violet5} 35%, {color.primary.brand6} 100%)`,
+        boxShadow: `{material.hierarchy.4f}`,
+        border: `{dimension.borderwidth.narrow} solid {color.primarycontainer.brand2}`,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::after': {
+          content: "''",
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: `conic-gradient(from 0deg at 50% 50%, transparent 0deg, {color.surfacecontainer.white32} 60deg, transparent 120deg)`,
+          opacity: '0.3',
+          animation: 'rotate 8s linear infinite',
+        }
+      },
+      title: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: "{dimension.padding.base} {dimension.padding.loose}",
+          justifyContent: 'center',
+          borderRadius: "{dimension.borderradius.medium}",
+          background: `linear-gradient(90deg, {color.surfacecontainer.white88} 0%, {color.surfacecontainer.white76} 100%)`,
+          backdropFilter: 'blur(10px)',
+          boxShadow: `{material.hierarchy.2f}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
+          marginBottom: "{dimension.margin.base}",
+        },
+        metaType: 'text',
+        variant: 'techGradientTitle',
+      },
+      gallery: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: "{dimension.borderradius.medium}",
+          background: `linear-gradient(180deg, {color.surfacecontainer.white88} 0%, {color.surfacecontainer.white76} 100%)`,
+          padding: "{dimension.padding.loose}",
+          gap: "{dimension.gap.base}",
+          backdropFilter: 'blur(10px)',
+          boxShadow: `inset {material.hierarchy.B1}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
+        },
+        title: {
+          metaType: 'text',
+          variant: 'techGradientSubtitle',
+        },
+        images: {
+          type: 'template',
+          style: {
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: "{dimension.gap.base}",
+            marginTop: "{dimension.margin.base}"
+          },
+          image1: {
+            metaType: 'image',
+            variant: 'rounded'
+          },
+          image2: {
+            metaType: 'image',
+            variant: 'rounded'
+          },
+          image3: {
+            metaType: 'image',
+            variant: 'rounded'
+          },
+          image4: {
+            metaType: 'image',
+            variant: 'rounded'
+          }
+        },
+        description: {
+          metaType: 'text',
+          variant: 'techGradientSegment',
+          style: {
+            marginTop: "{dimension.margin.base}"
+          }
+        }
+      }
+    },
+
+    // ==================== 优雅青蓝卡片系列 ====================
+
+    // 1. 优雅青蓝标准布局  
+    elegantStandard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        h3: 'content.title',
+        p: 'content.segment',
+        'button:primary': 'content.buttonContainer.button',
+        'button:secondary': 'content.buttonContainer.secondaryButton',
+        img: 'content.image',
+        ul: 'content.list',
+        table: 'content.table',
+        blockquote: 'content.quote',
+        code: 'content.codeBlock'
       },
       style: {
         display: 'flex',
         flexDirection: 'column',
         borderRadius: "{dimension.borderradius.xxxl}",
         padding: "{dimension.padding.semiloose}",
-        background: `linear-gradient(145deg, {color.secondarycontainer.violet1} 0%, {color.primarycontainer.brand1} 50%, {color.secondarycontainer.violet1} 100%)`,
+        background: `linear-gradient(145deg, {color.primarycontainer.brand1} 0%, {color.primarycontainer.brand2} 50%, {color.secondarycontainer.violet1} 100%)`,
         boxShadow: `{material.hierarchy.2f}`,
-        border: `{dimension.borderwidth.base} solid {color.secondary.violet3}`,
+        border: `{dimension.borderwidth.base} solid {color.primary.brand3}`,
         position: 'relative',
         overflow: 'hidden',
-        // 优雅的纹理效果
         '&::before': {
           content: "''",
           position: 'absolute',
@@ -1727,8 +2241,8 @@ export const DEFAULT_STYLE_CONFIG = {
           left: '0',
           right: '0',
           bottom: '0',
-          backgroundImage: `radial-gradient(circle at 25% 25%, {color.secondarycontainer.violet2} 0%, transparent 50%), 
-                       radial-gradient(circle at 75% 75%, {color.primarycontainer.brand2} 0%, transparent 50%)`,
+          backgroundImage: `radial-gradient(circle at 25% 25%, {color.primarycontainer.brand2} 0%, transparent 50%), 
+                       radial-gradient(circle at 75% 75%, {color.secondarycontainer.violet2} 0%, transparent 50%)`,
           opacity: '0.4',
           borderRadius: "{dimension.borderradius.xxxl}",
         }
@@ -1744,9 +2258,8 @@ export const DEFAULT_STYLE_CONFIG = {
           background: `linear-gradient(90deg, {color.surfacecontainer.white100} 0%, {color.secondarycontainer.violet0} 100%)`,
           boxShadow: `{material.hierarchy.1f}`,
           marginBottom: "{dimension.margin.tight}",
-          border: `{dimension.borderwidth.narrow} solid {color.secondary.violet4}`,
+          border: `{dimension.borderwidth.narrow} solid {color.primary.brand4}`,
           position: 'relative',
-          // 左侧竖线
           '&::before': {
             content: "''",
             position: 'absolute',
@@ -1755,10 +2268,9 @@ export const DEFAULT_STYLE_CONFIG = {
             transform: 'translateY(-50%)',
             width: '3px',
             height: '50%',
-            background: `linear-gradient(180deg, {color.secondary.violet5} 0%, {color.secondary.violet6} 100%)`,
+            background: `linear-gradient(180deg, {color.primary.brand5} 0%, {color.primary.brand6} 100%)`,
             borderRadius: "{dimension.borderradius.xs}",
           },
-          // 右侧竖线
           '&::after': {
             content: "''",
             position: 'absolute',
@@ -1767,7 +2279,7 @@ export const DEFAULT_STYLE_CONFIG = {
             transform: 'translateY(-50%)',
             width: '3px',
             height: '50%',
-            background: `linear-gradient(180deg, {color.secondary.violet5} 0%, {color.secondary.violet6} 100%)`,
+            background: `linear-gradient(180deg, {color.primary.brand5} 0%, {color.primary.brand6} 100%)`,
             borderRadius: "{dimension.borderradius.xs}",
           }
         },
@@ -1780,16 +2292,13 @@ export const DEFAULT_STYLE_CONFIG = {
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
-          height: '100%',
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
-          padding: "{dimension.padding.semiloose}",
+          padding: "{dimension.padding.extraloose}",
           gap: "{dimension.gap.tight}",
-          boxShadow: `inset {material.hierarchy.B1}, {material.hierarchy.main}`,
+          boxShadow: `{material.hierarchy.B1}, {material.hierarchy.main}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
           position: 'relative',
-          marginBottom: "{dimension.margin.base}",
-          // 左上角圆点
           '&::before': {
             content: "''",
             position: 'absolute',
@@ -1801,7 +2310,6 @@ export const DEFAULT_STYLE_CONFIG = {
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
           },
-          // 右下角圆点
           '&::after': {
             content: "''",
             position: 'absolute',
@@ -1815,510 +2323,384 @@ export const DEFAULT_STYLE_CONFIG = {
           }
         },
         title: {
-          style: {
-            position: 'relative',
-            // 右上角圆点 - 通过 title 元素实现
-            '&::before': {
-              content: "''",
-              position: 'absolute',
-              top: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`,
-              right: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`,
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
-              boxShadow: `{material.hierarchy.main}`,
-            }
-          },
           metaType: 'text',
           variant: 'elegantCardSubtitle',
         },
         segment: {
-          style: {
-            position: 'relative',
-            // 最后一个segment添加左下角圆点
-            '&:last-child::after': {
-              content: "''",
-              position: 'absolute',
-              bottom: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`,
-              left: `calc(-{dimension.padding.semiloose} + {dimension.padding.base})`,
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
-              boxShadow: `{material.hierarchy.main}`,
-            }
-          },
           metaType: 'text',
           variant: 'elegantCardSegment',
-        }
-      },
-      // 新增按钮区域
-      actions: {
-        type: 'template',
-        style: {
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: "{dimension.gap.base}",
-          padding: "{dimension.padding.base}",
         },
-        button: {
-          metaType: 'button',
-          variant: 'ghost',
+        buttonContainer: {
+          type: 'template',
+          style: {
+            display: 'flex',
+            flexDirection: 'row',
+          },
+          button: {
+            metaType: 'button',
+            variant: 'primary',
+            style: {
+              alignSelf: 'flex-start',
+            }
+          },
+          secondaryButton: {
+            metaType: 'button',
+            variant: 'secondary',
+            style: {
+              alignSelf: 'flex-start'
+            }
+          },
+        },
+        image: {
+          metaType: 'image',
+          variant: 'rounded',
+          style: {
+            marginTop: "{dimension.margin.base}"
+          }
+        },
+        list: {
+          metaType: 'list',
+          variant: 'unordered'
+        },
+        table: {
+          metaType: 'table',
+          variant: 'container'
+        },
+        quote: {
+          metaType: 'text',
+          variant: 'quote'
+        },
+        codeBlock: {
+          metaType: 'text',
+          variant: 'codeBlock'
         }
       },
     },
 
-    // 4. 产品展示卡片模板 (全新)
-    productCard: {
+    // 2. 优雅青蓝列表布局
+    elegantList: {
       type: 'template',
       markdownMapping: {
-        img: 'image',
-        h2: 'header.title',
-        h3: 'header.price',
-        p: 'content.description',
-        a: 'actions.button',
+        h2: 'title',
+        h3: 'listContainer.listTitle',
+        'li:1': 'listContainer.list.item1',
+        'li:2': 'listContainer.list.item2',
+        'li:3': 'listContainer.list.item3',
+        'li:4': 'listContainer.list.item4',
+        'li:5': 'listContainer.list.item5',
+        p: 'summary.text'
       },
       style: {
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: "{dimension.borderradius.xl}",
-        background: "{color.surfacecontainer.white100}",
+        borderRadius: "{dimension.borderradius.xxxl}",
+        padding: "{dimension.padding.semiloose}",
+        background: `linear-gradient(145deg, {color.primarycontainer.brand1} 0%, {color.primarycontainer.brand2} 50%, {color.secondarycontainer.violet1} 100%)`,
         boxShadow: `{material.hierarchy.2f}`,
-        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
-        overflow: 'hidden',
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: `{material.hierarchy.4f}`,
-        }
-      },
-      image: {
-        style: {
-          width: '100%',
-          height: '200px',
-          objectFit: 'cover',
-          borderRadius: "{dimension.borderradius.large} {dimension.borderradius.large} 0 0",
-          background: `linear-gradient(135deg, {color.surface.grey1} 0%, {color.surface.grey2} 100%)`,
-        },
-        metaType: 'image',
-        variant: 'normal',
-      },
-      header: {
-        type: 'template',
-        style: {
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          padding: "{dimension.padding.loose}",
-          gap: "{dimension.gap.base}",
-        },
-        title: {
-          metaType: 'text',
-          variant: 'productCardTitle',
-        },
-        price: {
-          // style: {
-          //   textAlign: 'right',
-          // },
-          metaType: 'text',
-          variant: 'productCardPrice',
-        }
-      },
-      content: {
-        type: 'template',
-        style: {
-          padding: "0 {dimension.padding.loose} {dimension.padding.base}",
-        },
-        description: {
-          metaType: 'text',
-          variant: 'productCardDescription',
-        }
-      },
-      actions: {
-        type: 'template',
-        style: {
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: "{dimension.padding.loose}",
-          gap: "{dimension.gap.base}",
-          borderTop: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
-          background: "{color.surface.grey0}",
-        },
-        button: {
-          metaType: 'button',
-          variant: 'primary',
-        }
-      },
-    },
-
-    // 5. 统计数据卡片模板 (全新)
-    statisticsCard: {
-      type: 'template',
-      markdownMapping: {
-        h1: 'stats.number',
-        h2: 'stats.label',
-        h3: 'stats.trend',
-        p: 'content.description',
-        a: 'actions.button',
-      },
-      style: {
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: "{dimension.borderradius.xl}",
-        background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.primarycontainer.brand0} 100%)`,
-        boxShadow: `{material.hierarchy.1f}`,
-        border: `{dimension.borderwidth.narrow} solid {color.primarycontainer.brand2}`,
-        padding: "{dimension.padding.loose}",
+        border: `{dimension.borderwidth.base} solid {color.primary.brand3}`,
         position: 'relative',
         overflow: 'hidden',
         '&::before': {
           content: "''",
           position: 'absolute',
           top: '0',
+          left: '0',
           right: '0',
-          width: '60px',
-          height: '60px',
-          background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.primary.brand6} 100%)`,
-          borderRadius: "0 {dimension.borderradius.xl} 0 100%",
-          opacity: '0.1',
+          bottom: '0',
+          backgroundImage: `radial-gradient(circle at 25% 25%, {color.primarycontainer.brand2} 0%, transparent 50%), 
+                       radial-gradient(circle at 75% 75%, {color.secondarycontainer.violet2} 0%, transparent 50%)`,
+          opacity: '0.4',
+          borderRadius: "{dimension.borderradius.xxxl}",
         }
       },
-      stats: {
-        type: 'template',
+      title: {
         style: {
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
-          textAlign: 'center',
-          gap: "{dimension.gap.tight}",
-          marginBottom: "{dimension.margin.base}",
-        },
-        number: {
-          metaType: 'text',
-          variant: 'statCardNumber',
-        },
-        label: {
-          metaType: 'text',
-          variant: 'statCardLabel',
-        },
-        trend: {
-          style: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: "{dimension.gap.tight}",
-            padding: "{dimension.padding.tight} {dimension.padding.base}",
-            background: "{color.success.green1}",
-            borderRadius: "{dimension.borderradius.large}",
-            border: `{dimension.borderwidth.narrow} solid {color.success.green3}`,
-          },
-          metaType: 'text',
-          variant: 'statCardTrend',
-        }
-      },
-      content: {
-        type: 'template',
-        style: {
-          textAlign: 'center',
-          marginBottom: "{dimension.margin.base}",
-        },
-        description: {
-          metaType: 'text',
-          variant: 'neomorphismSegment',
-        }
-      },
-      actions: {
-        type: 'template',
-        style: {
-          display: 'flex',
+          padding: "{dimension.padding.base} {dimension.padding.semiloose}",
           justifyContent: 'center',
-        },
-        button: {
-          metaType: 'button',
-          variant: 'ghost',
-        }
-      },
-    },
-
-    // 6. 用户信息卡片模板 (全新)
-    userCard: {
-      type: 'template',
-      markdownMapping: {
-        img: 'avatar',
-        h2: 'info.name',
-        h3: 'info.role',
-        p: 'info.bio',
-        a: 'actions.button',
-      },
-      style: {
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: "{dimension.borderradius.xl}",
-        background: "{color.surfacecontainer.white100}",
-        boxShadow: `{material.hierarchy.2f}`,
-        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
-        padding: "{dimension.padding.loose}",
-        alignItems: 'center',
-        textAlign: 'center',
-        position: 'relative',
-      },
-      avatar: {
-        style: {
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          objectFit: 'cover',
-          border: `{dimension.borderwidth.wide} solid {color.primarycontainer.brand2}`,
-          boxShadow: `{material.hierarchy.2f}`,
-          marginBottom: "{dimension.margin.base}",
-        },
-        metaType: 'image',
-        variant: 'circle',
-      },
-      info: {
-        type: 'template',
-        style: {
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: "{dimension.gap.tight}",
-          marginBottom: "{dimension.margin.base}",
-        },
-        name: {
-          metaType: 'text',
-          variant: 'userCardName',
-        },
-        role: {
-          style: {
-            padding: "{dimension.padding.tight} {dimension.padding.base}",
-            background: "{color.secondarycontainer.violet1}",
-            borderRadius: "{dimension.borderradius.large}",
-            border: `{dimension.borderwidth.narrow} solid {color.secondary.violet3}`,
+          borderRadius: "{dimension.borderradius.xl}",
+          background: `linear-gradient(90deg, {color.surfacecontainer.white100} 0%, {color.secondarycontainer.violet0} 100%)`,
+          boxShadow: `{material.hierarchy.1f}`,
+          marginBottom: "{dimension.margin.tight}",
+          border: `{dimension.borderwidth.narrow} solid {color.primary.brand4}`,
+          position: 'relative',
+          '&::before': {
+            content: "''",
+            position: 'absolute',
+            left: "{dimension.padding.base}",
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '3px',
+            height: '50%',
+            background: `linear-gradient(180deg, {color.primary.brand5} 0%, {color.primary.brand6} 100%)`,
+            borderRadius: "{dimension.borderradius.xs}",
           },
-          metaType: 'text',
-          variant: 'userCardRole',
-        },
-        bio: {
-          style: {
-            marginTop: "{dimension.margin.base}",
-          },
-          metaType: 'text',
-          variant: 'userCardBio',
-        }
-      },
-      actions: {
-        type: 'template',
-        style: {
-          display: 'flex',
-          flexDirection: 'row',
-          gap: "{dimension.gap.base}",
-          width: '100%',
-        },
-        button: {
-          style: {
-            flex: '1',
-          },
-          metaType: 'button',
-          variant: 'secondary',
-        }
-      },
-    },
-
-    // 7. 通知提醒卡片模板 (全新)
-    notificationCard: {
-      type: 'template',
-      markdownMapping: {
-        h2: 'header.title',
-        h3: 'header.timestamp',
-        p: 'content.message',
-        a: 'actions.button',
-        blockquote: 'alert',
-      },
-      style: {
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: "{dimension.borderradius.large}",
-        background: "{color.surfacecontainer.white100}",
-        boxShadow: `{material.hierarchy.1f}`,
-        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
-        borderLeft: `{dimension.borderwidth.wide} solid {color.primary.brand5}`,
-        overflow: 'hidden',
-      },
-      header: {
-        type: 'template',
-        style: {
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: "{dimension.padding.loose}",
-          background: "{color.surface.grey0}",
-          borderBottom: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
-        },
-        title: {
-          metaType: 'text',
-          variant: 'notificationTitle',
-        },
-        timestamp: {
-          metaType: 'text',
-          variant: 'notificationTime',
-        }
-      },
-      content: {
-        type: 'template',
-        style: {
-          padding: "{dimension.padding.loose}",
-        },
-        message: {
-          metaType: 'text',
-          variant: 'notificationMessage',
-        }
-      },
-      alert: {
-        style: {
-          margin: "{dimension.margin.base} {dimension.padding.loose}",
-          padding: "{dimension.padding.base}",
-          background: "{color.warning.orange1}",
-          borderRadius: "{dimension.borderradius.medium}",
-          border: `{dimension.borderwidth.narrow} solid {color.warning.orange3}`,
+          '&::after': {
+            content: "''",
+            position: 'absolute',
+            right: "{dimension.padding.base}",
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '3px',
+            height: '50%',
+            background: `linear-gradient(180deg, {color.primary.brand5} 0%, {color.primary.brand6} 100%)`,
+            borderRadius: "{dimension.borderradius.xs}",
+          }
         },
         metaType: 'text',
-        variant: 'notificationMessage',
+        variant: 'elegantCardTitle',
       },
-      actions: {
+      listContainer: {
         type: 'template',
         style: {
           display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
+          flexDirection: 'column',
+          borderRadius: "{dimension.borderradius.xl}",
+          background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
+          padding: "{dimension.padding.extraloose}",
           gap: "{dimension.gap.base}",
-          padding: "{dimension.padding.loose}",
-          background: "{color.surface.grey0}",
-          borderTop: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+          boxShadow: `{material.hierarchy.B1}, {material.hierarchy.main}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+          marginBottom: "{dimension.margin.base}",
+          position: 'relative',
+          '&::before': {
+            content: "''",
+            position: 'absolute',
+            top: "{dimension.padding.base}",
+            left: "{dimension.padding.base}",
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+          },
+          '&::after': {
+            content: "''",
+            position: 'absolute',
+            bottom: "{dimension.padding.base}",
+            right: "{dimension.padding.base}",
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+          }
         },
-        button: {
-          metaType: 'button',
-          variant: 'ghost',
+        listTitle: {
+          metaType: 'text',
+          variant: 'elegantCardSubtitle',
+        },
+        list: {
+          type: 'template',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: "{dimension.gap.tight}",
+            marginTop: "{dimension.margin.base}"
+          },
+          item1: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item2: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item3: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item4: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item5: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          }
         }
       },
+      summary: {
+        type: 'template',
+        style: {
+          borderRadius: "{dimension.borderradius.xl}",
+          background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
+          padding: "{dimension.padding.base}",
+          boxShadow: `{material.hierarchy.B1}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        },
+        text: {
+          metaType: 'text',
+          variant: 'elegantCardSegment'
+        }
+      }
     },
 
-    // 8. 操作选择卡片模板 (全新)
-    actionCard: {
+    // 3. 优雅青蓝表格布局
+    elegantTable: {
       type: 'template',
       markdownMapping: {
         h2: 'title',
-        p: 'content.description',
-        a: 'actions.button',
+        h3: 'tableContainer.tableTitle',
+        table: 'tableContainer.dataTable',
+        p: 'notes.text'
       },
       style: {
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: "{dimension.borderradius.xl}",
-        background: `linear-gradient(135deg, {color.surface.grey0} 0%, {color.surface.grey1} 100%)`,
-        boxShadow: `{material.hierarchy.1f}`,
-        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
-        padding: "{dimension.padding.loose}",
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          boxShadow: `{material.hierarchy.3f}`,
+        borderRadius: "{dimension.borderradius.xxxl}",
+        padding: "{dimension.padding.semiloose}",
+        background: `linear-gradient(145deg, {color.primarycontainer.brand1} 0%, {color.primarycontainer.brand2} 50%, {color.secondarycontainer.violet1} 100%)`,
+        boxShadow: `{material.hierarchy.2f}`,
+        border: `{dimension.borderwidth.base} solid {color.primary.brand3}`,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: "''",
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          right: '0',
+          bottom: '0',
+          backgroundImage: `radial-gradient(circle at 25% 25%, {color.primarycontainer.brand2} 0%, transparent 50%), 
+                       radial-gradient(circle at 75% 75%, {color.secondarycontainer.violet2} 0%, transparent 50%)`,
+          opacity: '0.4',
+          borderRadius: "{dimension.borderradius.xxxl}",
+        }
+      },
+      title: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: "{dimension.padding.base} {dimension.padding.semiloose}",
+          justifyContent: 'center',
+          borderRadius: "{dimension.borderradius.xl}",
+          background: `linear-gradient(90deg, {color.surfacecontainer.white100} 0%, {color.secondarycontainer.violet0} 100%)`,
+          boxShadow: `{material.hierarchy.1f}`,
+          marginBottom: "{dimension.margin.tight}",
+          border: `{dimension.borderwidth.narrow} solid {color.primary.brand4}`,
+          position: 'relative',
+          '&::before': {
+            content: "''",
+            position: 'absolute',
+            left: "{dimension.padding.base}",
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '3px',
+            height: '50%',
+            background: `linear-gradient(180deg, {color.primary.brand5} 0%, {color.primary.brand6} 100%)`,
+            borderRadius: "{dimension.borderradius.xs}",
+          },
+          '&::after': {
+            content: "''",
+            position: 'absolute',
+            right: "{dimension.padding.base}",
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '3px',
+            height: '50%',
+            background: `linear-gradient(180deg, {color.primary.brand5} 0%, {color.primary.brand6} 100%)`,
+            borderRadius: "{dimension.borderradius.xs}",
+          }
+        },
+        metaType: 'text',
+        variant: 'elegantCardTitle',
+      },
+      tableContainer: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
-        }
-      },
-      title: {
-        style: {
-          textAlign: 'center',
-          marginBottom: "{dimension.margin.base}",
-          padding: "{dimension.padding.base}",
-          background: `linear-gradient(90deg, {color.primary.brand4} 0%, {color.secondary.violet5} 100%)`,
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          color: 'transparent',
-        },
-        metaType: 'text',
-        variant: 'productCardTitle',
-      },
-      content: {
-        type: 'template',
-        style: {
-          textAlign: 'center',
-          marginBottom: "{dimension.margin.loose}",
-        },
-        description: {
-          metaType: 'text',
-          variant: 'productCardDescription',
-        }
-      },
-      actions: {
-        type: 'template',
-        style: {
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+          padding: "{dimension.padding.extraloose}",
           gap: "{dimension.gap.base}",
+          boxShadow: `{material.hierarchy.B1}, {material.hierarchy.main}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+          marginBottom: "{dimension.margin.base}",
+          position: 'relative',
+          '&::before': {
+            content: "''",
+            position: 'absolute',
+            top: "{dimension.padding.base}",
+            left: "{dimension.padding.base}",
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+          },
+          '&::after': {
+            content: "''",
+            position: 'absolute',
+            bottom: "{dimension.padding.base}",
+            right: "{dimension.padding.base}",
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
+            boxShadow: `{material.hierarchy.main}`,
+          }
         },
-        button: {
-          metaType: 'button',
-          variant: 'secondary',
+        tableTitle: {
+          metaType: 'text',
+          variant: 'elegantCardSubtitle',
+        },
+        dataTable: {
+          metaType: 'table',
+          style: {
+            marginTop: "{dimension.margin.base}"
+          }
         }
       },
-    },
-
-    // 9. 轻量级信息卡片模板 (全新)
-    lightCard: {
-      type: 'template',
-      markdownMapping: {
-        h3: 'title',
-        p: 'content',
-        a: 'action',
-      },
-      style: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: "{dimension.borderradius.large}",
-        background: "{color.surfacecontainer.white100}",
-        boxShadow: `{material.hierarchy.main}`,
-        border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
-        padding: "{dimension.padding.base}",
-        gap: "{dimension.gap.base}",
-        transition: 'all 0.2s ease',
-        '&:hover': {
-          transform: 'translateX(4px)',
-          boxShadow: `{material.hierarchy.2f}`,
+      notes: {
+        type: 'template',
+        style: {
+          borderRadius: "{dimension.borderradius.xl}",
+          background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
+          padding: "{dimension.padding.base}",
+          boxShadow: `{material.hierarchy.B1}`,
+          border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
+        },
+        text: {
+          metaType: 'text',
+          variant: 'elegantCardSegment'
         }
-      },
-      title: {
-        style: {
-          flex: '1',
-          fontWeight: "{font.fontweight.semibold}",
-          color: "{color.onsurface.black88}",
-        },
-        metaType: 'text',
-        variant: 'neomorphismSubtitle',
-      },
-      content: {
-        style: {
-          flex: '2',
-          color: "{color.onsurface.black64}",
-        },
-        metaType: 'text',
-        variant: 'neomorphismSegment',
-      },
-      action: {
-        style: {
-          minWidth: '80px',
-        },
-        metaType: 'button',
-        variant: 'ghost',
-      },
+      }
     },
-
     // Copy End
   },
 

@@ -84,8 +84,11 @@ function processText(text) {
   if (!text || typeof text !== 'string') return '';
 
   try {
+    // 🔧 修复：清理段落符号
+    const cleanedText = text.replace(/§PARAGRAPH§/g, '');
+    
     // 预处理文本，优化KaTeX解析
-    const preparedText = prepareMarkdownForKatex(text);
+    const preparedText = prepareMarkdownForKatex(cleanedText);
 
     // 使用markedInstance处理Markdown和KaTeX
     const parseResult = markedInstance.parse(preparedText);
@@ -103,9 +106,10 @@ function processText(text) {
   
   } catch (error) {
     console.error("处理文本时出错:", error);
-    // 🔧 修复：出错时返回转义后的原文本，而不是undefined
+    // 🔧 修复：出错时返回转义后的原文本，而不是undefined，同时清理段落符号
+    const cleanedText = text.replace(/§PARAGRAPH§/g, '');
     const errorMessage = `<span style="color:red;">公式或Markdown解析错误: ${escapeHtml(error.message)}</span>`;
-    return errorMessage + escapeHtml(text).replace(/\\n/g, '<br>');
+    return errorMessage + escapeHtml(cleanedText).replace(/\\n/g, '<br>');
   }
 }
 
@@ -134,8 +138,6 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
       height: height,
       width: width,
       "box-sizing": "border-box",
-      "back-width": width,
-      "back-height": height,
       position: "relative"
     },
     children: []
@@ -174,9 +176,17 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
 
   // 处理文本内容 - 包括Markdown和KaTeX
   let processedContent = text;
+  // 🔧 修复：清理段落符号
+  if (typeof processedContent === 'string') {
+    processedContent = processedContent.replace(/§PARAGRAPH§/g, '');
+  }
   // 如果是富文本，使用富文本处理过的内容
   if (hasRichText && richTextOptions.processedText) {
     processedContent = richTextOptions.processedText;
+    // 🔧 修复：也清理富文本中的段落符号
+    if (typeof processedContent === 'string') {
+      processedContent = processedContent.replace(/§PARAGRAPH§/g, '');
+    }
   }
 
   // 应用Markdown和KaTeX处理
@@ -583,6 +593,9 @@ function parseTemplateCardContent(content, cardStyleConfig) {
   // 🆕 用于跟踪容器，确保相同容器的子元素被合并
   const containerMap = new Map(); // key: containerName, value: containerElement
   
+  // 🆕 用于跟踪列表项计数器
+  let listItemCounter = 0;
+  
   while (i < lines.length) {
     const line = lines[i].trim();
     
@@ -593,9 +606,114 @@ function parseTemplateCardContent(content, cardStyleConfig) {
 
     // 🆕 优先检查 markdown 格式（如果有 markdownMapping 配置）
     if (hasMarkdownMapping) {
-      const markdownResult = parseMarkdownToTemplate(line, cardStyleConfig.markdownMapping);
-      if (markdownResult) {
+      const parseResult = parseMarkdownToTemplate(line, cardStyleConfig.markdownMapping, listItemCounter);
+      if (parseResult && parseResult.markdownResult) {
+        const { markdownResult, newListItemCounter } = parseResult;
+        listItemCounter = newListItemCounter;
+        
         console.log(`发现 markdown 格式: ${markdownResult.type} -> ${markdownResult.templatePath}, 内容: "${markdownResult.content}"`);
+        
+        // 🆕 特殊处理表格：收集完整的表格内容
+        if (markdownResult.type === 'table' && markdownResult.isTableLine) {
+          console.log(`🔍 开始收集完整表格内容，起始行: ${i}`);
+          
+          // 收集所有连续的表格行
+          const tableLines = [line];
+          let j = i + 1;
+          
+          while (j < lines.length) {
+            const nextLine = lines[j].trim();
+            if (!nextLine) {
+              j++;
+              continue; // 跳过空行
+            }
+            
+            // 检查是否还是表格行
+            const nextParseResult = parseMarkdownToTemplate(nextLine, cardStyleConfig.markdownMapping, 0);
+            if (nextParseResult && nextParseResult.markdownResult && 
+                nextParseResult.markdownResult.type === 'table' && 
+                nextParseResult.markdownResult.isTableLine) {
+              tableLines.push(nextLine);
+              j++;
+            } else {
+              break; // 遇到非表格行，停止收集
+            }
+          }
+          
+          // 合并完整的表格内容
+          const completeTableContent = tableLines.join('\n');
+          console.log(`📋 收集到完整表格，共 ${tableLines.length} 行`);
+          
+          // 创建表格元素
+          const templateElement = createOrMergeTemplateElement(
+            markdownResult.templatePath, 
+            completeTableContent, 
+            cardStyleConfig, 
+            containerMap, 
+            children,
+            null, // existingElement
+            { ...markdownResult, content: completeTableContent } // 传递完整表格内容
+          );
+          
+          // 跳过已处理的表格行
+          i = j;
+          continue;
+        }
+        
+        // 🆕 特殊处理代码块：收集完整的代码块内容
+        if (markdownResult.type === 'code' && markdownResult.isCodeBlockStart) {
+          console.log(`🔍 开始收集完整代码块内容，起始行: ${i}, 语言: ${markdownResult.language}`);
+          
+          // 收集代码块内容
+          const codeLines = [line]; // 包含开始标记 ```language
+          let j = i + 1;
+          let foundEnd = false;
+          
+          while (j < lines.length) {
+            const nextLine = lines[j];
+            codeLines.push(nextLine);
+            
+            // 检查是否是代码块结束标记
+            if (nextLine.trim() === '```') {
+              foundEnd = true;
+              j++;
+              break;
+            }
+            j++;
+          }
+          
+          if (!foundEnd) {
+            console.warn(`⚠️ 代码块未找到结束标记，从第${i}行开始`);
+          }
+          
+          // 提取纯代码内容（去除开始和结束的```标记）
+          let pureCodeContent = '';
+          if (codeLines.length >= 2) {
+            // 去除第一行（```language）和最后一行（```）
+            const codeContentLines = codeLines.slice(1);
+            if (codeContentLines[codeContentLines.length - 1].trim() === '```') {
+              codeContentLines.pop(); // 移除最后的 ```
+            }
+            pureCodeContent = codeContentLines.join('\n');
+          }
+          
+          console.log(`📋 收集到完整代码块，共 ${codeLines.length} 行，提取纯代码内容 ${pureCodeContent.length} 字符`);
+          
+          // 创建代码块元素
+          const templateElement = createOrMergeTemplateElement(
+            markdownResult.templatePath, 
+            pureCodeContent, // 传递纯代码内容
+            cardStyleConfig, 
+            containerMap, 
+            children,
+            null, // existingElement
+            { ...markdownResult, content: pureCodeContent, language: markdownResult.language } // 传递纯代码内容和语言信息
+          );
+          
+          // 跳过已处理的代码块行
+          i = j;
+          continue;
+        }
         
         // 🆕 检查是否需要合并到现有容器，传递完整的解析结果
         const templateElement = createOrMergeTemplateElement(
@@ -615,6 +733,7 @@ function parseTemplateCardContent(content, cardStyleConfig) {
       // 🆕 检查是否有 others 映射，用于处理未匹配的内容
       if (cardStyleConfig.markdownMapping.others) {
         console.log(`发现未映射的内容，开始收集连续的未映射内容，起始行: ${i}`);
+        console.log(`others 映射值: "${cardStyleConfig.markdownMapping.others}"`);
         
         // 收集连续的未映射内容
         const collectResult = collectUnmappedMarkdownContent(lines, i, cardStyleConfig.markdownMapping);
@@ -627,6 +746,16 @@ function parseTemplateCardContent(content, cardStyleConfig) {
           
           // 将解析后的元素放到 others 指定的容器中
           for (const element of parsedElements) {
+            console.log(`准备创建模板元素，others映射: "${cardStyleConfig.markdownMapping.others}", 元素类型: ${element.type}`);
+            console.log(`cardStyleConfig.markdownMapping:`, cardStyleConfig.markdownMapping);
+            console.log(`element:`, element);
+            
+            // 🔧 验证 others 映射是否存在
+            if (!cardStyleConfig.markdownMapping.others) {
+              console.error(`❌ others 映射未定义! markdownMapping:`, cardStyleConfig.markdownMapping);
+              continue; // 跳过这个元素
+            }
+            
             createOrMergeTemplateElement(cardStyleConfig.markdownMapping.others, '', cardStyleConfig, containerMap, children, element);
           }
         }
@@ -671,21 +800,30 @@ function parseTemplateCardContent(content, cardStyleConfig) {
       } else {
         // 🆕 如果有 markdownMapping 且是普通文本，尝试作为段落处理
         if (hasMarkdownMapping && cardStyleConfig.markdownMapping.p) {
-          console.log(`将普通文本作为段落处理: "${line}"`);
-          // 🆕 使用合并逻辑处理段落
-          createOrMergeTemplateElement(
-            cardStyleConfig.markdownMapping.p, 
-            line, 
-            cardStyleConfig, 
-            containerMap, 
-            children,
-            null, // existingElement
-            { type: 'p', content: line } // markdownData for paragraph
-          );
+          // 🔧 修复：清理段落符号
+          const cleanedLine = line.replace(/§PARAGRAPH§/g, '');
+          if (cleanedLine.trim()) {
+            console.log(`将普通文本作为段落处理: "${cleanedLine}"`);
+            console.log(`p 映射值: "${cardStyleConfig.markdownMapping.p}"`);
+            // 🆕 使用合并逻辑处理段落
+            createOrMergeTemplateElement(
+              cardStyleConfig.markdownMapping.p, 
+              cleanedLine, 
+              cardStyleConfig, 
+              containerMap, 
+              children,
+              null, // existingElement
+              { type: 'p', content: cleanedLine } // markdownData for paragraph
+            );
+          }
         } else if (!hasMarkdownMapping) {
           // 如果没有 markdownMapping，按普通卡片处理
-          const textElement = createTextElement(line);
-          children.push(textElement);
+          // 🔧 修复：清理段落符号
+          const cleanedLine = line.replace(/§PARAGRAPH§/g, '');
+          if (cleanedLine.trim()) {
+            const textElement = createTextElement(cleanedLine);
+            children.push(textElement);
+          }
         }
         // 🆕 如果有 markdownMapping 但没有 p 映射，且没有 others 映射，则跳过不处理
         i++;
@@ -713,10 +851,10 @@ function collectUnmappedMarkdownContent(lines, startIndex, markdownMapping) {
     }
     
     // 检查是否为已映射的 markdown 格式
-    const mappedResult = parseMarkdownToTemplate(line, markdownMapping);
-    if (mappedResult) {
+    const parseResult = parseMarkdownToTemplate(line, markdownMapping, 0);
+    if (parseResult && parseResult.markdownResult) {
       // 遇到已映射的内容，停止收集
-      console.log(`在第${i}行遇到已映射内容，停止收集: ${mappedResult.type}`);
+      console.log(`在第${i}行遇到已映射内容，停止收集: ${parseResult.markdownResult.type}`);
       break;
     }
     
@@ -750,81 +888,210 @@ function collectUnmappedMarkdownContent(lines, startIndex, markdownMapping) {
 }
 
 // 🆕 解析 markdown 格式并映射到模板路径
-function parseMarkdownToTemplate(line, markdownMapping) {
+function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
+  let currentListItemCounter = listItemCounter;
+  
+  // 🆕 优先检查列表项格式（支持单独的li:n映射）
+  const listItemInfo = isListItem(line);
+  if (listItemInfo.isList) {
+    // 增加列表项计数器
+    currentListItemCounter++;
+    
+    // 构造列表项映射键，例如 'li:1', 'li:2'
+    const listItemKey = `li:${currentListItemCounter}`;
+    
+    if (markdownMapping[listItemKey]) {
+      console.log(`🎯 使用专门的列表项映射: ${listItemKey} -> ${markdownMapping[listItemKey]}`);
+      return {
+        markdownResult: {
+          type: 'li',
+          listItemNumber: currentListItemCounter,
+          templatePath: markdownMapping[listItemKey],
+          content: listItemInfo.content.trim()
+        },
+        newListItemCounter: currentListItemCounter
+      };
+    } else {
+      console.log(`⚪ 无专门的列表项映射: ${listItemKey}，将使用默认处理`);
+      // 如果没有专门的li:n映射，重置计数器，让它走通用的ul处理
+      currentListItemCounter = listItemCounter;
+    }
+  }
+  
   // 检查标题格式
   const h1Match = line.match(/^#\s+(.+)$/);
   if (h1Match && markdownMapping.h1) {
     return {
-      type: 'h1',
-      templatePath: markdownMapping.h1,
-      content: h1Match[1].trim()
+      markdownResult: {
+        type: 'h1',
+        templatePath: markdownMapping.h1,
+        content: h1Match[1].trim()
+      },
+      newListItemCounter: currentListItemCounter
     };
   }
   
   const h2Match = line.match(/^##\s+(.+)$/);
   if (h2Match && markdownMapping.h2) {
     return {
-      type: 'h2',
-      templatePath: markdownMapping.h2,
-      content: h2Match[1].trim()
+      markdownResult: {
+        type: 'h2',
+        templatePath: markdownMapping.h2,
+        content: h2Match[1].trim()
+      },
+      newListItemCounter: currentListItemCounter
     };
   }
   
   const h3Match = line.match(/^###\s+(.+)$/);
   if (h3Match && markdownMapping.h3) {
     return {
-      type: 'h3',
-      templatePath: markdownMapping.h3,
-      content: h3Match[1].trim()
+      markdownResult: {
+        type: 'h3',
+        templatePath: markdownMapping.h3,
+        content: h3Match[1].trim()
+      },
+      newListItemCounter: currentListItemCounter
     };
   }
   
   const h4Match = line.match(/^####\s+(.+)$/);
   if (h4Match && markdownMapping.h4) {
     return {
-      type: 'h4',
-      templatePath: markdownMapping.h4,
-      content: h4Match[1].trim()
+      markdownResult: {
+        type: 'h4',
+        templatePath: markdownMapping.h4,
+        content: h4Match[1].trim()
+      },
+      newListItemCounter: currentListItemCounter
     };
   }
   
   const h5Match = line.match(/^#####\s+(.+)$/);
   if (h5Match && markdownMapping.h5) {
     return {
-      type: 'h5',
-      templatePath: markdownMapping.h5,
-      content: h5Match[1].trim()
+      markdownResult: {
+        type: 'h5',
+        templatePath: markdownMapping.h5,
+        content: h5Match[1].trim()
+      },
+      newListItemCounter: currentListItemCounter
     };
   }
   
   const h6Match = line.match(/^######\s+(.+)$/);
   if (h6Match && markdownMapping.h6) {
     return {
-      type: 'h6',
-      templatePath: markdownMapping.h6,
-      content: h6Match[1].trim()
+      markdownResult: {
+        type: 'h6',
+        templatePath: markdownMapping.h6,
+        content: h6Match[1].trim()
+      },
+      newListItemCounter: currentListItemCounter
     };
   }
   
-  // 🆕 检查链接格式 [text](url)
+  // 🆕 检查按钮类型标记格式 [variant][text](url) 或 [variant] [text](url)
+  const buttonVariantMatch = line.match(/^\[(\w+)\]\s*\[([^\]]+)\]\(([^)]+)\)$/);
+  if (buttonVariantMatch) {
+    const [, variant, buttonText, buttonUrl] = buttonVariantMatch;
+    const supportedVariants = ['primary', 'secondary', 'success', 'warning', 'error', 'ghost', 'link'];
+    
+    if (supportedVariants.includes(variant)) {
+      // 构造按钮类型映射键，例如 'button:primary', 'button:secondary'
+      const buttonTypeKey = `button:${variant}`;
+      
+      if (markdownMapping[buttonTypeKey]) {
+        return {
+          markdownResult: {
+            type: 'button',
+            buttonVariant: variant,
+            templatePath: markdownMapping[buttonTypeKey],
+            content: buttonText.trim(),
+            url: buttonUrl.trim()
+          },
+          newListItemCounter: currentListItemCounter
+        };
+      }
+    }
+  }
+  
+  // 🆕 检查普通链接格式 [text](url) - 映射到 button:primary
   const linkMatch = line.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
-  if (linkMatch && markdownMapping.a) {
-    return {
-      type: 'a',
-      templatePath: markdownMapping.a,
-      content: linkMatch[1].trim(), // 链接文本
-      url: linkMatch[2].trim()       // 链接URL
-    };
+  if (linkMatch) {
+    const [, linkText, linkUrl] = linkMatch;
+    
+    // 优先检查是否有 button:primary 映射
+    if (markdownMapping['button:primary']) {
+      return {
+        markdownResult: {
+          type: 'button',
+          buttonVariant: 'primary',
+          templatePath: markdownMapping['button:primary'],
+          content: linkText.trim(),
+          url: linkUrl.trim()
+        },
+        newListItemCounter: currentListItemCounter
+      };
+    }
+    // 回退到通用链接映射
+    else if (markdownMapping.a) {
+      return {
+        markdownResult: {
+          type: 'a',
+          templatePath: markdownMapping.a,
+          content: linkText.trim(),
+          url: linkUrl.trim()
+        },
+        newListItemCounter: currentListItemCounter
+      };
+    }
   }
   
   // 🆕 检查图片格式 ![alt](url)
   const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
   if (imgMatch && markdownMapping.img) {
     return {
-      type: 'img',
-      templatePath: markdownMapping.img,
-      content: imgMatch[1].trim(), // 图片alt文本
-      url: imgMatch[2].trim()      // 图片URL
+      markdownResult: {
+        type: 'img',
+        templatePath: markdownMapping.img,
+        content: imgMatch[1].trim(), // 图片alt文本
+        url: imgMatch[2].trim()      // 图片URL
+      },
+      newListItemCounter: currentListItemCounter
+    };
+  }
+  
+  // 🆕 检查代码块格式 ```language
+  const codeBlockMatch = line.match(/^```(\w+)?$/);
+  if (codeBlockMatch) {
+    const language = codeBlockMatch[1] || 'plaintext';
+    const templatePath = markdownMapping.code || markdownMapping.p || markdownMapping.others;
+    console.log(`🎯 发现代码块开始: ${language}, 映射路径: ${templatePath}`);
+    return {
+      markdownResult: {
+        type: 'code',
+        language: language,
+        templatePath: templatePath, // 优先使用 code 映射，其次 p 映射，最后 others 映射
+        content: line.trim(),
+        isCodeBlockStart: true
+      },
+      newListItemCounter: currentListItemCounter
+    };
+  }
+  
+  // 🆕 检查代码块结束标记 ```
+  if (line.trim() === '```') {
+    const templatePath = markdownMapping.code || markdownMapping.p || markdownMapping.others;
+    console.log(`🎯 发现代码块结束, 映射路径: ${templatePath}`);
+    return {
+      markdownResult: {
+        type: 'code',
+        templatePath: templatePath, // 优先使用 code 映射，其次 p 映射，最后 others 映射
+        content: line.trim(),
+        isCodeBlockEnd: true
+      },
+      newListItemCounter: currentListItemCounter
     };
   }
   
@@ -832,19 +1099,52 @@ function parseMarkdownToTemplate(line, markdownMapping) {
   const blockquoteMatch = line.match(/^>\s*(.+)$/);
   if (blockquoteMatch && markdownMapping.blockquote) {
     return {
-      type: 'blockquote',
-      templatePath: markdownMapping.blockquote,
-      content: blockquoteMatch[1].trim()
+      markdownResult: {
+        type: 'blockquote',
+        templatePath: markdownMapping.blockquote,
+        content: blockquoteMatch[1].trim()
+      },
+      newListItemCounter: currentListItemCounter
     };
+  }
+  
+  // 🆕 检查表格格式 | 表头 | 表头 |
+  if (line.includes('|') && markdownMapping.table) {
+    const trimmedLine = line.trim();
+    // 检查是否是表格行（包含竖线分隔符）
+    // 匹配标准markdown表格格式：|列1|列2| 或 列1|列2|列3
+    const isTableLine = trimmedLine.match(/^\|.*\|$/) || 
+                       trimmedLine.match(/^[^|]*\|.*\|[^|]*$/) ||
+                       trimmedLine.match(/^[-|\s|:]+$/); // 表格分隔行如 |---|---|
+    
+    if (isTableLine) {
+      console.log(`🎯 发现表格行: ${trimmedLine.substring(0, 50)}...`);
+      return {
+        markdownResult: {
+          type: 'table',
+          templatePath: markdownMapping.table,
+          content: trimmedLine, // 返回原始表格行
+          isTableLine: true
+        },
+        newListItemCounter: currentListItemCounter
+      };
+    }
   }
   
   // 🆕 检查段落格式（非空行且不匹配其他格式）
   if (line.trim() && markdownMapping.p) {
-    return {
-      type: 'p',
-      templatePath: markdownMapping.p,
-      content: line.trim()
-    };
+    // 🔧 修复：清理段落符号
+    const cleanedContent = line.trim().replace(/§PARAGRAPH§/g, '');
+    if (cleanedContent) {
+      return {
+        markdownResult: {
+          type: 'p',
+          templatePath: markdownMapping.p,
+          content: cleanedContent
+        },
+        newListItemCounter: currentListItemCounter
+      };
+    }
   }
   
   // 如果没有匹配到任何 markdown 格式，返回 null
@@ -856,6 +1156,21 @@ function parseMarkdownToTemplate(line, markdownMapping) {
 // 🆕 创建或合并到现有容器的模板元素
 function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, containerMap, children, existingElement = null, markdownData = null) {
   console.log(`创建或合并模板元素，路径: ${templatePath}, 内容: "${content}", 已有元素: ${existingElement ? existingElement.type : 'null'}`);
+  
+  // 🔧 验证 templatePath 参数
+  if (!templatePath || typeof templatePath !== 'string') {
+    console.error(`❌ templatePath 无效: ${templatePath}, 类型: ${typeof templatePath}`);
+    console.error('调用堆栈信息:', new Error().stack);
+    
+    // 如果有已存在的元素，直接添加到children中
+    if (existingElement) {
+      console.log(`🔧 直接添加已存在元素到children: ${existingElement.type}`);
+      children.push(existingElement);
+      return existingElement;
+    }
+    
+    return null;
+  }
   
   // 解析路径（支持嵌套路径如 'content.title'）
   const pathParts = templatePath.split('.');
@@ -956,6 +1271,80 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
     }
     
     return childElement;
+  } else if (pathParts.length === 3) {
+    // 🆕 支持三层嵌套路径，如 'listContainer.list.item1'
+    const level1TagName = pathParts[0]; // listContainer
+    const level2TagName = pathParts[1]; // list
+    const level3TagName = pathParts[2]; // item1
+    
+    console.log(`🏗️ 处理三层嵌套路径: ${level1TagName}.${level2TagName}.${level3TagName}`);
+    
+    // 检查各级配置是否存在
+    const level1Config = cardStyleConfig[level1TagName];
+    if (!level1Config) {
+      console.warn(`警告: 未找到一级模板标签 ${level1TagName} 的配置`);
+      return null;
+    }
+    
+    const level2Config = level1Config[level2TagName];
+    if (!level2Config) {
+      console.warn(`警告: 未找到二级模板标签 ${level1TagName}.${level2TagName} 的配置`);
+      return null;
+    }
+    
+    const level3Config = level2Config[level3TagName];
+    if (!level3Config) {
+      console.warn(`警告: 未找到三级模板标签 ${level1TagName}.${level2TagName}.${level3TagName} 的配置`);
+      return null;
+    }
+    
+    // 创建第三级元素
+    let level3Element;
+    if (existingElement) {
+      level3Element = existingElement;
+    } else {
+      level3Element = createTemplateTagElement(level3TagName, content, level2Config, markdownData);
+      if (!level3Element) {
+        return null;
+      }
+    }
+    
+    // 获取或创建第一级容器
+    let level1Element = containerMap.get(level1TagName);
+    if (!level1Element) {
+      level1Element = createTemplateTagElement(level1TagName, '', cardStyleConfig);
+      if (!level1Element) {
+        return null;
+      }
+      children.push(level1Element);
+      containerMap.set(level1TagName, level1Element);
+      console.log(`创建新的一级容器: ${level1TagName}`);
+    }
+    
+    // 获取或创建第二级容器
+    const level2ContainerKey = `${level1TagName}.${level2TagName}`;
+    let level2Element = containerMap.get(level2ContainerKey);
+    if (!level2Element) {
+      level2Element = createTemplateTagElement(level2TagName, '', level1Config);
+      if (!level2Element) {
+        return null;
+      }
+      
+      // 将第二级容器添加到第一级容器中
+      if (level1Element.layout && level1Element.layout.children) {
+        level1Element.layout.children.push(level2Element);
+      }
+      containerMap.set(level2ContainerKey, level2Element);
+      console.log(`创建新的二级容器: ${level2TagName} 在 ${level1TagName} 中`);
+    }
+    
+    // 将第三级元素添加到第二级容器中
+    if (level2Element.layout && level2Element.layout.children) {
+      level2Element.layout.children.push(level3Element);
+      console.log(`将三级元素 ${level3TagName} 添加到 ${level1TagName}.${level2TagName} 中，当前子元素数量: ${level2Element.layout.children.length}`);
+    }
+    
+    return level3Element;
   } else {
     console.warn(`警告: 不支持的模板路径深度: ${templatePath}`);
     return null;
@@ -1051,6 +1440,63 @@ function extractTemplateTag(lines, startIndex, tagName) {
   };
 }
 
+// 🆕 创建元素容器（用于包装具有样式的元素）
+function createElementContainer(tagName, content, cardStyleConfig, elementInstance, markdownData = null) {
+  const id = generateUUID();
+  const uniqueClassName = `template-${tagName}-${id}`;
+  const tagConfig = cardStyleConfig[tagName] || {};
+  
+  // 创建容器来包装元件实例
+  const containerElement = {
+    dataKeys: [],
+    name: "layout",
+    "name-zh": `模板标签容器-${tagName}`,
+    "file-type": "template",
+    theme: "default",
+    _metadata: {
+      actualType: 'templateTag',
+      tagName: tagName,
+      isTemplateTag: true,
+      isLayout: true,
+      isElementContainer: true,
+      containedElementType: markdownData ? markdownData.type : (tagConfig.metaType || 'unknown'),
+      containedElementVariant: markdownData ? (markdownData.variant || 'default') : (tagConfig.variant || 'default'),
+      tagContent: content
+    },
+    layout: {
+      style: {
+        display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+        layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+        layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
+        primaryAxisSizingMode: "fixed",
+        counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
+        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
+        layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+        boxSizing: "border-box",
+        "border-style": "solid",
+        "border-width": "0",
+        "border-color": "initial",
+        height: "auto",
+        width: tagConfig.metaType === "button" ? "auto" : "100%",
+        "box-sizing": "border-box",
+        position: "relative",
+        ...(tagConfig.style || {}) // 应用标签样式
+      },
+      classStyle: {
+        ...(tagConfig.style || {})
+      },
+      className: uniqueClassName,
+      children: [elementInstance] // 包装元件实例
+    },
+    description: `模板标签容器 - ${tagName}`,
+    id,
+    events: [{}]
+  };
+  
+  return containerElement;
+}
+
 // 创建模板标签元素
 function createTemplateTagElement(tagName, content, cardStyleConfig, markdownData = null) {
   const id = generateUUID();
@@ -1063,7 +1509,50 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
     return null;
   }
 
-  // 检查是否为元件引用
+  // 🆕 优先检查 markdownData 的类型，决定如何渲染元素
+  if (markdownData && markdownData.type) {
+    console.log(`根据 markdownData 类型创建元素: ${markdownData.type}`);
+    
+    let elementInstance = null;
+    if (markdownData.type === 'code') {
+      // 代码块类型，优先创建代码元素
+      const language = markdownData.language || 'plaintext';
+      console.log(`创建代码元素: 语言="${language}", 内容="${content.substring(0, 50)}..."`);
+      elementInstance = createCodeElement(content, language);
+    } else if (markdownData.type === 'table') {
+      // 表格类型
+      console.log(`创建表格元素: 内容="${content.substring(0, 50)}..."`);
+      elementInstance = createTableElement(content);
+    } else if (markdownData.type === 'img') {
+      // 图片类型
+      const imageUrl = markdownData.url || '';
+      console.log(`创建图片元素: URL="${imageUrl}"`);
+      elementInstance = createBackgroundElement(imageUrl, 'normal');
+    } else if (markdownData.type === 'button') {
+      // 按钮类型
+      const buttonText = content;
+      const buttonUrl = markdownData.url || '#';
+      const buttonVariant = markdownData.buttonVariant || 'primary';
+      console.log(`创建按钮元素: 文本="${buttonText}", URL="${buttonUrl}", 变体="${buttonVariant}"`);
+      elementInstance = createButtonElement(buttonText, buttonUrl, buttonVariant);
+    }
+    
+    // 如果成功创建了元素实例，跳过后续的 tagConfig 处理
+    if (elementInstance) {
+      // 如果标签配置中有 style，需要创建容器来包装元件并应用样式
+      if (tagConfig.style) {
+        console.log(`为 markdownData 元素创建样式容器: ${tagName}`);
+        
+        // 创建容器来包装元件实例
+        const containerElement = createElementContainer(tagName, content, cardStyleConfig, elementInstance, markdownData);
+        return containerElement;
+      } else {
+        return elementInstance;
+      }
+    }
+  }
+  
+  // 检查是否为元件引用（回退到原有逻辑）
   if (tagConfig.metaType && tagConfig.variant) {
     console.log(`创建元件引用: ${tagConfig.metaType}.${tagConfig.variant}`);
     
@@ -1072,16 +1561,27 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
     if (tagConfig.metaType === 'text') {
       elementInstance = createTextElement(content, tagConfig.variant);
     } else if (tagConfig.metaType === 'button') {
-      // 🆕 处理button类型，从markdownData中获取URL
+      // 🆕 处理button类型，从markdownData中获取URL和变体信息
       const buttonText = content;
       const buttonUrl = markdownData && markdownData.url ? markdownData.url : '#';
-      console.log(`创建button元件: 文本="${buttonText}", URL="${buttonUrl}", 变体="${tagConfig.variant}"`);
-      elementInstance = createButtonElement(buttonText, buttonUrl, tagConfig.variant);
+      // 🔧 修复：优先使用markdownData中的buttonVariant，回退到tagConfig中的variant
+      const buttonVariant = (markdownData && markdownData.buttonVariant) ? markdownData.buttonVariant : tagConfig.variant;
+      console.log(`创建button元件: 文本="${buttonText}", URL="${buttonUrl}", 变体="${buttonVariant}"`);
+      elementInstance = createButtonElement(buttonText, buttonUrl, buttonVariant);
     } else if (tagConfig.metaType === 'image') {
       // 🆕 处理image类型，从markdownData中获取URL
       const imageUrl = markdownData && markdownData.url ? markdownData.url : '';
       console.log(`创建image元件: URL="${imageUrl}", 变体="${tagConfig.variant}"`);
       elementInstance = createBackgroundElement(imageUrl, tagConfig.variant);
+    } else if (tagConfig.metaType === 'table') {
+      // 🆕 处理table类型，直接创建表格元素（不需要variant）
+      console.log(`创建table元件: 内容="${content.substring(0, 50)}..."`);
+      elementInstance = createTableElement(content);
+    } else if (tagConfig.metaType === 'code') {
+      // 🆕 处理code类型，创建代码元素
+      const language = markdownData && markdownData.language ? markdownData.language : 'plaintext';
+      console.log(`创建code元件: 语言="${language}", 内容="${content.substring(0, 50)}..."`);
+      elementInstance = createCodeElement(content, language);
     }
     // 可以在这里添加其他元件类型的支持
     
@@ -1127,8 +1627,6 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             height: "auto",
             width: "100%",
             "box-sizing": "border-box",
-            "back-width": "100%",
-            "back-height": "auto",
             position: "relative",
             ...(tagConfig.style || {}) // 应用标签样式
           },
@@ -4124,10 +4622,14 @@ function parseMarkdown(markdown, options = {}) {
 
     // 普通文本行
     if (trimmedLine !== '') {
-      if (currentTextBlock) {
-        currentTextBlock += '\n' + trimmedLine;
-      } else {
-        currentTextBlock = trimmedLine;
+      // 🔧 修复：清理段落符号
+      const cleanedLine = trimmedLine.replace(/§PARAGRAPH§/g, '');
+      if (cleanedLine) {
+        if (currentTextBlock) {
+          currentTextBlock += '\n' + cleanedLine;
+        } else {
+          currentTextBlock = cleanedLine;
+        }
       }
     }
   }
