@@ -2367,6 +2367,8 @@ function createIconElement(iconName, variant = 'medium') {
         }
       }
     },
+    type: "icon_line",
+    state: "default",
     events: [{}]
   };
   
