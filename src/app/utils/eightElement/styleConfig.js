@@ -1917,16 +1917,13 @@ export const DEFAULT_STYLE_CONFIG = {
           gap: "{dimension.gap.base}",
         },
         title: {
-          style: {
-            flex: '1',
-          },
           metaType: 'text',
           variant: 'productCardTitle',
         },
         price: {
-          style: {
-            textAlign: 'right',
-          },
+          // style: {
+          //   textAlign: 'right',
+          // },
           metaType: 'text',
           variant: 'productCardPrice',
         }

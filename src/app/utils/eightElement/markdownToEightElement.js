@@ -255,7 +255,7 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
         style: {
           // layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
-          "word-break": "break-all",
+          // "word-break": "break-all",
           width: elementWidth, // 设置宽度
           textColor: {
             element: "color",
@@ -294,7 +294,7 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}) {
           layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
           "text-decoration": "underline",
-          "word-break": "break-all",
+          // "word-break": "break-all",
           width: elementWidth, // 设置宽度
           textColor: {
             element: "color",
