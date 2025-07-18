@@ -4212,7 +4212,9 @@ function parseMarkdown(markdown, options = {}) {
 
           if (variant === 'row') {
             direction = LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL;
-            alignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
+            // changed center to stretch
+            // alignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
+            alignItems = 'stretch';
             counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER;
           } else if (variant === 'column') {
             direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL;
