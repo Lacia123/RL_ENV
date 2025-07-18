@@ -2330,7 +2330,7 @@ export const DEFAULT_STYLE_CONFIG = {
           '&::after': {
             content: "''",
             position: 'absolute',
-            bottom: "{dimension.padding.base}",
+            top: "{dimension.padding.base}",
             right: "{dimension.padding.base}",
             width: '6px',
             height: '6px',
@@ -2338,11 +2338,11 @@ export const DEFAULT_STYLE_CONFIG = {
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
           },
-          '& > *:first-child::before': {
+          '& > *:last-child::before': {
             content: "''",
             position: 'absolute',
-            top: `calc(-{dimension.padding.base})`, // 相对于content容器的位置
-            right: `calc(-{dimension.padding.base})`, // 相对于content容器的位置
+            bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
+            right: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
             width: '6px',
             height: '6px',
             borderRadius: '50%',
@@ -2457,7 +2457,7 @@ export const DEFAULT_STYLE_CONFIG = {
                        radial-gradient(circle at 75% 75%, {color.secondarycontainer.violet2} 0%, transparent 50%)`,
           opacity: '0.4',
           borderRadius: "{dimension.borderradius.xxxl}",
-        }
+        },
       },
       title: {
         style: {
@@ -2525,7 +2525,7 @@ export const DEFAULT_STYLE_CONFIG = {
           '&::after': {
             content: "''",
             position: 'absolute',
-            bottom: "{dimension.padding.base}",
+            top: "{dimension.padding.base}",
             right: "{dimension.padding.base}",
             width: '6px',
             height: '6px',
@@ -2533,10 +2533,10 @@ export const DEFAULT_STYLE_CONFIG = {
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
           },
-          '& > *:first-child::before': {
+          '& > *:last-child::before': {
             content: "''",
             position: 'absolute',
-            top: `calc(-{dimension.padding.extraloose})`, // 相对于content容器的位置
+            bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
             right: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
             width: '6px',
             height: '6px',
@@ -2738,7 +2738,7 @@ export const DEFAULT_STYLE_CONFIG = {
           '&::after': {
             content: "''",
             position: 'absolute',
-            bottom: "{dimension.padding.base}",
+            top: "{dimension.padding.base}",
             right: "{dimension.padding.base}",
             width: '6px',
             height: '6px',
@@ -2746,10 +2746,10 @@ export const DEFAULT_STYLE_CONFIG = {
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
           },
-          '& > *:first-child::before': {
+          '& > *:last-child::before': {
             content: "''",
             position: 'absolute',
-            top: `calc(-{dimension.padding.extraloose})`, // 相对于content容器的位置
+            bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
             right: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
             width: '6px',
             height: '6px',

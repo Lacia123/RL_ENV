@@ -20,176 +20,6 @@ import collectEightElementMeasurements from '../utils/eightElement/collectElemen
 // - 数学公式 $inline$ 和 $$block$$
 // - 表格、代码块、引用等标准 markdown 语法
 const MARKDOWN_TEMPLATES = {
-
-  errorSeries: {
-    name: '🚨 错误卡片系列',
-    description: '有问题的卡片',
-    markdown: `
-    # 优雅青蓝卡片系列展示
-
-## 设计特点
-优雅青蓝卡片系列采用渐变背景、精致装饰和层次化设计，提供三种专业的内容展示方式。
-<layout:row>
-<card:techGradientStandard>
-## 标准布局卡片
-### 设计理念
-优雅青蓝标准布局采用渐变背景和装饰性元素，营造出高端、专业的视觉效果。适用于重要内容展示、产品介绍等场景。
-
-**主要特色：**
-- 🎨 渐变背景：多层次青蓝色渐变
-- ✨ 装饰元素：对称的装饰线条和圆点
-- 📱 响应式设计：适配各种屏幕尺寸
-- 🔍 层次清晰：标题和内容区域明确分离
-
-![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
-
-这种设计风格特别适合商务场景、品牌展示和高端产品介绍。
-[了解更多](https://example.com/elegant)
-[secondary][了解更多](https://example.com/elegant)
-</card:techGradientStandard>
-
-<card:techGradientHeaderActions>
-## 列表布局卡片
-[了解更多](https://example.com/elegant)
-[secondary][了解更多](https://example.com/elegant)
-### 核心功能
-专为列表内容优化的布局，每个列表项都有独特的视觉样式和左侧装饰线。
-
-- ✅ 模块化设计架构
-- ✅ 智能内容自适应
-- ✅ 多层级信息展示  
-- ✅ 统一视觉语言
-- ✅ 无障碍访问支持
-
-完美适配功能介绍、特性列表、优势展示等内容组织方式。
-
-</card:techGradientHeaderActions>
-
-</layout:row>
-
-<layout:row>
-
-<card:techGradientGallery>
-## 表格布局卡片
-### 数据展示
-![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
-![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
-![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
-
-专业的表格数据展示布局，保持优雅青蓝风格的同时确保数据的清晰可读。
-
-| 功能模块 | 完成度 | 优先级 |
-|---------|--------|--------|
-| 卡片系统 | 100% | 高 |
-| 布局引擎 | 95% | 高 |
-| 主题配置 | 88% | 中 |
-| 动画效果 | 75% | 中 |
-| 响应式设计 | 92% | 高 |
-
-这种布局特别适合数据报告、功能对比、进度跟踪等需要表格化展示的内容。
-</card:techGradientGallery>
-
-<card:elegantStandard>
-## 混合内容展示
-### 综合应用
-优雅青蓝标准布局支持各种内容类型的混合展示，包括文本、图片、按钮、代码等。
-
-**代码示例：**
-\`\`\`javascript
-const a = 1;
-\`\`\`
-
-> "优雅的设计不是添加更多，而是去除不必要的元素，直到每个细节都有其存在的理由。" —— 设计哲学
-
-[查看源码](https://github.com/example/elegant-cards)
-[设计指南](https://example.com/design-guide)
-</card:elegantStandard>
-
-</layout:row>
-
-
-<card:highlight>
-## 高亮突出风格
-### Highlight & Emphasis
-强烈的品牌色对比，让重要信息快速抓住用户注意力
-
-\`\`\`css
-.highlight-card {
-  background: linear-gradient(brand-color);
-  color: white;
-  border-radius: 12px;
-}
-\`\`\`
-
-适用于重要通知、促销活动、核心功能介绍等需要强调的内容
-</card:highlight>
-
-[查看源码](https://github.com/example/elegant-cards)
-
-## 使用指南
-
-### 基本语法
-\`\`\`markdown
-<card:elegantStandard>
-## 卡片标题
-### 子标题
-内容段落支持 **粗体** 和 *斜体* 格式
-![图片](url)
-[按钮链接](url)
-</card:elegantStandard>
-\`\`\`
-
-### 列表卡片语法
-\`\`\`markdown
-<card:elegantList>
-## 列表标题
-### 子标题
-- 列表项1
-- 列表项2
-- 列表项3
-总结段落
-</card:elegantList>
-\`\`\`
-
-### 表格卡片语法
-\`\`\`markdown
-<card:elegantTable>
-## 表格标题
-### 子标题
-| 列1 | 列2 | 列3 |
-|-----|-----|-----|
-| 数据1 | 数据2 | 数据3 |
-说明文字
-</card:elegantTable>
-\`\`\`
-
-
-
-
-## 应用场景
-
-<layout:row>
-**商务展示**
-企业介绍、产品发布、品牌宣传
-
-**数据报告**  
-业务指标、项目进度、统计分析
-
-**功能说明**
-产品特性、服务介绍、使用教程
-</layout:row>
-
-### 设计原则
-
-1. **视觉层次**：通过颜色、大小、间距建立清晰的信息层级
-2. **一致性**：所有卡片保持统一的设计语言和视觉风格  
-3. **可读性**：确保在各种背景和设备上都有良好的可读性
-4. **互动性**：合理使用阴影、渐变等效果提升用户体验
-
-优雅青蓝卡片系列为您的内容提供专业、精致的展示方式。
-     `
-  },
-
   elegantCardSeries: {
     name: '🌟 优雅卡片系列',
     description: '展示新增的优雅青蓝风格卡片系列：标准、列表、表格三种布局',
@@ -348,6 +178,157 @@ const a = 1;
 4. **互动性**：合理使用阴影、渐变等效果提升用户体验
 
 优雅青蓝卡片系列为您的内容提供专业、精致的展示方式。`
+  },
+
+  techGradientSeries: {
+    name: '🚀 科技渐变系列',
+    description: '展示科技渐变风格：标准布局和头部动作两种设计',
+    markdown: `# 科技渐变系列展示
+
+## 现代科技美学
+科技渐变系列采用现代科技美学设计理念，通过渐变色彩和未来感元素，营造出前沿科技的视觉体验。
+
+<layout:row>
+<card:techGradientStandard>
+## 科技渐变标准
+### 技术创新平台
+科技渐变标准布局专为现代技术产品和创新平台设计，融合了未来感的渐变色彩与简洁的信息架构。
+
+**核心特性：**
+- 🌈 动态渐变：多层次科技色彩过渡
+- 💎 玻璃拟态：现代UI设计趋势
+- ⚡ 高性能：优化的渲染和交互
+- 🔮 未来感：前沿的视觉设计语言
+
+![科技产品](https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=600&h=200)
+
+### 应用场景
+- 科技产品展示
+- 创新项目介绍  
+- 数字化解决方案
+- 前沿技术说明
+
+**技术栈展示：**
+\`\`\`typescript
+interface TechStack {
+  frontend: 'React' | 'Vue' | 'Angular';
+  backend: 'Node.js' | 'Python' | 'Go';
+  database: 'PostgreSQL' | 'MongoDB';
+  cloud: 'AWS' | 'Azure' | 'GCP';
+}
+\`\`\`
+
+> "技术的发展永不停歇，我们的创新也永不止步。"
+
+[开始体验](https://example.com/demo)
+[secondary][技术文档](https://docs.example.com)
+</card:techGradientStandard>
+
+<card:techGradientHeaderActions>
+## AI智能平台
+[立即试用](https://example.com/try)
+[secondary][了解更多](https://example.com/learn)
+
+### 人工智能解决方案
+我们的AI智能平台集成了最新的机器学习算法和深度学习技术，为企业提供智能化的数据分析和决策支持。
+
+**平台优势：**
+- 🤖 智能算法：先进的AI模型和算法
+- 📊 数据洞察：深度数据分析和可视化
+- 🔄 自动化：智能流程自动化
+- 🛡️ 安全可靠：企业级安全保障
+
+![AI技术](https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=200)
+
+### 服务模块
+- 智能客服机器人
+- 预测性分析引擎
+- 自然语言处理
+- 计算机视觉解决方案
+- 推荐系统算法
+
+平台采用云原生架构，支持弹性扩展和高可用部署，满足不同规模企业的需求。
+</card:techGradientHeaderActions>
+</layout:row>
+
+<layout:row>
+<card:techGradientStandard>
+## 区块链生态
+### 去中心化金融平台
+基于区块链技术的去中心化金融平台，提供安全、透明、高效的数字资产管理服务。
+
+**技术特点：**
+- ⛓️ 区块链技术：安全可信的分布式账本
+- 💰 DeFi协议：去中心化金融协议
+- 🔒 智能合约：自动化执行的数字协议
+- 🌐 跨链互操作：多链生态支持
+
+| 功能模块 | 状态 | 版本 |
+|----------|------|------|
+| 数字钱包 | ✅ 已上线 | v2.1 |
+| 交易所 | ✅ 已上线 | v1.8 |
+| 借贷协议 | 🚧 开发中 | v1.0 |
+| 流动性挖矿 | 📋 规划中 | v1.0 |
+
+\`\`\`solidity
+contract DeFiProtocol {
+    mapping(address => uint256) public balances;
+    
+    function deposit() public payable {
+        balances[msg.sender] += msg.value;
+    }
+}
+\`\`\`
+
+> "区块链技术正在重新定义价值交换的方式。"
+
+[连接钱包](https://example.com/wallet)
+[secondary][白皮书](https://example.com/whitepaper)
+</card:techGradientStandard>
+
+<card:techGradientHeaderActions>
+## 云计算服务
+[免费试用](https://example.com/free-trial)
+[secondary][价格方案](https://example.com/pricing)
+
+### 弹性云基础设施
+提供灵活、可扩展的云计算基础设施服务，帮助企业快速构建和部署应用程序。
+
+**服务优势：**
+- ☁️ 弹性计算：按需扩展的计算资源
+- 💾 数据存储：安全可靠的云端存储
+- 🌍 全球部署：覆盖全球的数据中心
+- 📈 自动扩缩：智能资源调度
+
+![云计算](https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&h=200)
+
+### 核心服务
+- 弹性计算实例 (ECS)
+- 对象存储服务 (OSS)
+- 关系型数据库 (RDS)
+- 容器服务 (Kubernetes)
+- 负载均衡 (ALB)
+
+我们的云平台支持多种编程语言和开发框架，提供完整的DevOps工具链，助力企业数字化转型。
+</card:techGradientHeaderActions>
+</layout:row>
+
+## 设计理念
+
+### 科技美学
+科技渐变系列追求现代科技美学，通过渐变色彩营造未来感，适用于科技产品、创新项目、数字化服务等场景。
+
+### 信息架构
+- **标准布局**：适合内容丰富的展示场景，支持多媒体内容
+- **头部动作**：突出核心操作，快速引导用户行动
+
+### 应用场景
+1. **科技产品**：软件、硬件、平台展示
+2. **创新项目**：研发成果、技术方案介绍
+3. **数字服务**：云计算、AI、区块链等服务
+4. **企业宣传**：技术实力、创新能力展示
+
+科技渐变系列为您的科技产品和创新项目提供专业的视觉呈现。`
   },
 
   landing: {
@@ -602,11 +583,12 @@ RESTful API，快速集成现有系统
 **📍 地址**: 北京市朝阳区科技园
 </layout:row>`
   },
-// <layout:root backgroundImage="url(https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)">
+  // <layout:root backgroundImage="url(https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)">
   article: {
     name: '📖 技术文档',
     description: '原始的技术文档风格，包含各种元素类型',
     markdown: `
+<layout:root backgroundImage="url(https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)">
 # 八要素测试文档
 
 ## 基本元素
@@ -760,66 +742,56 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 8. **高斯率（Integral Form）**  
    - 电场的环流量等于包围的净电荷量：  
      $$ \\oint \\mathbf{E} \\cdot d\\mathbf{l} = 4\\pi k_e Q_{enc} $$
+</layout:root>
 `
   },
   jd: {
     name: '🧑‍💼招聘',
     description: '招聘页面风格',
     markdown: `
-    <card:neomorphism>
-# 算法工程师招聘JD
-### 加入我们的算法团队
-</card:neomorphism>
+    <card:techGradientHeaderActions>
+## 算法工程师招聘JD
+[secondary][联系我们](https://example.com/elegant)
+[在线申请](https://example.com/elegant)
+</card:techGradientHeaderActions>
 <layout:row>
-[在线申请](https://example.com/apply)
-[了解更多](https://example.com/about)
-[联系我们](https://example.com/contact)
-</layout:row>
-<layout:row>
-<card:techGradient>
+<card:elegantTable>
 ## 职位详情
-### 算法工程师
-**薪资范围**：200K - 300K CNY  
-**工作地点**：北京/上海/深圳（可选）  
-**招聘人数**：5人  
-**工作类型**：全职
-</card:techGradient>
-<card:techGradient>
+| 条目 | 详情 | 
+|---------|--------|
+| **薪资范围** | 200K - 300K  |
+| **工作地点** | 北京 | 
+| **招聘人数** | 5人 | 
+| **工作类型** | 全职 |
+更多岗位可以关注公司招聘官方链接。
+</card:elegantTable>
+<card:elegantList>
 ## 公司简介
-### 创新科技公司
-我们是一家专注于人工智能和大数据领域的创新科技公司，致力于为企业提供最先进的数字化解决方案，助力业务增长和数字化转型。我们拥有一支充满活力和创新精神的技术团队，平均从业经验8年以上。我们拥有一支充满活力和创新精神的技术团队，平均从业经验8年以上。我们拥有一支充满活力和创新精神的技术团队，平均从业经验8年以上。
-</card:techGradient>
-</layout:row>
-## 职位描述
-### 岗位职责
-1. 设计和实现高效的算法解决方案，解决实际业务问题  
-2. 参与前沿技术研究，包括但不限于机器学习、深度学习、自然语言处理等领域  
-3. 优化现有算法模型，提升系统性能和用户体验  
-4. 撰写技术文档，分享研究成果，参与技术交流
-### 任职要求
-**必备技能**：  
-- 计算机科学、数学或相关专业本科及以上学历  
-- 熟悉Python/C++/Java等至少一种编程语言  
-- 扎实的数据结构和算法基础，熟悉常见的算法优化技巧  
-- 具有良好的数学分析能力和逻辑思维能力  
-**加分项**：  
-- 有机器学习、深度学习、自然语言处理等领域的实践经验  
-- 熟悉分布式系统、大数据处理或高性能计算  
-- 有顶会论文发表或开源项目贡献  
-- 具备良好的团队协作能力和沟通能力
-## 公司福利
-### 我们提供
-- **薪资待遇**：行业内有竞争力的薪资，优秀者薪资不设上限  
-- **职业发展**：完善的晋升体系，支持个人成长和职业发展  
-- **工作环境**：开放自由的工作氛围，舒适的工作空间  
-- **团队活动**：丰富的团队建设活动和节日福利
+- ✅ 我们是一家专注于人工智能和大数据领域的创新科技公司
+- ✅ 我们拥有一支充满活力和创新精神的技术团队
+- ✅ 我们拥有一支充满活力和创新精神的技术团队 
+- ✅ 我们拥有一支充满活力和创新精神的技术团队
+致力于提供最先进的数字化解决方案。
+</card:elegantList>
+<card:elegantStandard>
+## 公司简介
+### 关于企业
+我们是一家专注于人工智能和大数据领域的创新科技公司。
+![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
+**关于团队**
+我们拥有一支充满活力和创新精神的技术团队。我们拥有一支充满活力和创新精神的技术团队。
 
-<card:elegant>
+</card:elegantStandard>
+</layout:row>
+
+<card:neomorphismStandard>
 ### 加入我们
 成为我们团队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长，共同打造行业领先的解决方案。如果你对算法充满热情，渴望挑战，欢迎加入我们！
 ### 应聘方式
-[在线申请](https://example.com/apply) [了解更多](https://example.com/about) [联系我们](https://example.com/contact)
-</card:elegant>
+[官网在线申请](https://example.com/apply)
+[公众号后台申请](https://example.com/about)
+[发送邮件申请](https://example.com/contact)
+</card:neomorphismStandard>
     `
   }
 };
