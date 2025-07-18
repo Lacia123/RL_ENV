@@ -4062,6 +4062,11 @@ function parseMarkdown(markdown, options = {}) {
     const { line, isTable, tableContent, isTableStart } = markedLines[i];
     const trimmedLine = line.trim();
 
+    // 🔧 修复：跳过完全空白的行
+    if (!trimmedLine) {
+      continue;
+    }
+
     // 检查是否为段落分隔符
     if (trimmedLine === '§PARAGRAPH§') {
       // 处理之前累积的内容
@@ -4368,8 +4373,21 @@ function parseMarkdown(markdown, options = {}) {
           h1Blocks.push(currentH1Block);
         }
 
+        // 🔧 修复：在创建新标题块之前，保存根级别的现有元素
+        const rootElements = stack[0].elements; // 获取根级别的元素
+        console.log(`🔍 一级标题处理前，根级别有 ${rootElements.length} 个元素`);
+        
         // 创建新的一级标题布局
         const newHeadingLayout = createHeadingLayout(content, [], level);
+
+        // 🔧 修复：将根级别的现有元素添加到新标题块的开头
+        if (rootElements.length > 0) {
+          console.log(`🔧 将 ${rootElements.length} 个根级别元素添加到新标题块`);
+          // 将根级别元素添加到标题块的children数组开头
+          newHeadingLayout.layout.children.unshift(...rootElements);
+          // 清空根级别元素，避免重复
+          rootElements.length = 0;
+        }
 
         // 创建新的一级标题块
         currentH1Block = newHeadingLayout;
@@ -4517,16 +4535,43 @@ function parseMarkdown(markdown, options = {}) {
     }
 
     // 整行是图片 ![alt](url)
-    if (trimmedLine.match(/^!\[.*?\]\(.*?\)$/) && !trimmedLine.match(/^!\[.*?\]\(.*?\).*?\[.*?\]\(.*?\)/)) {
-      flushTextBlock();
-      flushConsecutiveButtons();
+    // 🔧 修复：改进图片检测逻辑，增加调试信息
+    const isImageLine = trimmedLine.match(/^!\[.*?\]\(.*?\)$/);
+    const hasMultipleLinks = trimmedLine.match(/^!\[.*?\]\(.*?\).*?\[.*?\]\(.*?\)/);
+    
+    // 🔧 只在真正检测到图片时输出关键调试信息
+    if (trimmedLine.includes('![') && trimmedLine.includes('](')) {
+      console.log(`🔍 检测到可能的图片行 ${i}: "${trimmedLine.substring(0, 50)}..."`);
+    }
+    
+    // 🔧 修复：更宽松的图片检测逻辑
+    if (trimmedLine.includes('![') && trimmedLine.includes('](') && trimmedLine.includes(')')) {
+      const basicImagePattern = /!\[([^\]]*)\]\(([^)]+)\)/;
+      const imgMatch = trimmedLine.match(basicImagePattern);
+      
+      if (imgMatch && !hasMultipleLinks) {
+        flushTextBlock();
+        flushConsecutiveButtons();
 
-      const imgUrl = trimmedLine.match(/\((.*?)\)/)[1];
+        // 🔧 修复：提取图片信息并创建完整的图片元素
+        const imgAlt = imgMatch[1].trim();
+        const imgUrl = imgMatch[2].trim();
+        
+        console.log(`🖼️ 成功创建独立图片元素: alt="${imgAlt}", url="${imgUrl}"`);
+        
+        // 创建带有完整信息的背景元素
+        const backgroundElement = createBackgroundElement(imgUrl, 'normal');
+        
+        // 🆕 添加图片的alt信息到元数据中
+        if (backgroundElement._metadata) {
+          backgroundElement._metadata.alt = imgAlt;
+        }
+        
+        stack[stack.length - 1].elements.push(backgroundElement);
+        console.log(`✅ 图片元素已添加到栈中`);
 
-      const backgroundElement = createBackgroundElement(imgUrl);
-      stack[stack.length - 1].elements.push(backgroundElement);
-
-      continue;
+        continue;
+      }
     }
 
     // 检查是否有多个链接或混合内容
@@ -4947,7 +4992,14 @@ function parseMarkdown(markdown, options = {}) {
       } else if (type === 'image') {
         const imgAlt = match[1];
         const imgUrl = match[2];
-        const backgroundElement = createBackgroundElement(imgUrl);
+        console.log(`🖼️ 处理混合内容中的图片: alt="${imgAlt}", url="${imgUrl}"`);
+        const backgroundElement = createBackgroundElement(imgUrl, 'normal');
+        
+        // 🆕 添加图片的alt信息到元数据中
+        if (backgroundElement._metadata) {
+          backgroundElement._metadata.alt = imgAlt;
+        }
+        
         currentLayout.layout.children.push(backgroundElement);
       }
 

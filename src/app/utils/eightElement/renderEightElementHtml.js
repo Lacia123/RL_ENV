@@ -1191,14 +1191,32 @@ function renderImageElement(element) {
     const className = element.layout && element.layout.className ? element.layout.className : '';
     const classAttr = className ? `class="${className}"` : '';
 
-    // 获取图片URL
+    // 获取图片URL，支持多种属性来源
     let imageUrl = element.imageUrl || '';
+    
+    // 🔧 修复：从多个可能的位置获取图片URL
+    if (!imageUrl && element.material && element.material.image && element.material.image.default) {
+        imageUrl = element.material.image.default.resource || '';
+    }
+    
+    // 🔧 修复：从src属性获取图片URL
+    if (!imageUrl && element.src) {
+        imageUrl = element.src;
+    }
+    
+    // 🆕 获取alt文本，支持多种来源
+    let altText = 'Element Image';
+    if (element._metadata && element._metadata.alt) {
+        altText = element._metadata.alt;
+    }
+
+    console.log(`🖼️ 渲染图片元素: URL="${imageUrl}", Alt="${altText}"`);
 
     if (imageUrl) {
         // 添加图片标签
         return `
       <div id="${element.id || ''}" ${classAttr} data-element-type="image" ${styleAttr}>
-        <img src="${imageUrl}" alt="Element Image" style="width:100%;height:100%;object-fit:cover;">
+        <img src="${imageUrl}" alt="${altText}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
       </div>
     `;
     } else {
