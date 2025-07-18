@@ -2434,6 +2434,11 @@ export const DEFAULT_STYLE_CONFIG = {
         'li:3': 'listContainer.list.item3',
         'li:4': 'listContainer.list.item4',
         'li:5': 'listContainer.list.item5',
+        'li:6': 'listContainer.list.item6',
+        'li:7': 'listContainer.list.item7',
+        'li:8': 'listContainer.list.item8',
+        'li:9': 'listContainer.list.item9',
+        'li:10': 'listContainer.list.item10',
         p: 'summary.text'
       },
       style: {
@@ -2502,6 +2507,7 @@ export const DEFAULT_STYLE_CONFIG = {
         type: 'template',
         style: {
           display: 'flex',
+          flex: 1,
           flexDirection: 'column',
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
@@ -2567,6 +2573,7 @@ export const DEFAULT_STYLE_CONFIG = {
           type: 'template',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: "{dimension.gap.tight}",
             marginTop: "{dimension.margin.base}",
@@ -2613,6 +2620,56 @@ export const DEFAULT_STYLE_CONFIG = {
             }
           },
           item5: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item6: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item7: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item8: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item9: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item10: {
             metaType: 'text',
             variant: 'elegantCardSegment',
             style: {
@@ -2715,6 +2772,7 @@ export const DEFAULT_STYLE_CONFIG = {
         type: 'template',
         style: {
           display: 'flex',
+          flex: 1,
           flexDirection: 'column',
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
@@ -2780,6 +2838,7 @@ export const DEFAULT_STYLE_CONFIG = {
           metaType: 'table',
           style: {
             marginTop: "{dimension.margin.base}",
+            flex: 1,
             position: 'relative',
           }
         }
