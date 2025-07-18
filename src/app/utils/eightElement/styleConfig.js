@@ -2062,7 +2062,7 @@ export const DEFAULT_STYLE_CONFIG = {
           backdropFilter: 'blur(10px)',
           boxShadow: `{material.hierarchy.2f}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.white48}`,
-          
+
         },
         title: {
           metaType: 'text',
@@ -2341,26 +2341,24 @@ export const DEFAULT_STYLE_CONFIG = {
           '& > *:first-child::before': {
             content: "''",
             position: 'absolute',
-            top: "-{dimension.padding.base}",
-            right: "-{dimension.padding.base}",
+            top: `calc(-{dimension.padding.base})`, // 相对于content容器的位置
+            right: `calc(-{dimension.padding.base})`, // 相对于content容器的位置
             width: '6px',
             height: '6px',
             borderRadius: '50%',
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
-            zIndex: 10,
           },
           '& > *:last-child::after': {
             content: "''",
             position: 'absolute',
-            bottom: "-{dimension.padding.base}",
-            left: "-{dimension.padding.base}",
+            bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
+            left: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
             width: '6px',
             height: '6px',
             borderRadius: '50%',
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
-            zIndex: 10,
           },
         },
         title: {
@@ -2538,26 +2536,24 @@ export const DEFAULT_STYLE_CONFIG = {
           '& > *:first-child::before': {
             content: "''",
             position: 'absolute',
-            top: "-{dimension.padding.base}",
-            right: "-{dimension.padding.base}",
+            top: `calc(-{dimension.padding.extraloose})`, // 相对于content容器的位置
+            right: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
             width: '6px',
             height: '6px',
             borderRadius: '50%',
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
-            zIndex: 10,
           },
           '& > *:last-child::after': {
             content: "''",
             position: 'absolute',
-            bottom: "-{dimension.padding.base}",
-            left: "-{dimension.padding.base}",
+            bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
+            left: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
             width: '6px',
             height: '6px',
             borderRadius: '50%',
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
-            zIndex: 10,
           },
         },
         listTitle: {
@@ -2753,26 +2749,24 @@ export const DEFAULT_STYLE_CONFIG = {
           '& > *:first-child::before': {
             content: "''",
             position: 'absolute',
-            top: "calc(-({dimension.padding.base} - 6px))",
-            right: "-{dimension.padding.base}",
+            top: `calc(-{dimension.padding.extraloose})`, // 相对于content容器的位置
+            right: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
             width: '6px',
             height: '6px',
             borderRadius: '50%',
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
-            zIndex: 10,
           },
           '& > *:last-child::after': {
             content: "''",
             position: 'absolute',
-            bottom: "-{dimension.padding.base}",
-            left: "-{dimension.padding.base}",
+            bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
+            left: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
             width: '6px',
             height: '6px',
             borderRadius: '50%',
             background: `linear-gradient(135deg, {color.secondary.violet4} 0%, {color.secondary.violet6} 100%)`,
             boxShadow: `{material.hierarchy.main}`,
-            zIndex: 10,
           },
         },
         tableTitle: {
