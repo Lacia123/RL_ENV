@@ -2090,6 +2090,7 @@ export const DEFAULT_STYLE_CONFIG = {
         type: 'template',
         style: {
           display: 'flex',
+          flex: 1,
           flexDirection: 'column',
           width: '100%',
           marginTop: "{dimension.margin.base}",
