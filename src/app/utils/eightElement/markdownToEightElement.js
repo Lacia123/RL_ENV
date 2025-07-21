@@ -1472,7 +1472,7 @@ function createElementContainer(tagName, content, cardStyleConfig, elementInstan
         counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
         primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
         counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
-        layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+        // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         boxSizing: "border-box",
         "border-style": "solid",
         "border-width": "0",
@@ -1619,7 +1619,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
             primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
             counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
-            layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+            // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
             boxSizing: "border-box",
             "border-style": "solid",
             "border-width": "0",
@@ -1684,7 +1684,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
         counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
         primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
         counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
-        layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+        // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         boxSizing: "border-box",
         "border-style": "solid",
         "border-width": "0",
@@ -2454,12 +2454,12 @@ function createButtonElement(text, url, variant = 'primary') {
           "data-key": "",
           style: {
             text: {
-              value: buttonStyleConfig.fontColor || COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
+              value: buttonStyleConfig.color || COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
               type: "color",
               key: "color-text"
             }
           },
-          resource: buttonStyleConfig.fontColor || COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100]
+          resource: buttonStyleConfig.color || COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100]
         }
       },
       border: {
@@ -3337,7 +3337,7 @@ function createHeadingBlockContainer(headingLayout) {
         primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN, // 将主轴对齐改为左对齐
         counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN, // 将交叉轴对齐改为左对齐
         "align-self": "flex-start", // 确保自身左对齐
-        layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+        // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         boxSizing: "border-box",
         "border-style": "solid",
         "border-width": "0",

@@ -2320,6 +2320,7 @@ export const DEFAULT_STYLE_CONFIG = {
         style: {
           display: 'flex',
           flexDirection: 'column',
+          justifyContent: 'space-between',
           width: '100%',
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
@@ -2328,6 +2329,7 @@ export const DEFAULT_STYLE_CONFIG = {
           boxShadow: `{material.hierarchy.B1}, {material.hierarchy.main}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
           position: 'relative',
+          flex:1,          
           '&::before': {
             content: "''",
             position: 'absolute',
