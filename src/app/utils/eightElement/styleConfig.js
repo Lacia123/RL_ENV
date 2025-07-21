@@ -502,6 +502,17 @@ export const DEFAULT_STYLE_CONFIG = {
       gridTemplateColumns: 'none',
       gridTemplateAreas: 'none',
       justifyItems: 'stretch'
+    },
+    bgColumn: {
+      padding: `${DIMENSION_CONSTANTS.PADDING.base}`,
+      borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.large,
+      display: 'flex',
+      flexDirection: 'column',
+      flexWrap: 'nowrap',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      backgroundColor: "{color.primary.brand5}",
     }
   },
 
@@ -2440,6 +2451,11 @@ export const DEFAULT_STYLE_CONFIG = {
         'li:8': 'listContainer.list.item8',
         'li:9': 'listContainer.list.item9',
         'li:10': 'listContainer.list.item10',
+        'li:11': 'listContainer.list.item11',
+        'li:12': 'listContainer.list.item12',
+        'li:13': 'listContainer.list.item13',
+        'li:14': 'listContainer.list.item14',
+        'li:15': 'listContainer.list.item15',
         p: 'summary.text'
       },
       style: {
@@ -2679,7 +2695,57 @@ export const DEFAULT_STYLE_CONFIG = {
               borderRadius: "{dimension.borderradius.medium}",
               borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
             }
-          }
+          },
+          item11: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item12: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item13: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item14: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
+          item15: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
+            }
+          },
         }
       },
       summary: {
