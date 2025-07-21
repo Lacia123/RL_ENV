@@ -512,7 +512,7 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyContent: 'flex-start',
       alignItems: 'flex-start',
       gap: DIMENSION_CONSTANTS.GAP.base,
-      backgroundColor: "{color.primary.brand5}",
+      backgroundColor: "{color.primary.brand3}",
     }
   },
 

@@ -363,16 +363,10 @@ export function calculateLevelChange(baseValue, delta, levels, tokenType, defaul
   const baseLevelName = parseBaseValueLevel(baseValue, tokenType, defaultLevel);
   let baseIndex = levels.indexOf(baseLevelName);
 
-  console.log(`     🔍 calculateLevelChange调试:`);
-  console.log(`       原始基准值: "${baseValue}"`);
-  console.log(`       解析后级别名: "${baseLevelName}"`);
-  console.log(`       在级别数组中的索引: ${baseIndex}`);
-
   // 如果找不到基准级别，使用默认级别
   if (baseIndex === -1) {
     const defaultIndex = levels.indexOf(defaultLevel);
     baseIndex = defaultIndex !== -1 ? defaultIndex : Math.floor(levels.length / 2); // 如果默认级别也找不到，使用中间值
-    console.log(`       ⚠️ 级别未找到，使用默认: "${defaultLevel}" (索引: ${baseIndex})`);
   }
 
   const offset = Math.ceil(delta * 4); // 最大可以变化4个级别
@@ -404,8 +398,6 @@ export const RL_ACTIONS = {
         // 定义圆润度级别数组
         const roundnessLevels = ['none', 'xs', 'small', 'medium', 'large', 'xl', 'xxl', 'xxxl', 'xxxxl'];
 
-        console.log(`🎯 圆润程度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
-
         try {
           // 将 intensity (0-1) 映射到级别索引 (0-8)
           const maxIndex = roundnessLevels.length - 1;
@@ -418,11 +410,8 @@ export const RL_ACTIONS = {
           // 直接返回对应的 token 值
           const tokenValue = DESIGN_TOKEN_MAPPING.dimension.borderRadius[selectedLevel];
 
-          console.log(`   📍 选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue}`);
-
           return tokenValue;
         } catch (error) {
-          console.error('❌ 圆润程度映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.dimension.borderRadius.small; // 回退到默认值
         }
       }
@@ -441,8 +430,6 @@ export const RL_ACTIONS = {
     },
     styleMapping: {
       clipPath: (baseValue, intensity, elementType, variant) => {
-        console.log(`🎯 形态复杂度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
-
         try {
           // 定义复杂度级别
           let clipPathValue = 'none';
@@ -464,11 +451,8 @@ export const RL_ACTIONS = {
             clipPathValue = 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)';
           }
 
-          console.log(`   📍 复杂度级别: ${clipPathValue} (强度: ${intensity.toFixed(2)})`);
-
           return clipPathValue;
         } catch (error) {
-          console.error('❌ 形态复杂度映射错误:', error.message, '强度:', intensity);
           return 'none'; // 回退到默认值
         }
       }
@@ -490,8 +474,6 @@ export const RL_ACTIONS = {
         // 定义轮廓强度级别数组
         const outlineLevels = ['none', 'narrow', 'base', 'wide'];
 
-        console.log(`🎯 轮廓强度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
-
         try {
           // 将 intensity (0-1) 映射到级别索引 (0-3)
           const maxIndex = outlineLevels.length - 1;
@@ -504,11 +486,8 @@ export const RL_ACTIONS = {
           // 直接返回对应的 token 值
           const tokenValue = DESIGN_TOKEN_MAPPING.dimension.borderWidth[selectedLevel];
 
-          console.log(`   📍 选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue}`);
-
           return tokenValue;
         } catch (error) {
-          console.error('❌ 轮廓强度映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.dimension.borderWidth.narrow; // 回退到默认值
         }
       }
@@ -530,8 +509,7 @@ export const RL_ACTIONS = {
     // 品牌色占比
     styleMapping: {
       color: (current, intensity, elementType, variant) => {
-        console.log(`🎯 品牌色占比调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
-
+  
         try {
           // h2标题特殊处理：使用主题色（因为有独特背景）
           if (elementType === 'text' && variant === 'h2') {
@@ -588,12 +566,10 @@ export const RL_ACTIONS = {
 
           return smartTextColor;
         } catch (error) {
-          console.error('❌ 品牌色文字颜色映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.color.onSurface.black88; // 安全回退
         }
       },
       fill: (current, intensity, elementType, variant) => {
-        console.log(`🎯 品牌色占比调控(fill): 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 图表子元素的fill字段特殊处理
@@ -626,12 +602,10 @@ export const RL_ACTIONS = {
           // 对于其他元素的fill字段，使用默认的颜色逻辑
           return current;
         } catch (error) {
-          console.error('❌ 品牌色fill颜色映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.color.onSurface.black88; // 安全回退
         }
       },
       '&:hover.backgroundColor': (current, intensity, elementType, variant) => {
-        console.log(`🎯 品牌色 hover 背景调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 🔧 专门处理表格行的 hover 效果 - 使用更明显的对比色
@@ -649,12 +623,10 @@ export const RL_ACTIONS = {
             }
           }
         } catch (error) {
-          console.error('❌ 品牌色背景颜色映射错误:', error.message, '强度:', intensity);
           return current;
         }
       },
       backgroundColor: (current, intensity, elementType, variant) => {
-        console.log(`🎯 品牌色背景调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 创建分层背景色系统：layout > container/table > surface
@@ -714,7 +686,6 @@ export const RL_ACTIONS = {
             }
           }
         } catch (error) {
-          console.error('❌ 品牌色背景颜色映射错误:', error.message, '强度:', intensity);
           return current;
         }
       }
@@ -733,7 +704,6 @@ export const RL_ACTIONS = {
     },
     styleMapping: {
       backgroundColor: (current, intensity, elementType, variant) => {
-        console.log(`🎯 色彩明暗调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 根据强度调整背景亮度
@@ -754,7 +724,6 @@ export const RL_ACTIONS = {
             return DESIGN_TOKEN_MAPPING.color.surface.grey0;
           }
         } catch (error) {
-          console.error('❌ 色彩明暗背景映射错误:', error.message, '强度:', intensity);
           return current;
         }
       },
@@ -781,7 +750,6 @@ export const RL_ACTIONS = {
             return DESIGN_TOKEN_MAPPING.color.onSurface.black64;
           }
         } catch (error) {
-          console.error('❌ 色彩明暗文字映射错误:', error.message, '强度:', intensity);
           return current;
         }
       }
@@ -803,7 +771,6 @@ export const RL_ACTIONS = {
     },
     styleMapping: {
       fontSize: (baseValue, intensity, elementType, variant) => {
-        console.log(`🎯 信息密度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 定义字体大小级别数组
@@ -831,7 +798,6 @@ export const RL_ACTIONS = {
             return DESIGN_TOKEN_MAPPING.font.size[selectedLevel];
           }
         } catch (error) {
-          console.error('❌ 信息密度字体映射错误:', error.message, '强度:', intensity);
           return baseValue;
         }
       },
@@ -862,7 +828,6 @@ export const RL_ACTIONS = {
             return DESIGN_TOKEN_MAPPING.dimension.padding[selectedLevel];
           }
         } catch (error) {
-          console.error('❌ 信息密度间距映射错误:', error.message, '强度:', intensity);
           return baseValue;
         }
       }
@@ -881,7 +846,6 @@ export const RL_ACTIONS = {
     },
     styleMapping: {
       fontWeight: (baseValue, intensity, elementType, variant) => {
-        console.log(`🎯 视觉强度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 定义字体重量级别数组
@@ -909,7 +873,6 @@ export const RL_ACTIONS = {
             return DESIGN_TOKEN_MAPPING.font.weight[selectedLevel];
           }
         } catch (error) {
-          console.error('❌ 视觉强度字重映射错误:', error.message, '强度:', intensity);
           return baseValue;
         }
       },
@@ -936,7 +899,6 @@ export const RL_ACTIONS = {
             return DESIGN_TOKEN_MAPPING.color.onSurface.black100;
           }
         } catch (error) {
-          console.error('❌ 视觉强度颜色映射错误:', error.message, '强度:', intensity);
           return current;
         }
       }
@@ -956,8 +918,7 @@ export const RL_ACTIONS = {
     },
     styleMapping: {
       justifyContent: (baseValue, intensity, elementType, variant) => {
-        console.log(`🎯 板式重心调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
-
+        
         try {
           // 只对 layout 元素且 variant 为 row 时设置 justifyContent
           if (elementType === 'layout' && variant === 'row') {
@@ -976,7 +937,6 @@ export const RL_ACTIONS = {
           // 其他情况保持原值
           return baseValue;
         } catch (error) {
-          console.error('❌ 板式重心主轴对齐映射错误:', error.message, '强度:', intensity);
           return baseValue; // 回退到原值
         }
       },
@@ -999,12 +959,10 @@ export const RL_ACTIONS = {
           // 其他情况保持原值
           return baseValue;
         } catch (error) {
-          console.error('❌ 板式重心交叉轴对齐映射错误:', error.message, '强度:', intensity);
           return baseValue; // 回退到原值
         }
       },
       textAlign: (baseValue, intensity, elementType, variant) => {
-        console.log(`🎯 板式重心文本对齐: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 对文本元素应用文本对齐调整
@@ -1024,7 +982,6 @@ export const RL_ACTIONS = {
           // 其他情况保持原值
           return baseValue;
         } catch (error) {
-          console.error('❌ 板式重心文本对齐映射错误:', error.message, '强度:', intensity);
           return baseValue; // 回退到原值
         }
       }
@@ -1048,8 +1005,6 @@ export const RL_ACTIONS = {
         // 定义阴影层次级别数组
         const shadowLevels = ['ground', 'main', 'B1', '1f', '2f', '3f', '4f', '5f'];
 
-        console.log(`🎯 光影纵深调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
-
         try {
           // 将 intensity (0-1) 映射到级别索引 (0-7)
           const maxIndex = shadowLevels.length - 1;
@@ -1062,11 +1017,8 @@ export const RL_ACTIONS = {
           // 直接返回对应的 token 值
           const tokenValue = DESIGN_TOKEN_MAPPING.material.hierarchy[selectedLevel];
 
-          console.log(`   📍 选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue}`);
-
           return tokenValue;
         } catch (error) {
-          console.error('❌ 光影纵深映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.material.hierarchy.main; // 回退到默认值
         }
       }
@@ -1086,7 +1038,6 @@ export const RL_ACTIONS = {
     },
     styleMapping: { 
       backgroundImage: (baseValue, intensity, elementType, variant) => {
-        console.log(`🎯 表面肌理调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           let textureValue = 'none';
@@ -1111,11 +1062,8 @@ export const RL_ACTIONS = {
             textureValue = 'repeating-linear-gradient(45deg, rgba(0,0,0,0.12), rgba(0,0,0,0.12) 2px, transparent 2px, transparent 10px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.08), rgba(0,0,0,0.08) 1px, transparent 1px, transparent 5px)';
           }
 
-          console.log(`   📍 纹理级别: ${textureValue} (强度: ${intensity.toFixed(2)})`);
-
           return textureValue;
         } catch (error) {
-          console.error('❌ 表面肌理映射错误:', error.message, '强度:', intensity);
           return 'none'; // 回退到默认值
         }
       }
@@ -1135,7 +1083,6 @@ export const RL_ACTIONS = {
     },
     styleMapping: {
       backgroundColor: (baseValue, intensity, elementType, variant) => {
-        console.log(`🎯 通透程度调控: 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 如果没有颜色值，返回原值
@@ -1166,11 +1113,8 @@ export const RL_ACTIONS = {
             resultColor = `rgba(${r}, ${g}, ${b}, ${opacity.toFixed(2)})`;
           }
 
-          console.log(`   📍 透明度转换: ${baseValue} → ${resultColor} (透明度: ${opacity.toFixed(2)})`);
-
           return resultColor;
         } catch (error) {
-          console.error('❌ 通透程度映射错误:', error.message, '强度:', intensity);
           return baseValue; // 回退到原始值
         }
       },
@@ -1216,16 +1160,13 @@ export const RL_ACTIONS = {
     },
     styleMapping: {
       padding: (baseValue, intensity, elementType, variant) => {
-        // 🚫 布局元素（row/column）不调整 padding，保持容器嵌套的一致性
-        if (elementType === 'layout' && (variant === 'row' || variant === 'column')) {
-          console.log(`🎯 呼吸感调控(padding): 跳过布局元素 ${elementType}.${variant}，保持原值`);
+        // 🚫 布局元素（row/column/bgColumn）不调整 padding，保持容器嵌套的一致性
+        if (elementType === 'layout' && (variant === 'row' || variant === 'column' || variant === 'bgColumn')) {
           return baseValue; // 保持原有的 padding 值
         }
 
         // 定义空间级别数组
         const spacingLevels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-
-        console.log(`🎯 呼吸感调控(padding): 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 将 intensity (0-1) 映射到级别索引 (0-9)
@@ -1241,20 +1182,16 @@ export const RL_ACTIONS = {
 
           return tokenValue;
         } catch (error) {
-          console.error('❌ 呼吸感padding映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.dimension.padding.base; // 回退到默认值
         }
       },
       margin: (baseValue, intensity, elementType, variant) => {
         // 🚫 布局元素（row/column）不调整 margin，保持容器嵌套的一致性
-        if (elementType === 'layout' && (variant === 'row' || variant === 'column')) {
-          console.log(`🎯 呼吸感调控(margin): 跳过布局元素 ${elementType}.${variant}，保持原值`);
+        if (elementType === 'layout' && (variant === 'row' || variant === 'column' || variant === 'bgColumn' )) {
           return baseValue; // 保持原有的 margin 值
         }
 
         const spacingLevels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-
-        console.log(`🎯 呼吸感调控(margin): 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           const maxIndex = spacingLevels.length - 1;
@@ -1265,14 +1202,11 @@ export const RL_ACTIONS = {
 
           return tokenValue;
         } catch (error) {
-          console.error('❌ 呼吸感margin映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.dimension.margin.base;
         }
       },
       gap: (baseValue, intensity, elementType, variant) => {
         const spacingLevels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-
-        console.log(`🎯 呼吸感调控(gap): 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           const maxIndex = spacingLevels.length - 1;
@@ -1281,11 +1215,8 @@ export const RL_ACTIONS = {
           const selectedLevel = spacingLevels[levelIndex];
           const tokenValue = DESIGN_TOKEN_MAPPING.dimension.gap[selectedLevel];
 
-          console.log(`   📍 选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue}`);
-
           return tokenValue;
         } catch (error) {
-          console.error('❌ 呼吸感gap映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.dimension.gap.base;
         }
       }
