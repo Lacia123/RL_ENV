@@ -1239,8 +1239,6 @@ export const RL_ACTIONS = {
         // 定义边框宽度级别数组
         const borderWidthLevels = ['none', 'narrow', 'base', 'wide'];
 
-        console.log(`🎯 边缘张力调控(borderWidth): 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
-
         try {
           // 将 intensity (0-1) 映射到级别索引 (0-3)
           const maxIndex = borderWidthLevels.length - 1;
@@ -1253,19 +1251,14 @@ export const RL_ACTIONS = {
           // 直接返回对应的 token 值
           const tokenValue = DESIGN_TOKEN_MAPPING.dimension.borderWidth[selectedLevel];
 
-          console.log(`   📍 选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue}`);
-
           return tokenValue;
         } catch (error) {
-          console.error('❌ 边缘张力borderWidth映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.dimension.borderWidth.narrow; // 回退到默认值
         }
       },
       gap: (baseValue, intensity, elementType, variant) => {
         // 定义间距级别数组（与张力成反比）
         const gapLevels = ['none', 'supertight', 'extratight', 'tight', 'semitight', 'base', 'semiloose', 'loose', 'extraloose', 'superloose'];
-
-        console.log(`🎯 边缘张力调控(gap): 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 张力越高，间距越小（反向映射）
@@ -1280,11 +1273,8 @@ export const RL_ACTIONS = {
           // 直接返回对应的 token 值
           const tokenValue = DESIGN_TOKEN_MAPPING.dimension.gap[selectedLevel];
 
-          console.log(`   📍 反向选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue} (反向强度: ${reversedIntensity.toFixed(3)})`);
-
           return tokenValue;
         } catch (error) {
-          console.error('❌ 边缘张力gap映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.dimension.gap.base;
         }
       }
@@ -1304,8 +1294,7 @@ export const RL_ACTIONS = {
     },
     styleMapping: {
       transform: (baseValue, intensity, elementType, variant) => {
-        console.log(`🎯 视觉重量调控(transform): 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
-
+  
         try {
           // 将强度映射到缩放范围：0.0→0.7, 0.5→1.0, 1.0→1.3
           const minScale = 0.7;
@@ -1313,19 +1302,15 @@ export const RL_ACTIONS = {
           const scale = minScale + intensity * (maxScale - minScale);
 
           const result = `scale(${scale.toFixed(2)})`;
-          console.log(`   📍 缩放值: ${result} (强度: ${intensity.toFixed(3)})`);
 
           return result;
         } catch (error) {
-          console.error('❌ 视觉重量transform映射错误:', error.message, '强度:', intensity);
           return 'scale(1.0)'; // 回退到默认值
         }
       },
       fontWeight: (baseValue, intensity, elementType, variant) => {
         // 定义字体重量级别数组
         const fontWeightLevels = ['light', 'medium', 'semibold', 'bold'];
-
-        console.log(`🎯 视觉重量调控(fontWeight): 元素=${elementType}.${variant}, 强度=${intensity.toFixed(3)}`);
 
         try {
           // 将 intensity (0-1) 映射到级别索引 (0-3)
@@ -1339,11 +1324,8 @@ export const RL_ACTIONS = {
           // 直接返回对应的 token 值
           const tokenValue = DESIGN_TOKEN_MAPPING.font.weight[selectedLevel];
 
-          console.log(`   📍 选择级别: ${selectedLevel} (索引: ${levelIndex}) → ${tokenValue}`);
-
           return tokenValue;
         } catch (error) {
-          console.error('❌ 视觉重量fontWeight映射错误:', error.message, '强度:', intensity);
           return DESIGN_TOKEN_MAPPING.font.weight.medium; // 回退到默认值
         }
       }
@@ -1900,11 +1882,6 @@ export class ActionConflictResolver {
           if (conflicts.length > 0) {
             try {
               finalValue = this.resolveStyleConflict(property, currentValue, newValue);
-
-              // 记录冲突解决的变化
-              if (finalValue !== newValue) {
-                console.log(`🔧 冲突解决 ${property}: ${currentValue} → ${newValue} → ${finalValue} (冲突合并后)`);
-              }
             } catch (conflictError) {
               console.warn(`❌ 冲突解决失败 ${property}:`, conflictError.message);
               finalValue = newValue; // 使用新值作为回退
@@ -2460,13 +2437,6 @@ export function getElementBaseTokens(styleConfig, elementType = 'text', variant 
     _configFound: true
   };
 
-  //   console.log(`✅ 成功提取 ${elementType}.${variant} 的基准tokens:`, Object.keys(baseTokens).filter(k => !k.startsWith('_')));
-
-  // 对于layout元素，特别标注其层级
-  if (elementType === 'layout') {
-    console.log(`   🏗️ Layout层级: ${variant} (${variant === 'root' ? '根布局' : '内部布局'})`);
-  }
-
   return { baseTokens, metadata };
 }
 
@@ -2495,8 +2465,6 @@ export class ActionSystemManager {
     this.styleConfig = styleConfig;
     this.environments = new Map(); // 存储不同元件类型的环境
     this.availableElements = this.getAvailableElements();
-    console.log('动作系统管理器创建完成');
-    console.log('可用元件类型:', Object.keys(this.availableElements));
   }
 
   /**
@@ -2516,22 +2484,16 @@ export class ActionSystemManager {
     const envKey = `${elementType}.${variant}`;
 
     if (!this.environments.has(envKey)) {
-      console.log(`🔧 为 ${envKey} 创建新的动作环境`);
-
       // 获取该元件形态的基准tokens和元数据
       const { baseTokens, metadata } = getElementBaseTokens(this.styleConfig, elementType, variant);
 
       if (!metadata._configFound) {
-        console.warn(`无法为 ${envKey} 创建环境：配置未找到`);
         return null;
       }
 
       // 创建专用的RL环境，分离传递基准样式和元数据
       const environment = new RLStyleEnvironment(baseTokens, metadata);
       this.environments.set(envKey, environment);
-
-      console.log(`✅ ${envKey} 环境创建成功，基准tokens:`, Object.keys(baseTokens));
-      console.log(`   📋 元数据:`, metadata);
     }
 
     return this.environments.get(envKey);

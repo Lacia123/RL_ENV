@@ -4,11 +4,12 @@ import { renderEightElementToHtml } from '../utils/eightElement/renderEightEleme
 import { convertEightElementToLayout } from '../utils/layoutAnalysis/eightElementAnalysis';
 import { markdownToEightElement, applyLayoutControlsToEightElement } from '../utils/eightElement/markdownToEightElement';
 
-import { RL_ACTIONS, ActionSystemManager, createActionSystemManager, convertActionResultsToTokens } from '../utils/seeds/rl_action_engines';
+import { RL_ACTIONS, createActionSystemManager } from '../utils/seeds/rl_action_engines';
 import { DEFAULT_STYLE_CONFIG } from '../utils/eightElement/styleConfig';
 import { analyzeElementsInEightElement, applyActionsToEightElement } from '../utils/eightElement/markdownToEightElement';
 import VisualSpaceEvaluator from '../components/VisualSpaceEvaluator';
 import collectEightElementMeasurements from '../utils/eightElement/collectElementMeasurements.js';
+
 
 // 🆕 Markdown 示例配置
 // 扩展说明：要添加新的模板，只需要在下面的 MARKDOWN_TEMPLATES 对象中添加新的条目
@@ -35,10 +36,10 @@ const MARKDOWN_TEMPLATES = {
 优雅青蓝标准布局采用渐变背景和装饰性元素，营造出高端、专业的视觉效果。适用于重要内容展示、产品介绍等场景。
 
 **主要特色：**
-- 🎨 渐变背景：多层次青蓝色渐变
-- ✨ 装饰元素：对称的装饰线条和圆点
-- 📱 响应式设计：适配各种屏幕尺寸
-- 🔍 层次清晰：标题和内容区域明确分离
+- 渐变背景：多层次青蓝色渐变
+- 装饰元素：对称的装饰线条和圆点
+- 响应式设计：适配各种屏幕尺寸
+- 层次清晰：标题和内容区域明确分离
 
 ![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
 
@@ -79,10 +80,10 @@ const MARKDOWN_TEMPLATES = {
 优雅青蓝标准布局采用渐变背景和装饰性元素，营造出高端、专业的视觉效果。适用于重要内容展示、产品介绍等场景。
 
 **主要特色：**
-- 🎨 渐变背景：多层次青蓝色渐变
-- ✨ 装饰元素：对称的装饰线条和圆点
-- 📱 响应式设计：适配各种屏幕尺寸
-- 🔍 层次清晰：标题和内容区域明确分离
+- 渐变背景：多层次青蓝色渐变
+- 装饰元素：对称的装饰线条和圆点
+- 响应式设计：适配各种屏幕尺寸
+- 层次清晰：标题和内容区域明确分离
 
 ![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
 
@@ -145,7 +146,6 @@ const MARKDOWN_TEMPLATES = {
 const a = 1;
 \`\`\`
 
-> "优雅的设计不是添加更多，而是去除不必要的元素，直到每个细节都有其存在的理由。" —— 设计哲学
 
 [查看源码](https://github.com/example/elegant-cards)
 [设计指南](https://example.com/design-guide)
