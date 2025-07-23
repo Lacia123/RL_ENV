@@ -123,12 +123,6 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
       layoutMode: direction,
       layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
       primaryAxisSizingMode: "fixed",
-      counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-      primaryAxisAlignItems: direction === LAYOUT_CONSTANTS.DIRECTION.VERTICAL ? alignItems : LAYOUT_CONSTANTS.ALIGN.X.CENTER,
-      // 当方向为水平时，交叉轴（垂直方向）居中对齐；当方向为垂直时，交叉轴（水平方向）左对齐
-      counterAxisAlignItems: direction === LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL ?
-        LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER :
-        LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
       // layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
       layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
       boxSizing: "border-box",
@@ -1469,9 +1463,6 @@ function createElementContainer(tagName, content, cardStyleConfig, elementInstan
         layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
         layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
         primaryAxisSizingMode: "fixed",
-        counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
-        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
         // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         boxSizing: "border-box",
         "border-style": "solid",
@@ -1616,9 +1607,6 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
             layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
             primaryAxisSizingMode: "fixed",
-            counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-            primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
-            counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
             // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
             boxSizing: "border-box",
             "border-style": "solid",
@@ -1681,9 +1669,6 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
         layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
         layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
         primaryAxisSizingMode: "fixed",
-        counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
-        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
         // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         boxSizing: "border-box",
         "border-style": "solid",
@@ -1953,9 +1938,6 @@ function createCardElement(content, variant = 'standard') {
           layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
           layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
           primaryAxisSizingMode: "fixed",
-          counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-          primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
-          counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
           boxSizing: "border-box",
           "border-style": "solid",
@@ -2194,10 +2176,6 @@ function createButtonElement(text, url, variant = 'primary') {
           display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
           layoutMode: LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL,
           layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
-          primaryAxisSizingMode: LAYOUT_CONSTANTS.SIZING.AUTO,
-          counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.AUTO,
-          primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
-          counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER,
           layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
           minWidth: {
@@ -2340,10 +2318,6 @@ function createButtonElement(text, url, variant = 'primary') {
           display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
           layoutMode: LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL,
           layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
-          primaryAxisSizingMode: LAYOUT_CONSTANTS.SIZING.AUTO,
-          counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.AUTO,
-          primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER,
-          counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER,
           layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
           minWidth: {
@@ -2659,10 +2633,6 @@ function createIconElement(iconName, variant = 'medium') {
           display: "{layout.state.display.flex}",
           layoutMode: "{layout.direction.NONE}",
           layoutWrap: "{layout.wrap.NO_WRAP}",
-          primaryAxisSizingMode: "{layout.sizing.AUTO}",
-          counterAxisSizingMode: "{layout.sizing.FIXED}",
-          primaryAxisAlignItems: "{layout.align.x.CENTER}",
-          counterAxisAlignItems: "{layout.align.y.items.CENTER}",
           layoutAlign: "{layout.align.y.self.INHERIT}",
           layoutGrow: "{layout.grow.0}",
           height: {
@@ -3003,10 +2973,6 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
           display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
           layoutMode: LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL,
           layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
-          primaryAxisSizingMode: LAYOUT_CONSTANTS.SIZING.AUTO,
-          counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-          primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
-          counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
           layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
           layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
           // borderColor: {
@@ -3161,12 +3127,6 @@ function createLayoutElement(direction, children = [], options = {}) {
     baseLayout.style.gap = gap;
   }
 
-  // 设置主轴对齐方式
-  baseLayout.style.primaryAxisAlignItems = alignItems;
-
-  // 设置交叉轴对齐方式
-  baseLayout.style.counterAxisAlignItems = counterAxisAlign;
-
   // 🔧 重要：确保传入的 justifyContent 和 alignItems 被正确设置
   if (options.justifyContent !== undefined) {
     baseLayout.style.justifyContent = options.justifyContent;
@@ -3289,10 +3249,6 @@ function createFlexWrapLayout(children = []) {
         layoutMode: LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL,
         // 使用CSS的flex-wrap属性
         "flex-wrap": "wrap",
-        primaryAxisSizingMode: "fixed",
-        counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN, // 水平布局主轴左对齐
-        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER, // 水平布局交叉轴居中
         // layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
         "align-self": "flex-start",
         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
@@ -3332,10 +3288,6 @@ function createHeadingBlockContainer(headingLayout) {
       style: {
         display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
         layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
-        primaryAxisSizingMode: "fixed",
-        counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN, // 将主轴对齐改为左对齐
-        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN, // 将交叉轴对齐改为左对齐
         "align-self": "flex-start", // 确保自身左对齐
         // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         boxSizing: "border-box",
@@ -5057,10 +5009,6 @@ function createEightElementRoot(markdownElements, rootAttributes = {}) {
         display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
         layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
         layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
-        primaryAxisSizingMode: "responsive",
-        counterAxisSizingMode: LAYOUT_CONSTANTS.SIZING.FIXED,
-        primaryAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.X.CENTER, // 根容器主轴居中对齐
-        counterAxisAlignItems: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER, // 根容器交叉轴居中对齐
         layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
         width: "calc(100% - 30px)",
@@ -6171,15 +6119,11 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
       // 🔧 同时更新layout.style和layout.classStyle
       if (element.layout.style) {
         element.layout.style.layoutMode = targetDirection;
-        element.layout.style.primaryAxisAlignItems = newPrimaryAxisAlignItems;
-        element.layout.style.counterAxisAlignItems = newCounterAxisAlignItems;
         console.log(`      ✅ 已更新 style: layoutMode=${targetDirection}, primaryAxis=${newPrimaryAxisAlignItems}, counterAxis=${newCounterAxisAlignItems}`);
       }
       
       if (element.layout.classStyle) {
         element.layout.classStyle.layoutMode = targetDirection;
-        element.layout.classStyle.primaryAxisAlignItems = newPrimaryAxisAlignItems;
-        element.layout.classStyle.counterAxisAlignItems = newCounterAxisAlignItems;
         console.log(`      ✅ 已更新 classStyle: layoutMode=${targetDirection}, primaryAxis=${newPrimaryAxisAlignItems}, counterAxis=${newCounterAxisAlignItems}`);
       }
     }
@@ -6218,8 +6162,6 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
     
     const importantSettings = {
       layoutMode: targetDirection,
-      primaryAxisAlignItems: currentPrimaryAxisAlignItems || (targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start'),
-      counterAxisAlignItems: currentCounterAxisAlignItems || (targetDirection === 'HORIZONTAL' ? 'center' : 'flex-start')
     };
     
     // 🔧 修复：同时更新样式配置到style和classStyle（但不包括会被覆盖的关键设置）
@@ -6251,14 +6193,10 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
     
     if (element.layout.style) {
       element.layout.style.layoutMode = importantSettings.layoutMode;
-      element.layout.style.primaryAxisAlignItems = importantSettings.primaryAxisAlignItems;
-      element.layout.style.counterAxisAlignItems = importantSettings.counterAxisAlignItems;
     }
     
     if (element.layout.classStyle) {
       element.layout.classStyle.layoutMode = importantSettings.layoutMode;
-      element.layout.classStyle.primaryAxisAlignItems = importantSettings.primaryAxisAlignItems;
-      element.layout.classStyle.counterAxisAlignItems = importantSettings.counterAxisAlignItems;
     }
     
     console.log(`      🔒 已确保布局调控设置不被覆盖: layoutMode=${importantSettings.layoutMode}`);
