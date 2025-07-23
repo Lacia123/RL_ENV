@@ -2101,7 +2101,7 @@ export const DEFAULT_STYLE_CONFIG = {
         type: 'template',
         style: {
           display: 'flex',
-          flex: 1,
+          flex: '1',
           flexDirection: 'column',
           width: '100%',
           marginTop: "{dimension.margin.base}",
@@ -2329,7 +2329,7 @@ export const DEFAULT_STYLE_CONFIG = {
           boxShadow: `{material.hierarchy.B1}, {material.hierarchy.main}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
           position: 'relative',
-          flex:1,          
+          flex: '1',          
           '&::before': {
             content: "''",
             position: 'absolute',
@@ -2526,7 +2526,7 @@ export const DEFAULT_STYLE_CONFIG = {
         type: 'template',
         style: {
           display: 'flex',
-          flex: 1,
+          flex: '1',
           flexDirection: 'column',
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
@@ -2592,7 +2592,7 @@ export const DEFAULT_STYLE_CONFIG = {
           type: 'template',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: '1',
             flexDirection: 'column',
             gap: "{dimension.gap.tight}",
             marginTop: "{dimension.margin.base}",
@@ -2841,7 +2841,7 @@ export const DEFAULT_STYLE_CONFIG = {
         type: 'template',
         style: {
           display: 'flex',
-          flex: 1,
+          flex: '1',
           flexDirection: 'column',
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(135deg, {color.surfacecontainer.white100} 0%, {color.surface.grey0} 100%)`,
@@ -2907,7 +2907,7 @@ export const DEFAULT_STYLE_CONFIG = {
           metaType: 'table',
           style: {
             marginTop: "{dimension.margin.base}",
-            flex: 1,
+            flex: '1',
             position: 'relative',
           }
         }
