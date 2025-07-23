@@ -4167,6 +4167,7 @@ function parseMarkdown(markdown, options = {}) {
             // changed center to stretch
             // alignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
             alignItems = 'stretch';
+            // alignItems = 'flex-start';
             counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER;
           } else if (variant === 'column') {
             direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL;

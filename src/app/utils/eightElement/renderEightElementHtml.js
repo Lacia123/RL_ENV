@@ -887,14 +887,33 @@ function computeElementStyle(element) {
     // 如果没有元素，返回空样式
     if (!element) return computedStyle;
 
+    // 🆕 检查是否为画廊布局，画廊布局需要特殊处理
+    const isGalleryLayout = element._metadata?.variant === 'gallery' || 
+                           (element.layout && element.layout.style && element.layout.style.columnCount);
+
     // 处理layout.style，通过统一的引用处理逻辑
     if (element.layout && element.layout.style) {
         processStyleReferences({ computedStyle }, element, element.layout.style);
     }
 
-    // 默认值处理：如果设置了display=flex但未设置flex方向，默认为column
-    if (computedStyle.display === 'flex' && !computedStyle.flexDirection) {
-        computedStyle.flexDirection = 'column';
+    // 🆕 画廊布局特殊处理：确保使用多列布局而不是flex
+    if (isGalleryLayout) {
+        // 强制覆盖可能冲突的flex属性
+        computedStyle.display = 'block';  // 画廊必须使用block，不能是flex
+        
+        // 移除可能的flex相关属性
+        delete computedStyle.flexDirection;
+        delete computedStyle.flexWrap;
+        delete computedStyle.justifyContent;
+        delete computedStyle.alignItems;
+        delete computedStyle.gap;  // 画廊使用marginBottom而不是gap
+        
+        console.log(`🎨 画廊布局特殊处理: 强制设置display=block，移除flex属性`);
+    } else {
+        // 默认值处理：如果设置了display=flex但未设置flex方向，默认为column
+        if (computedStyle.display === 'flex' && !computedStyle.flexDirection) {
+            computedStyle.flexDirection = 'column';
+        }
     }
 
     return computedStyle;
