@@ -516,7 +516,7 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     gallery: {
       // 使用CSS多列布局，不使用flexbox
-      columnCount: 2,
+      columnCount: '2',
       columnGap: '15px',
       columnFill: "balance",
       
@@ -526,9 +526,9 @@ export const DEFAULT_STYLE_CONFIG = {
       // 不设置gap、flexDirection等flex相关属性
       
       // 子元素样式
-      '& > *': {
+      '& > *': {  
         breakInside: 'avoid',        // 避免元素被分割到不同列
-        marginBottom: '15px',        // 元素间距用margin而不是gap
+        marginTop: '15px',        // 元素间距用margin而不是gap
         display: 'block',            // 子元素也使用block布局
         width: '100%'                // 确保子元素宽度正确
       }
