@@ -2543,7 +2543,7 @@ export const DEFAULT_STYLE_CONFIG = {
         h2: 'title',
         h3: 'listContainer.listTitle',
         'li:*': 'listContainer.list.item*',
-        ul: 'listContainer.list.item*',
+        ul: 'listContainer.list',  // 🆕 无序列表映射到列表容器
         p: 'summary.text'
       },
       style: {

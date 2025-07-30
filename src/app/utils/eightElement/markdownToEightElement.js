@@ -1007,6 +1007,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
   
   // 🆕 优先检查列表项格式（支持单独的li:n映射）
   const listItemInfo = isListItem(line);
+  
   if (listItemInfo.isList) {
     // 增加列表项计数器
     currentListItemCounter++;
@@ -1016,7 +1017,6 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     
     // 🆕 先尝试通配符匹配 li:*
     const wildcardResult = findWildcardMatch(listItemKey, markdownMapping);
-    console.log(`🔍 列表项通配符查找: ${listItemKey}`, { matched: wildcardResult.matched, templatePath: wildcardResult.templatePath });
     
     if (wildcardResult.matched) {
       const processedTemplatePath = processTemplatePathWithWildcard(
@@ -1607,6 +1607,7 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
     // 🆕 检查最终子元素配置（支持通配符匹配）
     let finalConfig = currentConfig[finalTagName];
     let actualFinalTagName = finalTagName;
+    let usedWildcardMatch = false;
     
     // 如果直接匹配失败，尝试通配符匹配
     if (!finalConfig) {
@@ -1619,6 +1620,7 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
           if (wildcardMatch !== null) {
             finalConfig = configValue;
             actualFinalTagName = finalTagName; // 保持实际的子元素名称
+            usedWildcardMatch = true; // 🔧 标记使用了通配符匹配
             console.log(`🎯 最终子元素通配符匹配成功: ${finalTagName} 匹配模式 ${configKey}`);
             break;
           }
@@ -1637,8 +1639,16 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
       // 如果传入了已解析的元素，直接使用
       finalElement = existingElement;
     } else {
+      // 🔧 修复：如果使用了通配符匹配，创建一个临时的配置对象来传递正确的配置
+      let tempConfig = currentConfig;
+      if (usedWildcardMatch) {
+        // 说明使用了通配符匹配，需要创建临时配置
+        tempConfig = { ...currentConfig, [actualFinalTagName]: finalConfig };
+        console.log(`🔧 创建临时配置，将 ${actualFinalTagName} 映射到通配符匹配的配置`);
+      }
+      
       // 否则创建新的模板元素
-      finalElement = createTemplateTagElement(actualFinalTagName, content, currentConfig, markdownData);
+      finalElement = createTemplateTagElement(actualFinalTagName, content, tempConfig, markdownData);
       if (!finalElement) {
         return null;
       }
@@ -4096,7 +4106,8 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
     // 🔍 保存元数据用于分析
     _metadata: {
       actualType: 'chart',
-      variant: chartType || 'line',
+      variant: variant || 'normal',  // 🔧 修复：使用正确的 variant 参数
+      chartType: chartType || 'line', // 🆕 添加图表类型到元数据
       isChart: true
     },
     svgContent: svgContent,
@@ -6640,6 +6651,7 @@ function findWildcardMatch(input, markdownMapping) {
   for (const [pattern, templatePath] of Object.entries(markdownMapping)) {
     if (pattern.includes('*')) {
       const wildcardMatch = extractWildcardMatch(input, pattern);
+      
       if (wildcardMatch !== null) {
         return {
           matched: true,
