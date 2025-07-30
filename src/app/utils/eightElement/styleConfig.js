@@ -854,8 +854,6 @@ export const DEFAULT_STYLE_CONFIG = {
         padding: "{dimension.padding.extratight}",
     },
     normal: {
-        // 图表容器  
-    container: {
       margin: "{dimension.margin.loose} 0",
       padding: "{dimension.padding.extraloose}",
       backgroundColor: "{color.surfacecontainer.white100}",
@@ -864,33 +862,45 @@ export const DEFAULT_STYLE_CONFIG = {
       borderWidth: "{dimension.borderwidth.narrow}",
       borderColor: "{color.surfacecontainer.black12}",
       borderStyle: "solid"
-    },
-    // 图表标题
-    title: {
-      fontSize: "{font.size.large}",
-      fontWeight: "{font.fontweight.semibold}",
-      color: "{color.surfacecontainer.white100}",
-      // color: "{color.onsurface.black88}",
-      marginBottom: "{dimension.margin.base}",
-      textAlign: 'center'
-    },
-    // 图例
-    legend: {
-      fontSize: "{font.size.small}",
-      fontWeight: "400",
-      fill: "{color.onsurface.black88}",
-      display: 'flex',
-      justifyContent: 'center',
-      gap: "{dimension.gap.loose}",
-      marginTop: "{dimension.margin.base}"
-    },
-    // 坐标轴  
-    axis: {
-      fontSize: "{font.size.tiny}",
-      fontWeight: "400",
-      fill: "{color.onsurface.black88}",
-    },
     }
+    // normal: {
+    //     // 图表容器  
+    // container: {
+    //   margin: "{dimension.margin.loose} 0",
+    //   padding: "{dimension.padding.extraloose}",
+    //   backgroundColor: "{color.surfacecontainer.white100}",
+    //   borderRadius: "{dimension.borderradius.xl}",
+    //   boxShadow: "{material.hierarchy.2f}",
+    //   borderWidth: "{dimension.borderwidth.narrow}",
+    //   borderColor: "{color.surfacecontainer.black12}",
+    //   borderStyle: "solid"
+    // },
+    // // 图表标题
+    // title: {
+    //   fontSize: "{font.size.large}",
+    //   fontWeight: "{font.fontweight.semibold}",
+    //   color: "{color.surfacecontainer.white100}",
+    //   // color: "{color.onsurface.black88}",
+    //   marginBottom: "{dimension.margin.base}",
+    //   textAlign: 'center'
+    // },
+    // // 图例
+    // legend: {
+    //   fontSize: "{font.size.small}",
+    //   fontWeight: "400",
+    //   fill: "{color.onsurface.black88}",
+    //   display: 'flex',
+    //   justifyContent: 'center',
+    //   gap: "{dimension.gap.loose}",
+    //   marginTop: "{dimension.margin.base}"
+    // },
+    // // 坐标轴  
+    // axis: {
+    //   fontSize: "{font.size.tiny}",
+    //   fontWeight: "400",
+    //   fill: "{color.onsurface.black88}",
+    // },
+    // }
   },
   // smallChart: {
   //   container: {
