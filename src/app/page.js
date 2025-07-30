@@ -13,7 +13,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex py-3">
             <div className="font-bold text-blue-600">
-              八要素分析器
+              强化学习环境
             </div>
           </div>
         </div>

@@ -22,13 +22,18 @@ function createJsdomEnv(width = 800, height = 500) {
   const dom = new JSDOM(`<!DOCTYPE html><html><body></body></html>`);
   const document = dom.window.document;
   
-  // 创建SVG元素
+  // 🆕 创建响应式SVG元素 - 适应容器宽度
   const svg = d3.select(document.body)
     .append('svg')
-    .attr('width', "100%")
-    .attr('height', height)
-    .attr('viewBox', `0 0 ${width} ${height}`)
-    .attr('xmlns', 'http://www.w3.org/2000/svg');
+    .attr('width', '100%')        // 🆕 使用100%宽度，适应容器
+    .attr('height', '100%')       // 🆕 使用100%高度，完全填充
+    .attr('viewBox', `0 0 ${width} ${height}`)  // 保持原始比例
+    .attr('preserveAspectRatio', 'none')  // 🆕 不保持宽高比，完全拉伸填充
+    .attr('xmlns', 'http://www.w3.org/2000/svg')
+    .style('width', '100%')       // 🆕 CSS确保宽度100%
+    .style('height', '100%')      // 🆕 CSS确保高度100%
+    .style('display', 'block')    // 🆕 块级元素，避免内联空隙
+    .style('min-height', '200px'); // 🆕 最小高度，避免太小
   
   // 解析颜色tokens
   const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
@@ -141,11 +146,36 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
     }
     
     // 设置图表尺寸和边距
-    const width = 800;
-    const height = 500;
-    const margin = { top: 50, right: 50, bottom: 70, left: 70 };
+    // 🆕 增大基础尺寸，让图表占满容器
+    const width = 600;  // 增大宽度，充分利用容器空间
+    const height = 400; // 增大高度，保持合理比例
+    // 🆕 根据图表宽度动态调整显示参数
+    const isSmallChart = chartStyleConfig?.variant === 'small'
+    // 🆕 根据是否为小图表优化边距
+    const optimizedMargin = isSmallChart ? 
+      { top: 15, right: 20, bottom: 60, left: 80 } :   // 小图表：减少上下边距，优化空间利用
+      { top: 20, right: 30, bottom: 80, left: 90 };    // 普通图表：保持充足边距
+    
+    const margin = optimizedMargin;
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
+    
+    
+    const displayConfig = {
+      // 🆕 添加 isSmallChart 标识
+      isSmallChart: isSmallChart,
+      // 坐标轴刻度数量
+      yTickCount: isSmallChart ? 3 : 5,
+      xLabelRotation: isSmallChart ? 30 : 45, // 🆕 小图表使用30度旋转，避免重叠又保持可读性
+      // 字体大小 - 🆕 进一步增大小图表的字体差异，特别是轴标题
+      axisLabelSize: isSmallChart ? '20px' : '12px',     // 小图表轴标签显著更大 (18px→20px)
+      dataLabelSize: isSmallChart ? '16px' : '10px',     // 小图表数据标签显著更大
+      legendLabelSize: isSmallChart ? '16px' : '10px',   // 小图表图例显著更大
+      // 显示策略 - 🆕 调整X轴标签显示策略
+      showEveryNthXLabel: 1, // 🆕 总是显示所有X轴标签，通过旋转和字体大小解决拥挤问题
+      dotRadius: isSmallChart ? 7 : 4,          // 🆕 小图表点显著更大
+      strokeWidth: isSmallChart ? 5 : 2.5       // 🆕 小图表线显著更粗
+    };
     
     // 提取标题行和数据行
     const headers = tableData[0];
@@ -182,14 +212,18 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
     // 根据图表类型生成不同的图表
     switch(chartType) {
       case 'grouped_line':
-        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig);
+        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
+      case 'line':
+        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
       case 'bar':
-        return generateBarChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig);
+        return generateBarChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
       case 'barh':
-        return generateBarHChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig);
+        return generateBarHChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
+      case 'pie':
+        return generatePieChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
       default:
         // 默认使用分组折线图
-        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig);
+        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
     }
   } catch (error) {
     console.error('生成图表时发生错误:', error);
@@ -206,9 +240,10 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
  * @param {number} height - 图表高度
  * @param {Object} margin - 图表边距
  * @param {Object} chartStyleConfig - 图表样式配置
+ * @param {Object} displayConfig - 显示配置（字体大小、刻度数量等）
  * @returns {string} - SVG图表的HTML字符串
  */
-function generateGroupedLineChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null) {
+function generateGroupedLineChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}) {
   try {
     console.log('生成分组折线图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
@@ -237,18 +272,17 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       'color-brand5',
       'color-brand4'
     ]
-    
-    const lineStyles = [
-      { strokeWidth: 3, dashArray: "0" },      // 实线粗
-      { strokeWidth: 2.5, dashArray: "0" },    // 实线中
-      { strokeWidth: 2, dashArray: "0" },      // 实线细
-      { strokeWidth: 3.5, dashArray: "0" },    // 实线最粗
-      { strokeWidth: 1.8, dashArray: "0" },    // 实线较细
-      { strokeWidth: 2.8, dashArray: "0" },    // 实线中粗
-      { strokeWidth: 2.2, dashArray: "0" },    // 实线中细
-      { strokeWidth: 3.2, dashArray: "0" },    // 实线粗2
-      { strokeWidth: 2.3, dashArray: "0" },    // 实线中2
-      { strokeWidth: 1.9, dashArray: "0" }     // 实线细2
+        const lineStyles = [
+      { strokeWidth: 3, dashArray: "0" },   
+      { strokeWidth: 2.5, dashArray: "0" },  
+      { strokeWidth: 2, dashArray: "0" },    
+      { strokeWidth: 3.5, dashArray: "0" },     
+      { strokeWidth: 1.8, dashArray: "0" }, 
+      { strokeWidth: 2.8, dashArray: "0" },  
+      { strokeWidth: 2.2, dashArray: "0" },    
+      { strokeWidth: 3.2, dashArray: "0" },     
+      { strokeWidth: 2.3, dashArray: "0" },   
+      { strokeWidth: 1.9, dashArray: "0" }          
     ];
     
     const innerWidth = width - margin.left - margin.right;
@@ -263,13 +297,15 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     valueFields.forEach(field => {
       allValues = allValues.concat(data.map(d => d[field]));
     });
-    const yMin = Math.min(0, ...allValues);
-    const yMax = Math.max(...allValues) * 1.1; // 上限留10%空间
+    
+    // 🆕 优化Y轴范围，减少空白区域
+    const yMin = Math.min(0, Math.min(...allValues) * 0.9); // 降低下限，留5%空间而不是从0开始
+    const yMax = Math.max(...allValues) * 1.05; // 上限只留5%空间，而不是10%
     
     const xScale = d3.scalePoint()
       .domain(xValues)
       .range([0, innerWidth])
-      .padding(0.5);
+      .padding(0.3); // 🆕 减少左右边距，增加图表密度 (0.5→0.3)
     
     const yScale = d3.scaleLinear()
       .domain([yMin, yMax])
@@ -427,7 +463,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
             .attr('d', line(lineData))
             .attr('stroke', '#000')
             .attr('fill', 'none')
-            .attr('stroke-width', lineStyle.strokeWidth)
+            .attr('stroke-width', displayConfig.strokeWidth || lineStyle.strokeWidth) // 🆕 使用动态线条粗细
             .attr('stroke-dasharray', lineStyle.dashArray);
 
         // 2. Draw DOTS (and their groups) on top of lines
@@ -440,7 +476,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
 
         dots.append('circle')
             .attr('class', `dot dot-${colorClassSuffix}`)
-            .attr('r', 4)
+            .attr('r', displayConfig.dotRadius || 4) // 🆕 使用动态圆点大小
             .attr('fill', '#000')
             .attr('stroke', '#fff')
             .attr('stroke-width', 1.5);
@@ -468,7 +504,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
                         .attr('class', `data-label data-label-${colorClassSuffix}`)
                         .attr('x', pos.x)
                         .attr('y', pos.y)
-                        .attr('font-size', '10px')
+                        .attr('font-size', displayConfig.dataLabelSize || '10px') // 🆕 使用动态数据标签字体大小
                         .attr('text-anchor', pos.anchor)
                         .attr('fill', '#000') // Use series color for label
                         .attr('font-weight', 'normal')
@@ -497,7 +533,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       .attr('stroke-opacity', 0.7);
     
     // 添加Y轴网格线
-    const yTickCount = 5;
+    const yTickCount = displayConfig.yTickCount || 5; // 🆕 使用动态刻度数量
     const yTicks = yScale.ticks(yTickCount);
     g.append('g')
       .attr('class', 'grid y-grid')
@@ -520,8 +556,9 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     // 获取轴样式配置
     const axisClassName = chartStyleConfig?.axis?.className || 'axis-label';
     
+    // 🆕 显示所有X轴标签，优化日期显示
     xAxis.selectAll('g')
-      .data(xValues)
+      .data(xValues) // 🆕 显示所有X轴标签
       .enter()
       .append('g')
       .attr('transform', d => `translate(${xScale(d)},0)`)
@@ -529,10 +566,19 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       .attr('class', axisClassName)
       .attr('y', 9)
       .attr('dy', '.71em')
-      .attr('transform', 'rotate(45)')
-      .attr('text-anchor', 'start')
-      .attr('font-size', '12px')
-      .text(d => d);
+      .attr('transform', displayConfig.xLabelRotation ? `rotate(${displayConfig.xLabelRotation})` : 'rotate(45)') // 🆕 使用动态旋转角度
+      .attr('text-anchor', displayConfig.xLabelRotation <= 15 ? 'middle' : 'start') // 🆕 小角度旋转时居中对齐
+      .attr('font-size', displayConfig.axisLabelSize || '12px') // 🆕 使用动态轴标签字体大小
+      .text(d => {
+        // 🆕 优化日期显示，截取月-日部分
+        if (d.includes('-')) {
+          const parts = d.split('-');
+          if (parts.length === 3) {
+            return `${parts[1]}-${parts[2]}`; // 显示 "03-10" 而不是 "2025-03-10"
+          }
+        }
+        return d;
+      });
     
     // 添加Y轴
     const yAxis = g.append('g')
@@ -552,19 +598,28 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
           .attr('x', -9)
           .attr('dy', '.32em')
           .attr('text-anchor', 'end')
-          .attr('font-size', '12px')
-          .text(d => d.toFixed(2));
+          .attr('font-size', displayConfig.axisLabelSize || '12px') // 🆕 使用动态轴标签字体大小
+          .text(d => {
+            // 🆕 智能格式化数字：整数不显示小数点，小数最多显示1位
+            if (d % 1 === 0) {
+              return d.toString(); // 整数直接显示
+            } else if (Math.abs(d) >= 100) {
+              return d.toFixed(0); // 大数字不显示小数
+            } else {
+              return d.toFixed(1); // 小数显示1位
+            }
+          });
       });
     
-    // 添加图例 - 修改图例排版以避免重叠
+    // 添加图例 - 🆕 优化图例排版以节省空间
     const legend = g.append('g')
       .attr('class', 'legend')
-      .attr('transform', `translate(0, -${margin.top - 10})`);
+      .attr('transform', `translate(0, -${margin.top - 5})`); // 🆕 图例更靠近顶部，节省空间
     
-    // 动态计算图例位置 - 使用更紧凑的布局
-    const legendItemWidth = 140; // 调整图例项宽度，增加间距
-    const legendItemHeight = 20; // 图例项高度
-    const legendItemsPerRow = Math.min(3, valueFields.length); // 减少每行图例数量以增加间距
+    // 🆕 动态计算图例位置 - 调整间距避免重叠
+    const legendItemWidth = displayConfig.isSmallChart ? 150 : 160; // 🆕 增加图例间距避免重叠 (100→150)
+    const legendItemHeight = displayConfig.isSmallChart ? 20 : 24;   // 🆕 增加图例高度避免垂直重叠 (16→20)
+    const legendItemsPerRow = Math.min(3, valueFields.length); // 🆕 减少每行图例数量避免拥挤 (4→3)
     const legendWidth = legendItemsPerRow * legendItemWidth;
     
     valueFields.forEach((field, i) => {
@@ -608,12 +663,12 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
         .attr('class', legendClassName)
         .attr('x', 20)
         .attr('y', 9)
-        .attr('font-size', '10px') // 缩小字体大小
+        .attr('font-size', displayConfig.legendLabelSize || '10px') // 🆕 使用动态图例字体大小
         .attr('alignment-baseline', 'middle')
         .text(field);
       
-      // 如果文字太长，截断并添加省略号
-      const maxTextLength = 85; // 最大文本长度（像素）
+      // 如果文字太长，截断并添加省略号 - 🆕 根据间距调整最大长度
+      const maxTextLength = displayConfig.isSmallChart ? 120 : 130; // 🆕 增加最大文本长度，配合更大的间距
       const truncateText = (text, maxLength) => {
         const node = text.node();
         if (node) {
@@ -646,14 +701,41 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
  * @param {number} height - 图表高度
  * @param {Object} margin - 图表边距
  * @param {Object} chartStyleConfig - 图表样式配置
+ * @param {Object} displayConfig - 显示配置（字体大小、刻度数量等）
  * @returns {string} - SVG图表的HTML字符串
  */
-function generateBarChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null) {
+function generateBarChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}) {
   try {
-    console.log('生成柱状图，使用d3和jsdom');
+    console.log('生成垂直柱状图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
     // 创建JSDOM环境
     const { svg, document } = createJsdomEnv(width, height);
+    
+    // 解析颜色
+    const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
+    const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
+    const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
+    
+    // 定义颜色数组
+    const colorValues = [
+      colorBrand5,
+      colorBrand4,
+      colorBrand3,
+      '#76b7b2', 
+      '#59a14f', 
+      '#edc949', 
+      '#af7aa1', 
+      '#ff9da7', 
+      '#9c755f', 
+      '#bab0ab'
+    ];
+
+    const colorClass = [
+      'color-brand6',
+      'color-brand5',
+      'color-brand4'
+    ];
+    
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
     
@@ -661,30 +743,111 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
     
-    // 添加提示文本
-    g.append('text')
-      .attr('x', innerWidth / 2)
-      .attr('y', innerHeight / 2)
-      .attr('text-anchor', 'middle')
-      .attr('font-family', 'sans-serif')
-      .attr('font-size', '24px')
-      .attr('fill', '#333')
-      .text('柱状图功能正在开发中');
+    // X轴类别（品牌名称）
+    const categories = data.map(d => d[dateField]);
     
-    g.append('text')
-      .attr('x', innerWidth / 2)
-      .attr('y', innerHeight / 2 + 40)
+    // 处理单个数据系列的情况
+    const valueField = valueFields[0]; // 只使用第一个数据系列
+    
+    // 寻找所有数据系列的最大值，用于设置比例尺
+    let maxValue = 0;
+    valueFields.forEach(field => {
+      const fieldMax = d3.max(data, d => parseFloat(d[field].toString().replace('%', '')) || 0);
+      maxValue = Math.max(maxValue, fieldMax);
+    });
+    maxValue = maxValue * 1.1; // 增加10%的空间
+    
+    // 创建x和y轴的比例尺
+    const xScale = d3.scaleBand()
+      .domain(categories)
+      .range([0, innerWidth])
+      .padding(displayConfig.isSmallChart ? 0.2 : 0.3); // 🆕 小图表减少柱子间距
+    
+    const yScale = d3.scaleLinear()
+      .domain([0, maxValue])
+      .range([innerHeight, 0]);
+    
+    // 添加垂直网格线
+    g.append('g')
+      .attr('class', 'grid x-grid')
+      .selectAll('line')
+      .data(yScale.ticks(displayConfig.isSmallChart ? 3 : 5)) // 🆕 小图表减少网格线数量
+      .enter()
+      .append('line')
+      .attr('x1', 0)
+      .attr('y1', d => yScale(d))
+      .attr('x2', innerWidth)
+      .attr('y2', d => yScale(d))
+      .attr('stroke', '#e0e0e0')
+      .attr('stroke-opacity', 0.7);
+    
+    // 🆕 手动创建X轴标签，设置合适的字体大小
+    const xAxis = g.append('g')
+      .attr('class', 'axis x-axis')
+      .attr('transform', `translate(0,${innerHeight})`);
+    
+    // 添加X轴刻度线和标签（品牌名称）
+    xAxis.selectAll('.tick')
+      .data(categories)
+      .enter()
+      .append('g')
+      .attr('class', 'tick')
+      .attr('transform', d => `translate(${xScale(d) + xScale.bandwidth() / 2}, 0)`)
+      .call(g => {
+        // 添加刻度线
+        g.append('line')
+          .attr('y2', 6)
+          .attr('stroke', '#666');
+        
+        // 🆕 添加标签文字，使用动态字体大小
+        g.append('text')
+          .attr('y', 9)
+          .attr('dy', '.71em')
+          .attr('text-anchor', 'middle')
+          .attr('font-size', displayConfig.axisLabelSize || '14px') // 🆕 使用动态字体大小
+          .attr('fill', '#333')
+          .text(d => d);
+      });
+    
+    // 添加y轴
+    const yAxis = g.append('g')
+      .attr('class', 'axis y-axis')
+      .call(d3.axisLeft(yScale).ticks(displayConfig.isSmallChart ? 3 : 5));
+    
+    // 获取柱状图颜色
+    const barColor = colorValues[0];
+    const colorClassSuffix = colorClass[0];
+    
+    // 绘制垂直柱状图
+    const bars = g.selectAll('.bar')
+      .data(data)
+      .enter()
+      .append('rect')
+      .attr('class', `bar bar-${colorClassSuffix}`)
+      .attr('x', d => xScale(d[dateField]))
+      .attr('y', d => yScale(parseFloat(d[valueField].toString().replace('%', '')) || 0))
+      .attr('width', xScale.bandwidth())
+      .attr('height', d => innerHeight - yScale(parseFloat(d[valueField].toString().replace('%', '')) || 0))
+      .attr('fill', '#000');
+    
+    // 添加数值标签
+    g.selectAll('.bar-label')
+      .data(data)
+      .enter()
+      .append('text')
+      .attr('class', 'bar-label')
+      .attr('x', d => xScale(d[dateField]) + xScale.bandwidth() / 2)
+      .attr('y', d => yScale(parseFloat(d[valueField].toString().replace('%', '')) || 0) - 5)
       .attr('text-anchor', 'middle')
-      .attr('font-family', 'sans-serif')
-      .attr('font-size', '14px')
-      .attr('fill', '#666')
-      .text('当前已支持分组折线图 (grouped_line)');
+      .attr('fill', '#333')
+      .attr('font-size', displayConfig.dataLabelSize || '12px') // 🆕 使用动态数据标签字体大小
+      .text(d => d[valueField]);
     
     // 将SVG转换为字符串
     return svg.node().outerHTML;
   } catch (error) {
-    console.error('生成柱状图时发生错误:', error);
-    return generateErrorSvg('生成柱状图失败: ' + error.message);
+    console.error('生成垂直柱状图时发生错误:', error);
+    return generateErrorSvg('生成垂直柱状图失败: ' + error.message);
   }
 }
 
@@ -697,9 +860,10 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
  * @param {number} height - 图表高度
  * @param {Object} margin - 图表边距
  * @param {Object} chartStyleConfig - 图表样式配置
+ * @param {Object} displayConfig - 显示配置（字体大小、刻度数量等）
  * @returns {string} - SVG图表的HTML字符串
  */
-function generateBarHChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null) {
+function generateBarHChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}) {
   try {
     console.log('生成水平柱状图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
@@ -760,13 +924,13 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
     const yScale = d3.scaleBand()
       .domain(categories)
       .range([0, innerHeight])
-      .padding(0.3);
+      .padding(displayConfig.isSmallChart ? 0.2 : 0.3); // 🆕 小图表减少柱子间距，提高空间利用
     
     // 添加水平网格线
     g.append('g')
       .attr('class', 'grid y-grid')
       .selectAll('line')
-      .data(xScale.ticks(5))
+      .data(xScale.ticks(displayConfig.isSmallChart ? 3 : 5)) // 🆕 小图表减少网格线数量
       .enter()
       .append('line')
       .attr('x1', d => xScale(d))
@@ -782,10 +946,32 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('transform', `translate(0,${innerHeight})`)
       .call(d3.axisBottom(xScale).ticks(5).tickFormat(d => d));
     
-    // 添加y轴
+    // 🆕 手动创建Y轴标签，设置合适的字体大小
     const yAxis = g.append('g')
-      .attr('class', 'axis y-axis')
-      .call(d3.axisLeft(yScale));
+      .attr('class', 'axis y-axis');
+    
+    // 添加Y轴刻度线和标签
+    yAxis.selectAll('.tick')
+      .data(categories)
+      .enter()
+      .append('g')
+      .attr('class', 'tick')
+      .attr('transform', d => `translate(0, ${yScale(d) + yScale.bandwidth() / 2})`)
+      .call(g => {
+        // 添加刻度线
+        g.append('line')
+          .attr('x2', -6)
+          .attr('stroke', '#666');
+        
+        // 🆕 添加标签文字，使用动态字体大小
+        g.append('text')
+          .attr('x', -9)
+          .attr('dy', '.32em')
+          .attr('text-anchor', 'end')
+          .attr('font-size', displayConfig.axisLabelSize || '14px') // 🆕 使用动态字体大小
+          .attr('fill', '#333')
+          .text(d => d);
+      });
     
     // 获取柱状图颜色
     const barColor = colorValues[0];
@@ -813,7 +999,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('dy', '.35em')
       .attr('text-anchor', 'start')
       .attr('fill', '#333')
-      .attr('font-size', '12px')
+      .attr('font-size', displayConfig.dataLabelSize || '12px') // 🆕 使用动态数据标签字体大小
       .text(d => d[valueField]);
     
     
@@ -826,7 +1012,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('x', innerWidth / 2)
       .attr('y', innerHeight + 40)
       .attr('text-anchor', 'middle')
-      .attr('font-size', '14px')
+      .attr('font-size', displayConfig.axisLabelSize || '14px') // 🆕 使用动态轴标签字体大小
       .text(valueField);
     
     // 添加Y轴标题
@@ -836,7 +1022,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('x', -innerHeight / 2)
       .attr('y', -60)
       .attr('text-anchor', 'middle')
-      .attr('font-size', '14px')
+      .attr('font-size', displayConfig.axisLabelSize || '14px') // 🆕 使用动态轴标签字体大小
       .text(dateField);
     
     // 将SVG转换为字符串
@@ -844,6 +1030,165 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
   } catch (error) {
     console.error('生成水平柱状图时发生错误:', error);
     return generateErrorSvg('生成水平柱状图失败: ' + error.message);
+  }
+}
+
+/**
+ * 生成饼图
+ * @param {Array} data - 图表数据
+ * @param {string} dateField - 标签字段名（饼图中为类别标签）
+ * @param {Array} valueFields - 值字段名数组（饼图中为数值）
+ * @param {number} width - 图表宽度
+ * @param {number} height - 图表高度
+ * @param {Object} margin - 图表边距
+ * @param {Object} chartStyleConfig - 图表样式配置
+ * @param {Object} displayConfig - 显示配置（字体大小、刻度数量等）
+ * @returns {string} - SVG图表的HTML字符串
+ */
+function generatePieChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}) {
+  try {
+    console.log('生成饼图, 数据点数:', data.length, '值字段:', valueFields);
+    
+    // 创建JSDOM环境
+    const { svg, document } = createJsdomEnv(width, height);
+    
+    // 解析颜色配置
+    const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
+    const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
+    const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
+    const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
+    
+    // 扩展颜色数组用于多个扇形
+    const colorValues = [
+      colorBrand5,
+      colorBrand4,
+      colorBrand3,
+      colorBrand6,
+      '#76b7b2', 
+      '#59a14f', 
+      '#edc949', 
+      '#af7aa1', 
+      '#ff9da7', 
+      '#9c755f', 
+      '#bab0ab'
+    ];
+    
+    // 处理饼图数据 - 使用第一个值字段
+    const valueField = valueFields[0];
+    const pieData = data.map(d => {
+      let rawValue = d[valueField];
+      // 🆕 处理百分号：移除 % 符号并转换为数字
+      let numericValue = parseFloat(rawValue.toString().replace('%', '')) || 0;
+      
+      return {
+        label: d[dateField],
+        value: numericValue,
+        originalValue: rawValue // 保留原始值用于显示
+      };
+    });
+    
+    console.log('饼图数据:', pieData);
+    
+    // 计算图表区域
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    
+    // 🆕 优化饼图半径，减少留白，提高空间利用率
+    const baseRadius = Math.min(innerWidth, innerHeight) / 2;
+    const radius = displayConfig.isSmallChart ? 
+      baseRadius - 10 :  // 小图表：减少留白，图例可能在外部
+      baseRadius - 20;   // 普通图表：保留一些空间给标签
+    
+    // 创建主图表组，居中定位
+    const g = svg.append('g')
+      .attr('transform', `translate(${width / 2},${height / 2})`);
+    
+    // 创建饼图生成器
+    const pie = d3.pie()
+      .value(d => d.value)
+      .sort(null); // 不排序，保持原始顺序
+    
+    // 创建弧形生成器
+    const arc = d3.arc()
+      .innerRadius(0)
+      .outerRadius(radius);
+    
+    // 创建标签弧形（稍微外移）
+    const labelArc = d3.arc()
+      .innerRadius(radius + 10)
+      .outerRadius(radius + 10);
+    
+    // 生成饼图扇形
+    const arcs = g.selectAll('.arc')
+      .data(pie(pieData))
+      .enter()
+      .append('g')
+      .attr('class', 'arc');
+    
+    // 绘制扇形
+    arcs.append('path')
+      .attr('d', arc)
+      .attr('fill', (d, i) => colorValues[i % colorValues.length])
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 2);
+    
+    // 🆕 应用小图表优化 - 标签字体大小
+    const labelFontSize = displayConfig.dataLabelSize || '12px';
+    
+    // 添加标签
+    arcs.append('text')
+      .attr('transform', d => `translate(${labelArc.centroid(d)})`)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', labelFontSize) // 🆕 使用动态字体大小
+      .attr('fill', '#333')
+      .attr('font-weight', 'bold')
+      .text(d => d.data.label);
+    
+    // 添加数值标签（显示在扇形内部）
+    arcs.append('text')
+      .attr('transform', d => `translate(${arc.centroid(d)})`)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', displayConfig.dataLabelSize || '12px') // 🆕 使用动态字体大小
+      .attr('fill', '#fff')
+      .attr('font-weight', 'bold')
+      .attr('stroke', '#000')
+      .attr('stroke-width', '0.5px')
+      .attr('paint-order', 'stroke')
+      .text(d => d.data.originalValue); // 🆕 显示原始值（包含%符号）
+    
+    // 🆕 添加图例（可选）
+    if (pieData.length <= 5) { // 只有在项目不太多时才显示图例
+      const legend = g.append('g')
+        .attr('class', 'legend')
+        .attr('transform', `translate(${radius + 40}, ${-pieData.length * 10})`);
+      
+      const legendFontSize = displayConfig.legendLabelSize || '12px';
+      
+      pieData.forEach((d, i) => {
+        const legendItem = legend.append('g')
+          .attr('transform', `translate(0, ${i * 20})`);
+        
+        // 图例色块
+        legendItem.append('rect')
+          .attr('width', 15)
+          .attr('height', 15)
+          .attr('fill', colorValues[i % colorValues.length]);
+        
+        // 图例文字
+        legendItem.append('text')
+          .attr('x', 20)
+          .attr('y', 12)
+          .attr('font-size', legendFontSize) // 🆕 使用动态字体大小
+          .attr('fill', '#333')
+          .text(`${d.label}: ${d.originalValue}`); // 🆕 使用原始值显示
+      });
+    }
+    
+    // 将SVG转换为字符串
+    return svg.node().outerHTML;
+  } catch (error) {
+    console.error('生成饼图时发生错误:', error);
+    return generateErrorSvg('生成饼图失败: ' + error.message);
   }
 }
 
@@ -912,5 +1257,6 @@ export default {
   generateGroupedLineChart,
   generateBarChart,
   generateBarHChart,
+  generatePieChart,
   generateErrorSvg
 }; 

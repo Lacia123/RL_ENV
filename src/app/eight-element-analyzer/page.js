@@ -28,7 +28,35 @@ const MARKDOWN_TEMPLATES = {
 
 ## 设计特点
 优雅青蓝卡片系列采用渐变背景、精致装饰和层次化设计，提供三种专业的内容展示方式。
+
+<card:headerCard>
+## 三、头部品牌分析
+联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
+
+[chart:barh]
+| 品牌 | 市场份额 | 增长率 |
+|------|----------|--------|
+| 联想 | 35% | +12% |
+| 苹果 | 28% | +8% |
+| 荣耀 | 18% | +15% |
+
+[chart:grouped_line]| 日期 | 心流满意度FSV | 心流专注值FFV | 心流效能值FEV |
+| --- | --- | --- | --- |
+| 2025-03-10 | 0.0 | 0.36 | 2.55 |
+| 2025-03-11 | 0.0 | 0.41 | 2.22 |
+| 2025-03-12 | 0.0 | 0.36 | 2.64 |
+| 2025-03-13 | 0.0 | 0.32 | 2.94 |
+
+[chart:pie]
+| 类型 | 占比 |
+|------|------|
+| 游戏本 | 40% |
+| 轻薄本 | 35% |
+| 工作站 | 25% |
+</card:headerCard>
+
 <layout:bgColumn>
+
 <layout:row>
 <card:elegantStandard>
 ## 标准布局卡片
@@ -1720,7 +1748,7 @@ const EightElementAnalyzer = () => {
 
   return (
     <div className="h-screen bg-gray-50 p-4 flex flex-col">
-      <h1 className="text-2xl font-bold mb-4 flex-shrink-0">八要素结构分析工具</h1>
+      <h1 className="text-2xl font-bold mb-4 flex-shrink-0">强化学习环境</h1>
 
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
         {/* 左侧编辑器区域 */}

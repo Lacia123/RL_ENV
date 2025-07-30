@@ -812,6 +812,18 @@ export const DEFAULT_STYLE_CONFIG = {
       color: "{color.onprimary.black88}",
       fontSize: "{font.size.small}",
     },
+
+    // 标题卡片风格文字样式
+    headerCardTitle: {
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.onprimary.black88}",
+      fontSize: "{font.size.large}",
+    },
+    headerCardText: {
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onprimary.black76}",
+      fontSize: "{font.size.medium}",
+    }
   },
 
   // ==================== 数学公式元件 ==================== (新增)
@@ -837,7 +849,12 @@ export const DEFAULT_STYLE_CONFIG = {
     }
   },
   chart: {
-    // 图表容器  
+    small: {
+        margin: "{dimension.margin.base} 0",
+        padding: "{dimension.padding.extratight}",
+    },
+    normal: {
+        // 图表容器  
     container: {
       margin: "{dimension.margin.loose} 0",
       padding: "{dimension.padding.extraloose}",
@@ -873,7 +890,77 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "400",
       fill: "{color.onsurface.black88}",
     },
+    }
   },
+  // smallChart: {
+  //   container: {
+  //     margin: "{dimension.margin.base} 0",
+  //     padding: "{dimension.padding.extratight}",
+  //   },
+  //    // 图表标题
+  //    title: {
+  //     fontSize: "{font.size.large}",
+  //     fontWeight: "{font.fontweight.semibold}",
+  //     color: "{color.surfacecontainer.white100}",
+  //     // color: "{color.onsurface.black88}",
+  //     marginBottom: "{dimension.margin.base}",
+  //     textAlign: 'center'
+  //   },
+  //   // 图例
+  //   legend: {
+  //     fontSize: "{font.size.small}",
+  //     fontWeight: "400",
+  //     fill: "{color.onsurface.black88}",
+  //     display: 'flex',
+  //     justifyContent: 'center',
+  //     gap: "{dimension.gap.loose}",
+  //     marginTop: "{dimension.margin.base}"
+  //   },
+  //   // 坐标轴  
+  //   axis: {
+  //     fontSize: "{font.size.tiny}",
+  //     fontWeight: "400",
+  //     fill: "{color.onsurface.black88}",
+  //   },
+  // },
+  // chart: {
+  //   // 图表容器  
+  //   container: {
+  //     margin: "{dimension.margin.loose} 0",
+  //     padding: "{dimension.padding.extraloose}",
+  //     backgroundColor: "{color.surfacecontainer.white100}",
+  //     borderRadius: "{dimension.borderradius.xl}",
+  //     boxShadow: "{material.hierarchy.2f}",
+  //     borderWidth: "{dimension.borderwidth.narrow}",
+  //     borderColor: "{color.surfacecontainer.black12}",
+  //     borderStyle: "solid"
+  //   },
+  //   // 图表标题
+  //   title: {
+  //     fontSize: "{font.size.large}",
+  //     fontWeight: "{font.fontweight.semibold}",
+  //     color: "{color.surfacecontainer.white100}",
+  //     // color: "{color.onsurface.black88}",
+  //     marginBottom: "{dimension.margin.base}",
+  //     textAlign: 'center'
+  //   },
+  //   // 图例
+  //   legend: {
+  //     fontSize: "{font.size.small}",
+  //     fontWeight: "400",
+  //     fill: "{color.onsurface.black88}",
+  //     display: 'flex',
+  //     justifyContent: 'center',
+  //     gap: "{dimension.gap.loose}",
+  //     marginTop: "{dimension.margin.base}"
+  //   },
+  //   // 坐标轴  
+  //   axis: {
+  //     fontSize: "{font.size.tiny}",
+  //     fontWeight: "400",
+  //     fill: "{color.onsurface.black88}",
+  //   },
+  // },
   // 表格元素配置
   table: {
     // 表格容器  
@@ -2455,21 +2542,8 @@ export const DEFAULT_STYLE_CONFIG = {
       markdownMapping: {
         h2: 'title',
         h3: 'listContainer.listTitle',
-        'li:1': 'listContainer.list.item1',
-        'li:2': 'listContainer.list.item2',
-        'li:3': 'listContainer.list.item3',
-        'li:4': 'listContainer.list.item4',
-        'li:5': 'listContainer.list.item5',
-        'li:6': 'listContainer.list.item6',
-        'li:7': 'listContainer.list.item7',
-        'li:8': 'listContainer.list.item8',
-        'li:9': 'listContainer.list.item9',
-        'li:10': 'listContainer.list.item10',
-        'li:11': 'listContainer.list.item11',
-        'li:12': 'listContainer.list.item12',
-        'li:13': 'listContainer.list.item13',
-        'li:14': 'listContainer.list.item14',
-        'li:15': 'listContainer.list.item15',
+        'li:*': 'listContainer.list.item*',
+        ul: 'listContainer.list.item*',
         p: 'summary.text'
       },
       style: {
@@ -2610,147 +2684,7 @@ export const DEFAULT_STYLE_CONFIG = {
             marginTop: "{dimension.margin.base}",
             position: 'relative',
           },
-          item1: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item2: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item3: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item4: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item5: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item6: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item7: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item8: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item9: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item10: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item11: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item12: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item13: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item14: {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
-          item15: {
+          'item*': {
             metaType: 'text',
             variant: 'elegantCardSegment',
             style: {
@@ -2940,6 +2874,59 @@ export const DEFAULT_STYLE_CONFIG = {
       }
     },
     // Copy End
+
+
+    headerCard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        p: 'text',
+        "chart:*": 'chartContainer.chart*'
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xxxl}",
+        padding: "{dimension.padding.extraloose} 0",
+        boxShadow: "{material.hierarchy.main}",
+        borderRadius: "{dimension.borderradius.xl}",
+        borderWidth: "{dimension.borderwidth.narrow}",
+        borderColor: "{color.surfacecontainer.black12}",
+        borderStyle: "solid",
+        background: "{color.surfacecontainer.white100}",
+        marginBottom: "{dimension.margin.base}",
+      },
+      title: {
+        style: {
+          width: '100%',
+          padding: "0 {dimension.padding.base}",
+          borderLeftWidth: "{dimension.borderwidth.wide}",
+          borderLeftStyle: "solid",
+          borderLeftColor: "{color.primary.brand5}",
+        },
+        metaType: 'text',
+        variant: 'headerCardTitle',
+      },
+      text: {
+        style: {
+          padding: "0 {dimension.padding.base}",
+          marginTop: "{dimension.margin.base}",
+        },
+        metaType: 'text',
+        variant: 'headerCardText',
+      },
+      chartContainer: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+        },
+        "chart*": {
+          metaType: 'chart',
+          variant: 'small'
+        } 
+      }
+    },
   },
 
   // ==================== 图像元件 ====================
