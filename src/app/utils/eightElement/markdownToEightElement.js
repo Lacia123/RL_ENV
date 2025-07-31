@@ -5980,16 +5980,7 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
         filteredOut.push(`${property}: ${value}`);
       }
     });
-    
-    // 🔧 特别检查 fontSize 和 padding
-    if (elementType === 'table' && variant === 'container') {
-      console.log(`🎯 表格样式检查:`);
-      console.log(`   - fontSize: ${cssProperties.fontSize || 'undefined'}`);
-      console.log(`   - padding: ${cssProperties.padding || 'undefined'}`);
-      console.log(`   - background: ${cssProperties.background || 'undefined'}`);
-      console.log(`   - borderRadius: ${cssProperties.borderRadius || 'undefined'}`);
-    }
-    
+        
     // 记录原始值并应用样式更新 - 同时更新classStyle和style
     Object.entries(cssProperties).forEach(([property, value]) => {
       // 记录原始值（优先从classStyle获取）
@@ -6004,7 +5995,6 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
         if (!element.layout.table) element.layout.table = {};
         if (!element.layout.table.style) element.layout.table.style = {};
         element.layout.table.style[property] = value;
-        console.log(`📋 table.container: ${property} = ${value} 已应用到 layout.table.style`);
       }
       
       updatedCount++;
@@ -6099,7 +6089,6 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
     
     // 🔧 新增：表格子元素的特殊处理 - 直接应用到表格子元素
     if (elementType === 'table' && variant === 'container') {
-      console.log(`🔍 表格子元素动作应用检查`);
       
       const subElementTypes = ['th', 'td', 'tr'];
       subElementTypes.forEach(subType => {
@@ -6107,8 +6096,7 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
         const subStyleUpdates = elementStyleUpdates.get(subUpdateKey);
         
         if (subStyleUpdates && element.layout && element.layout[subType]) {
-          console.log(`🎯 为 table.${subType} 应用独立动作`);
-          
+     
           // 创建一个特殊的应用函数，直接应用到子元素配置
           const applySubElementStyles = (subType, updates) => {
             // 过滤CSS属性
@@ -6120,9 +6108,7 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
                 cssProperties[property] = value;
               }
             });
-            
-            console.log(`📋 table.${subType} 收到动作结果:`, Object.keys(cssProperties));
-            
+                        
             // 确保子元素结构存在
             if (!element.layout[subType]) element.layout[subType] = {};
             if (subType === 'tr') {
@@ -6146,7 +6132,6 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
                   }
                   nestedStyles[pseudoClass][nestedProperty] = value;
                   
-                  console.log(`   🔄 转换嵌套属性: ${property} → ${pseudoClass}.${nestedProperty} = ${value}`);
                 } else {
                   // 普通属性直接复制
                   nestedStyles[property] = value;
@@ -6161,24 +6146,10 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
               // 🔧 对 tr 使用嵌套格式转换
               const nestedStyles = convertFlatToNested(cssProperties);
               element.layout[subType].classStyle = nestedStyles;
-              
-              // 记录转换后的样式
-              Object.entries(nestedStyles).forEach(([property, value]) => {
-                if (typeof value === 'object') {
-                  // 嵌套对象
-                  Object.entries(value).forEach(([nestedProp, nestedValue]) => {
-                    console.log(`   ✅ ${property}.${nestedProp} = ${nestedValue} 已应用到 table.${subType}`);
-                  });
-                } else {
-                  // 普通属性
-                  console.log(`   ✅ ${property} = ${value} 已应用到 table.${subType}`);
-                }
-              });
             } else {
               // 其他子元素使用原有逻辑
               Object.entries(cssProperties).forEach(([property, value]) => {
                 element.layout[subType].style[property] = value;
-                console.log(`   ✅ ${property} = ${value} 已应用到 table.${subType}`);
               });
             }
           };
@@ -6190,16 +6161,13 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
     
     // 🔧 新增：图表子元素的特殊处理 - 直接应用到图表子元素
     if (elementType === 'chart' && variant === 'container') {
-      console.log(`🔍 图表子元素动作应用检查`);
       
       const subElementTypes = ['title', 'legend', 'axis'];
       subElementTypes.forEach(subType => {
         const subUpdateKey = `chart.${subType}`;
         const subStyleUpdates = elementStyleUpdates.get(subUpdateKey);
         
-        if (subStyleUpdates && element.layout && element.layout[subType]) {
-          console.log(`🎯 为 chart.${subType} 应用独立动作`);
-          
+        if (subStyleUpdates && element.layout && element.layout[subType]) {          
           // 创建一个特殊的应用函数，直接应用到子元素配置
           const applySubElementStyles = (subType, updates) => {
             // 过滤CSS属性
@@ -6211,9 +6179,7 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
                 cssProperties[property] = value;
               }
             });
-            
-            console.log(`📋 chart.${subType} 收到动作结果:`, Object.keys(cssProperties));
-            
+                        
             // 确保子元素结构存在
             if (!element.layout[subType]) element.layout[subType] = {};
             if (!element.layout[subType].classStyle) element.layout[subType].classStyle = {};
@@ -6221,7 +6187,6 @@ export function applyActionsToEightElement(eightElement, pageElements, actionMan
             // 应用样式到对应的子元素配置
             Object.entries(cssProperties).forEach(([property, value]) => {
               element.layout[subType].classStyle[property] = value;
-              console.log(`   ✅ ${property} = ${value} 已应用到 chart.${subType}`);
             });
           };
           
@@ -6330,11 +6295,7 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
   
   buildIndexMap(updatedEightElement, 0);
   console.log(`   📋 重新分析完成，映射了 ${indexToLayoutMap.size} 个layout`);
-  
-  if (layoutAnalysis) {
-    console.log(`   ℹ️ 已忽略传入的layoutAnalysis，使用深拷贝后结构的重新分析结果`);
-  }
-  
+    
   // 创建基于索引的布局调控映射
   const controlsMap = new Map();
   layoutControls.forEach(control => {
@@ -6358,54 +6319,24 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
       console.warn(`⚠️ 警告: 索引 ${layoutIndex} 对应的layout元素不存在`);
       return;
     }
-    
-    console.log(`   🔍 更新Layout: 索引=${layoutIndex}, ID=${element.id}, 强度=${intensity.toFixed(2)}`);
-    console.log(`      当前元素信息: variant=${element._metadata?.variant}, originalVariant=${element._metadata?.originalVariant}`);
-    console.log(`      当前layout.style.layoutMode=${element.layout?.style?.layoutMode}`);
-    
+       
     const targetVariant = intensity <= 0.5 ? 'column' : 'row';
     const targetDirection = intensity <= 0.5 ? 'VERTICAL' : 'HORIZONTAL';
     
     // 获取当前layout信息
     const currentDirection = element.layout?.style?.layoutMode || 'VERTICAL';
-    const currentVariant = element._metadata?.variant || 'column';
-    
-    console.log(`   🔧 更新Layout 索引=${layoutIndex}, ID=${element.id}:`);
-    console.log(`      原: ${currentVariant}(${currentDirection}) → 新: ${targetVariant}(${targetDirection})`);
-    console.log(`      强度: ${intensity.toFixed(2)}`);
-    console.log(`      🔍 更新前状态:`);
-    console.log(`         element.layout.style.layoutMode: ${element.layout?.style?.layoutMode}`);
-    console.log(`         element.layout.classStyle.layoutMode: ${element.layout?.classStyle?.layoutMode}`);
-    console.log(`         element._metadata.variant: ${element._metadata?.variant}`);
-    
+       
     // 🔧 修复：先清理可能冲突的布局属性，然后同时更新style和classStyle
     if (element.layout) {
-      console.log(`      🎯 更新layoutMode: ${currentDirection} → ${targetDirection}`);
-      
-      // 🆕 先清理可能冲突的属性（但保留板式重心动作设置）
-      const layoutPropertiesToClear = ['layoutMode'];
-      layoutPropertiesToClear.forEach(prop => {
-        if (element.layout.style && element.layout.style.hasOwnProperty(prop)) {
-          console.log(`      🧹 清理 style.${prop}: ${element.layout.style[prop]} → 即将覆盖`);
-        }
-        if (element.layout.classStyle && element.layout.classStyle.hasOwnProperty(prop)) {
-          console.log(`      🧹 清理 classStyle.${prop}: ${element.layout.classStyle[prop]} → 即将覆盖`);
-        }
-      });
-      
+
+           
       // 🔧 不清理 primaryAxisAlignItems 和 counterAxisAlignItems，因为它们可能包含板式重心动作的设置
-      console.log(`      🔒 保留对齐属性以避免覆盖板式重心动作设置`);
-      console.log(`         保留 primaryAxisAlignItems 和 counterAxisAlignItems`);
-      
+        
       // 🔧 保留板式重心动作设置的对齐方式
       // 检查是否已有板式重心动作设置的对齐方式
       const hasExistingJustifyContent = element.layout.style?.justifyContent || element.layout.classStyle?.justifyContent;
       const hasExistingAlignItems = element.layout.style?.alignItems || element.layout.classStyle?.alignItems;
-      
-      console.log(`      🔍 检查现有对齐设置:`);
-      console.log(`         justifyContent: ${hasExistingJustifyContent || 'none'}`);
-      console.log(`         alignItems: ${hasExistingAlignItems || 'none'}`);
-      
+        
       // 🔧 根据布局方向和现有的板式重心动作设置计算新的对齐方式
       let newPrimaryAxisAlignItems, newCounterAxisAlignItems;
       
@@ -6437,22 +6368,13 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
       
       // 🔧 重要：布局调控不应该干预板式重心动作设置
       // 布局调控只负责方向转换，板式重心动作的对齐设置由板式重心动作本身负责
-      console.log(`      🔄 布局调控策略: 只转换布局方向，保留现有对齐设置`);
-      console.log(`         现有 justifyContent: ${hasExistingJustifyContent || 'none'}`);
-      console.log(`         现有 alignItems: ${hasExistingAlignItems || 'none'}`);
-      console.log(`         策略: 保持现有对齐设置不变，让板式重心动作自己处理`)
-      
-      console.log(`      🎯 计算的新对齐方式: primaryAxis=${newPrimaryAxisAlignItems}, counterAxis=${newCounterAxisAlignItems}`);
-      
       // 🔧 同时更新layout.style和layout.classStyle
       if (element.layout.style) {
         element.layout.style.layoutMode = targetDirection;
-        console.log(`      ✅ 已更新 style: layoutMode=${targetDirection}, primaryAxis=${newPrimaryAxisAlignItems}, counterAxis=${newCounterAxisAlignItems}`);
       }
       
       if (element.layout.classStyle) {
         element.layout.classStyle.layoutMode = targetDirection;
-        console.log(`      ✅ 已更新 classStyle: layoutMode=${targetDirection}, primaryAxis=${newPrimaryAxisAlignItems}, counterAxis=${newCounterAxisAlignItems}`);
       }
     }
   
@@ -6510,7 +6432,6 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
             }
           }
         });
-        console.log(`      📝 应用了 ${targetVariant} 样式配置到 classStyle 和 style (排除布局调控和板式重心动作属性)`);
       }
     } catch (error) {
       console.warn(`⚠️ 获取Layout样式配置失败 (${targetVariant}):`, error);
@@ -6526,36 +6447,11 @@ export function applyLayoutControlsToEightElement(eightElement, layoutControls, 
     if (element.layout.classStyle) {
       element.layout.classStyle.layoutMode = importantSettings.layoutMode;
     }
-    
-    console.log(`      🔒 已确保布局调控设置不被覆盖: layoutMode=${importantSettings.layoutMode}`);
-    console.log(`      📝 板式重心动作的 justifyContent 和 alignItems 由板式重心动作本身负责设置`);
-    
-    // 🔧 最终验证：确认更新是否成功
-    console.log(`      🔍 更新后状态验证:`);
-    console.log(`         element.layout.style.layoutMode: ${element.layout?.style?.layoutMode}`);
-    console.log(`         element.layout.classStyle.layoutMode: ${element.layout?.classStyle?.layoutMode}`);
-    console.log(`         element._metadata.variant: ${element._metadata?.variant}`);
-    console.log(`         目标应该是: ${targetDirection}`);
-    
-    const isUpdateSuccessful = (element.layout?.style?.layoutMode === targetDirection) && 
-                             (element.layout?.classStyle?.layoutMode === targetDirection);
-    console.log(`         更新${isUpdateSuccessful ? '成功✅' : '失败❌'}`);
-    
+        
     updatedLayoutsCount++;
-    console.log(`      ✅ Layout 索引=${layoutIndex}, ID=${element.id} 更新完成`);
+
   });
-  
-  console.log(`\n🎨 布局调控应用完成！`);
-  console.log(`   📊 更新的布局数量: ${updatedLayoutsCount}`);
-  
-  if (updatedLayoutsCount > 0) {
-    console.log(`   ✅ 所有布局变化已应用到八要素结构中`);
-  } else {
-    console.log(`   ⚪ 没有布局被更新，可能是因为:`);
-    console.log(`      - 提供的布局ID不存在`);
-    console.log(`      - 布局调控强度未发生变化`);
-  }
-  
+    
   return updatedEightElement;
 }
 
