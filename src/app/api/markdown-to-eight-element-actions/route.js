@@ -169,7 +169,7 @@ export async function POST(request) {
       return NextResponse.json({
         success: true,
         eightElement: processedEightElement,
-        originalEightElement: originalEightElement,
+        // originalEightElement: originalEightElement,
         // 返回应用的动作和布局调控信息
         appliedActions: actions,
         appliedLayoutControls: layoutControls,

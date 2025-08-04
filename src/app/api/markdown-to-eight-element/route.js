@@ -56,7 +56,7 @@ export async function POST(request) {
       return NextResponse.json({
         success: true,
         eightElement: processedEightElement,
-        originalEightElement: eightElement,
+        // originalEightElement: eightElement,
         designTokens: designTokens,
         tokensApplied: !!designTokens
       }, { status: 200 });
