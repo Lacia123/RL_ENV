@@ -750,7 +750,7 @@ export const DEFAULT_STYLE_CONFIG = {
     cardTitle: {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.white100}",
-      fontSize: "{font.size.medium}",
+      fontSize: "{font.size.large}",
     },
     cardSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
@@ -759,58 +759,58 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     cardSegment: {
       color: "{color.onprimary.black88}",
-      fontSize: "{font.size.small}",
+      fontSize: "{font.size.medium}",
     },
 
     // 新拟态风格文字样式
     neomorphismTitle: {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.white100}",
-      fontSize: "{font.size.medium}",
+      fontSize: "{font.size.large}",
     },
     neomorphismSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.black88}",
-      fontSize: "{font.size.small}",
+      fontSize: "{font.size.medium}",
     },
     neomorphismSegment: {
       fontWeight: "{font.fontweight.medium}",
       color: "{color.onprimary.black88}",
-      fontSize: "{font.size.small}",
+      fontSize: "{font.size.medium}",
     },
 
     // 科技渐变风格文字样式
     techGradientTitle: {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.primary.brand6}", // 深蓝色确保可读性
-      fontSize: "{font.size.medium}",
+      fontSize: "{font.size.large}",
     },
     techGradientSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.black88}",
-      fontSize: "{font.size.small}",
+      fontSize: "{font.size.medium}",
     },
     techGradientSegment: {
       fontWeight: "{font.fontweight.medium}",
       color: "{color.onprimary.black88}",
-      fontSize: "{font.size.small}",
+      fontSize: "{font.size.medium}",
     },
 
     // 优雅青蓝卡片风格文字样式
     elegantCardTitle: {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.primary.brand6}", // 深青蓝色确保可读性
-      fontSize: "{font.size.medium}",
+      fontSize: "{font.size.large}",
     },
     elegantCardSubtitle: {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.black88}",
-      fontSize: "{font.size.small}",
+      fontSize: "{font.size.medium}",
     },
     elegantCardSegment: {
       fontWeight: "{font.fontweight.medium}",
       color: "{color.onprimary.black88}",
-      fontSize: "{font.size.small}",
+      fontSize: "{font.size.medium}",
     },
 
     // 标题卡片风格文字样式
