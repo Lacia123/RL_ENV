@@ -13,12 +13,25 @@ import { JSDOM } from 'jsdom';
 
 
 const legendConfig = {
-  fontSize: "{font.size.small}",
+  fontSize: "10px",
   fontWeight: "400",
   fill: "{color.onsurface.black88}",
 }
 
 const axisConfig = {
+  fontSize: "10px",
+  fontWeight: "400",
+  fill: "{color.onsurface.black88}",
+}
+
+
+const smallAxisConfig = {
+  fontSize: "{font.size.small}",
+  fontWeight: "400",
+  fill: "{color.onsurface.black88}",
+}
+
+const smalllegendConfig = {
   fontSize: "{font.size.small}",
   fontWeight: "400",
   fill: "{color.onsurface.black88}",
@@ -167,7 +180,7 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
     // 🆕 根据是否为小图表优化边距
     const optimizedMargin = isSmallChart ? 
       { top: 15, right: 20, bottom: 60, left: 80 } :   // 小图表：减少上下边距，优化空间利用
-      { top: 20, right: 30, bottom: 80, left: 90 };    // 普通图表：保持充足边距
+      { top: 40, right: 50, bottom: 90, left: 90 };    // 普通图表：保持充足边距
     
     const margin = optimizedMargin;
     const innerWidth = width - margin.left - margin.right;
@@ -181,9 +194,9 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
       yTickCount: isSmallChart ? 3 : 5,
       xLabelRotation: isSmallChart ? 30 : 45, // 🆕 小图表使用30度旋转，避免重叠又保持可读性
       // 字体大小 - 🆕 进一步增大小图表的字体差异，特别是轴标题
-      axisLabelSize: isSmallChart ? '20px' : '12px',     // 小图表轴标签显著更大 (18px→20px)
-      dataLabelSize: isSmallChart ? '16px' : '10px',     // 小图表数据标签显著更大
-      legendLabelSize: isSmallChart ? '16px' : '10px',   // 小图表图例显著更大
+      axisLabelSize: isSmallChart ? '20px' : '10px',     // 小图表轴标签显著更大，非小图表调小 (12px→10px)
+      dataLabelSize: isSmallChart ? '16px' : '8px',      // 小图表数据标签显著更大，非小图表调小 (10px→8px)
+      legendLabelSize: isSmallChart ? '16px' : '8px',    // 小图表图例显著更大，非小图表调小 (10px→8px)
       // 显示策略 - 🆕 调整X轴标签显示策略
       showEveryNthXLabel: 1, // 🆕 总是显示所有X轴标签，通过旋转和字体大小解决拥挤问题
       dotRadius: isSmallChart ? 7 : 4,          // 🆕 小图表点显著更大
@@ -517,7 +530,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
                         .attr('class', `data-label data-label-${colorClassSuffix}`)
                         .attr('x', pos.x)
                         .attr('y', pos.y)
-                        .attr('font-size', displayConfig.dataLabelSize || '10px') // 🆕 使用动态数据标签字体大小
+                        .attr('font-size', displayConfig.dataLabelSize || '8px') // 🆕 使用动态数据标签字体大小
                         .attr('text-anchor', pos.anchor)
                         .attr('fill', '#000') // Use series color for label
                         .attr('font-weight', 'normal')
@@ -569,10 +582,11 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     // 获取轴样式配置
     const axisClassName = chartStyleConfig?.axis?.className || 'axis-label';
     
-    // 🆕 使用 axisConfig 中的 token 解析样式
-    const resolvedAxisFontSize = resolveToken(axisConfig.fontSize);
-    const resolvedAxisFontWeight = resolveToken(axisConfig.fontWeight);
-    const resolvedAxisFill = resolveToken(axisConfig.fill);
+    // 🆕 根据图表大小选择合适的轴配置
+    const currentAxisConfig = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
+    const resolvedAxisFontSize = resolveToken(currentAxisConfig.fontSize);
+    const resolvedAxisFontWeight = resolveToken(currentAxisConfig.fontWeight);
+    const resolvedAxisFill = resolveToken(currentAxisConfig.fill);
     
     // 🆕 显示所有X轴标签，优化日期显示
     xAxis.selectAll('g')
@@ -586,7 +600,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       .attr('dy', '.71em')
       .attr('transform', displayConfig.xLabelRotation ? `rotate(${displayConfig.xLabelRotation})` : 'rotate(45)') // 🆕 使用动态旋转角度
       .attr('text-anchor', displayConfig.xLabelRotation <= 15 ? 'middle' : 'start') // 🆕 小角度旋转时居中对齐
-      .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '12px') // 🆕 优先使用token，其次使用动态配置
+      .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
       .attr('font-weight', resolvedAxisFontWeight || '400') // 🆕 使用token中的字体粗细
       .attr('fill', resolvedAxisFill || '#666') // 🆕 使用token中的颜色
       .text(d => {
@@ -618,7 +632,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
           .attr('x', -9)
           .attr('dy', '.32em')
           .attr('text-anchor', 'end')
-          .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '12px') // 🆕 优先使用token，其次使用动态配置
+          .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
           .attr('font-weight', resolvedAxisFontWeight || '400') // 🆕 使用token中的字体粗细
           .attr('fill', resolvedAxisFill || '#666') // 🆕 使用token中的颜色
           .text(d => {
@@ -680,17 +694,18 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       // 获取图例样式配置
       const legendClassName = chartStyleConfig?.legend?.className || 'legend-label';
       
-      // 🆕 使用 legendConfig 中的 token 解析样式
-      const resolvedFontSize = resolveToken(legendConfig.fontSize);
-      const resolvedFontWeight = resolveToken(legendConfig.fontWeight);
-      const resolvedFill = resolveToken(legendConfig.fill);
+      // 🆕 根据图表大小选择合适的图例配置
+      const currentLegendConfig = displayConfig.isSmallChart ? smalllegendConfig : legendConfig;
+      const resolvedFontSize = resolveToken(currentLegendConfig.fontSize);
+      const resolvedFontWeight = resolveToken(currentLegendConfig.fontWeight);
+      const resolvedFill = resolveToken(currentLegendConfig.fill);
       
       // 减小图例文字大小，截断过长的文字
       const text = legendItem.append('text')
         .attr('class', legendClassName)
         .attr('x', 20)
         .attr('y', 9)
-        .attr('font-size', resolvedFontSize || displayConfig.legendLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
+        .attr('font-size', resolvedFontSize || displayConfig.legendLabelSize || '8px') // 🆕 优先使用token，其次使用动态配置
         .attr('font-weight', resolvedFontWeight || '400')  // 🆕 使用token中的字体粗细
         .attr('fill', resolvedFill || '#666')  // 🆕 使用token中的颜色
         .attr('alignment-baseline', 'middle')
@@ -815,10 +830,11 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
       .attr('class', 'axis x-axis')
       .attr('transform', `translate(0,${innerHeight})`);
     
-    // 🆕 使用 axisConfig 中的 token 解析样式
-    const resolvedAxisFontSize2 = resolveToken(axisConfig.fontSize);
-    const resolvedAxisFontWeight2 = resolveToken(axisConfig.fontWeight);
-    const resolvedAxisFill2 = resolveToken(axisConfig.fill);
+    // 🆕 根据图表大小选择合适的轴配置
+    const currentAxisConfig2 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
+    const resolvedAxisFontSize2 = resolveToken(currentAxisConfig2.fontSize);
+    const resolvedAxisFontWeight2 = resolveToken(currentAxisConfig2.fontWeight);
+    const resolvedAxisFill2 = resolveToken(currentAxisConfig2.fill);
     
     // 添加X轴刻度线和标签（品牌名称）
     xAxis.selectAll('.tick')
@@ -838,7 +854,7 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
           .attr('y', 9)
           .attr('dy', '.71em')
           .attr('text-anchor', 'middle')
-          .attr('font-size', resolvedAxisFontSize2 || displayConfig.axisLabelSize || '14px') // 🆕 优先使用token，其次使用动态配置
+          .attr('font-size', resolvedAxisFontSize2 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
           .attr('font-weight', resolvedAxisFontWeight2 || '400') // 🆕 使用token中的字体粗细
           .attr('fill', resolvedAxisFill2 || '#333') // 🆕 使用token中的颜色
           .text(d => d);
@@ -875,7 +891,7 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
       .attr('y', d => yScale(parseFloat(d[valueField].toString().replace('%', '')) || 0) - 5)
       .attr('text-anchor', 'middle')
       .attr('fill', '#333')
-      .attr('font-size', displayConfig.dataLabelSize || '12px') // 🆕 使用动态数据标签字体大小
+      .attr('font-size', displayConfig.dataLabelSize || '8px') // 🆕 使用动态数据标签字体大小
       .text(d => d[valueField]);
     
     // 将SVG转换为字符串
@@ -985,10 +1001,11 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
     const yAxis = g.append('g')
       .attr('class', 'axis y-axis');
     
-    // 🆕 使用 axisConfig 中的 token 解析样式
-    const resolvedAxisFontSize3 = resolveToken(axisConfig.fontSize);
-    const resolvedAxisFontWeight3 = resolveToken(axisConfig.fontWeight);
-    const resolvedAxisFill3 = resolveToken(axisConfig.fill);
+    // 🆕 根据图表大小选择合适的轴配置
+    const currentAxisConfig3 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
+    const resolvedAxisFontSize3 = resolveToken(currentAxisConfig3.fontSize);
+    const resolvedAxisFontWeight3 = resolveToken(currentAxisConfig3.fontWeight);
+    const resolvedAxisFill3 = resolveToken(currentAxisConfig3.fill);
     
     // 添加Y轴刻度线和标签
     yAxis.selectAll('.tick')
@@ -1008,7 +1025,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
           .attr('x', -9)
           .attr('dy', '.32em')
           .attr('text-anchor', 'end')
-          .attr('font-size', resolvedAxisFontSize3 || displayConfig.axisLabelSize || '14px') // 🆕 优先使用token，其次使用动态配置
+          .attr('font-size', resolvedAxisFontSize3 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
           .attr('font-weight', resolvedAxisFontWeight3 || '400') // 🆕 使用token中的字体粗细
           .attr('fill', resolvedAxisFill3 || '#333') // 🆕 使用token中的颜色
           .text(d => d);
@@ -1040,17 +1057,18 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('dy', '.35em')
       .attr('text-anchor', 'start')
       .attr('fill', '#333')
-      .attr('font-size', displayConfig.dataLabelSize || '12px') // 🆕 使用动态数据标签字体大小
+      .attr('font-size', displayConfig.dataLabelSize || '8px') // 🆕 使用动态数据标签字体大小
       .text(d => d[valueField]);
     
     
     // 获取轴样式配置
     const axisClassName = chartStyleConfig?.axis?.className || 'axis-title';
     
-    // 🆕 使用 axisConfig 中的 token 解析样式
-    const resolvedAxisFontSize4 = resolveToken(axisConfig.fontSize);
-    const resolvedAxisFontWeight4 = resolveToken(axisConfig.fontWeight);
-    const resolvedAxisFill4 = resolveToken(axisConfig.fill);
+    // 🆕 根据图表大小选择合适的轴配置
+    const currentAxisConfig4 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
+    const resolvedAxisFontSize4 = resolveToken(currentAxisConfig4.fontSize);
+    const resolvedAxisFontWeight4 = resolveToken(currentAxisConfig4.fontWeight);
+    const resolvedAxisFill4 = resolveToken(currentAxisConfig4.fill);
     
     // 添加X轴标题
     g.append('text')
@@ -1058,7 +1076,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('x', innerWidth / 2)
       .attr('y', innerHeight + 40)
       .attr('text-anchor', 'middle')
-      .attr('font-size', resolvedAxisFontSize4 || displayConfig.axisLabelSize || '14px') // 🆕 优先使用token，其次使用动态配置
+      .attr('font-size', resolvedAxisFontSize4 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
       .attr('font-weight', resolvedAxisFontWeight4 || '400') // 🆕 使用token中的字体粗细
       .attr('fill', resolvedAxisFill4 || '#333') // 🆕 使用token中的颜色
       .text(valueField);
@@ -1070,7 +1088,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('x', -innerHeight / 2)
       .attr('y', -60)
       .attr('text-anchor', 'middle')
-      .attr('font-size', resolvedAxisFontSize4 || displayConfig.axisLabelSize || '14px') // 🆕 优先使用token，其次使用动态配置
+      .attr('font-size', resolvedAxisFontSize4 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
       .attr('font-weight', resolvedAxisFontWeight4 || '400') // 🆕 使用token中的字体粗细
       .attr('fill', resolvedAxisFill4 || '#333') // 🆕 使用token中的颜色
       .text(dateField);
@@ -1183,7 +1201,7 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
       .attr('stroke-width', 2);
     
     // 🆕 应用小图表优化 - 标签字体大小
-    const labelFontSize = displayConfig.dataLabelSize || '12px';
+    const labelFontSize = displayConfig.dataLabelSize || '8px';
     
     // 添加标签
     arcs.append('text')
@@ -1198,7 +1216,7 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
     arcs.append('text')
       .attr('transform', d => `translate(${arc.centroid(d)})`)
       .attr('text-anchor', 'middle')
-      .attr('font-size', displayConfig.dataLabelSize || '12px') // 🆕 使用动态字体大小
+      .attr('font-size', displayConfig.dataLabelSize || '8px') // 🆕 使用动态字体大小
       .attr('fill', '#fff')
       .attr('font-weight', 'bold')
       .attr('stroke', '#000')
@@ -1212,11 +1230,12 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
         .attr('class', 'legend')
         .attr('transform', `translate(${radius + 40}, ${-pieData.length * 10})`);
       
-      // 🆕 使用 legendConfig 中的 token 解析样式
-      const resolvedFontSize = resolveToken(legendConfig.fontSize);
-      const resolvedFontWeight = resolveToken(legendConfig.fontWeight);
-      const resolvedFill = resolveToken(legendConfig.fill);
-      const legendFontSize = resolvedFontSize || displayConfig.legendLabelSize || '12px';
+      // 🆕 根据图表大小选择合适的图例配置
+      const currentLegendConfig2 = displayConfig.isSmallChart ? smalllegendConfig : legendConfig;
+      const resolvedFontSize = resolveToken(currentLegendConfig2.fontSize);
+      const resolvedFontWeight = resolveToken(currentLegendConfig2.fontWeight);
+      const resolvedFill = resolveToken(currentLegendConfig2.fill);
+      const legendFontSize = resolvedFontSize || displayConfig.legendLabelSize || '8px';
       
       pieData.forEach((d, i) => {
         const legendItem = legend.append('g')
