@@ -34,7 +34,7 @@ const MARKDOWN_TEMPLATES = {
    AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注
 
    ### 中国市场
-   <percentValue color={color.success.green5}>#### 15%</percentValue>
+   <percentValue color={color.success.green6}>#### 15%</percentValue>
    AI-PC 出货量
 
    ### 全球市场  

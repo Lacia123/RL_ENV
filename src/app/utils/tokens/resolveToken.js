@@ -16,7 +16,7 @@ import colorSecondary from './color/secondary.js';
 import colorSecondaryContainer from './color/secondarycontainer.js';
 import colorTertiary from './color/tertiary.js';
 import colorTertiaryContainer from './color/tertiarycontainer.js';
-import colorError from './color/error.js';
+import colorErr from './color/err.js';
 import colorSuccess from './color/success.js';
 import colorWarning from './color/warning.js';
 import colorLink from './color/link.js';
@@ -98,7 +98,8 @@ const tokenCollections = deepMerge(
   colorSecondary,
   colorSecondaryContainer,
   colorTertiary,
-  colorError,
+  colorErr,
+  // colorError,
   colorSuccess,
   colorWarning,
   colorLink,
