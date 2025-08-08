@@ -441,7 +441,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 根布局元素
     root: {
       style: {
-        padding: `${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.base} ${DIMENSION_CONSTANTS.PADDING.loose}`,
+        padding: `${DIMENSION_CONSTANTS.PADDING.base}`,
         margin: DIMENSION_CONSTANTS.MARGIN.base,
         backgroundColor: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
         borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.large,
@@ -823,6 +823,22 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.black76}",
       fontSize: "{font.size.medium}",
+    },
+    percentItemTitle: {
+      fontSize: "{font.size.small}",
+      fontWeight: "bold",
+      color: "{color.onsurfacecontainer.grey9}",
+    },
+    percentValue: {
+      fontSize: "{font.size.xxl}",
+      fontWeight: "bold", 
+      color: "{color.error.red5}",
+    },
+    percentItemDescription: {
+      lineHeight: "1.4",
+      fontSize: "{font.size.tiny}",
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.onsurfacecontainer.grey9}",
     }
   },
 
@@ -2885,7 +2901,6 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     // Copy End
 
-
     headerCard: {
       type: 'template',
       markdownMapping: {
@@ -2937,6 +2952,92 @@ export const DEFAULT_STYLE_CONFIG = {
         } 
       }
     },
+  
+    headerPrecentCard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        p: 'text',
+        'h3+h4+p:group': 'percentItems.percentItem*', // 将h3+h4+p组合分组到percentItems容器中的percentItem
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: "{dimension.borderradius.xl}",
+        padding: "{dimension.padding.extraloose} 0",
+        boxShadow: "{material.hierarchy.main}",
+        borderWidth: "{dimension.borderwidth.narrow}",
+        borderColor: "{color.surfacecontainer.black12}",
+        borderStyle: "solid",
+        background: "{color.surfacecontainer.white100}",
+        marginBottom: "{dimension.margin.base}",
+      },
+      title: {
+        style: {
+          width: '100%',
+          padding: "0 {dimension.padding.base}",
+          borderLeftWidth: "{dimension.borderwidth.wide}",
+          borderLeftStyle: "solid",
+          borderLeftColor: "{color.primary.brand5}",
+        },
+        metaType: 'text',
+        variant: 'headerCardTitle',
+      },
+      text: {
+        style: {
+          padding: "0 {dimension.padding.base}",
+          marginTop: "{dimension.margin.base}",
+        },
+        metaType: 'text',
+        variant: 'headerCardText',
+      },
+      percentItems: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          gap: "{dimension.gap.loose}",
+          padding: "{dimension.padding.base}",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+        },
+        "percentItem*": {
+          type: 'template',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            flex: "1",
+            minWidth: "200px",
+            padding: "{dimension.padding.base}",
+            alignItems: "center",
+            textAlign: "center",
+          },
+          markdownMapping: {
+            h3: 'itemTitle',
+            h4: 'percentValue',
+            p: 'itemDescription',
+          },
+          itemTitle: {
+            style: {
+              marginBottom: "{dimension.margin.tight}",
+            },
+            metaType: 'text',
+            variant: 'percentItemTitle',
+          },
+          percentValue: {
+            style: {
+              marginBottom: "{dimension.margin.tight}",
+            },
+            metaType: 'text',
+            variant: 'percentValue',
+          },
+          itemDescription: {
+            metaType: 'text',
+            variant: 'percentItemDescription',
+          }
+        }
+      }
+    }
   },
 
   // ==================== 图像元件 ====================

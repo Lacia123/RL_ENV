@@ -156,10 +156,16 @@ function detectMathInHTML(htmlContent) {
 }
 
 // 创建文本元素 - 修改以支持富文本和KaTeX
-function createTextElement(text, variant = 'normal', richTextOptions = {}) {
+function createTextElement(text, variant = 'normal', richTextOptions = {}, customStyles = null) {
   const id = generateUUID();
   // 获取文本元素的样式配置
   let textStyleConfig = getElementStyleConfig('text', variant);
+  
+  // 🆕 应用自定义样式覆盖到元件级别
+  if (customStyles && Object.keys(customStyles).length > 0) {
+    console.log(`🎨 为文本元件应用自定义样式: variant=${variant}`, customStyles);
+    textStyleConfig = applyCustomStyleOverride(textStyleConfig, customStyles, variant);
+  }
   
   // 判断是否有富文本选项
   const hasRichText = Object.keys(richTextOptions).length > 0;
@@ -573,8 +579,8 @@ function isCardTag(line) {
   return { isCardTag: false };
 }
 // 解析模板卡片内容
-function parseTemplateCardContent(content, cardStyleConfig) {
-  console.log(`解析模板卡片内容，长度: ${content.length}`);
+function parseTemplateCardContent(content, cardStyleConfig, returnElements = false) {
+  console.log(`解析模板卡片内容，长度: ${content.length}, 返回元素: ${returnElements}`);
   
   const lines = content.split('\n');
   const children = [];
@@ -582,6 +588,23 @@ function parseTemplateCardContent(content, cardStyleConfig) {
 
   // 🆕 检查是否有 markdownMapping 配置
   const hasMarkdownMapping = cardStyleConfig.markdownMapping && Object.keys(cardStyleConfig.markdownMapping).length > 0;
+  
+  // 🆕 预解析所有分组配置
+  const groupConfigs = [];
+  if (hasMarkdownMapping) {
+    for (const [key, value] of Object.entries(cardStyleConfig.markdownMapping)) {
+      const groupInfo = parseGroupPattern(key);
+      if (groupInfo) {
+        groupConfigs.push({
+          pattern: groupInfo.elements,
+          templatePath: value,
+          mappingKey: key,
+          groupInfo
+        });
+      }
+    }
+    console.log(`🔍 发现 ${groupConfigs.length} 个分组配置:`, groupConfigs.map(g => g.mappingKey));
+  }
   
   // 🆕 用于跟踪容器，确保相同容器的子元素被合并
   const containerMap = new Map(); // key: containerName, value: containerElement
@@ -597,7 +620,84 @@ function parseTemplateCardContent(content, cardStyleConfig) {
       continue;
     }
 
-    // 🆕 优先检查 markdown 格式（如果有 markdownMapping 配置）
+    // 🆕 优先检查是否匹配分组模式
+    if (groupConfigs.length > 0) {
+      const groupMatch = checkGroupStart(line, groupConfigs);
+      if (groupMatch) {
+        console.log(`🔍 发现分组起始元素: ${groupMatch.startElement.type}, 分组模式: ${groupMatch.groupConfig.mappingKey}`);
+        
+        // 处理分组收集
+        const groupResult = collectGroupItems(lines, i, groupMatch.groupConfig, cardStyleConfig);
+        if (groupResult) {
+          // 处理分组路径：检查是否是通配符路径（如 percentItems.percentItem*）
+          const templatePath = groupMatch.groupConfig.templatePath;
+          if (templatePath.includes('*')) {
+            // 通配符路径：为每个分组项创建独立的子元素
+            const pathParts = templatePath.split('.');
+            const parentPath = pathParts[0]; // percentItems
+            const childPattern = pathParts[1]; // percentItem*
+            const childBaseName = childPattern.replace('*', ''); // percentItem
+            
+            console.log(`🔧 处理通配符分组路径: ${templatePath}, 分组项数量: ${groupResult.items.length}`);
+            
+            // 首先确保父容器存在
+            let parentContainer = containerMap.get(parentPath);
+            if (!parentContainer) {
+              parentContainer = createTemplateTagElement(parentPath, '', cardStyleConfig);
+              if (parentContainer) {
+                children.push(parentContainer);
+                containerMap.set(parentPath, parentContainer);
+                console.log(`创建父容器: ${parentPath}`);
+              }
+            }
+            
+            // 为每个分组项创建独立的子元素
+            groupResult.items.forEach((groupItem, index) => {
+              const childName = `${childBaseName}${index + 1}`; // percentItem1, percentItem2, ...
+              const childPath = `${parentPath}.${childName}`;
+              const itemContent = groupItem.rawLines.join('\n');
+              
+              console.log(`🔧 创建分组子项 ${index + 1}/${groupResult.items.length}: ${childPath}`);
+              console.log(`📝 子项内容: "${itemContent}"`);
+              console.log(`🎯 分组项详情:`, JSON.stringify(groupItem, null, 2));
+              
+              const childElement = createOrMergeTemplateElement(
+                childPath,
+                itemContent,
+                cardStyleConfig,
+                containerMap,
+                children,
+                null,
+                { isGroupItem: true, groupItemIndex: index, groupItem }
+              );
+              
+              if (childElement) {
+                console.log(`✅ 分组子项创建成功: ${childPath}`);
+              } else {
+                console.log(`❌ 分组子项创建失败: ${childPath}`);
+              }
+            });
+          } else {
+            // 普通路径：整体创建分组元素
+            const templateElement = createOrMergeTemplateElement(
+              templatePath,
+              groupResult.content,
+              cardStyleConfig,
+              containerMap,
+              children,
+              null,
+              { isGroup: true, groupItems: groupResult.items, groupConfig: groupMatch.groupConfig }
+            );
+          }
+          
+          // 跳过已处理的行
+          i = groupResult.nextIndex;
+          continue;
+        }
+      }
+    }
+
+    // 🆕 检查 markdown 格式（单独元素处理）
     if (hasMarkdownMapping) {
       const parseResult = parseMarkdownToTemplate(line, cardStyleConfig.markdownMapping, listItemCounter);
       if (parseResult && parseResult.markdownResult) {
@@ -605,6 +705,8 @@ function parseTemplateCardContent(content, cardStyleConfig) {
         listItemCounter = newListItemCounter;
         
         console.log(`发现 markdown 格式: ${markdownResult.type} -> ${markdownResult.templatePath}, 内容: "${markdownResult.content}"`);
+        
+
         
         // 🆕 特殊处理表格：收集完整的表格内容
         if (markdownResult.type === 'table' && markdownResult.isTableLine) {
@@ -946,6 +1048,10 @@ function parseTemplateCardContent(content, cardStyleConfig) {
     }
   }
 
+  if (returnElements) {
+    return children;
+  }
+  
   return children;
 }
 
@@ -1001,9 +1107,187 @@ function collectUnmappedMarkdownContent(lines, startIndex, markdownMapping) {
     endIndex: i // 下一行的索引
   };
 }
+// 🆕 解析分组模式，支持 h3+h4+p:group 这种语法
+function parseGroupPattern(pattern) {
+  const groupMatch = pattern.match(/^(.+):group$/);
+  if (!groupMatch) return null;
+  
+  const elements = groupMatch[1].split('+').map(el => el.trim());
+  return {
+    elements,
+    pattern: groupMatch[1],
+    isGroup: true
+  };
+}
+
+// 🆕 检查当前行是否匹配任何分组模式的起始元素
+function checkGroupStart(line, groupConfigs) {
+  for (const groupConfig of groupConfigs) {
+    const firstElementType = groupConfig.pattern[0];
+    const parseResult = parseMarkdownToTemplate(line, { [firstElementType]: 'temp' }, 0);
+    
+    if (parseResult && parseResult.markdownResult && parseResult.markdownResult.type === firstElementType) {
+      return {
+        groupConfig,
+        startElement: parseResult.markdownResult
+      };
+    }
+  }
+  return null;
+}
+
+// 🆕 收集分组项目
+function collectGroupItems(lines, startIndex, groupConfig, cardStyleConfig) {
+  console.log(`🔍 开始收集分组项目，分组模式: ${groupConfig.pattern.join('+')}`);
+  
+  const groupPattern = groupConfig.pattern;
+  const groupItems = [];
+  let i = startIndex;
+  
+  while (i < lines.length) {
+    const currentGroupItem = {
+      elements: {},
+      rawLines: []
+    };
+    
+    // 收集一个完整的分组项
+    let elementIndex = 0;
+    let j = i;
+    
+    while (j < lines.length && elementIndex < groupPattern.length) {
+      const line = lines[j].trim();
+      if (!line) {
+        j++;
+        continue;
+      }
+      
+      const expectedType = groupPattern[elementIndex];
+      const parseResult = parseMarkdownToTemplate(line, { [expectedType]: 'temp' }, 0);
+      
+      if (parseResult && parseResult.markdownResult && parseResult.markdownResult.type === expectedType) {
+        // 匹配期望的元素类型
+        currentGroupItem.elements[expectedType] = parseResult.markdownResult.content;
+        currentGroupItem.rawLines.push(line);
+        elementIndex++;
+      } else if (expectedType === 'p' && line.match(/^[^#]/)) {
+        // 对于p类型，匹配非标题行
+        currentGroupItem.elements['p'] = line;
+        currentGroupItem.rawLines.push(line);
+        elementIndex++;
+      } else {
+        // 不匹配，检查是否是新的分组开始
+        const newGroupCheck = checkGroupStart(line, [groupConfig]);
+        if (newGroupCheck && elementIndex > 0) {
+          // 是新的分组开始，当前分组项收集完成
+          break;
+        } else if (elementIndex === 0) {
+          // 第一个元素就不匹配，说明不是分组
+          return null;
+        } else {
+          // 不是分组模式的一部分，停止收集
+          break;
+        }
+      }
+      
+      j++;
+    }
+    
+    // 如果收集到了完整的分组项（所有元素都有）
+    if (elementIndex === groupPattern.length) {
+      groupItems.push(currentGroupItem);
+      i = j;
+      
+      // 检查下一行是否是新的分组开始
+      if (j < lines.length) {
+        const nextLine = lines[j].trim();
+        if (nextLine) {
+          const nextGroupCheck = checkGroupStart(nextLine, [groupConfig]);
+          if (!nextGroupCheck) {
+            // 不是新的分组开始，结束收集
+            break;
+          }
+        }
+      }
+    } else {
+      // 没有收集到完整的分组项，结束收集
+      break;
+    }
+  }
+  
+  if (groupItems.length > 0) {
+    const groupContent = groupItems.map(item => item.rawLines.join('\n')).join('\n\n');
+    console.log(`📋 收集到 ${groupItems.length} 个分组项目`);
+    
+    return {
+      items: groupItems,
+      content: groupContent,
+      nextIndex: i
+    };
+  }
+  
+  return null;
+}
+
+// 🆕 解析自定义样式标签，如 <percentValue color={color.success.green5}>#### 15%</percentValue>
+function parseCustomStyleTag(line) {
+  // 匹配格式: <tagName attr1={value1} attr2={value2}>content</tagName>
+  const customTagRegex = /<(\w+)(\s+[^>]*)?>([^<]+)<\/\1>/;
+  const match = line.match(customTagRegex);
+  
+  if (!match) {
+    return null;
+  }
+  
+  const tagName = match[1];
+  const attributesStr = match[2] || '';
+  const content = match[3].trim();
+  
+  // 解析属性
+  const customStyles = {};
+  if (attributesStr.trim()) {
+    // 匹配属性格式: attr={value}
+    const attrRegex = /(\w+)=\{([^}]+)\}/g;
+    let attrMatch;
+    while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
+      const attrName = attrMatch[1];
+      const attrValue = attrMatch[2];
+      
+      // 将属性名转换为CSS样式属性
+      const cssProperty = attrName === 'color' ? 'color' : attrName;
+      customStyles[cssProperty] = attrValue;
+    }
+  }
+  
+  console.log(`🎨 解析到自定义样式标签: ${tagName}, 内容: "${content}", 样式:`, customStyles);
+  
+  return {
+    variant: tagName,
+    content: content,
+    customStyles: customStyles
+  };
+}
+
 // 🆕 解析 markdown 格式并映射到模板路径
 function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
   let currentListItemCounter = listItemCounter;
+  
+  // 🆕 首先检查是否是自定义样式标签
+  const customStyleResult = parseCustomStyleTag(line);
+  if (customStyleResult) {
+    // 解析内容部分的markdown格式（如 #### 15%）
+    const contentResult = parseMarkdownToTemplate(customStyleResult.content, markdownMapping, currentListItemCounter);
+    if (contentResult && contentResult.markdownResult) {
+      // 将自定义样式附加到解析结果
+      return {
+        markdownResult: {
+          ...contentResult.markdownResult,
+          customVariant: customStyleResult.variant,
+          customStyles: customStyleResult.customStyles
+        },
+        newListItemCounter: contentResult.newListItemCounter
+      };
+    }
+  }
   
   // 🆕 优先检查列表项格式（支持单独的li:n映射）
   const listItemInfo = isListItem(line);
@@ -1513,8 +1797,10 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
       // 如果传入了已解析的元素，直接使用
       childElement = existingElement;
     } else {
-      // 否则创建新的模板元素，使用实际的子元素名称
-      childElement = createTemplateTagElement(actualChildTagName, content, parentConfig, markdownData);
+      // 否则创建新的模板元素，使用子元素配置
+      // 为子元素创建临时配置对象，以便createTemplateTagElement能正确访问
+      const tempChildConfig = { [actualChildTagName]: childConfig };
+      childElement = createTemplateTagElement(actualChildTagName, content, tempChildConfig, markdownData);
       if (!childElement) {
         return null;
       }
@@ -1809,6 +2095,23 @@ function createElementContainer(tagName, content, cardStyleConfig, elementInstan
   
   return containerElement;
 }
+// 🆕 应用自定义样式覆盖
+function applyCustomStyleOverride(baseStyle, customStyles, customVariant) {
+  if (!customStyles) {
+    return baseStyle;
+  }
+  
+  // 创建样式副本并应用覆盖
+  const overriddenStyle = { ...baseStyle };
+  
+  Object.entries(customStyles).forEach(([property, value]) => {
+      const resolvedValue = resolveToken(`{${value}}`);
+      overriddenStyle[property] = resolvedValue;
+  });
+  
+  return overriddenStyle;
+}
+
 // 创建模板标签元素
 function createTemplateTagElement(tagName, content, cardStyleConfig, markdownData = null) {
   const id = generateUUID();
@@ -1819,6 +2122,46 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
   if (!tagConfig) {
     console.warn(`警告: 未找到模板标签 ${tagName} 的配置`);
     return null;
+  }
+
+  // 🆕 检查是否有嵌套的markdownMapping，如果有，需要递归解析内容
+  if (tagConfig.markdownMapping && content && content.trim()) {
+    console.log(`🔍 发现嵌套markdownMapping，递归解析内容: ${tagName}`);
+    
+    // 递归解析嵌套的markdown内容
+    const nestedChildren = [];
+    const nestedContainerMap = new Map();
+    
+    // 使用递归调用parseTemplateCardContent来处理嵌套内容
+    const nestedElements = parseTemplateCardContent(content, tagConfig, true);
+    
+    if (nestedElements && nestedElements.length > 0) {
+      console.log(`✅ 嵌套解析成功，获得 ${nestedElements.length} 个子元素`);
+      
+      // 创建容器元素来包装嵌套的子元素
+      const containerElement = {
+        dataKeys: [],
+        name: "layout",
+        "name-zh": `嵌套模板容器-${tagName}`,
+        "file-type": "template",
+        type: "layout",
+        variant: "normal",
+        id: id,
+        className: uniqueClassName,
+        layout: {
+          direction: tagConfig.style?.flexDirection === 'row' ? 'horizontal' : 'vertical',
+          style: tagConfig.style || {},
+          children: nestedElements,
+          classStyle: {
+            ...(tagConfig.style || {})
+          },
+          className: uniqueClassName,
+        },
+        
+      };
+      
+      return containerElement;
+    }
   }
 
   // 🆕 优先检查 markdownData 的类型，决定如何渲染元素
@@ -1869,11 +2212,26 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
   if (tagConfig.metaType && tagConfig.variant) {
     console.log(`创建元件引用: ${tagConfig.metaType}.${tagConfig.variant}`);
     
+    // 🆕 处理自定义样式覆盖
+    let finalVariant = tagConfig.variant;
+    let styleOverride = null;
+    
+    // 检查是否有自定义变体和样式
+    if (markdownData && markdownData.customVariant) {
+      console.log(`🎨 检测到自定义变体: ${markdownData.customVariant}`);
+      // 如果自定义变体与当前标签配置匹配，应用自定义样式
+      if (markdownData.customVariant === finalVariant) {
+        styleOverride = markdownData.customStyles;
+        console.log(`✅ 变体匹配，将应用自定义样式:`, styleOverride);
+      }
+    }
+    
     // 根据 metaType 创建对应的元件
     let elementInstance = null;
     if (tagConfig.metaType === 'text') {
-      console.log(`🔍 创建文本元素: content="${content.substring(0, 30)}...", variant="${tagConfig.variant}"`);
-      elementInstance = createTextElement(content, tagConfig.variant);
+      console.log(`🔍 创建文本元素: content="${content.substring(0, 30)}...", variant="${finalVariant}"`);
+      // 🆕 将自定义样式传递给文本元件
+      elementInstance = createTextElement(content, finalVariant, {}, styleOverride);
       console.log(`🔍 文本元素创建结果:`, elementInstance ? '成功' : '失败');
     } else if (tagConfig.metaType === 'button') {
       // 🆕 处理button类型，从markdownData中获取URL和变体信息
@@ -1910,6 +2268,9 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
     if (tagConfig.style) {
       console.log(`为元件引用创建样式容器: ${tagName}`);
       
+      // 🆕 容器使用基础样式，自定义样式已应用到元件级别
+      const finalStyle = tagConfig.style;
+      
       // 创建容器来包装元件实例
       const containerElement = {
         dataKeys: [],
@@ -1924,7 +2285,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
           isLayout: true,
           isElementContainer: true,
           containedElementType: tagConfig.metaType,
-          containedElementVariant: tagConfig.variant,
+          containedElementVariant: finalVariant,
           tagContent: content
         },
         layout: {
@@ -1942,10 +2303,10 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             width: "100%",
             "box-sizing": "border-box",
             position: "relative",
-            ...(tagConfig.style || {}) // 应用标签样式
+            ...finalStyle // 容器使用基础样式
           },
           classStyle: {
-            ...(tagConfig.style || {})
+            ...finalStyle // 容器使用基础样式
           },
           className: uniqueClassName,
           children: [elementInstance] // 包装元件实例
@@ -5341,7 +5702,7 @@ function createEightElementRoot(markdownElements, rootAttributes = {}) {
         layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
         layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
-        width: "calc(100% - 30px)",
+        // width: "calc(100% - 30px)",
         height: "100%",
         position: "relative",
         "back-width": "auto",

@@ -29,6 +29,23 @@ const MARKDOWN_TEMPLATES = {
 ## 设计特点
 优雅青蓝卡片系列采用渐变背景、精致装饰和层次化设计，提供三种专业的内容展示方式。
 
+<card:headerPrecentCard>
+   ## 二、市场概述
+   AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注
+
+   ### 中国市场
+   <percentValue color={color.success.green5}>#### 15%</percentValue>
+   AI-PC 出货量
+
+   ### 全球市场  
+   #### 25%
+   AI-PC 渗透率
+
+   ### 未来预测
+   #### 40%
+   预计增长率
+</card:headerPrecentCard>
+
 <card:headerCard>
 ## 三、头部品牌分析
 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
