@@ -441,7 +441,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 根布局元素
     root: {
       style: {
-        padding: `${DIMENSION_CONSTANTS.PADDING.base}`,
+        // padding: `${DIMENSION_CONSTANTS.PADDING.base}`,
         margin: DIMENSION_CONSTANTS.MARGIN.base,
         backgroundColor: COLOR_CONSTANTS.BASIC.OPACITY.WHITE[100],
         borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.large,
