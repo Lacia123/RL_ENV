@@ -499,11 +499,15 @@ function isLayoutTag(line) {
     // 解析属性
     const attributes = {};
     if (attributesStr) {
-      // 匹配 key="value" 格式的属性
-      const attrRegex = /(\w+)=["']([^"']*?)["']/g;
+      // 匹配多种格式的属性：key="value", key='value', key={value}
+      const attrRegex = /(\w+)=(["']([^"']*?)["']|\{([^}]*?)\})/g;
       let attrMatch;
       while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
-        attributes[attrMatch[1]] = attrMatch[2];
+        const attrName = attrMatch[1];
+        // attrMatch[3] 是引号格式的值，attrMatch[4] 是大括号格式的值
+        const attrValue = attrMatch[3] !== undefined ? attrMatch[3] : attrMatch[4];
+        attributes[attrName] = attrValue;
+        console.log(`🔍 解析布局属性: ${attrName} = "${attrValue}"`);
       }
     }
     

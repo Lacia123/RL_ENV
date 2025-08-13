@@ -4,6 +4,8 @@
  * 提供了对不同元素类型样式的完整配置
  */
 
+import resolveToken from '../tokens/resolveToken.js';
+
 // CSS变量系统
 export const CSS_VARIABLE_SYSTEM = {
   // 字体系统
@@ -463,7 +465,7 @@ export const DEFAULT_STYLE_CONFIG = {
         gridTemplateAreas: 'none',
         justifyItems: 'stretch',
       },
-      supportedAttributes: ['backgroundImage']
+      supportedAttributes: ['backgroundImage', 'backgroundRepeat', 'backgroundSize', 'backgroundPosition', 'backgroundColor']
     },
     // 列布局元素（默认垂直布局）
     column: {
@@ -503,15 +505,22 @@ export const DEFAULT_STYLE_CONFIG = {
       justifyItems: 'stretch'
     },
     bgColumn: {
-      padding: `${DIMENSION_CONSTANTS.PADDING.base}`,
-      borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.large,
-      display: 'flex',
-      flexDirection: 'column',
-      flexWrap: 'nowrap',
-      justifyContent: 'flex-start',
-      alignItems: 'flex-start',
-      gap: DIMENSION_CONSTANTS.GAP.base,
-      backgroundColor: "{color.primary.brand3}",
+      style: {
+        padding: `${DIMENSION_CONSTANTS.PADDING.base}`,
+        borderRadius: DIMENSION_CONSTANTS.BORDER_RADIUS.large,
+        boxShadow: "{material.hierarchy.main}",
+        borderWidth: "{dimension.borderwidth.narrow}",
+        borderColor: "{color.surfacecontainer.black12}",
+        borderStyle: "solid",
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'nowrap',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        gap: DIMENSION_CONSTANTS.GAP.base,
+        background: "{color.primary.brand3}",
+      },
+      supportedAttributes: ['background', 'backgroundColor', 'padding', 'margin', 'borderRadius', 'borderColor', 'borderWidth', 'boxShadow']
     },
     gallery: {
       // 使用CSS多列布局，不使用flexbox
@@ -2911,7 +2920,6 @@ export const DEFAULT_STYLE_CONFIG = {
       style: {
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: "{dimension.borderradius.xxxl}",
         padding: "{dimension.padding.extraloose} 0",
         boxShadow: "{material.hierarchy.main}",
         borderRadius: "{dimension.borderradius.xl}",
@@ -3399,7 +3407,50 @@ export function getElementStyleConfig(elementType, variant = 'normal', attribute
       Object.entries(attributes).forEach(([attrName, attrValue]) => {
         if (variantConfig.supportedAttributes.includes(attrName)) {
           console.log(`   ✅ 应用支持的属性: ${attrName} = "${attrValue}"`);
-          finalStyle[attrName] = attrValue;
+          
+          // 🆕 解析token值 - 如果不包含大括号，自动添加（但排除URL等特殊值）
+          let resolvedValue = attrValue;
+          
+          // 检查是否是特殊值（URL, 普通CSS值等），这些不需要token解析
+          const isSpecialValue = attrValue.startsWith('url(') || 
+                                attrValue.startsWith('#') || 
+                                attrValue.match(/^\d+px$/) ||
+                                attrValue.match(/^\d+%$/) ||
+                                attrValue === 'none' ||
+                                attrValue === 'auto';
+          
+          if (!isSpecialValue && !attrValue.startsWith('{') && !attrValue.endsWith('}')) {
+            // 如果看起来像token路径（包含点），自动添加大括号
+            if (attrValue.includes('.')) {
+              const tokenToResolve = `{${attrValue}}`;
+              const tokenResult = resolveToken(tokenToResolve);
+              if (tokenResult !== tokenToResolve) {
+                console.log(`   🎯 Token解析: ${attrValue} -> ${tokenToResolve} -> ${tokenResult}`);
+                resolvedValue = tokenResult;
+              } else {
+                console.log(`   📝 Token未找到，使用原值: ${attrValue}`);
+                resolvedValue = attrValue;
+              }
+            } else {
+              console.log(`   📝 普通值: ${attrValue}`);
+              resolvedValue = attrValue;
+            }
+          } else if (attrValue.startsWith('{') && attrValue.endsWith('}')) {
+            // 显式的token格式
+            const tokenResult = resolveToken(attrValue);
+            if (tokenResult !== attrValue) {
+              console.log(`   🎯 Token解析: ${attrValue} -> ${tokenResult}`);
+              resolvedValue = tokenResult;
+            } else {
+              console.log(`   📝 Token未找到，使用原值: ${attrValue}`);
+              resolvedValue = attrValue;
+            }
+          } else {
+            console.log(`   📝 特殊值: ${attrValue} (跳过token解析)`);
+            resolvedValue = attrValue;
+          }
+          
+          finalStyle[attrName] = resolvedValue;
         } else {
           console.warn(`   ⚠️ 属性 "${attrName}" 不在支持列表中:`, variantConfig.supportedAttributes);
         }

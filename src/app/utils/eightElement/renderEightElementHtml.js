@@ -895,6 +895,11 @@ function computeElementStyle(element) {
     if (element.layout && element.layout.style) {
         processStyleReferences({ computedStyle }, element, element.layout.style);
     }
+    
+    // 🆕 也处理layout.classStyle，确保属性样式被应用
+    if (element.layout && element.layout.classStyle) {
+        processStyleReferences({ computedStyle }, element, element.layout.classStyle);
+    }
 
     // 🆕 画廊布局特殊处理：确保使用多列布局而不是flex
     if (isGalleryLayout) {

@@ -72,7 +72,7 @@ const MARKDOWN_TEMPLATES = {
 | 工作站 | 25% |
 </card:headerCard>
 
-<layout:bgColumn>
+<layout:bgColumn background={color.onprimary.white100}>
 
 <layout:row>
 <card:elegantStandard>
