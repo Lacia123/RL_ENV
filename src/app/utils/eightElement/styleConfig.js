@@ -2920,6 +2920,13 @@ export const DEFAULT_STYLE_CONFIG = {
         borderStyle: "solid",
         background: "{color.surfacecontainer.white100}",
         marginBottom: "{dimension.margin.base}",
+        // 嵌套选择器：重置内部ul元素的默认margin
+        "& ul": {
+          marginBlockStart: "0",
+          marginBlockEnd: "0",
+          marginTop: "0",
+          marginBottom: "0"
+        }
       },
       title: {
         style: {
@@ -2971,6 +2978,13 @@ export const DEFAULT_STYLE_CONFIG = {
         borderStyle: "solid",
         background: "{color.surfacecontainer.white100}",
         marginBottom: "{dimension.margin.base}",
+        // 嵌套选择器：重置内部ul元素的默认margin
+        "& ul": {
+          marginBlockStart: "0",
+          marginBlockEnd: "0",
+          marginTop: "0",
+          marginBottom: "0"
+        }
       },
       title: {
         style: {

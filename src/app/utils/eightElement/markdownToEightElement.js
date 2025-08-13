@@ -556,12 +556,29 @@ function isIconTag(line) {
 
 // 检测是否为卡片标签
 function isCardTag(line) {
-  // 匹配 <card> 或 <card:variant>
-  const cardTagMatch = line.trim().match(/^<card(?::(\w+))?>$/);
-  if (cardTagMatch) {
+  // 匹配带属性的开始标签: <card:variant attr1="value1" attr2="value2"> 或 <card:variant attr1={token.value}>
+  const cardTagWithAttrsMatch = line.trim().match(/^<card(?::(\w+))([^>]*)>$/);
+  if (cardTagWithAttrsMatch) {
+    const variant = cardTagWithAttrsMatch[1] || 'standard';
+    const attributesStr = cardTagWithAttrsMatch[2].trim();
+    
+    // 解析属性
+    const attributes = {};
+    if (attributesStr) {
+      // 匹配 key="value" 或 key={token.value} 格式的属性
+      const attrRegex = /(\w+)=(?:["']([^"']*?)["']|\{([^}]*?)\})/g;
+      let attrMatch;
+      while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
+        const key = attrMatch[1];
+        const value = attrMatch[2] || attrMatch[3]; // 支持引号和大括号格式
+        attributes[key] = value;
+      }
+    }
+    
     return {
       isCardTag: true,
-      variant: cardTagMatch[1] || 'standard', // 默认为 standard
+      variant: variant,
+      attributes: attributes,
       isClosing: false
     };
   }
@@ -572,6 +589,7 @@ function isCardTag(line) {
     return {
       isCardTag: true,
       variant: closingTagMatch[1] || 'standard',
+      attributes: {},
       isClosing: true
     };
   }
@@ -2479,10 +2497,11 @@ function extractCardBlock(lines, startIndex) {
   
   if (!startTagInfo.isCardTag || startTagInfo.isClosing) {
     console.error('无效的卡片标签起始行');
-    return { cardContent: '', variant: 'standard', endIndex: startIndex };
+    return { cardContent: '', variant: 'standard', attributes: {}, endIndex: startIndex };
   }
   
   const variant = startTagInfo.variant;
+  const attributes = startTagInfo.attributes || {};
   const contentLines = [];
   let i = startIndex + 1;
   let foundEnd = false;
@@ -2511,6 +2530,7 @@ function extractCardBlock(lines, startIndex) {
   return {
     cardContent: contentLines.join('\n').trim(),
     variant: variant,
+    attributes: attributes,
     endIndex: i - 1
   };
 }
@@ -2580,10 +2600,64 @@ function parseButtonVariant(text) {
 }
 
 // 创建卡片元素
-function createCardElement(content, variant = 'standard') {
+function createCardElement(content, variant = 'standard', attributes = {}) {
   const id = generateUUID();
   // 获取卡片元素的样式配置
-  const cardStyleConfig = getElementStyleConfig('card', variant);
+  let cardStyleConfig = getElementStyleConfig('card', variant);
+  
+  // 应用属性到样式配置（深拷贝以避免修改原配置）
+  if (Object.keys(attributes).length > 0) {
+    cardStyleConfig = JSON.parse(JSON.stringify(cardStyleConfig));
+    
+    // 确保样式对象存在
+    if (!cardStyleConfig.style) {
+      cardStyleConfig.style = {};
+    }
+    
+    // 处理各种可能的属性
+    Object.keys(attributes).forEach(attrKey => {
+      const attrValue = attributes[attrKey];
+      console.log(`🎨 应用卡片属性: ${attrKey} = ${attrValue}`);
+      
+      // 解析token值 - 如果不包含大括号，自动添加
+      let tokenToResolve = attrValue;
+      if (!attrValue.startsWith('{') && !attrValue.endsWith('}')) {
+        // 如果看起来像token路径（包含点），自动添加大括号
+        if (attrValue.includes('.')) {
+          tokenToResolve = `{${attrValue}}`;
+        }
+      }
+      
+      const resolvedValue = resolveToken(tokenToResolve);
+      if (resolvedValue !== tokenToResolve) {
+        console.log(`🎯 Token解析: ${attrValue} -> ${tokenToResolve} -> ${resolvedValue}`);
+      } else {
+        console.log(`📝 普通值: ${attrValue} (未解析为token)`);
+      }
+      
+      // 根据属性名称应用到相应的样式
+      if (attrKey === 'background' || attrKey === 'backgroundColor') {
+        cardStyleConfig.style.background = resolvedValue;
+      } else if (attrKey === 'color') {
+        cardStyleConfig.style.color = resolvedValue;
+      } else if (attrKey === 'border') {
+        cardStyleConfig.style.border = resolvedValue;
+      } else if (attrKey === 'borderColor') {
+        cardStyleConfig.style.borderColor = resolvedValue;
+      } else if (attrKey === 'borderRadius') {
+        cardStyleConfig.style.borderRadius = resolvedValue;
+      } else if (attrKey === 'padding') {
+        cardStyleConfig.style.padding = resolvedValue;
+      } else if (attrKey === 'margin') {
+        cardStyleConfig.style.margin = resolvedValue;
+      } else {
+        // 对于其他未知属性，直接添加到样式
+        cardStyleConfig.style[attrKey] = resolvedValue;
+      }
+    });
+    
+    console.log(`📋 修改后的卡片样式配置:`, JSON.stringify(cardStyleConfig.style, null, 2));
+  }
 
   // 生成唯一的className
   const uniqueClassName = `card-${id}`;
@@ -4927,13 +5001,13 @@ function parseMarkdown(markdown, options = {}) {
       }
 
       // 提取卡片标签内容
-      const { cardContent, variant, endIndex } = extractCardBlock(
+      const { cardContent, variant, attributes, endIndex } = extractCardBlock(
         markedLines.map(item => item.line),
         i
       );
 
       // 创建卡片元素
-      const cardElement = createCardElement(cardContent, variant);
+      const cardElement = createCardElement(cardContent, variant, attributes);
       
       console.log(`🔧 创建卡片元素: ID=${cardElement.id}, variant=${variant}, 内容长度=${cardContent.length}`);
 

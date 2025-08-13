@@ -46,7 +46,7 @@ const MARKDOWN_TEMPLATES = {
    预计增长率
 </card:headerPrecentCard>
 
-<card:headerCard>
+<card:headerCard background={color.success.green0}>
 ## 三、头部品牌分析
 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
 
