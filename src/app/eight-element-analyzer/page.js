@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { renderEightElementToHtml } from '../utils/eightElement/renderEightElementHtml';
 import { convertEightElementToLayout } from '../utils/layoutAnalysis/eightElementAnalysis';
 import { markdownToEightElement, applyLayoutControlsToEightElement } from '../utils/eightElement/markdownToEightElement';
@@ -1160,6 +1160,18 @@ const EightElementAnalyzer = () => {
     height: commonDimensions[2].height
   });
 
+  // 面板布局状态
+  const [panelSizes, setPanelSizes] = useState({
+    leftWidth: 50, // 左侧面板宽度百分比
+    topHeight: 70  // 上半部分高度百分比
+  });
+
+  // 拖拽调整大小的状态
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeDirection, setResizeDirection] = useState('');
+  const [resizeStartPos, setResizeStartPos] = useState({ x: 0, y: 0 });
+  const [resizeStartSize, setResizeStartSize] = useState({ leftWidth: 0, topHeight: 0 });
+
   // 初始化动作系统
   useEffect(() => {
     try {
@@ -1762,14 +1774,129 @@ const EightElementAnalyzer = () => {
     }
   };
 
+  // 使用useRef来存储拖拽状态，避免闭包问题
+  const dragStateRef = useRef({
+    isResizing: false,
+    resizeDirection: '',
+    resizeStartPos: { x: 0, y: 0 },
+    resizeStartSize: { leftWidth: 0, topHeight: 0 }
+  });
+
+  // 处理拖拽调整面板大小的函数
+  const handleResizeStart = useCallback((direction, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('开始拖拽:', direction);
+    
+    const startPos = {
+      x: e.clientX,
+      y: e.clientY
+    };
+    
+    const startSize = {
+      leftWidth: panelSizes.leftWidth,
+      topHeight: panelSizes.topHeight
+    };
+
+    // 更新状态
+    setIsResizing(true);
+    setResizeDirection(direction);
+    setResizeStartPos(startPos);
+    setResizeStartSize(startSize);
+
+    // 更新ref状态
+    dragStateRef.current = {
+      isResizing: true,
+      resizeDirection: direction,
+      resizeStartPos: startPos,
+      resizeStartSize: startSize
+    };
+
+    // 添加全局鼠标事件监听器
+    document.addEventListener('mousemove', handleResizeMove);
+    document.addEventListener('mouseup', handleResizeEnd);
+  }, [panelSizes.leftWidth, panelSizes.topHeight]);
+
+  const handleResizeMove = useCallback((e) => {
+    const dragState = dragStateRef.current;
+    if (!dragState.isResizing) return;
+
+    const containerRect = document.querySelector('.main-container')?.getBoundingClientRect();
+    if (!containerRect) {
+      console.log('找不到容器元素');
+      return;
+    }
+
+    let newLeftWidth = dragState.resizeStartSize.leftWidth;
+    let newTopHeight = dragState.resizeStartSize.topHeight;
+
+    // 根据拖拽方向计算新尺寸百分比
+    switch (dragState.resizeDirection) {
+      case 'vertical': {
+        // 垂直分割线 - 调整左右面板比例
+        const deltaPercent = ((e.clientX - dragState.resizeStartPos.x) / containerRect.width) * 100;
+        newLeftWidth = Math.max(20, Math.min(80, dragState.resizeStartSize.leftWidth + deltaPercent));
+        console.log('垂直拖拽:', e.clientX, deltaPercent, newLeftWidth);
+        break;
+      }
+      case 'horizontal': {
+        // 水平分割线 - 调整上下面板比例
+        const deltaPercent = ((e.clientY - dragState.resizeStartPos.y) / containerRect.height) * 100;
+        newTopHeight = Math.max(30, Math.min(90, dragState.resizeStartSize.topHeight + deltaPercent));
+        console.log('水平拖拽:', e.clientY, deltaPercent, newTopHeight);
+        break;
+      }
+    }
+
+    setPanelSizes({
+      leftWidth: newLeftWidth,
+      topHeight: newTopHeight
+    });
+  }, []);
+
+  const handleResizeEnd = useCallback(() => {
+    console.log('结束拖拽');
+    
+    setIsResizing(false);
+    setResizeDirection('');
+    
+    // 重置ref状态
+    dragStateRef.current.isResizing = false;
+    
+    // 移除全局事件监听器
+    document.removeEventListener('mousemove', handleResizeMove);
+    document.removeEventListener('mouseup', handleResizeEnd);
+  }, []);
+
+  // 清理事件监听器
+  useEffect(() => {
+    return () => {
+      document.removeEventListener('mousemove', handleResizeMove);
+      document.removeEventListener('mouseup', handleResizeEnd);
+    };
+  }, [handleResizeMove, handleResizeEnd]);
+
+  // 重置面板大小
+  const resetPanelSizes = () => {
+    setPanelSizes({
+      leftWidth: 50,
+      topHeight: 70
+    });
+  };
+
 
   return (
     <div className="h-screen bg-gray-50 p-4 flex flex-col">
       <h1 className="text-2xl font-bold mb-4 flex-shrink-0">强化学习环境</h1>
 
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
+      <div className="flex-1 flex min-h-0 main-container relative">
         {/* 左侧编辑器区域 */}
-        <div className="bg-white rounded-lg shadow p-4 overflow-y-auto">
+        <div 
+          className="bg-white rounded-lg shadow overflow-hidden flex flex-col mr-2"
+          style={{ width: `${panelSizes.leftWidth}%` }}
+        >
+          <div className="p-4 overflow-y-auto flex-1">
           <h2 className="text-lg font-medium mb-4">Markdown编辑器</h2>
 
           {/* 🆕 模板选择Tab */}
@@ -2220,10 +2347,22 @@ const EightElementAnalyzer = () => {
               当前尺寸: {dimensions.width} x {dimensions.height}
             </div>
           </div>
+          </div>
         </div>
 
+        {/* 垂直分割线 */}
+        <div 
+          className="w-1 bg-gray-300 hover:bg-blue-400 cursor-col-resize flex-shrink-0 transition-colors"
+          onMouseDown={(e) => handleResizeStart('vertical', e)}
+          title="拖拽调整面板比例"
+        />
+
         {/* 右侧预览区域 */}
-        <div className="bg-white rounded-lg shadow p-4 overflow-y-auto">
+        <div 
+          className="bg-white rounded-lg shadow overflow-hidden flex flex-col ml-2"
+          style={{ width: `${100 - panelSizes.leftWidth}%` }}
+        >
+          <div className="p-4 overflow-y-auto flex-1">
           <div className="flex border-b mb-4">
             <button
               className={`px-4 py-2 ${visibleTab === 'html' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
@@ -2246,30 +2385,51 @@ const EightElementAnalyzer = () => {
           </div>
 
           {/* HTML预览 */}
-          <div className={`${visibleTab === 'html' ? 'block' : 'hidden'}`}>
-            <h2 className="text-lg font-medium mb-2">HTML预览</h2>
-            <div className="border border-gray-300 rounded p-1 overflow-auto" style={{
-              width: '100%',
-              height: '600px',
-              backgroundColor: '#f5f5f5'
-            }}>
-              <div style={{
-                width: `${dimensions.width}px`,
-                height: `${dimensions.height}px`,
-                margin: '0 auto',
-                backgroundColor: 'white',
-                boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-                transition: 'width 0.3s, height 0.3s'
-              }}>
-                {renderedHtml && (  // 只在有内容时渲染 iframe
-                  <iframe
-                    ref={iframeRef}
-                    className="w-full h-full"
-                    srcDoc={renderedHtml}
-                    title="Eight Element Preview"
-                    key={iframeKey}  // 使用状态管理的 key
-                  ></iframe>
-                )}
+          <div className={`${visibleTab === 'html' ? 'block h-full' : 'hidden'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-medium">HTML预览</h2>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-500">
+                  面板比例: {panelSizes.leftWidth.toFixed(1)}% / {(100 - panelSizes.leftWidth).toFixed(1)}%
+                </span>
+                <button
+                  onClick={resetPanelSizes}
+                  className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                  title="重置面板比例"
+                >
+                  重置布局
+                </button>
+              </div>
+            </div>
+            
+            {/* HTML预览区域 - 占满整个可用空间 */}
+            <div className="border border-gray-300 rounded overflow-hidden bg-gray-100 h-full flex flex-col">
+              <div className="flex-1 flex items-center justify-center p-4">
+                <div 
+                  className="bg-white shadow-lg"
+                  style={{
+                    width: '95%',
+                    height: '95%',
+                    minWidth: '300px',
+                    minHeight: '200px',
+                    overflow: 'auto'
+                  }}
+                >
+                  {renderedHtml && (
+                    <iframe
+                      ref={iframeRef}
+                      className="w-full h-full border-0"
+                      srcDoc={renderedHtml}
+                      title="Eight Element Preview"
+                      key={iframeKey}
+                    ></iframe>
+                  )}
+                </div>
+              </div>
+              
+              {/* 内容尺寸信息 */}
+              <div className="px-2 py-1 bg-gray-50 border-t text-xs text-gray-600 text-center">
+                预览区域占比: 80% × 80% | 渲染尺寸: {dimensions.width} x {dimensions.height} px
               </div>
             </div>
           </div>
@@ -2392,6 +2552,7 @@ const EightElementAnalyzer = () => {
             ) : (
               <div className="text-red-500">❌ 系统未初始化</div>
             )}
+          </div>
           </div>
         </div>
       </div>
