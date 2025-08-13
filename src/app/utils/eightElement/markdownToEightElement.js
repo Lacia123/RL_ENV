@@ -16,6 +16,8 @@ import hljs from 'highlight.js';
 import markedKatex from 'marked-katex-extension';
 // 导入token解析和颜色判断功能
 import resolveToken, { isColorDark } from '../tokens/resolveToken.js';
+// 导入事件配置
+import { EVENT_NAME, EVENT_CONFIG } from './eventConfig.js';
 
 // 配置Marked实例，支持KaTeX和代码高亮
 const katexOptions = {
@@ -45,6 +47,50 @@ function generateUUID() {
 
 // 恢复随机UUID生成 - 简单可靠
 // 布局调控将改为使用解析索引而不是ID
+
+// 解析事件语法 [event:eventName] 并返回事件配置
+function parseEventSyntax(text, elementId, currentMarkdown = '') {
+  const eventPattern = /\[event:(\w+)\]/g;
+  const events = [];
+  let match;
+  
+  while ((match = eventPattern.exec(text)) !== null) {
+    const eventName = match[1];
+    
+    // 从eventConfig中获取对应的事件配置
+    if (EVENT_CONFIG[eventName]) {
+      const eventConfig = JSON.parse(JSON.stringify(EVENT_CONFIG[eventName])); // 深拷贝
+      
+      // 设置EventTargetId
+      eventConfig.EventTargetId = elementId;
+      
+      // 特殊处理edit事件的markdown参数
+      if (eventName === EVENT_NAME.EDIT && currentMarkdown) {
+        eventConfig.parameters.markdown = currentMarkdown;
+      }
+      
+      console.log(`🎯 解析到事件: ${eventName}, 绑定到元素: ${elementId}`);
+      events.push(eventConfig);
+    } else {
+      console.warn(`⚠️ 未找到事件配置: ${eventName}`);
+    }
+  }
+  
+  return events;
+}
+
+// 移除文本中的事件语法标记
+function removeEventSyntax(text) {
+  // 首先检查是否是完整的事件按钮语法：[event:eventName][buttonText](url)
+  const fullEventMatch = text.match(/^\[event:\w+\]\s*\[([^\]]+)\]\(([^)]+)\)$/);
+  if (fullEventMatch) {
+    // 如果是完整的事件按钮语法，返回按钮文本部分
+    return fullEventMatch[1].trim();
+  }
+  
+  // 否则只清理 [event:eventName] 标记
+  return text.replace(/\[event:\w+\]/g, '').trim();
+}
 
 // HTML转义函数，用于安全处理文本
 function escapeHtml(text) {
@@ -601,7 +647,7 @@ function isCardTag(line) {
   return { isCardTag: false };
 }
 // 解析模板卡片内容
-function parseTemplateCardContent(content, cardStyleConfig, returnElements = false) {
+function parseTemplateCardContent(content, cardStyleConfig, returnElements = false, currentMarkdown = '') {
   console.log(`解析模板卡片内容，长度: ${content.length}, 返回元素: ${returnElements}`);
   
   const lines = content.split('\n');
@@ -962,7 +1008,8 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
           containerMap, 
           children,
           null, // existingElement
-          markdownResult // 传递完整的解析结果，包含URL等信息
+          markdownResult, // 传递完整的解析结果，包含URL等信息
+          currentMarkdown // 传递原始markdown内容用于事件配置
         );
         
         i++;
@@ -981,7 +1028,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
           console.log(`收集到未映射内容 (${collectResult.lineCount} 行):\n${collectResult.content}`);
           
           // 使用标准 parseMarkdown 解析整块内容
-          const parsedElements = parseMarkdown(collectResult.content);
+          const parsedElements = parseMarkdown(collectResult.content, { currentMarkdown });
           
           // 将解析后的元素放到 others 指定的容器中
           for (const element of parsedElements) {
@@ -995,7 +1042,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
               continue; // 跳过这个元素
             }
             
-            createOrMergeTemplateElement(cardStyleConfig.markdownMapping.others, '', cardStyleConfig, containerMap, children, element);
+            createOrMergeTemplateElement(cardStyleConfig.markdownMapping.others, '', cardStyleConfig, containerMap, children, element, null, currentMarkdown);
           }
         }
         
@@ -1466,6 +1513,26 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     };
   }
   
+  // 🆕 检查事件语法格式 [event:eventName][text](url) - 创建为 primary 按钮
+  const eventLinkMatch = line.match(/^\[event:\w+\]\s*\[([^\]]+)\]\(([^)]+)\)$/);
+  if (eventLinkMatch) {
+    const primaryButtonMapping = markdownMapping['button:primary'];
+    if (primaryButtonMapping) {
+      console.log(`🔍 事件链接解析为 primary 按钮: ${eventLinkMatch[1]} -> ${primaryButtonMapping}`);
+      return {
+        markdownResult: {
+          type: 'button',
+          variant: 'primary',
+          templatePath: primaryButtonMapping,
+          content: eventLinkMatch[1].trim(), // 按钮文本
+          url: eventLinkMatch[2].trim(),     // 按钮URL
+          originalText: line.trim()          // 🆕 保存原始完整文本，包含事件语法
+        },
+        newListItemCounter: currentListItemCounter
+      };
+    }
+  }
+  
   // 检查链接格式 [text](url) - 默认创建为 primary 按钮
   const linkMatch = line.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
   if (linkMatch) {
@@ -1713,8 +1780,9 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
 }
 
 // 🆕 创建或合并到现有容器的模板元素
-function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, containerMap, children, existingElement = null, markdownData = null) {
+function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, containerMap, children, existingElement = null, markdownData = null, currentMarkdown = '') {
   console.log(`创建或合并模板元素，路径: ${templatePath}, 内容: "${content}", 已有元素: ${existingElement ? existingElement.type : 'null'}`);
+
   
   // 🔧 验证 templatePath 参数
   if (!templatePath || typeof templatePath !== 'string') {
@@ -1768,7 +1836,7 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
       return existingElement;
     } else {
       // 否则创建新的模板元素，直接添加到children
-      const templateElement = createTemplateTagElement(tagName, content, cardStyleConfig, markdownData);
+      const templateElement = createTemplateTagElement(tagName, content, cardStyleConfig, markdownData, currentMarkdown);
       if (templateElement) {
         children.push(templateElement);
       }
@@ -1881,7 +1949,7 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
       
       if (!containerElement) {
         // 创建新的容器
-        containerElement = createTemplateTagElement(currentTagName, '', currentConfig);
+        containerElement = createTemplateTagElement(currentTagName, '', currentConfig, null, currentMarkdown);
         if (!containerElement) {
           return null;
         }
@@ -1956,7 +2024,7 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
       }
       
       // 否则创建新的模板元素
-      finalElement = createTemplateTagElement(actualFinalTagName, content, tempConfig, markdownData);
+      finalElement = createTemplateTagElement(actualFinalTagName, content, tempConfig, markdownData, currentMarkdown);
       if (!finalElement) {
         return null;
       }
@@ -2135,7 +2203,8 @@ function applyCustomStyleOverride(baseStyle, customStyles, customVariant) {
 }
 
 // 创建模板标签元素
-function createTemplateTagElement(tagName, content, cardStyleConfig, markdownData = null) {
+function createTemplateTagElement(tagName, content, cardStyleConfig, markdownData = null, currentMarkdown = '') {
+
   const id = generateUUID();
   const uniqueClassName = `template-${tagName}-${id}`;
   
@@ -2212,7 +2281,11 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
       const buttonVariant = markdownData.variant || 'primary';  // 🔧 修复：使用 variant 而不是 buttonVariant
       console.log(`🔍 createTemplateTagElement: 按钮类型处理 - 文本="${buttonText}", URL="${buttonUrl}", 变体="${buttonVariant}"`);
       console.log(`🔍 markdownData 完整内容:`, markdownData);
-      elementInstance = createButtonElement(buttonText, buttonUrl, buttonVariant);
+      
+      // 🆕 如果有原始文本，使用原始文本来解析事件；否则使用按钮文本
+      const textForEventParsing = markdownData.originalText || buttonText;
+      console.log(`🔍 用于事件解析的文本: "${textForEventParsing}"`);
+      elementInstance = createButtonElement(textForEventParsing, buttonUrl, buttonVariant, currentMarkdown);
     }
     
     // 如果成功创建了元素实例，跳过后续的 tagConfig 处理
@@ -2350,10 +2423,10 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
   if (content && content.trim()) {
     if (tagConfig.type === 'template') {
       // 递归解析嵌套的模板标签
-      children = parseTemplateCardContent(content, tagConfig);
+      children = parseTemplateCardContent(content, tagConfig, false, currentMarkdown);
     } else {
       // 解析为普通内容
-      const parsedContent = parseMarkdown(content);
+      const parsedContent = parseMarkdown(content, { currentMarkdown });
       children = parsedContent;
     }
   }
@@ -2600,11 +2673,27 @@ function parseButtonVariant(text) {
     }
   }
   
+  // 🆕 检查事件语法格式：[event:eventName][文本](链接)
+  const eventPattern = /^\[event:\w+\]\s*\[([^\]]+)\]\(([^)]+)\)$/;
+  const eventMatch = text.match(eventPattern);
+  
+  if (eventMatch) {
+    const [, buttonText, url] = eventMatch;
+    console.log(`✅ 找到事件按钮: 文本="${buttonText}", URL="${url}"`);
+    return {
+      hasVariant: true,
+      variant: 'primary', // 事件按钮默认使用primary样式
+      text: buttonText,
+      url: url,
+      isEventButton: true // 标记为事件按钮
+    };
+  }
+  
   return { hasVariant: false };
 }
 
 // 创建卡片元素
-function createCardElement(content, variant = 'standard', attributes = {}) {
+function createCardElement(content, variant = 'standard', attributes = {}, currentMarkdown = '') {
   const id = generateUUID();
   // 获取卡片元素的样式配置
   let cardStyleConfig = getElementStyleConfig('card', variant);
@@ -2673,10 +2762,10 @@ function createCardElement(content, variant = 'standard', attributes = {}) {
   if (content && content.trim()) {
     if (isTemplateCard) {
       // 对于模板类型的卡片，解析嵌套的模板标签
-      cardChildren = parseTemplateCardContent(content, cardStyleConfig);
+      cardChildren = parseTemplateCardContent(content, cardStyleConfig, false, currentMarkdown);
     } else {
       // 对于普通卡片，递归解析内容
-      const parsedContent = parseMarkdown(content);
+      const parsedContent = parseMarkdown(content, { currentMarkdown });
       cardChildren = parsedContent;
     }
   }
@@ -2773,9 +2862,20 @@ function createCardElement(content, variant = 'standard', attributes = {}) {
   }
 }
 // 创建按钮元素（用于超链接）
-function createButtonElement(text, url, variant = 'primary') {
+function createButtonElement(text, url, variant = 'primary', currentMarkdown = '') {
   const id = generateUUID();
   console.log(`🔍 createButtonElement: 创建按钮 - 文本="${text}", URL="${url}", 变体="${variant}"`);
+  console.log(`🔍 传入的currentMarkdown长度: ${currentMarkdown.length}`);
+  
+  // 解析事件语法
+  const buttonEvents = parseEventSyntax(text, id, currentMarkdown);
+  const cleanText = removeEventSyntax(text); // 移除事件语法标记
+  
+  console.log(`🔍 解析到的事件数量: ${buttonEvents.length}`);
+  console.log(`🔍 清理后的按钮文本: "${cleanText}"`);
+  if (buttonEvents.length > 0) {
+    console.log(`🔍 解析到的事件配置:`, buttonEvents);
+  }
   
   // 获取按钮元素的样式配置
   const buttonStyleConfig = getElementStyleConfig('button', variant);
@@ -3318,7 +3418,7 @@ function createButtonElement(text, url, variant = 'primary') {
       fontsize: {
         default: {
           "data-key": "",
-          content: text, // 按钮文本
+          content: cleanText, // 使用清理后的按钮文本（移除事件语法）
           style: {
             fontsize: {
               value: buttonStyleConfig.fontSizes || FONT_CONSTANTS.SIZE.XL,
@@ -3347,7 +3447,7 @@ function createButtonElement(text, url, variant = 'primary') {
     },
     type: "button_normal", // 确保类型正确
     state: "default",
-    events: [{}],
+    events: buttonEvents.length > 0 ? buttonEvents : [{}], // 应用解析到的事件配置
     url: url  // 存储链接URL
   };
 
@@ -4691,7 +4791,8 @@ function processMarkdownWithMathProtection(markdown) {
 }
 // 改进Markdown解析功能，支持列表和富文本
 function parseMarkdown(markdown, options = {}) {
-  const { disableButtonGrouping = false, disableSiblingGrouping = false } = options;
+  const { disableButtonGrouping = false, disableSiblingGrouping = false, currentMarkdown: passedMarkdown } = options;
+  const currentMarkdown = passedMarkdown || markdown; // 优先使用传入的完整markdown，否则使用当前部分
   // 首先规范化换行符处理
   // 把所有的\r\n转换为\n
   const normalizedMarkdown = markdown.replace(/\r\n/g, '\n');
@@ -4902,7 +5003,8 @@ function parseMarkdown(markdown, options = {}) {
           console.log(`递归解析根布局内容`);
           const rootChildren = parseMarkdown(layoutContent, { 
             disableButtonGrouping: true,
-            disableSiblingGrouping: false
+            disableSiblingGrouping: false,
+            currentMarkdown
           });
           
           // 将解析的内容添加到当前堆栈
@@ -4924,7 +5026,8 @@ function parseMarkdown(markdown, options = {}) {
           console.log(`递归解析布局内容，变体: ${variant}，属性:`, attributes);
           const layoutChildren = parseMarkdown(layoutContent, { 
             disableButtonGrouping: true,
-            disableSiblingGrouping: variant === 'row'  // 🔧 只在 row 布局中禁用同级标题分组
+            disableSiblingGrouping: variant === 'row',  // 🔧 只在 row 布局中禁用同级标题分组
+            currentMarkdown
           });
 
           // 根据变体确定布局方向
@@ -5012,7 +5115,7 @@ function parseMarkdown(markdown, options = {}) {
       );
 
       // 创建卡片元素
-      const cardElement = createCardElement(cardContent, variant, attributes);
+      const cardElement = createCardElement(cardContent, variant, attributes, currentMarkdown);
       
       console.log(`🔧 创建卡片元素: ID=${cardElement.id}, variant=${variant}, 内容长度=${cardContent.length}`);
 
@@ -5301,6 +5404,8 @@ function parseMarkdown(markdown, options = {}) {
 
     // 检查是否有多个链接或混合内容
     if (trimmedLine.includes('[') && trimmedLine.includes('](') && trimmedLine.includes(')')) {
+      console.log(`🔍 检测到可能的链接内容: "${trimmedLine}"`);
+      
       // 首先检查是否是按钮类型标记格式
       const buttonVariantResult = parseButtonVariant(trimmedLine);
       
@@ -5310,7 +5415,7 @@ function parseMarkdown(markdown, options = {}) {
 
         console.log(`发现按钮类型标记: variant="${buttonVariantResult.variant}", 文本="${buttonVariantResult.text}", URL="${buttonVariantResult.url}"`);
 
-        const buttonElement = createButtonElement(buttonVariantResult.text, buttonVariantResult.url, buttonVariantResult.variant);
+        const buttonElement = createButtonElement(buttonVariantResult.text, buttonVariantResult.url, buttonVariantResult.variant, currentMarkdown);
         console.log(`按钮ID: ${buttonElement.id}, 名称: ${buttonElement.name}, 样式: ${buttonVariantResult.variant}`);
         consecutiveButtons.push(buttonElement);
 
@@ -5347,7 +5452,7 @@ function parseMarkdown(markdown, options = {}) {
 
           console.log(`创建默认按钮: 文本="${linkText}", URL="${linkUrl}"`);
 
-          const buttonElement = createButtonElement(linkText, linkUrl, 'primary'); // 默认使用primary样式
+          const buttonElement = createButtonElement(linkText, linkUrl, 'primary', currentMarkdown); // 默认使用primary样式
           console.log(`按钮ID: ${buttonElement.id}, 名称: ${buttonElement.name}, 样式: primary`);
           consecutiveButtons.push(buttonElement);
 
@@ -5632,6 +5737,8 @@ function parseMarkdown(markdown, options = {}) {
 
   // 辅助函数：处理混合内容行
   function processMixedContent(line) {
+    console.log(`🔍 processMixedContent 处理行: "${line}"`);
+    
     // 🔧 生成稳定的内容种子，添加行内容哈希
     const lineHash = line.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
     const contentSeed = `mixed-content-${line.slice(0, 30)}-len${line.length}`;
@@ -5643,9 +5750,11 @@ function parseMarkdown(markdown, options = {}) {
       position: position
     });
 
-    // 查找所有按钮类型标记 [variant] [text](url) 或 [variant][text](url)
-    const buttonVariantRegex = /\[(\w+)\]\s*\[([^\]]+)\]\(([^)]+)\)/g;
+    // 查找所有按钮类型标记 [variant] [text](url) 或 [variant][text](url) 或 [event:eventName][text](url)
+    const buttonVariantRegex = /\[(\w+(?::\w+)?)\]\s*\[([^\]]+)\]\(([^)]+)\)/g;
     const buttonVariantMatches = [...line.matchAll(buttonVariantRegex)];
+    console.log(`🎯 按钮变体正则: ${buttonVariantRegex.toString()}`);
+    console.log(`🎯 按钮变体匹配结果:`, buttonVariantMatches);
     console.log(`找到 ${buttonVariantMatches.length} 个按钮类型标记`);
 
     // 查找所有普通链接 [text](url) 但不是图片链接，也不是按钮类型标记
@@ -5698,9 +5807,14 @@ function parseMarkdown(markdown, options = {}) {
         const buttonUrl = match[3];
         const supportedVariants = ['primary', 'secondary', 'success', 'warning', 'error', 'ghost', 'link'];
         
-        if (supportedVariants.includes(variant)) {
+        // 检查是否是事件语法
+        if (variant.startsWith('event:')) {
+          console.log(`处理混合内容中的事件按钮: variant="${variant}", 文本="${buttonText}", URL="${buttonUrl}"`);
+          const buttonElement = createButtonElement(buttonText, buttonUrl, 'primary', currentMarkdown);
+          currentLayout.layout.children.push(buttonElement);
+        } else if (supportedVariants.includes(variant)) {
           console.log(`处理混合内容中的按钮类型标记: variant="${variant}", 文本="${buttonText}", URL="${buttonUrl}"`);
-          const buttonElement = createButtonElement(buttonText, buttonUrl, variant);
+          const buttonElement = createButtonElement(buttonText, buttonUrl, variant, currentMarkdown);
           currentLayout.layout.children.push(buttonElement);
         } else {
           // 如果variant不支持，当作普通文本处理
@@ -5711,7 +5825,7 @@ function parseMarkdown(markdown, options = {}) {
         const linkText = match[1];
         const linkUrl = match[2];
         console.log(`处理混合内容中的普通链接: 文本="${linkText}", URL="${linkUrl}"`);
-        const buttonElement = createButtonElement(linkText, linkUrl, 'primary'); // 默认使用primary样式
+        const buttonElement = createButtonElement(linkText, linkUrl, 'primary', currentMarkdown); // 默认使用primary样式
         currentLayout.layout.children.push(buttonElement);
       } else if (type === 'image') {
         const imgAlt = match[1];
@@ -5802,6 +5916,11 @@ function createEightElementRoot(markdownElements, rootAttributes = {}) {
 
 // 主函数：将Markdown转换为八要素格式
 function markdownToEightElement(markdown, styleConfig) {
+  // 🆕 保存原始未处理的markdown用于事件解析（清理内部标记）
+  const originalMarkdown = typeof markdown === 'string' 
+    ? markdown.replace(/§PARAGRAPH§/g, '') 
+    : markdown;
+  
   // 如果提供了样式配置，设置当前配置
   if (styleConfig) {
     try {
@@ -5836,7 +5955,10 @@ function markdownToEightElement(markdown, styleConfig) {
   console.log(`处理Markdown文本，长度: ${processedMarkdown.length}`);
 
   // 🆕 创建解析选项对象，用于收集根layout属性
-  const parseOptions = { rootAttributes: {} };
+  const parseOptions = { 
+    rootAttributes: {},
+    currentMarkdown: originalMarkdown  // 🆕 传递原始未处理的markdown用于事件解析
+  };
   
   // 直接使用parseMarkdown函数解析Markdown为元素数组
   const parsedElements = parseMarkdown(processedMarkdown, parseOptions);

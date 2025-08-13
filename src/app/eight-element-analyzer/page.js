@@ -192,7 +192,7 @@ const a = 1;
 \`\`\`
 
 
-[查看源码](https://github.com/example/elegant-cards)
+[event:edit][事件编辑](https://github.com/example/edit)
 [设计指南](https://example.com/design-guide)
 </card:elegantStandard>
 
