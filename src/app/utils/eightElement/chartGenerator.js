@@ -543,6 +543,12 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
             }
         });
     });
+
+    // 🆕 根据图表大小选择合适的轴配置
+    const currentAxisConfig = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
+    const resolvedAxisFontSize = resolveToken(currentAxisConfig.fontSize);
+    const resolvedAxisFontWeight = resolveToken(currentAxisConfig.fontWeight);
+    const resolvedAxisFill = resolveToken(currentAxisConfig.fill);
     
     // 添加X轴网格线
     g.append('g')
@@ -577,16 +583,13 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     // 添加X轴
     const xAxis = g.append('g')
       .attr('class', 'axis x-axis')
+      .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
       .attr('transform', `translate(0,${innerHeight})`);
     
     // 获取轴样式配置
     const axisClassName = chartStyleConfig?.axis?.className || 'axis-label';
     
-    // 🆕 根据图表大小选择合适的轴配置
-    const currentAxisConfig = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
-    const resolvedAxisFontSize = resolveToken(currentAxisConfig.fontSize);
-    const resolvedAxisFontWeight = resolveToken(currentAxisConfig.fontWeight);
-    const resolvedAxisFill = resolveToken(currentAxisConfig.fill);
+    
     
     // 🆕 显示所有X轴标签，优化日期显示
     xAxis.selectAll('g')
@@ -810,6 +813,13 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
     const yScale = d3.scaleLinear()
       .domain([0, maxValue])
       .range([innerHeight, 0]);
+
+    
+    // 🆕 根据图表大小选择合适的轴配置
+    const currentAxisConfig2 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
+    const resolvedAxisFontSize2 = resolveToken(currentAxisConfig2.fontSize);
+    const resolvedAxisFontWeight2 = resolveToken(currentAxisConfig2.fontWeight);
+    const resolvedAxisFill2 = resolveToken(currentAxisConfig2.fill);
     
     // 添加垂直网格线
     g.append('g')
@@ -828,13 +838,8 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
     // 🆕 手动创建X轴标签，设置合适的字体大小
     const xAxis = g.append('g')
       .attr('class', 'axis x-axis')
+      .attr('font-size', resolvedAxisFontSize2 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置 
       .attr('transform', `translate(0,${innerHeight})`);
-    
-    // 🆕 根据图表大小选择合适的轴配置
-    const currentAxisConfig2 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
-    const resolvedAxisFontSize2 = resolveToken(currentAxisConfig2.fontSize);
-    const resolvedAxisFontWeight2 = resolveToken(currentAxisConfig2.fontWeight);
-    const resolvedAxisFill2 = resolveToken(currentAxisConfig2.fill);
     
     // 添加X轴刻度线和标签（品牌名称）
     xAxis.selectAll('.tick')
@@ -966,6 +971,12 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
     
     // 处理单个数据系列的情况
     const valueField = valueFields[0]; // 只使用第一个数据系列
+
+    // 🆕 根据图表大小选择合适的轴配置
+    const currentAxisConfig3 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
+    const resolvedAxisFontSize3 = resolveToken(currentAxisConfig3.fontSize);
+    const resolvedAxisFontWeight3 = resolveToken(currentAxisConfig3.fontWeight);
+    const resolvedAxisFill3 = resolveToken(currentAxisConfig3.fill);
     
     // 创建x和y轴的比例尺
     const xScale = d3.scaleLinear()
@@ -995,18 +1006,17 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
     const xAxis = g.append('g')
       .attr('class', 'axis x-axis')
       .attr('transform', `translate(0,${innerHeight})`)
+      .attr('font-size', resolvedAxisFontSize3 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
       .call(d3.axisBottom(xScale).ticks(5).tickFormat(d => d));
+
+
+      xAxis.selectAll('g').attr('font-size', resolvedAxisFontSize3 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
     
     // 🆕 手动创建Y轴标签，设置合适的字体大小
     const yAxis = g.append('g')
-      .attr('class', 'axis y-axis');
+      .attr('class', 'axis y-axis')
     
-    // 🆕 根据图表大小选择合适的轴配置
-    const currentAxisConfig3 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
-    const resolvedAxisFontSize3 = resolveToken(currentAxisConfig3.fontSize);
-    const resolvedAxisFontWeight3 = resolveToken(currentAxisConfig3.fontWeight);
-    const resolvedAxisFill3 = resolveToken(currentAxisConfig3.fill);
-    
+     
     // 添加Y轴刻度线和标签
     yAxis.selectAll('.tick')
       .data(categories)
@@ -1057,7 +1067,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('dy', '.35em')
       .attr('text-anchor', 'start')
       .attr('fill', '#333')
-      .attr('font-size', displayConfig.dataLabelSize || '8px') // 🆕 使用动态数据标签字体大小
+      .attr('font-size', resolvedAxisFontSize3 || displayConfig.dataLabelSize || '8px') // 🆕 使用动态数据标签字体大小
       .text(d => d[valueField]);
     
     
@@ -1155,7 +1165,8 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
       };
     });
     
-    console.log('饼图数据:', pieData);
+    const currentAxisConfig4 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
+    const resolvedAxisFontSize4 = resolveToken(currentAxisConfig4.fontSize);
     
     // 计算图表区域
     const innerWidth = width - margin.left - margin.right;
@@ -1200,14 +1211,12 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
       .attr('stroke', '#fff')
       .attr('stroke-width', 2);
     
-    // 🆕 应用小图表优化 - 标签字体大小
-    const labelFontSize = displayConfig.dataLabelSize || '8px';
     
     // 添加标签
     arcs.append('text')
       .attr('transform', d => `translate(${labelArc.centroid(d)})`)
       .attr('text-anchor', 'middle')
-      .attr('font-size', labelFontSize) // 🆕 使用动态字体大小
+      .attr('font-size', resolvedAxisFontSize4 || displayConfig.dataLabelSize || '8px') // 🆕 使用动态字体大小
       .attr('fill', '#333')
       .attr('font-weight', 'bold')
       .text(d => d.data.label);
@@ -1216,7 +1225,7 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
     arcs.append('text')
       .attr('transform', d => `translate(${arc.centroid(d)})`)
       .attr('text-anchor', 'middle')
-      .attr('font-size', displayConfig.dataLabelSize || '8px') // 🆕 使用动态字体大小
+      .attr('font-size', resolvedAxisFontSize4 || displayConfig.dataLabelSize || '8px') // 🆕 使用动态字体大小
       .attr('fill', '#fff')
       .attr('font-weight', 'bold')
       .attr('stroke', '#000')
@@ -1225,38 +1234,40 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
       .text(d => d.data.originalValue); // 🆕 显示原始值（包含%符号）
     
     // 🆕 添加图例（可选）
-    if (pieData.length <= 5) { // 只有在项目不太多时才显示图例
-      const legend = g.append('g')
-        .attr('class', 'legend')
-        .attr('transform', `translate(${radius + 40}, ${-pieData.length * 10})`);
+    // if (pieData.length <= 5) { // 只有在项目不太多时才显示图例
+    //   const legend = g.append('g')
+    //     .attr('class', 'legend')
+    //     .attr('transform', `translate(${radius - 35}, ${-pieData.length * 55})`);
       
-      // 🆕 根据图表大小选择合适的图例配置
-      const currentLegendConfig2 = displayConfig.isSmallChart ? smalllegendConfig : legendConfig;
-      const resolvedFontSize = resolveToken(currentLegendConfig2.fontSize);
-      const resolvedFontWeight = resolveToken(currentLegendConfig2.fontWeight);
-      const resolvedFill = resolveToken(currentLegendConfig2.fill);
-      const legendFontSize = resolvedFontSize || displayConfig.legendLabelSize || '8px';
+    //   // 🆕 根据图表大小选择合适的图例配置
+    //   const currentLegendConfig2 = displayConfig.isSmallChart ? smalllegendConfig : legendConfig;
+    //   const resolvedFontSize = resolveToken(currentLegendConfig2.fontSize);
+    //   const resolvedFontWeight = resolveToken(currentLegendConfig2.fontWeight);
+    //   const resolvedFill = resolveToken(currentLegendConfig2.fill);
+    //   const legendFontSize = resolvedFontSize || displayConfig.legendLabelSize || '8px';
       
-      pieData.forEach((d, i) => {
-        const legendItem = legend.append('g')
-          .attr('transform', `translate(0, ${i * 20})`);
+    //   pieData.forEach((d, i) => {
+    //     const legendItem = legend.append('g')
+    //       .attr('transform', `translate(0, ${i * 20})`);
         
-        // 图例色块
-        legendItem.append('rect')
-          .attr('width', 15)
-          .attr('height', 15)
-          .attr('fill', colorValues[i % colorValues.length]);
+    //     // 图例色块
+    //     legendItem.append('rect')
+    //       .attr('width', 15)
+    //       .attr('height', 15)
+    //       .attr('fill', colorValues[i % colorValues.length]);
         
-        // 图例文字
-        legendItem.append('text')
-          .attr('x', 20)
-          .attr('y', 12)
-          .attr('font-size', legendFontSize) // 🆕 优先使用token，其次使用动态配置
-          .attr('font-weight', resolvedFontWeight || '400')  // 🆕 使用token中的字体粗细
-          .attr('fill', resolvedFill || '#333')  // 🆕 使用token中的颜色
-          .text(`${d.label}: ${d.originalValue}`); // 🆕 使用原始值显示
-      });
-    }
+    //     // 图例文字
+    //     legendItem.append('text')
+    //       .attr('x', 20)
+    //       .attr('y', 12)
+    //       .attr('width', 200)
+    //       .attr('word-break', 'break-all')
+    //       .attr('font-size', legendFontSize) // 🆕 优先使用token，其次使用动态配置
+    //       .attr('font-weight', resolvedFontWeight || '400')  // 🆕 使用token中的字体粗细
+    //       .attr('fill', resolvedFill || '#333')  // 🆕 使用token中的颜色
+    //       .text(`${d.label}: ${d.originalValue}`); // 🆕 使用原始值显示
+    //   });
+    // }
     
     // 将SVG转换为字符串
     return svg.node().outerHTML;
