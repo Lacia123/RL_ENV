@@ -3781,6 +3781,7 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
         default: {
           "data-key": "",
           type: "img",
+          preview: imageUrl,
           style: {
             image: {
               value: imageUrl,
@@ -5789,7 +5790,7 @@ function createEightElementRoot(markdownElements, rootAttributes = {}) {
         // 🆕 应用根布局样式配置中的属性样式
         ...rootStyleConfig
       },
-      children: markdownElements
+    children: markdownElements
     },
     events: [{}]
   };

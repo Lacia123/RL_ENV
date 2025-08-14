@@ -86,7 +86,7 @@ const MARKDOWN_TEMPLATES = {
 - 响应式设计：适配各种屏幕尺寸
 - 层次清晰：标题和内容区域明确分离
 
-![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
+![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)
 
 这种设计风格特别适合商务场景、品牌展示和高端产品介绍。
 [了解更多](https://example.com/elegant)
@@ -130,7 +130,7 @@ const MARKDOWN_TEMPLATES = {
 - 响应式设计：适配各种屏幕尺寸
 - 层次清晰：标题和内容区域明确分离
 
-![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
+![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)
 
 这种设计风格特别适合商务场景、品牌展示和高端产品介绍。
 [了解更多](https://example.com/elegant)
@@ -300,7 +300,7 @@ const a = 1;
 - ⚡ 高性能：优化的渲染和交互
 - 🔮 未来感：前沿的视觉设计语言
 
-![科技产品](https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=600&h=200)
+![科技产品](https://images.unsplash.com/photo-1518709268805-4e9042af2176)
 
 ### 应用场景
 - 科技产品展示
@@ -338,7 +338,7 @@ interface TechStack {
 - 🔄 自动化：智能流程自动化
 - 🛡️ 安全可靠：企业级安全保障
 
-![AI技术](https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=200)
+![AI技术](https://images.unsplash.com/photo-1677442136019-21780ecad995)
 
 ### 服务模块
 - 智能客服机器人
@@ -400,7 +400,7 @@ contract DeFiProtocol {
 - 🌍 全球部署：覆盖全球的数据中心
 - 📈 自动扩缩：智能资源调度
 
-![云计算](https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&h=200)
+![云计算](https://images.unsplash.com/photo-1544197150-b99a580bb7a8)
 
 ### 核心服务
 - 弹性计算实例 (ECS)
@@ -473,7 +473,7 @@ contract DeFiProtocol {
 ### 来自自然的设计语言
 观察自然界中的美妙图案，从叶脉的纹理到水滴的形状，这些都为我们的设计提供了无尽的灵感源泉。
 
-![自然之美](https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&h=300)
+![自然之美](https://images.unsplash.com/photo-1441974231531-c6227db76b6e)
 
 每一个设计元素都经过精心考量，确保它们能够和谐地融合在一起，就像自然界中的万物一样。
 
@@ -588,7 +588,7 @@ contract DeFiProtocol {
 - 📱 移动优先：专为触屏设备优化
 - 🤖 AI辅助：智能内容推荐和排版
 
-![设计趋势](https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=200)
+![设计趋势](https://images.unsplash.com/photo-1561070791-2526d30994b5)
 
 > "设计不是装饰，而是沟通。好的设计能够跨越语言和文化的障碍，直达人心。"
 
@@ -660,7 +660,7 @@ Pinterest作为瀑布流布局的典型代表，通过这种布局方式重新�
 [联系我们](/contact)
 </layout:row>
 
-![企业Logo](https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=300)
+![企业Logo](https://images.unsplash.com/photo-1560472354-b33ff0c44a43)
 
 ## 创新科技，引领未来
 <layout:row>
@@ -1095,7 +1095,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 ## 公司简介
 ### 关于企业
 我们是一家专注于人工智能和大数据领域的创新科技公司。
-![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg?w=400&h=200)
+![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)
 **关于团队**
 我们拥有一支充满活力和创新精神的技术团队。我们拥有一支充满活力和创新精神的技术团队。
 
