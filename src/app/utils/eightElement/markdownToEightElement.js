@@ -926,9 +926,9 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                 // 🆕 获取图表的 variant 配置
                 const chartVariant = getChartVariantFromConfig(markdownResult.templatePath, cardStyleConfig);
                 
-                const chartElement = createChartElement(chartResult.chartType, '', chartResult.tableData, chartResult.tableContent, chartVariant);
+                const chartElement = createChartElement(chartResult.chartType, '', chartResult.tableData, chartResult.tableContent, chartVariant, chartResult.chartTitle);
                 
-                // 生成SVG图表 - 传递 variant 信息
+                // 生成SVG图表 - 传递 variant 信息和标题
                 const chartStyleConfig = {
                   variant: chartVariant,
                   container: chartElement.layout?.container,
@@ -936,7 +936,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                   legend: chartElement.layout?.legend,
                   axis: chartElement.layout?.axis
                 };
-                const svgContent = generateChartSvg(chartResult.chartType, chartResult.tableData, chartStyleConfig);
+                const svgContent = generateChartSvg(chartResult.chartType, chartResult.tableData, chartStyleConfig, chartResult.chartTitle);
                 chartElement.svgContent = svgContent;
                 
                 // 使用通配符处理的路径创建模板元素
@@ -1671,10 +1671,15 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     }
   }
   
-  // 🆕 检查图表格式 [chart:type] (新增通配符支持)
+  // 🆕 检查图表格式 [chart:type|title] 或 [chart:type] (新增标题支持)
   const chartMatch = line.match(/^\[chart:(.+?)\]/);
   if (chartMatch) {
-    const chartType = chartMatch[1];
+    const fullChartSpec = chartMatch[1];
+    // 🆕 解析图表类型和可选标题
+    const [chartType, chartTitle] = fullChartSpec.includes('|') 
+      ? fullChartSpec.split('|', 2).map(s => s.trim())
+      : [fullChartSpec.trim(), null];
+    
     const chartKey = `chart:${chartType}`;
     
     // 先尝试通配符匹配
@@ -1685,11 +1690,12 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
         wildcardResult.wildcard || chartType
       );
       
-      console.log(`🎯 发现图表 (通配符匹配): ${chartKey} -> ${processedTemplatePath}`);
+      console.log(`🎯 发现图表 (通配符匹配): ${chartKey} -> ${processedTemplatePath}${chartTitle ? `, 标题: ${chartTitle}` : ''}`);
       return {
         markdownResult: {
           type: 'chart',
           chartType: chartType,
+          chartTitle: chartTitle, // 🆕 添加图表标题
           templatePath: processedTemplatePath,
           content: line.trim(),
           wildcard: wildcardResult.wildcard,
@@ -1702,11 +1708,12 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     // 如果没有通配符匹配，尝试精确匹配（兼容旧逻辑）
     if (markdownMapping[chartKey] || markdownMapping.chart) {
       const templatePath = markdownMapping[chartKey] || markdownMapping.chart;
-      console.log(`🎯 发现图表 (精确匹配): ${chartKey} -> ${templatePath}`);
+      console.log(`🎯 发现图表 (精确匹配): ${chartKey} -> ${templatePath}${chartTitle ? `, 标题: ${chartTitle}` : ''}`);
       return {
         markdownResult: {
           type: 'chart',
           chartType: chartType,
+          chartTitle: chartTitle, // 🆕 添加图表标题
           templatePath: templatePath,
           content: line.trim()
         },
@@ -4240,10 +4247,18 @@ function extractTableOrChartData(lines, startIndex) {
   const firstLine = lines[startIndex].trim();
   const chartMatch = firstLine.match(/^\[chart:(.+?)\]/);
   const isChart = !!chartMatch;
-  const chartType = isChart ? chartMatch[1] : null;
-
+  
+  let chartType = null;
+  let chartTitle = null;
+  
   if (isChart) {
-    console.log(`检测到图表类型: ${chartType}`);
+    const fullChartSpec = chartMatch[1];
+    // 🆕 解析图表类型和可选标题
+    [chartType, chartTitle] = fullChartSpec.includes('|') 
+      ? fullChartSpec.split('|', 2).map(s => s.trim())
+      : [fullChartSpec.trim(), null];
+    
+    console.log(`检测到图表类型: ${chartType}${chartTitle ? `, 标题: ${chartTitle}` : ''}`);
   } else {
     console.log('检测到普通表格');
   }
@@ -4282,6 +4297,7 @@ function extractTableOrChartData(lines, startIndex) {
   return {
     isChart: isChart,
     chartType: chartType,
+    chartTitle: chartTitle, // 🆕 添加图表标题
     tableContent: originalContent,
     tableData: tableData,
     endIndex: startIndex + i
@@ -4290,15 +4306,15 @@ function extractTableOrChartData(lines, startIndex) {
 
 // 处理表格数据 - 决定创建普通表格还是图表元素
 function processTableOrChartData(result, stack) {
-  const { isChart, chartType, tableContent, tableData, endIndex } = result;
+  const { isChart, chartType, chartTitle, tableContent, tableData, endIndex } = result;
 
   if (isChart) {
     // 处理为图表
     try {
       console.log(`处理图表数据，类型: ${chartType}`);
       
-      // 先创建图表元素（包含样式配置）- 使用默认 variant
-      const chartElement = createChartElement(chartType, '', tableData, tableContent, 'normal');
+      // 先创建图表元素（包含样式配置）- 使用默认 variant，传递标题
+      const chartElement = createChartElement(chartType, '', tableData, tableContent, 'normal', chartTitle);
       
       // 提取样式配置
       const chartStyleConfig = {
@@ -4308,8 +4324,8 @@ function processTableOrChartData(result, stack) {
         axis: chartElement.layout.axis
       };
       
-      // 生成SVG图表，传入样式配置
-      const svgContent = generateChartSvg(chartType, tableData, chartStyleConfig);
+      // 生成SVG图表，传入样式配置和标题
+      const svgContent = generateChartSvg(chartType, tableData, chartStyleConfig, chartTitle);
       
       // 更新图表元素的SVG内容
       chartElement.svgContent = svgContent;
@@ -4599,12 +4615,12 @@ function extractMarkdownCodeBlock(lines, startIndex) {
 }
 
 // 使用D3生成SVG图表
-function generateChartSvg(chartType, data, chartStyleConfig = null) {
-  console.log('开始生成图表SVG，类型:', chartType);
+function generateChartSvg(chartType, data, chartStyleConfig = null, chartTitle = null) {
+  console.log('开始生成图表SVG，类型:', chartType, chartTitle ? `，标题: ${chartTitle}` : '');
 
   try {
-    // 使用chartGenerator提供的功能生成SVG，传入样式配置
-    return generateChartFromTableData(data, chartType, chartStyleConfig);
+    // 使用chartGenerator提供的功能生成SVG，传入样式配置和标题
+    return generateChartFromTableData(data, chartType, chartStyleConfig, chartTitle);
   } catch (error) {
     console.error('生成图表SVG时出错:', error);
     // 返回错误信息的SVG
@@ -4617,7 +4633,7 @@ function generateChartSvg(chartType, data, chartStyleConfig = null) {
 }
 
 // 创建图表元素
-function createChartElement(chartType, svgContent, tableData, rawData, variant = 'normal') {
+function createChartElement(chartType, svgContent, tableData, rawData, variant = 'normal', chartTitle = null) {
   const id = generateUUID();
   const layoutStyleConfig = getElementStyleConfig('layout', 'column');
   
@@ -4647,7 +4663,8 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
     _metadata: {
       actualType: 'chart',
       variant: variant || 'normal',  // 🔧 修复：使用正确的 variant 参数
-      chartType: chartType || 'line', // 🆕 添加图表类型到元数据
+      chartType: chartType || 'line', // 🆕 图表类型（不包含标题）
+      title: chartTitle, // 🆕 添加图表标题到元数据
       isChart: true
     },
     svgContent: svgContent,

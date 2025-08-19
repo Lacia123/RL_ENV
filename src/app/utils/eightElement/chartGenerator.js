@@ -37,6 +37,12 @@ const smalllegendConfig = {
   fill: "{color.onsurface.black88}",
 }
 
+const titleConfig = {
+  fontSize: "{font.size.small}",
+  fontWeight: "400",
+  fill: "{color.onsurface.black88}",
+}
+
 /**
  * 创建JSDOM环境
  * @param {number} width - SVG宽度
@@ -160,9 +166,10 @@ function resolveColor(color) {
  * @param {Array} tableData - 二维数组表格数据
  * @param {string} chartType - 图表类型
  * @param {Object} chartStyleConfig - 图表样式配置（包含title、legend、axis的className和classStyle）
+ * @param {string} chartTitle - 图表标题（可选）
  * @returns {string} - SVG图表的HTML字符串
  */
-export function generateChartFromTableData(tableData, chartType, chartStyleConfig = null) {
+export function generateChartFromTableData(tableData, chartType, chartStyleConfig = null, chartTitle = null) {
   try {
     console.log('生成图表，类型:', chartType, '数据行数:', tableData.length);
     
@@ -238,18 +245,18 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
     // 根据图表类型生成不同的图表
     switch(chartType) {
       case 'grouped_line':
-        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
+        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'line':
-        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
+        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'bar':
-        return generateBarChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
+        return generateBarChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'barh':
-        return generateBarHChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
+        return generateBarHChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'pie':
-        return generatePieChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
+        return generatePieChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       default:
         // 默认使用分组折线图
-        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig);
+        return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
     }
   } catch (error) {
     console.error('生成图表时发生错误:', error);
@@ -267,9 +274,10 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
  * @param {Object} margin - 图表边距
  * @param {Object} chartStyleConfig - 图表样式配置
  * @param {Object} displayConfig - 显示配置（字体大小、刻度数量等）
+ * @param {string} chartTitle - 图表标题（可选）
  * @returns {string} - SVG图表的HTML字符串
  */
-function generateGroupedLineChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}) {
+function generateGroupedLineChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
   try {
     console.log('生成分组折线图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
@@ -314,8 +322,10 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
     
+    // 🆕 有标题时整个图表向下移动，为图例留出空间
+    const chartOffsetY = chartTitle ? 45 : 0;
     const g = svg.append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+      .attr('transform', `translate(${margin.left},${margin.top + chartOffsetY})`);
     
     const xValues = data.map(d => d[dateField]);
     
@@ -650,10 +660,26 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
           });
       });
     
+    // 🆕 添加图表标题（使用SVG绝对坐标确保所有图表标题在同一行）
+    if (chartTitle) {
+      const titleFontSize = resolveToken(titleConfig.fontSize)
+      const titleFontWeight = titleConfig.fontWeight
+      const titleFill = resolveToken(titleConfig.fill)
+      
+      svg.append('text')
+        .attr('x', width / 2)
+        .attr('y', 25)  // 🆕 使用SVG绝对坐标，与饼图保持一致
+        .attr('text-anchor', 'middle')
+        .attr('font-size', titleFontSize)
+        .attr('font-weight', titleFontWeight)
+        .attr('fill', titleFill)
+        .text(chartTitle);
+    }
+
     // 添加图例 - 🆕 优化图例排版以节省空间
     const legend = g.append('g')
       .attr('class', 'legend')
-      .attr('transform', `translate(0, -${margin.top - 5})`); // 🆕 图例更靠近顶部，节省空间
+      .attr('transform', `translate(0, ${-(margin.top - 5)})`); // 🆕 有标题时图例向下移动更多空间，增加与标题的间距
     
     // 🆕 动态计算图例位置 - 调整间距避免重叠
     const legendItemWidth = displayConfig.isSmallChart ? 150 : 160; // 🆕 增加图例间距避免重叠 (100→150)
@@ -749,9 +775,10 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
  * @param {Object} margin - 图表边距
  * @param {Object} chartStyleConfig - 图表样式配置
  * @param {Object} displayConfig - 显示配置（字体大小、刻度数量等）
+ * @param {string} chartTitle - 图表标题（可选）
  * @returns {string} - SVG图表的HTML字符串
  */
-function generateBarChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}) {
+function generateBarChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
   try {
     console.log('生成垂直柱状图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
@@ -786,9 +813,11 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
     
+    // 🆕 有标题时整个图表向下移动，保持与折线图一致
+    const chartOffsetY = chartTitle ? 15 : 0;
     // 主图表组
     const g = svg.append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+      .attr('transform', `translate(${margin.left},${margin.top + chartOffsetY})`);
     
     // X轴类别（品牌名称）
     const categories = data.map(d => d[dateField]);
@@ -899,6 +928,22 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
       .attr('font-size', displayConfig.dataLabelSize || '8px') // 🆕 使用动态数据标签字体大小
       .text(d => d[valueField]);
     
+    // 🆕 添加图表标题（使用SVG绝对坐标确保所有图表标题在同一行）
+    if (chartTitle) {
+      const titleFontSize = resolveToken(titleConfig.fontSize)
+      const titleFontWeight = titleConfig.fontWeight
+      const titleFill = resolveToken(titleConfig.fill)
+      
+      svg.append('text')
+        .attr('x', width / 2)
+        .attr('y', 25)  // 🆕 使用SVG绝对坐标，与所有图表保持一致
+        .attr('text-anchor', 'middle')
+        .attr('font-size', titleFontSize)
+        .attr('font-weight', titleFontWeight)
+        .attr('fill', titleFill)
+        .text(chartTitle);
+    }
+    
     // 将SVG转换为字符串
     return svg.node().outerHTML;
   } catch (error) {
@@ -917,9 +962,10 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
  * @param {Object} margin - 图表边距
  * @param {Object} chartStyleConfig - 图表样式配置
  * @param {Object} displayConfig - 显示配置（字体大小、刻度数量等）
+ * @param {string} chartTitle - 图表标题（可选）
  * @returns {string} - SVG图表的HTML字符串
  */
-function generateBarHChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}) {
+function generateBarHChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
   try {
     console.log('生成水平柱状图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
@@ -954,9 +1000,11 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
     
+    // 🆕 有标题时整个图表向下移动，保持与折线图一致
+    const chartOffsetY = chartTitle ? 15 : 0;
     // 主图表组
     const g = svg.append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+      .attr('transform', `translate(${margin.left},${margin.top + chartOffsetY})`);
     
     // X轴类别（日期）
     const categories = data.map(d => d[dateField]);
@@ -1103,6 +1151,22 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('fill', resolvedAxisFill4 || '#333') // 🆕 使用token中的颜色
       .text(dateField);
     
+    // 🆕 添加图表标题（使用SVG绝对坐标确保所有图表标题在同一行）
+    if (chartTitle) {
+      const titleFontSize = resolveToken(titleConfig.fontSize)
+      const titleFontWeight = titleConfig.fontWeight
+      const titleFill = resolveToken(titleConfig.fill)
+      
+      svg.append('text')
+        .attr('x', width / 2)
+        .attr('y', 25)  // 🆕 使用SVG绝对坐标，与所有图表保持一致
+        .attr('text-anchor', 'middle')
+        .attr('font-size', titleFontSize)
+        .attr('font-weight', titleFontWeight)
+        .attr('fill', titleFill)
+        .text(chartTitle);
+    }
+    
     // 将SVG转换为字符串
     return svg.node().outerHTML;
   } catch (error) {
@@ -1121,9 +1185,10 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
  * @param {Object} margin - 图表边距
  * @param {Object} chartStyleConfig - 图表样式配置
  * @param {Object} displayConfig - 显示配置（字体大小、刻度数量等）
+ * @param {string} chartTitle - 图表标题（可选）
  * @returns {string} - SVG图表的HTML字符串
  */
-function generatePieChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}) {
+function generatePieChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
   try {
     console.log('生成饼图, 数据点数:', data.length, '值字段:', valueFields);
     
@@ -1178,9 +1243,25 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
       baseRadius - 10 :  // 小图表：减少留白，图例可能在外部
       baseRadius - 20;   // 普通图表：保留一些空间给标签
     
-    // 创建主图表组，居中定位
+    // 🆕 添加图表标题
+    if (chartTitle) {
+      const titleFontSize = resolveToken(titleConfig.fontSize)
+      const titleFontWeight = titleConfig.fontWeight
+      const titleFill = resolveToken(titleConfig.fill)
+      
+      svg.append('text')
+        .attr('x', width / 2)  // 饼图使用完整宽度的一半
+        .attr('y', 25)         // 🆕 与其他图表保持一致的Y坐标
+        .attr('text-anchor', 'middle')
+        .attr('font-size', titleFontSize)
+        .attr('font-weight', titleFontWeight)
+        .attr('fill', titleFill)
+        .text(chartTitle);
+    }
+
+    // 创建主图表组，居中定位（如果有标题则向下移动）
     const g = svg.append('g')
-      .attr('transform', `translate(${width / 2},${height / 2})`);
+      .attr('transform', `translate(${width / 2},${height / 2 + (chartTitle ? 15 : 0)})`);
     
     // 创建饼图生成器
     const pie = d3.pie()
@@ -1234,40 +1315,40 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
       .text(d => d.data.originalValue); // 🆕 显示原始值（包含%符号）
     
     // 🆕 添加图例（可选）
-    // if (pieData.length <= 5) { // 只有在项目不太多时才显示图例
-    //   const legend = g.append('g')
-    //     .attr('class', 'legend')
-    //     .attr('transform', `translate(${radius - 35}, ${-pieData.length * 55})`);
+    // // if (pieData.length <= 5) { // 只有在项目不太多时才显示图例
+    // //   const legend = g.append('g')
+    // //     .attr('class', 'legend')
+    // //     .attr('transform', `translate(${radius - 35}, ${-pieData.length * 55})`);
       
-    //   // 🆕 根据图表大小选择合适的图例配置
-    //   const currentLegendConfig2 = displayConfig.isSmallChart ? smalllegendConfig : legendConfig;
-    //   const resolvedFontSize = resolveToken(currentLegendConfig2.fontSize);
-    //   const resolvedFontWeight = resolveToken(currentLegendConfig2.fontWeight);
-    //   const resolvedFill = resolveToken(currentLegendConfig2.fill);
-    //   const legendFontSize = resolvedFontSize || displayConfig.legendLabelSize || '8px';
+    // //   // 🆕 根据图表大小选择合适的图例配置
+    // //   const currentLegendConfig2 = displayConfig.isSmallChart ? smalllegendConfig : legendConfig;
+    // //   const resolvedFontSize = resolveToken(currentLegendConfig2.fontSize);
+    // //   const resolvedFontWeight = resolveToken(currentLegendConfig2.fontWeight);
+    // //   const resolvedFill = resolveToken(currentLegendConfig2.fill);
+    // //   const legendFontSize = resolvedFontSize || displayConfig.legendLabelSize || '8px';
       
-    //   pieData.forEach((d, i) => {
-    //     const legendItem = legend.append('g')
-    //       .attr('transform', `translate(0, ${i * 20})`);
+    // //   pieData.forEach((d, i) => {
+    // //     const legendItem = legend.append('g')
+    // //       .attr('transform', `translate(0, ${i * 20})`);
         
-    //     // 图例色块
-    //     legendItem.append('rect')
-    //       .attr('width', 15)
-    //       .attr('height', 15)
-    //       .attr('fill', colorValues[i % colorValues.length]);
+    // //     // 图例色块
+    // //     legendItem.append('rect')
+    // //       .attr('width', 15)
+    // //       .attr('height', 15)
+    // //       .attr('fill', colorValues[i % colorValues.length]);
         
-    //     // 图例文字
-    //     legendItem.append('text')
-    //       .attr('x', 20)
-    //       .attr('y', 12)
+    // //     // 图例文字
+    // //     legendItem.append('text')
+    // //       .attr('x', 20)
+    // //       .attr('y', 12)
     //       .attr('width', 200)
     //       .attr('word-break', 'break-all')
-    //       .attr('font-size', legendFontSize) // 🆕 优先使用token，其次使用动态配置
-    //       .attr('font-weight', resolvedFontWeight || '400')  // 🆕 使用token中的字体粗细
-    //       .attr('fill', resolvedFill || '#333')  // 🆕 使用token中的颜色
-    //       .text(`${d.label}: ${d.originalValue}`); // 🆕 使用原始值显示
-    //   });
-    // }
+    // //       .attr('font-size', legendFontSize) // 🆕 优先使用token，其次使用动态配置
+    // //       .attr('font-weight', resolvedFontWeight || '400')  // 🆕 使用token中的字体粗细
+    // //       .attr('fill', resolvedFill || '#333')  // 🆕 使用token中的颜色
+    // //       .text(`${d.label}: ${d.originalValue}`); // 🆕 使用原始值显示
+    // //   });
+    // // }
     
     // 将SVG转换为字符串
     return svg.node().outerHTML;
