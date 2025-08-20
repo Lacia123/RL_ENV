@@ -1054,7 +1054,6 @@ export const DEFAULT_STYLE_CONFIG = {
       borderRadius: "{dimension.borderradius.large}",
       padding: "{dimension.padding.base} {dimension.padding.extraloose}",
       cursor: 'pointer',
-      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       boxShadow: "{material.hierarchy.2f}",
       textDecoration: 'none',
       display: 'inline-flex',

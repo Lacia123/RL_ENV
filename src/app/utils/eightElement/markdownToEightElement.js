@@ -2869,14 +2869,15 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
   }
 }
 // 创建按钮元素（用于超链接）
-function createButtonElement(text, url, variant = 'primary', currentMarkdown = '') {
+function createButtonElement(text, url, variant = 'primary', currentMarkdown = '', displayText = null) {
   const id = generateUUID();
   console.log(`🔍 createButtonElement: 创建按钮 - 文本="${text}", URL="${url}", 变体="${variant}"`);
   console.log(`🔍 传入的currentMarkdown长度: ${currentMarkdown.length}`);
   
-  // 解析事件语法
+  // 解析事件语法（使用原始文本）
   const buttonEvents = parseEventSyntax(text, id, currentMarkdown);
-  const cleanText = removeEventSyntax(text); // 移除事件语法标记
+  // 使用提供的显示文本，或者从原始文本中移除事件语法标记
+  const cleanText = displayText || removeEventSyntax(text);
   
   console.log(`🔍 解析到的事件数量: ${buttonEvents.length}`);
   console.log(`🔍 清理后的按钮文本: "${cleanText}"`);
@@ -5432,7 +5433,8 @@ function parseMarkdown(markdown, options = {}) {
 
         console.log(`发现按钮类型标记: variant="${buttonVariantResult.variant}", 文本="${buttonVariantResult.text}", URL="${buttonVariantResult.url}"`);
 
-        const buttonElement = createButtonElement(buttonVariantResult.text, buttonVariantResult.url, buttonVariantResult.variant, currentMarkdown);
+        // 🆕 传入原始完整文本用于事件解析，同时传入提取的按钮文本
+        const buttonElement = createButtonElement(trimmedLine, buttonVariantResult.url, buttonVariantResult.variant, currentMarkdown, buttonVariantResult.text);
         console.log(`按钮ID: ${buttonElement.id}, 名称: ${buttonElement.name}, 样式: ${buttonVariantResult.variant}`);
         consecutiveButtons.push(buttonElement);
 
@@ -5827,7 +5829,8 @@ function parseMarkdown(markdown, options = {}) {
         // 检查是否是事件语法
         if (variant.startsWith('event:')) {
           console.log(`处理混合内容中的事件按钮: variant="${variant}", 文本="${buttonText}", URL="${buttonUrl}"`);
-          const buttonElement = createButtonElement(buttonText, buttonUrl, 'primary', currentMarkdown);
+          // 🆕 传入原始匹配文本用于事件解析
+          const buttonElement = createButtonElement(match[0], buttonUrl, 'primary', currentMarkdown, buttonText);
           currentLayout.layout.children.push(buttonElement);
         } else if (supportedVariants.includes(variant)) {
           console.log(`处理混合内容中的按钮类型标记: variant="${variant}", 文本="${buttonText}", URL="${buttonUrl}"`);
@@ -5874,10 +5877,68 @@ function parseMarkdown(markdown, options = {}) {
   }
 }
 
+// 🆕 递归收集所有EventTargetId的函数
+function collectEventTargetIds(elements) {
+  const eventTargetIds = [];
+  
+  const collectFromElement = (element) => {
+    if (!element) return;
+    
+    // 检查当前元素的events数组
+    if (element.events && Array.isArray(element.events)) {
+      element.events.forEach(event => {
+        if (event && event.EventTargetId && typeof event.EventTargetId === 'string') {
+          if (!eventTargetIds.includes(event.EventTargetId)) {
+            eventTargetIds.push(event.EventTargetId);
+            console.log(`🎯 收集到EventTargetId: ${event.EventTargetId}`);
+          }
+        }
+      });
+    }
+    
+    // 递归检查子元素
+    if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
+      element.layout.children.forEach(child => {
+        collectFromElement(child);
+      });
+    }
+    
+    // 检查其他可能包含子元素的结构
+    for (const key in element) {
+      if (typeof element[key] === 'object' && element[key] !== null) {
+        if (Array.isArray(element[key])) {
+          element[key].forEach(item => {
+            if (typeof item === 'object') {
+              collectFromElement(item);
+            }
+          });
+        } else if (element[key].layout && element[key].layout.children) {
+          collectFromElement(element[key]);
+        }
+      }
+    }
+  };
+  
+  // 收集所有元素中的EventTargetId
+  if (Array.isArray(elements)) {
+    elements.forEach(element => {
+      collectFromElement(element);
+    });
+  } else {
+    collectFromElement(elements);
+  }
+  
+  console.log(`📋 总共收集到 ${eventTargetIds.length} 个EventTargetId:`, eventTargetIds);
+  return eventTargetIds;
+}
+
 // 创建八要素根对象
 function createEightElementRoot(markdownElements, rootAttributes = {}) {
   // 使用随机UUID生成根布局ID
   const rootId = generateUUID();
+
+  // 🆕 收集所有EventTargetId
+  const eventTargetIds = collectEventTargetIds(markdownElements);
 
   // 🆕 获取根布局的样式配置，传入根layout属性
   const rootStyleConfig = getElementStyleConfig('layout', 'root', rootAttributes);
@@ -5892,6 +5953,7 @@ function createEightElementRoot(markdownElements, rootAttributes = {}) {
     "name-zh": "布局",
     "file-type": "template",
     theme: "default",
+    EventTargetIds: eventTargetIds, // 🆕 收集的所有EventTargetId
     // 🔍 保存根布局元数据用于分析
     _metadata: {
       actualType: 'layout',
