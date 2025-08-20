@@ -9,6 +9,7 @@ import { DEFAULT_STYLE_CONFIG } from '../utils/eightElement/styleConfig';
 import { analyzeElementsInEightElement, applyActionsToEightElement } from '../utils/eightElement/markdownToEightElement';
 import VisualSpaceEvaluator from '../components/VisualSpaceEvaluator';
 import collectEightElementMeasurements from '../utils/eightElement/collectElementMeasurements.js';
+import CrepeMarkdownEditor from '../components/CrepeMarkdownEditor';
 
 
 // 🆕 Markdown 示例配置
@@ -57,7 +58,8 @@ const MARKDOWN_TEMPLATES = {
 | 苹果 | 28% | +8% |
 | 荣耀 | 18% | +15% |
 
-[chart:grouped_line|心流指标趋势]| 日期 | 心流满意度FSV | 心流专注值FFV | 心流效能值FEV |
+[chart:grouped_line|心流指标趋势]
+| 日期 | 心流满意度FSV | 心流专注值FFV | 心流效能值FEV |
 | --- | --- | --- | --- |
 | 2025-03-10 | 0.0 | 0.36 | 2.55 |
 | 2025-03-11 | 0.0 | 0.41 | 2.22 |
@@ -70,6 +72,7 @@ const MARKDOWN_TEMPLATES = {
 | 游戏本 | 40% |
 | 轻薄本 | 35% |
 | 工作站 | 25% |
+
 </card:headerCard>
 
 <layout:bgColumn background={color.onprimary.white100}>
@@ -1146,6 +1149,11 @@ const EightElementAnalyzer = () => {
   const [iframeKey, setIframeKey] = useState(0);  // 添加 iframe key 状态
   const [copySuccess, setCopySuccess] = useState(false); // 复制成功状态
 
+  // 🆕 编辑器相关状态
+  const [isEditMode, setIsEditMode] = useState(false); // 是否处于编辑模式
+  const [editingMarkdown, setEditingMarkdown] = useState(''); // 正在编辑的markdown
+  const [currentEventTargetId, setCurrentEventTargetId] = useState(''); // 当前编辑的事件ID
+
   // 先定义commonDimensions
   const commonDimensions = [
     { name: '桌面 (1920x1080)', width: 1920, height: 1080 },
@@ -1345,6 +1353,26 @@ const EightElementAnalyzer = () => {
       return () => clearTimeout(timer);
     }
   }, [renderedHtml]);
+
+  // 🆕 监听iframe中的编辑事件
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data && event.data.type === 'EDIT_EVENT') {
+        console.log('🎯 收到iframe编辑事件:', event.data);
+
+        // 切换到编辑模式
+        setIsEditMode(true);
+        setEditingMarkdown(event.data.markdown);
+        setCurrentEventTargetId(event.data.eventTargetId);
+
+        // 确保切换到HTML预览标签页
+        setVisibleTab('html');
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   // 处理动作选择
   const handleActionToggle = (actionName) => {
@@ -1786,14 +1814,14 @@ const EightElementAnalyzer = () => {
   const handleResizeStart = useCallback((direction, e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     console.log('开始拖拽:', direction);
-    
+
     const startPos = {
       x: e.clientX,
       y: e.clientY
     };
-    
+
     const startSize = {
       leftWidth: panelSizes.leftWidth,
       topHeight: panelSizes.topHeight
@@ -1857,13 +1885,13 @@ const EightElementAnalyzer = () => {
 
   const handleResizeEnd = useCallback(() => {
     console.log('结束拖拽');
-    
+
     setIsResizing(false);
     setResizeDirection('');
-    
+
     // 重置ref状态
     dragStateRef.current.isResizing = false;
-    
+
     // 移除全局事件监听器
     document.removeEventListener('mousemove', handleResizeMove);
     document.removeEventListener('mouseup', handleResizeEnd);
@@ -1876,6 +1904,33 @@ const EightElementAnalyzer = () => {
       document.removeEventListener('mouseup', handleResizeEnd);
     };
   }, [handleResizeMove, handleResizeEnd]);
+
+  // 🆕 编辑器保存处理
+  const handleEditorSave = async (newMarkdown, eventTargetId) => {
+    console.log('💾 编辑器保存:', newMarkdown);
+    // 更新markdown内容
+    setMarkdown(newMarkdown);
+
+    // 退出编辑模式
+    setIsEditMode(false);
+    setEditingMarkdown('');
+    setCurrentEventTargetId('');
+
+    // 重新处理markdown（使用当前的动作和布局设置）
+    setTimeout(() => {
+      processMarkdown(null, layoutControls);
+    }, 100);
+  };
+
+  // 🆕 编辑器取消处理
+  const handleEditorCancel = () => {
+    console.log('🚫 编辑器取消');
+
+    // 退出编辑模式，不保存更改
+    setIsEditMode(false);
+    setEditingMarkdown('');
+    setCurrentEventTargetId('');
+  };
 
   // 重置面板大小
   const resetPanelSizes = () => {
@@ -1892,116 +1947,62 @@ const EightElementAnalyzer = () => {
 
       <div className="flex-1 flex min-h-0 main-container relative">
         {/* 左侧编辑器区域 */}
-        <div 
+        <div
           className="bg-white rounded-lg shadow overflow-hidden flex flex-col mr-2"
           style={{ width: `${panelSizes.leftWidth}%` }}
         >
           <div className="p-4 overflow-y-auto flex-1">
-          <h2 className="text-lg font-medium mb-4">Markdown编辑器</h2>
+            <h2 className="text-lg font-medium mb-4">Markdown编辑器</h2>
 
-          {/* 🆕 模板选择Tab */}
-          <div className="mb-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">模板选择</h3>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {Object.entries(MARKDOWN_TEMPLATES).map(([templateId, template]) => (
-                <button
-                  key={templateId}
-                  onClick={() => handleTemplateChange(templateId)}
-                  className={`px-3 py-2 text-sm rounded-lg border transition-all ${currentTemplate === templateId
-                    ? 'bg-blue-500 text-white border-blue-500 shadow-md'
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50'
-                    }`}
-                  title={template.description}
-                >
-                  {template.name}
-                </button>
-              ))}
-            </div>
-            <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
-              <strong>当前模板:</strong> {MARKDOWN_TEMPLATES[currentTemplate].description}
-            </div>
-          </div>
-
-          {/* Markdown编辑器 */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-700">Markdown内容</h3>
-              <span className="text-xs text-gray-500">
-                {markdown.length} 字符 | {markdown.split('\n').length} 行
-              </span>
-            </div>
-            <textarea
-              className="w-full h-64 border border-gray-300 rounded p-2 font-mono text-sm"
-              value={markdown}
-              onChange={(e) => setMarkdown(e.target.value)}
-              placeholder="输入Markdown文本..."
-            />
-          </div>
-
-          {/* 页面元件分析 */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-medium text-gray-700">页面元件分析</h3>
-              <button
-                onClick={() => setIsElementsCollapsed(!isElementsCollapsed)}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-                title={isElementsCollapsed ? "展开" : "折叠"}
-              >
-                {isElementsCollapsed ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                  </svg>
-                )}
-              </button>
-            </div>
-
-            {!isElementsCollapsed && (
-              <div className="mb-4 p-3 bg-gray-50 rounded border">
-                {pageElements.length > 0 ? (
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-gray-600 mb-2">
-                      当前页面包含 {pageElements.length} 种元件类型:
-                    </div>
-                    {pageElements.map(({ type, variant, count, sampleContent }) => (
-                      <div key={`${type}.${variant}`} className="flex items-center justify-between p-2 bg-white rounded border">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">
-                            {type}.{variant}
-                          </span>
-                          <span className="text-sm text-gray-600">
-                            {sampleContent && `"${sampleContent}"`}
-                          </span>
-                        </div>
-                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                          {count}个
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-sm text-gray-500 text-center py-4">
-                    请先输入Markdown内容以分析页面元件
-                  </div>
-                )}
+            {/* 🆕 模板选择Tab */}
+            <div className="mb-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">模板选择</h3>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {Object.entries(MARKDOWN_TEMPLATES).map(([templateId, template]) => (
+                  <button
+                    key={templateId}
+                    onClick={() => handleTemplateChange(templateId)}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-all ${currentTemplate === templateId
+                      ? 'bg-blue-500 text-white border-blue-500 shadow-md'
+                      : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50'
+                      }`}
+                    title={template.description}
+                  >
+                    {template.name}
+                  </button>
+                ))}
               </div>
-            )}
-          </div>
+              <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
+                <strong>当前模板:</strong> {MARKDOWN_TEMPLATES[currentTemplate].description}
+              </div>
+            </div>
 
-          {/* 动作影响范围 */}
-          {selectedActions.length > 0 && (
+            {/* Markdown编辑器 */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-700">Markdown内容</h3>
+                <span className="text-xs text-gray-500">
+                  {markdown.length} 字符 | {markdown.split('\n').length} 行
+                </span>
+              </div>
+              <textarea
+                className="w-full h-64 border border-gray-300 rounded p-2 font-mono text-sm"
+                value={markdown}
+                onChange={(e) => setMarkdown(e.target.value)}
+                placeholder="输入Markdown文本..."
+              />
+            </div>
+
+            {/* 页面元件分析 */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium text-gray-700">动作影响范围</h3>
+                <h3 className="font-medium text-gray-700">页面元件分析</h3>
                 <button
-                  onClick={() => setIsAffectedCollapsed(!isAffectedCollapsed)}
+                  onClick={() => setIsElementsCollapsed(!isElementsCollapsed)}
                   className="text-gray-500 hover:text-gray-700 transition-colors"
-                  title={isAffectedCollapsed ? "展开" : "折叠"}
+                  title={isElementsCollapsed ? "展开" : "折叠"}
                 >
-                  {isAffectedCollapsed ? (
+                  {isElementsCollapsed ? (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
@@ -2013,193 +2014,49 @@ const EightElementAnalyzer = () => {
                 </button>
               </div>
 
-              {!isAffectedCollapsed && (
-                <div className="mb-4 p-3 bg-yellow-50 rounded border border-yellow-200">
-                  {affectedElements.length > 0 ? (
+              {!isElementsCollapsed && (
+                <div className="mb-4 p-3 bg-gray-50 rounded border">
+                  {pageElements.length > 0 ? (
                     <div className="space-y-2">
-                      <div className="text-sm font-medium text-yellow-800 mb-2">
-                        当前动作将影响 {affectedElements.length} 种元件:
+                      <div className="text-sm font-medium text-gray-600 mb-2">
+                        当前页面包含 {pageElements.length} 种元件类型:
                       </div>
-                      {affectedElements.map(({ type, variant, count, sampleContent, tokenCount }) => (
-                        <div key={`${type}.${variant}`} className="flex items-center justify-between p-2 bg-yellow-100 rounded">
+                      {pageElements.map(({ type, variant, count, sampleContent }) => (
+                        <div key={`${type}.${variant}`} className="flex items-center justify-between p-2 bg-white rounded border">
                           <div className="flex items-center space-x-2">
-                            <span className="text-xs px-2 py-1 bg-yellow-200 text-yellow-800 rounded font-mono">
+                            <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">
                               {type}.{variant}
                             </span>
-                            <span className="text-sm text-yellow-700">
+                            <span className="text-sm text-gray-600">
                               {sampleContent && `"${sampleContent}"`}
                             </span>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xs bg-yellow-200 px-2 py-1 rounded">
-                              {count}个元件
-                            </span>
-                            <span className="text-xs bg-yellow-200 px-2 py-1 rounded">
-                              {tokenCount}个tokens
-                            </span>
-                          </div>
+                          <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                            {count}个
+                          </span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-sm text-yellow-700 text-center py-2">
-                      当前动作不会影响页面中的任何元件
+                    <div className="text-sm text-gray-500 text-center py-4">
+                      请先输入Markdown内容以分析页面元件
                     </div>
                   )}
                 </div>
               )}
             </div>
-          )}
 
-          <div className="mb-6">
-            <h3 className="font-medium text-gray-700 mb-2">动作空间设置</h3>
-
-            <div className="flex mb-3">
-              <button
-                className={`px-3 py-1 text-sm rounded-l ${actionInputMode === 'categories' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                onClick={() => setActionInputMode('categories')}
-              >
-                分类选择
-              </button>
-              <button
-                className={`px-3 py-1 text-sm rounded-r ${actionInputMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                onClick={() => setActionInputMode('list')}
-              >
-                列表模式
-              </button>
-            </div>
-
-            {actionInputMode === 'categories' ? (
-              <div className="space-y-4 max-h-80 overflow-y-auto">
-                {Object.entries(getActionsByCategory()).map(([category, actions]) => (
-                  <div key={category} className="border border-gray-200 rounded p-3">
-                    <h4 className="font-medium text-gray-800 mb-2 capitalize">
-                      {category === 'form' && '🎨 形态动作'}
-                      {category === 'color' && '🌈 色彩动作'}
-                      {category === 'typography' && '📝 字体动作'}
-                      {category === 'material' && '🎭 质感动作'}
-                      {category === 'proportion' && '📏 比例动作'}
-                      {category === 'composition' && '🏗️ 构图动作'}
-                      {category === 'state' && '🚦 状态动作'}
-                      {category === 'adaptive' && '🤖 智能动作'}
-                      {category === 'animation' && '🎬 动画动作'}
-                      {category === 'accessibility' && '♿ 可访问性动作'}
-                    </h4>
-                    <div className="space-y-2">
-                      {actions.map(actionName => {
-                        const isSelected = selectedActions.includes(actionName);
-                        const isAvailable = isActionAvailable(actionName);
-                        const conflicts = getActionConflicts(actionName);
-
-                        return (
-                          <div key={actionName} className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
-                                checked={isSelected}
-                                disabled={!isAvailable && !isSelected}
-                                onChange={() => handleActionToggle(actionName)}
-                                className="rounded"
-                              />
-                              <span className={`text-sm ${!isAvailable && !isSelected ? 'text-gray-400' : 'text-gray-700'}`}>
-                                {getActionDescription(actionName)}
-                              </span>
-                              {conflicts.length > 0 && (
-                                <span className="text-xs text-orange-500" title={`冲突动作: ${conflicts.join(', ')}`}>
-                                  ⚠️
-                                </span>
-                              )}
-                            </div>
-                            {isSelected && (
-                              <div className="flex items-center space-x-2">
-                                <span className="text-xs text-gray-500">强度:</span>
-                                <input
-                                  type="number"
-                                  min="0.1"
-                                  max="1.0"
-                                  step="0.1"
-                                  value={actionIntensities[actionName] || 0.5}
-                                  onChange={(e) => {
-                                    const value = parseFloat(e.target.value);
-                                    if (value >= 0.1 && value <= 1.0) {
-                                      handleIntensityChange(actionName, value);
-                                    }
-                                  }}
-                                  className="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded"
-                                />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="max-h-80 overflow-y-auto">
-                <div className="space-y-2">
-                  {availableActions.map(actionName => {
-                    const isSelected = selectedActions.includes(actionName);
-                    const isAvailable = isActionAvailable(actionName);
-                    const action = RL_ACTIONS[actionName];
-
-                    return (
-                      <div key={actionName} className="flex items-center justify-between p-2 border rounded">
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            disabled={!isAvailable && !isSelected}
-                            onChange={() => handleActionToggle(actionName)}
-                            className="rounded"
-                          />
-                          <div>
-                            <span className={`text-sm font-medium ${!isAvailable && !isSelected ? 'text-gray-400' : 'text-gray-700'}`}>
-                              {getActionDescription(actionName)}
-                            </span>
-                            <div className="text-xs text-gray-500">
-                              {action.category} • {action.intensity}
-                            </div>
-                          </div>
-                        </div>
-                        {isSelected && (
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xs text-gray-500">强度:</span>
-                            <input
-                              type="number"
-                              min="0.1"
-                              max="1.0"
-                              step="0.1"
-                              value={actionIntensities[actionName] || 0.5}
-                              onChange={(e) => {
-                                const value = parseFloat(e.target.value);
-                                if (value >= 0.1 && value <= 1.0) {
-                                  handleIntensityChange(actionName, value);
-                                }
-                              }}
-                              className="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* 🆕 布局调控（作为动作空间设置的子项） */}
-            {layoutAnalysis.length > 0 && (
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium text-gray-700">🏗️ 布局调控</h4>
+            {/* 动作影响范围 */}
+            {selectedActions.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-medium text-gray-700">动作影响范围</h3>
                   <button
-                    onClick={() => setIsLayoutControlsCollapsed(!isLayoutControlsCollapsed)}
+                    onClick={() => setIsAffectedCollapsed(!isAffectedCollapsed)}
                     className="text-gray-500 hover:text-gray-700 transition-colors"
-                    title={isLayoutControlsCollapsed ? "展开" : "折叠"}
+                    title={isAffectedCollapsed ? "展开" : "折叠"}
                   >
-                    {isLayoutControlsCollapsed ? (
+                    {isAffectedCollapsed ? (
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
@@ -2211,348 +2068,566 @@ const EightElementAnalyzer = () => {
                   </button>
                 </div>
 
-                <div className="text-xs text-blue-600 mb-3">
-                  发现 {layoutAnalysis.length} 个可调控的布局，可精确控制每个布局的方向
-                </div>
-
-                {!isLayoutControlsCollapsed && (
-                  <div className="space-y-3 max-h-60 overflow-y-auto">
-                    {layoutAnalysis.map((layout) => {
-                      // 🔧 修复：使用原始方向计算默认强度，如果用户没有设置调控则显示原始状态
-                      const defaultIntensity = getLayoutDefaultIntensity(layout);
-                      const currentIntensity = layoutControls[layout.index] !== undefined ? layoutControls[layout.index] : defaultIntensity;
-                      const currentVariant = currentIntensity <= 0.5 ? 'column' : 'row';
-                      // 🔧 修复：检查是否用户主动设置了调控
-                      const hasUserControl = layoutControls[layout.index] !== undefined;
-
-                      return (
-                        <div key={layout.index} className={`p-3 rounded border ${hasUserControl ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-200'}`}>
-                          <div className="flex items-center justify-between mb-2">
+                {!isAffectedCollapsed && (
+                  <div className="mb-4 p-3 bg-yellow-50 rounded border border-yellow-200">
+                    {affectedElements.length > 0 ? (
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium text-yellow-800 mb-2">
+                          当前动作将影响 {affectedElements.length} 种元件:
+                        </div>
+                        {affectedElements.map(({ type, variant, count, sampleContent, tokenCount }) => (
+                          <div key={`${type}.${variant}`} className="flex items-center justify-between p-2 bg-yellow-100 rounded">
                             <div className="flex items-center space-x-2">
-                              <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">
-                                {layout.isRoot ? 'root' : 'layout'}
+                              <span className="text-xs px-2 py-1 bg-yellow-200 text-yellow-800 rounded font-mono">
+                                {type}.{variant}
                               </span>
-                              <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">
-                                索引:{layout.index}
-                              </span>
-                              <span className={`text-xs px-2 py-1 rounded font-mono ${currentVariant === 'row' ? 'bg-orange-200 text-orange-800' : 'bg-green-200 text-green-800'
-                                }`}>
-                                {currentVariant}
-                              </span>
-                              <span className="text-xs text-gray-600">
-                                {layout.childrenCount}子
+                              <span className="text-sm text-yellow-700">
+                                {sampleContent && `"${sampleContent}"`}
                               </span>
                             </div>
-                            {hasUserControl && (
-                              <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
-                                已调整
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs bg-yellow-200 px-2 py-1 rounded">
+                                {count}个元件
                               </span>
-                            )}
+                              <span className="text-xs bg-yellow-200 px-2 py-1 rounded">
+                                {tokenCount}个tokens
+                              </span>
+                            </div>
                           </div>
-
-                          <div className="text-xs text-gray-700 mb-2">
-                            <span className="font-medium">内容:</span> {layout.content.preview}
-                          </div>
-
-                          {/* 🆕 显示布局的原始状态 */}
-                          <div className="text-xs text-gray-600 mb-2">
-                            <span className="font-medium">原始方向:</span>
-                            <span className={`ml-1 px-2 py-1 rounded font-mono ${getLayoutDefaultIntensity(layout) > 0.5 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
-                              {getLayoutDefaultIntensity(layout) > 0.5 ? 'row' : 'column'}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xs text-gray-600 w-12">强度:</span>
-                            <input
-                              type="range"
-                              min="0"
-                              max="1"
-                              step="0.1"
-                              value={currentIntensity}
-                              onChange={(e) => handleLayoutControlChange(layout.index, parseFloat(e.target.value))}
-                              className="flex-1"
-                            />
-                            <span className="text-xs font-mono w-8 text-center">
-                              {currentIntensity.toFixed(1)}
-                            </span>
-                          </div>
-
-                          <div className="text-xs text-gray-500 mt-1">
-                            0.0-0.5: 垂直 (column) | 0.5-1.0: 水平 (row)
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    <div className="pt-2 border-t border-gray-200">
-                      <button
-                        onClick={resetLayoutControls}
-                        className="w-full px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors text-xs"
-                      >
-                        重置布局调控
-                      </button>
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-yellow-700 text-center py-2">
+                        当前动作不会影响页面中的任何元件
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             )}
 
-            <div className="mt-4 space-y-3">
-              <button
-                className="px-4 py-2 rounded w-full bg-green-500 text-white hover:bg-green-600"
-                onClick={applyMarkdownChanges}
-              >
-                📝 重新解析 Markdown
-              </button>
-              <p className="text-xs text-gray-500">
-                手动重新解析当前 Markdown 内容（模板切换会自动触发解析）
-              </p>
+            <div className="mb-6">
+              <h3 className="font-medium text-gray-700 mb-2">动作空间设置</h3>
 
-              <button
-                className={`px-4 py-2 rounded w-full ${visibleTab === 'html'
-                  ? 'bg-blue-500 text-white hover:bg-blue-600'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                onClick={visibleTab === 'html' ? applyStyleSettings : undefined}
-                disabled={visibleTab !== 'html'}
-              >
-                🎨 应用调控设置
-              </button>
-              <p className="text-xs text-gray-500">
-                {visibleTab === 'html'
-                  ? `${selectedActions.length} 个动作 + ${Object.keys(layoutControls).length} 个布局调控，影响 ${affectedElements.length} 种元件类型`
-                  : '请切换到HTML预览页面后再应用调控设置'
-                }
-              </p>
-            </div>
-          </div>
-          <div className="mb-6">
-            <h3 className="font-medium text-gray-700 mb-2">预览尺寸设置</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {commonDimensions.map((dim) => (
+              <div className="flex mb-3">
                 <button
-                  key={dim.name}
-                  className={`px-3 py-2 text-sm rounded ${dimensions.width === dim.width && dimensions.height === dim.height
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                  onClick={() => handleDimensionChange(dim)}
+                  className={`px-3 py-1 text-sm rounded-l ${actionInputMode === 'categories' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                  onClick={() => setActionInputMode('categories')}
                 >
-                  {dim.name}
+                  分类选择
                 </button>
-              ))}
+                <button
+                  className={`px-3 py-1 text-sm rounded-r ${actionInputMode === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                  onClick={() => setActionInputMode('list')}
+                >
+                  列表模式
+                </button>
+              </div>
+
+              {actionInputMode === 'categories' ? (
+                <div className="space-y-4 max-h-80 overflow-y-auto">
+                  {Object.entries(getActionsByCategory()).map(([category, actions]) => (
+                    <div key={category} className="border border-gray-200 rounded p-3">
+                      <h4 className="font-medium text-gray-800 mb-2 capitalize">
+                        {category === 'form' && '🎨 形态动作'}
+                        {category === 'color' && '🌈 色彩动作'}
+                        {category === 'typography' && '📝 字体动作'}
+                        {category === 'material' && '🎭 质感动作'}
+                        {category === 'proportion' && '📏 比例动作'}
+                        {category === 'composition' && '🏗️ 构图动作'}
+                        {category === 'state' && '🚦 状态动作'}
+                        {category === 'adaptive' && '🤖 智能动作'}
+                        {category === 'animation' && '🎬 动画动作'}
+                        {category === 'accessibility' && '♿ 可访问性动作'}
+                      </h4>
+                      <div className="space-y-2">
+                        {actions.map(actionName => {
+                          const isSelected = selectedActions.includes(actionName);
+                          const isAvailable = isActionAvailable(actionName);
+                          const conflicts = getActionConflicts(actionName);
+
+                          return (
+                            <div key={actionName} className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  disabled={!isAvailable && !isSelected}
+                                  onChange={() => handleActionToggle(actionName)}
+                                  className="rounded"
+                                />
+                                <span className={`text-sm ${!isAvailable && !isSelected ? 'text-gray-400' : 'text-gray-700'}`}>
+                                  {getActionDescription(actionName)}
+                                </span>
+                                {conflicts.length > 0 && (
+                                  <span className="text-xs text-orange-500" title={`冲突动作: ${conflicts.join(', ')}`}>
+                                    ⚠️
+                                  </span>
+                                )}
+                              </div>
+                              {isSelected && (
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-xs text-gray-500">强度:</span>
+                                  <input
+                                    type="number"
+                                    min="0.1"
+                                    max="1.0"
+                                    step="0.1"
+                                    value={actionIntensities[actionName] || 0.5}
+                                    onChange={(e) => {
+                                      const value = parseFloat(e.target.value);
+                                      if (value >= 0.1 && value <= 1.0) {
+                                        handleIntensityChange(actionName, value);
+                                      }
+                                    }}
+                                    className="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="max-h-80 overflow-y-auto">
+                  <div className="space-y-2">
+                    {availableActions.map(actionName => {
+                      const isSelected = selectedActions.includes(actionName);
+                      const isAvailable = isActionAvailable(actionName);
+                      const action = RL_ACTIONS[actionName];
+
+                      return (
+                        <div key={actionName} className="flex items-center justify-between p-2 border rounded">
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              disabled={!isAvailable && !isSelected}
+                              onChange={() => handleActionToggle(actionName)}
+                              className="rounded"
+                            />
+                            <div>
+                              <span className={`text-sm font-medium ${!isAvailable && !isSelected ? 'text-gray-400' : 'text-gray-700'}`}>
+                                {getActionDescription(actionName)}
+                              </span>
+                              <div className="text-xs text-gray-500">
+                                {action.category} • {action.intensity}
+                              </div>
+                            </div>
+                          </div>
+                          {isSelected && (
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs text-gray-500">强度:</span>
+                              <input
+                                type="number"
+                                min="0.1"
+                                max="1.0"
+                                step="0.1"
+                                value={actionIntensities[actionName] || 0.5}
+                                onChange={(e) => {
+                                  const value = parseFloat(e.target.value);
+                                  if (value >= 0.1 && value <= 1.0) {
+                                    handleIntensityChange(actionName, value);
+                                  }
+                                }}
+                                className="w-16 px-1 py-0.5 text-xs border border-gray-300 rounded"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* 🆕 布局调控（作为动作空间设置的子项） */}
+              {layoutAnalysis.length > 0 && (
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-gray-700">🏗️ 布局调控</h4>
+                    <button
+                      onClick={() => setIsLayoutControlsCollapsed(!isLayoutControlsCollapsed)}
+                      className="text-gray-500 hover:text-gray-700 transition-colors"
+                      title={isLayoutControlsCollapsed ? "展开" : "折叠"}
+                    >
+                      {isLayoutControlsCollapsed ? (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="text-xs text-blue-600 mb-3">
+                    发现 {layoutAnalysis.length} 个可调控的布局，可精确控制每个布局的方向
+                  </div>
+
+                  {!isLayoutControlsCollapsed && (
+                    <div className="space-y-3 max-h-60 overflow-y-auto">
+                      {layoutAnalysis.map((layout) => {
+                        // 🔧 修复：使用原始方向计算默认强度，如果用户没有设置调控则显示原始状态
+                        const defaultIntensity = getLayoutDefaultIntensity(layout);
+                        const currentIntensity = layoutControls[layout.index] !== undefined ? layoutControls[layout.index] : defaultIntensity;
+                        const currentVariant = currentIntensity <= 0.5 ? 'column' : 'row';
+                        // 🔧 修复：检查是否用户主动设置了调控
+                        const hasUserControl = layoutControls[layout.index] !== undefined;
+
+                        return (
+                          <div key={layout.index} className={`p-3 rounded border ${hasUserControl ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-200'}`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <span className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded font-mono">
+                                  {layout.isRoot ? 'root' : 'layout'}
+                                </span>
+                                <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded font-mono">
+                                  索引:{layout.index}
+                                </span>
+                                <span className={`text-xs px-2 py-1 rounded font-mono ${currentVariant === 'row' ? 'bg-orange-200 text-orange-800' : 'bg-green-200 text-green-800'
+                                  }`}>
+                                  {currentVariant}
+                                </span>
+                                <span className="text-xs text-gray-600">
+                                  {layout.childrenCount}子
+                                </span>
+                              </div>
+                              {hasUserControl && (
+                                <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
+                                  已调整
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="text-xs text-gray-700 mb-2">
+                              <span className="font-medium">内容:</span> {layout.content.preview}
+                            </div>
+
+                            {/* 🆕 显示布局的原始状态 */}
+                            <div className="text-xs text-gray-600 mb-2">
+                              <span className="font-medium">原始方向:</span>
+                              <span className={`ml-1 px-2 py-1 rounded font-mono ${getLayoutDefaultIntensity(layout) > 0.5 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
+                                {getLayoutDefaultIntensity(layout) > 0.5 ? 'row' : 'column'}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs text-gray-600 w-12">强度:</span>
+                              <input
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.1"
+                                value={currentIntensity}
+                                onChange={(e) => handleLayoutControlChange(layout.index, parseFloat(e.target.value))}
+                                className="flex-1"
+                              />
+                              <span className="text-xs font-mono w-8 text-center">
+                                {currentIntensity.toFixed(1)}
+                              </span>
+                            </div>
+
+                            <div className="text-xs text-gray-500 mt-1">
+                              0.0-0.5: 垂直 (column) | 0.5-1.0: 水平 (row)
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      <div className="pt-2 border-t border-gray-200">
+                        <button
+                          onClick={resetLayoutControls}
+                          className="w-full px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors text-xs"
+                        >
+                          重置布局调控
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-4 space-y-3">
+                <button
+                  className="px-4 py-2 rounded w-full bg-green-500 text-white hover:bg-green-600"
+                  onClick={applyMarkdownChanges}
+                >
+                  📝 重新解析 Markdown
+                </button>
+                <p className="text-xs text-gray-500">
+                  手动重新解析当前 Markdown 内容（模板切换会自动触发解析）
+                </p>
+
+                <button
+                  className={`px-4 py-2 rounded w-full ${visibleTab === 'html'
+                    ? 'bg-blue-500 text-white hover:bg-blue-600'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  onClick={visibleTab === 'html' ? applyStyleSettings : undefined}
+                  disabled={visibleTab !== 'html'}
+                >
+                  🎨 应用调控设置
+                </button>
+                <p className="text-xs text-gray-500">
+                  {visibleTab === 'html'
+                    ? `${selectedActions.length} 个动作 + ${Object.keys(layoutControls).length} 个布局调控，影响 ${affectedElements.length} 种元件类型`
+                    : '请切换到HTML预览页面后再应用调控设置'
+                  }
+                </p>
+              </div>
             </div>
-            <div className="mt-2 text-xs text-gray-500">
-              当前尺寸: {dimensions.width} x {dimensions.height}
+            <div className="mb-6">
+              <h3 className="font-medium text-gray-700 mb-2">预览尺寸设置</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {commonDimensions.map((dim) => (
+                  <button
+                    key={dim.name}
+                    className={`px-3 py-2 text-sm rounded ${dimensions.width === dim.width && dimensions.height === dim.height
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    onClick={() => handleDimensionChange(dim)}
+                  >
+                    {dim.name}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 text-xs text-gray-500">
+                当前尺寸: {dimensions.width} x {dimensions.height}
+              </div>
             </div>
-          </div>
           </div>
         </div>
 
         {/* 垂直分割线 */}
-        <div 
+        <div
           className="w-1 bg-gray-300 hover:bg-blue-400 cursor-col-resize flex-shrink-0 transition-colors"
           onMouseDown={(e) => handleResizeStart('vertical', e)}
           title="拖拽调整面板比例"
         />
 
         {/* 右侧预览区域 */}
-        <div 
+        <div
           className="bg-white rounded-lg shadow overflow-hidden flex flex-col ml-2"
           style={{ width: `${100 - panelSizes.leftWidth}%` }}
         >
           <div className="p-4 overflow-y-auto flex-1">
-          <div className="flex border-b mb-4">
-            <button
-              className={`px-4 py-2 ${visibleTab === 'html' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
-              onClick={() => setVisibleTab('html')}
-            >
-              HTML预览
-            </button>
-            <button
-              className={`px-4 py-2 ${visibleTab === 'json' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
-              onClick={() => setVisibleTab('json')}
-            >
-              八要素JSON
-            </button>
-            <button
-              className={`px-4 py-2 ${visibleTab === 'score' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
-              onClick={() => setVisibleTab('score')}
-            >
-              布局评分
-            </button>
-          </div>
-
-          {/* HTML预览 */}
-          <div className={`${visibleTab === 'html' ? 'block h-full' : 'hidden'}`}>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-medium">HTML预览</h2>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">
-                  面板比例: {panelSizes.leftWidth.toFixed(1)}% / {(100 - panelSizes.leftWidth).toFixed(1)}%
-                </span>
-                <button
-                  onClick={resetPanelSizes}
-                  className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-                  title="重置面板比例"
-                >
-                  重置布局
-                </button>
-              </div>
+            <div className="flex border-b mb-4">
+              <button
+                className={`px-4 py-2 ${visibleTab === 'html' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+                onClick={() => setVisibleTab('html')}
+              >
+                HTML预览
+              </button>
+              <button
+                className={`px-4 py-2 ${visibleTab === 'json' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+                onClick={() => setVisibleTab('json')}
+              >
+                八要素JSON
+              </button>
+              <button
+                className={`px-4 py-2 ${visibleTab === 'score' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+                onClick={() => setVisibleTab('score')}
+              >
+                布局评分
+              </button>
             </div>
-            
-            {/* HTML预览区域 - 占满整个可用空间 */}
-            <div className="border border-gray-300 rounded overflow-hidden bg-gray-100 h-full flex flex-col">
-              <div className="flex-1 flex items-center justify-center p-4">
-                <div 
-                  className="bg-white shadow-lg"
-                  style={{
-                    width: '95%',
-                    height: '95%',
-                    minWidth: '300px',
-                    minHeight: '200px',
-                    overflow: 'auto'
-                  }}
-                >
-                  {renderedHtml && (
-                    <iframe
-                      ref={iframeRef}
-                      className="w-full h-full border-0"
-                      srcDoc={renderedHtml}
-                      title="Eight Element Preview"
-                      key={iframeKey}
-                    ></iframe>
-                  )}
+
+            {/* HTML预览 */}
+            <div className={`${visibleTab === 'html' ? 'block h-full' : 'hidden'}`}>
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-lg font-medium">
+                  {'HTML预览'}
+                </h2>
+                <div className="flex items-center space-x-2">
+                  (
+                  <>
+                    <span className="text-sm text-gray-500">
+                      面板比例: {panelSizes.leftWidth.toFixed(1)}% / {(100 - panelSizes.leftWidth).toFixed(1)}%
+                    </span>
+                    <button
+                      onClick={resetPanelSizes}
+                      className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                      title="重置面板比例"
+                    >
+                      重置布局
+                    </button>
+                  </>
+                  )
                 </div>
               </div>
-              
-              {/* 内容尺寸信息 */}
-              <div className="px-2 py-1 bg-gray-50 border-t text-xs text-gray-600 text-center">
-                预览区域占比: 80% × 80% | 渲染尺寸: {dimensions.width} x {dimensions.height} px
-              </div>
-            </div>
-          </div>
 
-          {/* JSON预览 */}
-          <div className={`${visibleTab === 'json' ? 'block' : 'hidden'}`}>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-medium">八要素结构</h2>
-              <div className="flex items-center space-x-2">
-                {copySuccess && (
-                  <span className="text-sm text-green-600 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    已复制！
-                  </span>
-                )}
-                <button
-                  onClick={copyToClipboard}
-                  disabled={!eightElement}
-                  className={`flex items-center space-x-1 px-3 py-1 text-sm rounded transition-colors ${eightElement
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  title="复制JSON到剪贴板"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  <span>复制</span>
-                </button>
-              </div>
-            </div>
-            <div className="border border-gray-300 rounded p-2 h-96 overflow-auto bg-gray-50">
-              <pre className="text-xs">
-                {eightElement ? JSON.stringify(eightElement, null, 2) : '等待处理...'}
-              </pre>
-            </div>
-          </div>
+              {/* 🆕 条件渲染：编辑模式显示编辑器，预览模式显示iframe */}
+              {isEditMode ? (
+                // 编辑器模式 - 直接占用预览容器的完整区域
+                <div className="border border-gray-300 rounded bg-white h-full">
+                  <CrepeMarkdownEditor
+                    initialMarkdown={editingMarkdown}
+                    onSave={handleEditorSave}
+                    onCancel={handleEditorCancel}
+                    isVisible={true}
+                    eventTargetId={currentEventTargetId}
+                  />
+                </div>
+              ) : (
+                // 预览模式
+                <div className="border border-gray-300 rounded overflow-hidden bg-gray-100 h-full flex flex-col">
+                  <div className="flex-1 flex items-center justify-center p-4">
+                    <div
+                      className="bg-white shadow-lg"
+                      style={{
+                        width: '95%',
+                        height: '95%',
+                        minWidth: '300px',
+                        minHeight: '200px',
+                        overflow: 'auto'
+                      }}
+                    >
+                      {renderedHtml && (
+                        <iframe
+                          ref={iframeRef}
+                          className="w-full h-full border-0"
+                          srcDoc={renderedHtml}
+                          title="Eight Element Preview"
+                          key={iframeKey}
+                        ></iframe>
+                      )}
+                    </div>
+                  </div>
 
-          {/* 评分结果 */}
-          <div className={`${visibleTab === 'score' ? 'block' : 'hidden'}`}>
-            <h2 className="text-lg font-medium mb-2">布局评分</h2>
-            <div className="h-96 overflow-auto">
-              {layout && domMeasurements && (
-                <VisualSpaceEvaluator
-                  layout={layout}
-                  domMeasurements={domMeasurements}
-                />
+                  {/* 内容尺寸信息 */}
+                  <div className="px-2 py-1 bg-gray-50 border-t text-xs text-gray-600 text-center">
+                    预览区域占比: 80% × 80% | 渲染尺寸: {dimensions.width} x {dimensions.height} px
+                  </div>
+                </div>
               )}
             </div>
-          </div>
 
-          {/* 当前使用的动作 */}
-          <div className="mt-4 text-xs text-gray-500 p-2 bg-gray-100 rounded">
-            <div className="font-medium mb-1">动作系统状态:</div>
-            {actionManager ? (
-              <div className="space-y-2">
-                <div className="text-green-600">✅ 系统已初始化</div>
-                <div>页面元件类型: {pageElements.length} 种</div>
-                <div>可用动作: {actionManager.getAvailableActions().length} 个</div>
+            {/* JSON预览 */}
+            <div className={`${visibleTab === 'json' ? 'block' : 'hidden'}`}>
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-lg font-medium">八要素结构</h2>
+                <div className="flex items-center space-x-2">
+                  {copySuccess && (
+                    <span className="text-sm text-green-600 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      已复制！
+                    </span>
+                  )}
+                  <button
+                    onClick={copyToClipboard}
+                    disabled={!eightElement}
+                    className={`flex items-center space-x-1 px-3 py-1 text-sm rounded transition-colors ${eightElement
+                      ? 'bg-blue-500 text-white hover:bg-blue-600'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    title="复制JSON到剪贴板"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span>复制</span>
+                  </button>
+                </div>
+              </div>
+              <div className="border border-gray-300 rounded p-2 h-96 overflow-auto bg-gray-50">
+                <pre className="text-xs">
+                  {eightElement ? JSON.stringify(eightElement, null, 2) : '等待处理...'}
+                </pre>
+              </div>
+            </div>
 
-                {selectedActions.length > 0 ? (
-                  <div className="mt-2">
-                    <div className="font-medium mb-1">已选择的动作:</div>
-                    <div className="space-y-1">
-                      {selectedActions.map(actionName => (
-                        <div key={actionName} className="flex justify-between">
-                          <span>{getActionDescription(actionName)}</span>
-                          <span className="font-mono">
-                            {(actionIntensities[actionName] || 0.5).toFixed(1)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-2 pt-2 border-t border-gray-300">
-                      <div className="text-yellow-600">
-                        💡 影响范围: {affectedElements.length} 种元件 • 总计 {affectedElements.reduce((sum, el) => sum + el.count, 0)} 个元件
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-gray-400 mt-2">未选择动作</div>
-                )}
-
-                {/* 🆕 布局调控状态 */}
-                {layoutAnalysis.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-gray-300">
-                    <div className="font-medium mb-1">布局调控状态:</div>
-                    <div className="text-blue-600">
-                      🏗️ 发现 {layoutAnalysis.length} 个可调控布局
-                    </div>
-                    {Object.keys(layoutControls).length > 0 && (
-                      <div className="mt-1">
-                        <div className="text-xs">当前调控:</div>
-                        {layoutAnalysis.map(layout => {
-                          const userSetIntensity = layoutControls[layout.index];
-                          if (userSetIntensity === undefined) return null;
-
-                          const currentVariant = userSetIntensity <= 0.5 ? 'column' : 'row';
-                          // 🔧 修复：任何设置的调控都视为用户主动修改
-                          const hasUserControl = true;
-
-                          return (
-                            <div key={layout.index} className="flex justify-between items-center">
-                              <span className="text-xs">
-                                索引{layout.index} ({layout.childrenCount}子)
-                              </span>
-                              <span className={`font-mono ${hasUserControl ? 'text-blue-600 font-bold' : ''}`}>
-                                {currentVariant} ({userSetIntensity.toFixed(1)})
-                              </span>
-                            </div>
-                          );
-                        }).filter(Boolean)}
-                      </div>
-                    )}
-                  </div>
+            {/* 评分结果 */}
+            <div className={`${visibleTab === 'score' ? 'block' : 'hidden'}`}>
+              <h2 className="text-lg font-medium mb-2">布局评分</h2>
+              <div className="h-96 overflow-auto">
+                {layout && domMeasurements && (
+                  <VisualSpaceEvaluator
+                    layout={layout}
+                    domMeasurements={domMeasurements}
+                  />
                 )}
               </div>
-            ) : (
-              <div className="text-red-500">❌ 系统未初始化</div>
-            )}
-          </div>
+            </div>
+
+            {/* 当前使用的动作 */}
+            <div className="mt-4 text-xs text-gray-500 p-2 bg-gray-100 rounded">
+              <div className="font-medium mb-1">动作系统状态:</div>
+              {actionManager ? (
+                <div className="space-y-2">
+                  <div className="text-green-600">✅ 系统已初始化</div>
+                  <div>页面元件类型: {pageElements.length} 种</div>
+                  <div>可用动作: {actionManager.getAvailableActions().length} 个</div>
+
+                  {selectedActions.length > 0 ? (
+                    <div className="mt-2">
+                      <div className="font-medium mb-1">已选择的动作:</div>
+                      <div className="space-y-1">
+                        {selectedActions.map(actionName => (
+                          <div key={actionName} className="flex justify-between">
+                            <span>{getActionDescription(actionName)}</span>
+                            <span className="font-mono">
+                              {(actionIntensities[actionName] || 0.5).toFixed(1)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-gray-300">
+                        <div className="text-yellow-600">
+                          💡 影响范围: {affectedElements.length} 种元件 • 总计 {affectedElements.reduce((sum, el) => sum + el.count, 0)} 个元件
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-gray-400 mt-2">未选择动作</div>
+                  )}
+
+                  {/* 🆕 布局调控状态 */}
+                  {layoutAnalysis.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-gray-300">
+                      <div className="font-medium mb-1">布局调控状态:</div>
+                      <div className="text-blue-600">
+                        🏗️ 发现 {layoutAnalysis.length} 个可调控布局
+                      </div>
+                      {Object.keys(layoutControls).length > 0 && (
+                        <div className="mt-1">
+                          <div className="text-xs">当前调控:</div>
+                          {layoutAnalysis.map(layout => {
+                            const userSetIntensity = layoutControls[layout.index];
+                            if (userSetIntensity === undefined) return null;
+
+                            const currentVariant = userSetIntensity <= 0.5 ? 'column' : 'row';
+                            // 🔧 修复：任何设置的调控都视为用户主动修改
+                            const hasUserControl = true;
+
+                            return (
+                              <div key={layout.index} className="flex justify-between items-center">
+                                <span className="text-xs">
+                                  索引{layout.index} ({layout.childrenCount}子)
+                                </span>
+                                <span className={`font-mono ${hasUserControl ? 'text-blue-600 font-bold' : ''}`}>
+                                  {currentVariant} ({userSetIntensity.toFixed(1)})
+                                </span>
+                              </div>
+                            );
+                          }).filter(Boolean)}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-red-500">❌ 系统未初始化</div>
+              )}
+            </div>
           </div>
         </div>
       </div>

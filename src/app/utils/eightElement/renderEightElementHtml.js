@@ -64,7 +64,7 @@ export function renderEightElementToHtml(eightElement, options = {}) {
       <title>Eight Element Renderer</title>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
       <link rel="stylesheet" href="${highlightTheme}" crossorigin="anonymous"></link>
-      
+       
       <style>
         body {
           margin: 0;
@@ -93,6 +93,92 @@ export function renderEightElementToHtml(eightElement, options = {}) {
             padding: 3px 5px;
         }
         
+        /* 🆕 编辑器相关样式 */
+        .editor-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          z-index: 9999;
+          display: none;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .editor-container {
+          width: 90%;
+          max-width: 1200px;
+          height: 80%;
+          background: white;
+          border-radius: 8px;
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .editor-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #eee;
+        }
+        
+        .editor-title {
+          font-size: 18px;
+          font-weight: bold;
+          color: #333;
+        }
+        
+        .editor-buttons {
+          display: flex;
+          gap: 10px;
+        }
+        
+        .editor-btn {
+          padding: 8px 16px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s;
+        }
+        
+        .editor-btn-primary {
+          background: #007bff;
+          color: white;
+        }
+        
+        .editor-btn-primary:hover {
+          background: #0056b3;
+        }
+        
+        .editor-btn-secondary {
+          background: #6c757d;
+          color: white;
+        }
+        
+        .editor-btn-secondary:hover {
+          background: #545b62;
+        }
+        
+        .editor-content {
+          flex: 1;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        
+        #markdown-editor {
+          width: 100%;
+          height: 100%;
+        }
+        
         /* 动态生成的类样式 */
         ${cssStyles}
       </style>
@@ -107,6 +193,334 @@ export function renderEightElementToHtml(eightElement, options = {}) {
     // 创建HTML文档尾部
     const htmlFooter = `
       </div>
+      
+      <!-- 🆕 Markdown 编辑器覆盖层 -->
+      <div class="editor-overlay" id="editor-overlay">
+        <div class="editor-container">
+          <div class="editor-header">
+            <div class="editor-title">编辑 Markdown 内容</div>
+            <div class="editor-buttons">
+              <button class="editor-btn editor-btn-primary" id="save-btn">保存</button>
+              <button class="editor-btn editor-btn-secondary" id="cancel-btn">返回</button>
+            </div>
+          </div>
+          <div class="editor-content">
+            <div id="markdown-editor"></div>
+          </div>
+        </div>
+      </div>
+      
+      <script type="module">
+        // 🆕 编辑器功能实现
+        let crepeEditor = null;
+        let currentMarkdown = '';
+        let currentEventTargetId = '';
+        
+        // 初始化编辑器（延迟加载）
+        async function initEditor() {
+          if (crepeEditor) return crepeEditor;
+          
+          try {
+            // 等待所有依赖加载完成
+            await waitForDependencies();
+            
+            // 尝试多种全局变量名称
+            const CrepeClass = window.Crepe || 
+                              window.MilkdownCrepe?.Crepe || 
+                              window['@milkdown/crepe']?.Crepe ||
+                              window.milkdownCrepe?.Crepe;
+            
+            if (!CrepeClass) {
+              throw new Error('Crepe类未找到，可能依赖加载失败');
+            }
+            
+            console.log('🔍 找到Crepe类:', typeof CrepeClass);
+            
+            crepeEditor = new CrepeClass({
+              root: '#markdown-editor',
+              defaultValue: '',
+            });
+            
+            await crepeEditor.create();
+            console.log('✅ Crepe 编辑器初始化成功');
+            return crepeEditor;
+          } catch (error) {
+            console.error('❌ Crepe 编辑器初始化失败:', error);
+            console.log('🔄 回退到简单编辑器...');
+            
+            // 回退到功能丰富的 textarea 编辑器
+            createFallbackEditor();
+            return null;
+          }
+        }
+        
+        // 等待依赖加载
+        function waitForDependencies() {
+          return new Promise((resolve) => {
+            let attempts = 0;
+            const maxAttempts = 50; // 5秒超时
+            
+            const checkDependencies = () => {
+              attempts++;
+              
+              // 检查关键依赖是否已加载
+              const hasLodash = window._ !== undefined;
+              const hasProseMirror = window.ProseMirror !== undefined || window['prosemirror-state'] !== undefined;
+              const hasCrepe = window.Crepe !== undefined || 
+                              window.MilkdownCrepe !== undefined || 
+                              window['@milkdown/crepe'] !== undefined;
+              
+              console.log('🔍 依赖检查:', { hasLodash, hasProseMirror, hasCrepe, attempt: attempts });
+              
+              if (attempts >= maxAttempts) {
+                console.warn('⚠️ 依赖加载超时，继续尝试初始化');
+                resolve();
+              } else if (hasLodash || hasCrepe) {
+                console.log('✅ 基础依赖已加载');
+                resolve();
+              } else {
+                setTimeout(checkDependencies, 100);
+              }
+            };
+            
+            checkDependencies();
+          });
+        }
+        
+        // 创建回退编辑器
+        function createFallbackEditor() {
+          const editorContainer = document.getElementById('markdown-editor');
+          editorContainer.innerHTML = \`
+            <div style="height: 100%; display: flex; flex-direction: column;">
+              <div style="padding: 10px; background: #f5f5f5; border-bottom: 1px solid #ddd; font-size: 12px; color: #666;">
+                简化 Markdown 编辑器 (Crepe 加载失败时的备用方案)
+              </div>
+              <textarea id="fallback-editor" 
+                style="flex: 1; border: none; padding: 15px; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; resize: none; outline: none; line-height: 1.5;"
+                placeholder="在此输入 Markdown 内容..."></textarea>
+            </div>
+          \`;
+        }
+        
+        // 显示编辑器
+        async function showEditor(markdown, eventTargetId) {
+          currentMarkdown = markdown;
+          currentEventTargetId = eventTargetId;
+          
+          console.log('🔧 显示编辑器，EventTargetId:', eventTargetId);
+          console.log('📝 要编辑的markdown长度:', markdown.length);
+          
+          const overlay = document.getElementById('editor-overlay');
+          overlay.style.display = 'flex';
+          
+          // 初始化编辑器
+          const editor = await initEditor();
+          
+          if (editor) {
+            // 使用 Crepe 编辑器
+            try {
+              // 设置编辑器内容
+              await editor.action((ctx) => {
+                const view = ctx.get('editorView');
+                const schema = ctx.get('schema');
+                const parser = ctx.get('parser');
+                
+                // 解析 markdown 并设置到编辑器
+                const doc = parser(markdown);
+                view.dispatch(view.state.tr.replaceWith(0, view.state.doc.content.size, doc));
+              });
+            } catch (error) {
+              console.error('设置编辑器内容失败:', error);
+            }
+          } else {
+            // 使用回退的 textarea
+            const fallbackEditor = document.getElementById('fallback-editor');
+            if (fallbackEditor) {
+              fallbackEditor.value = markdown;
+            }
+          }
+        }
+        
+        // 获取编辑器内容
+        async function getEditorContent() {
+          if (crepeEditor) {
+            try {
+              return await crepeEditor.action((ctx) => {
+                const serializer = ctx.get('serializer');
+                const view = ctx.get('editorView');
+                return serializer(view.state.doc);
+              });
+            } catch (error) {
+              console.error('获取Crepe编辑器内容失败:', error);
+              // 如果Crepe获取失败，尝试回退编辑器
+              const fallbackEditor = document.getElementById('fallback-editor');
+              return fallbackEditor ? fallbackEditor.value : currentMarkdown;
+            }
+          } else {
+            // 使用回退的 textarea
+            const fallbackEditor = document.getElementById('fallback-editor');
+            if (fallbackEditor) {
+              console.log('📝 从回退编辑器获取内容，长度:', fallbackEditor.value.length);
+              return fallbackEditor.value;
+            } else {
+              console.warn('⚠️ 回退编辑器也未找到，返回原始内容');
+              return currentMarkdown;
+            }
+          }
+        }
+        
+        // 隐藏编辑器
+        function hideEditor() {
+          const overlay = document.getElementById('editor-overlay');
+          overlay.style.display = 'none';
+        }
+        
+        // 重新渲染页面
+        async function rerenderPage(newMarkdown) {
+          try {
+            console.log('🔄 开始重新渲染页面...');
+            console.log('📝 新的markdown长度:', newMarkdown.length);
+            
+            // 调用 markdown-to-html API 重新生成 HTML
+            const response = await fetch('/api/markdown-to-html', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                markdown: newMarkdown,
+                width: 800,
+                height: 500
+              })
+            });
+            
+            if (!response.ok) {
+              throw new Error('API调用失败: ' + response.status);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success && result.html) {
+              // 🆕 重新加载整个页面内容
+              document.open();
+              document.write(result.html);
+              document.close();
+              console.log('✅ 页面重新渲染成功');
+            } else {
+              throw new Error(result.error || '重新渲染失败');
+            }
+          } catch (error) {
+            console.error('❌ 重新渲染失败:', error);
+            alert('保存失败: ' + error.message);
+          }
+        }
+        
+        // 保存按钮事件
+        document.getElementById('save-btn').addEventListener('click', async () => {
+          try {
+            const newMarkdown = await getEditorContent();
+            console.log('💾 保存编辑内容，长度:', newMarkdown.length);
+            
+            hideEditor();
+            await rerenderPage(newMarkdown);
+          } catch (error) {
+            console.error('保存失败:', error);
+            alert('保存失败: ' + error.message);
+          }
+        });
+        
+        // 取消按钮事件
+        document.getElementById('cancel-btn').addEventListener('click', () => {
+          hideEditor();
+        });
+        
+        // 🆕 为所有具有 edit 事件的元素添加点击监听器
+        document.addEventListener('DOMContentLoaded', () => {
+          console.log('🎯 页面加载完成，开始绑定编辑事件...');
+          
+          // 获取所有EventTargetIds
+          const eventTargetIds = ${JSON.stringify(eightElement.EventTargetIds || [])};
+          console.log('📋 找到EventTargetIds:', eventTargetIds);
+          
+          // 检查是否在iframe中（React环境）
+          const isInIframe = window.parent !== window;
+          
+          // 为每个EventTargetId绑定点击事件
+          eventTargetIds.forEach(targetId => {
+            const element = document.getElementById(targetId);
+            if (element) {
+              console.log('🔗 为元素绑定编辑事件:', targetId);
+              
+              element.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // 🆕 从元素的事件配置中获取markdown内容
+                const elementData = findElementDataById(targetId);
+                if (elementData && elementData.events) {
+                  const editEvent = elementData.events.find(event => 
+                    event.runtimeEventKey === 'edit' && event.parameters && event.parameters.markdown
+                  );
+                  
+                  if (editEvent) {
+                    console.log('🎯 触发编辑事件，EventTargetId:', targetId);
+                    
+                    if (isInIframe) {
+                      // 🆕 在React环境中，发送消息给父窗口
+                      console.log('📤 发送编辑事件到React父窗口');
+                      window.parent.postMessage({
+                        type: 'EDIT_EVENT',
+                        eventTargetId: targetId,
+                        markdown: editEvent.parameters.markdown
+                      }, '*');
+                    } else {
+                      // 在独立HTML中，使用内置编辑器
+                      showEditor(editEvent.parameters.markdown, targetId);
+                    }
+                  } else {
+                    console.warn('⚠️ 未找到edit事件配置:', targetId);
+                  }
+                } else {
+                  console.warn('⚠️ 未找到元素数据:', targetId);
+                }
+              });
+            } else {
+              console.warn('⚠️ 未找到元素:', targetId);
+            }
+          });
+        });
+        
+        // 🆕 监听来自React父窗口的消息
+        window.addEventListener('message', (event) => {
+          if (event.data && event.data.type === 'SETUP_EDIT_LISTENER') {
+            console.log('📨 收到React父窗口的设置消息');
+            // React环境已经设置好了，不需要额外处理
+          }
+        });
+        
+        // 🆕 辅助函数：根据ID查找元素数据（从八要素结构中）
+        function findElementDataById(targetId) {
+          const eightElementData = ${JSON.stringify(eightElement)};
+          
+          function searchElement(element) {
+            if (!element) return null;
+            
+            if (element.id === targetId) {
+              return element;
+            }
+            
+            if (element.layout && element.layout.children) {
+              for (const child of element.layout.children) {
+                const found = searchElement(child);
+                if (found) return found;
+              }
+            }
+            
+            return null;
+          }
+          
+          return searchElement(eightElementData);
+        }
+      </script>
     </body>
     </html>
   `;
