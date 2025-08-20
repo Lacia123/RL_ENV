@@ -109,7 +109,29 @@ const EditorControls = ({ onSave, onCancel, isSaving, eventTargetId }) => {
 };
 
 /**
- * 清理 markdown 中的转义符
+ * 解析 markdown 给 Crepe 编辑器使用 - 添加转义字符保护自定义标签
+ */
+const resolveMarkdown = (markdown) => {
+  if (!markdown) return '';
+  
+  let resolved = markdown
+    // 🆕 为自定义标签添加转义字符，防止 Crepe 误解析
+    .replace(/<(card|layout|icon)([^>]*?)>/g, '\\<$1$2\\>')
+    .replace(/<\/(card|layout|icon)([^>]*?)>/g, '\\</$1$2\\>')
+    // 🆕 为自定义元素标签添加转义字符
+    .replace(/<(percentValue|title|content)([^>]*?)>/g, '\\<$1$2\\>')
+    .replace(/<\/(percentValue|title|content)([^>]*?)>/g, '\\</$1$2\\>')
+    // 🆕 为事件语法添加转义字符
+    .replace(/\[event:(\w+)\]/g, '\\[event:$1\\]')
+    // 🆕 为图表语法添加转义字符
+    .replace(/\[chart:([^\]]+)\]/g, '\\[chart:$1\\]');
+  
+  console.log('🔧 为 Crepe 编辑器添加转义字符保护');
+  return resolved;
+};
+
+/**
+ * 清理 markdown 中的转义符 - 从 Crepe 编辑器获取内容后使用
  */
 const cleanMarkdown = (markdown) => {
   if (!markdown) return '';
@@ -142,6 +164,8 @@ const cleanMarkdown = (markdown) => {
     /(\[chart:[^\]]+\])\n{2,}(\s*\|[^\n]*\|)/g,
     '$1\n$2'
   );
+  
+  console.log('🧹 清理转义符完成');
   return cleaned;
 };
 
@@ -151,10 +175,14 @@ const cleanMarkdown = (markdown) => {
 const CrepeEditor = ({ initialMarkdown }) => {
   const { get } = useEditor((root) => {
     console.log('🔧 初始化 Crepe 编辑器...');
+    
+    // 🆕 使用 resolveMarkdown 为自定义标签添加转义字符保护
+    const resolvedMarkdown = resolveMarkdown(initialMarkdown);
+    console.log('🔧 已为自定义标签添加转义字符保护');
 
     const crepe = new Crepe({
       root,
-      defaultValue: initialMarkdown
+      defaultValue: resolvedMarkdown
     });
 
     return crepe;

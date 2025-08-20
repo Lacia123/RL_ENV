@@ -693,6 +693,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
       const groupMatch = checkGroupStart(line, groupConfigs);
       if (groupMatch) {
         console.log(`🔍 发现分组起始元素: ${groupMatch.startElement.type}, 分组模式: ${groupMatch.groupConfig.mappingKey}`);
+        console.log(`🔍 开始从第${i}行收集分组项目: "${line}"`);
         
         // 处理分组收集
         const groupResult = collectGroupItems(lines, i, groupMatch.groupConfig, cardStyleConfig);
@@ -1222,13 +1223,25 @@ function collectGroupItems(lines, startIndex, groupConfig, cardStyleConfig) {
     // 收集一个完整的分组项
     let elementIndex = 0;
     let j = i;
+    let consecutiveEmptyLines = 0; // 🆕 跟踪连续空行数量
     
     while (j < lines.length && elementIndex < groupPattern.length) {
       const line = lines[j].trim();
+      
+      // 🆕 处理空行：允许分组内的空行，但限制连续空行数量
       if (!line) {
+        consecutiveEmptyLines++;
+        // 🆕 如果连续空行超过3行，可能是分组结束
+        if (consecutiveEmptyLines > 3) {
+          console.log(`🔍 连续空行过多(${consecutiveEmptyLines})，可能是分组结束`);
+          break;
+        }
         j++;
         continue;
       }
+      
+      // 🆕 重置连续空行计数
+      consecutiveEmptyLines = 0;
       
       const expectedType = groupPattern[elementIndex];
       const parseResult = parseMarkdownToTemplate(line, { [expectedType]: 'temp' }, 0);
@@ -1238,23 +1251,42 @@ function collectGroupItems(lines, startIndex, groupConfig, cardStyleConfig) {
         currentGroupItem.elements[expectedType] = parseResult.markdownResult.content;
         currentGroupItem.rawLines.push(line);
         elementIndex++;
-      } else if (expectedType === 'p' && line.match(/^[^#]/)) {
-        // 对于p类型，匹配非标题行
-        currentGroupItem.elements['p'] = line;
-        currentGroupItem.rawLines.push(line);
-        elementIndex++;
+        console.log(`✅ 匹配到 ${expectedType}: "${parseResult.markdownResult.content}"`);
+      } else if (expectedType === 'p') {
+        // 🆕 对于p类型，需要特殊处理
+        if (line === '§PARAGRAPH§') {
+          // 如果是段落分隔符，跳过并继续寻找真正的段落内容
+          j++;
+          continue;
+        } else if (line.match(/^[^#\[\|]/)) {
+          // 匹配非标题行、非链接行、非表格行
+          // 排除以 # 开头的标题、以 [ 开头的链接、以 | 开头的表格
+          currentGroupItem.elements['p'] = line;
+          currentGroupItem.rawLines.push(line);
+          elementIndex++;
+          console.log(`✅ 匹配到段落: "${line}"`);
+        } else {
+          // 不匹配段落格式，跳过这行继续寻找
+          j++;
+          continue;
+        }
       } else {
         // 不匹配，检查是否是新的分组开始
         const newGroupCheck = checkGroupStart(line, [groupConfig]);
         if (newGroupCheck && elementIndex > 0) {
           // 是新的分组开始，当前分组项收集完成
+          console.log(`🔄 检测到新分组开始，当前分组项收集完成 (已收集${elementIndex}/${groupPattern.length}个元素)`);
           break;
         } else if (elementIndex === 0) {
           // 第一个元素就不匹配，说明不是分组
+          console.log(`❌ 第一个元素不匹配，不是有效分组: "${line}"`);
           return null;
         } else {
-          // 不是分组模式的一部分，停止收集
-          break;
+          // 🆕 改进：如果不是期望的类型，但已经收集了一些元素，检查是否可以跳过这行
+          console.log(`⚠️ 不匹配期望类型 ${expectedType}，尝试跳过: "${line}"`);
+          // 跳过不匹配的行，继续寻找下一个期望的元素
+          j++;
+          continue;
         }
       }
       
