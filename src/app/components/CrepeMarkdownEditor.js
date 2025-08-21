@@ -83,7 +83,7 @@ const EditorControls = ({ onSave, onCancel, isSaving, eventTargetId }) => {
             transition: 'all 0.2s'
           }}
         >
-          {isSaving ? '保存中...' : '💾 保存'}
+          {isSaving ? '保存中...' : '保存'}
         </button>
 
         <button
@@ -101,7 +101,7 @@ const EditorControls = ({ onSave, onCancel, isSaving, eventTargetId }) => {
             transition: 'all 0.2s'
           }}
         >
-          🔙 返回
+          返回
         </button>
       </div>
     </div>
@@ -115,6 +115,10 @@ const resolveMarkdown = (markdown) => {
   if (!markdown) return '';
   
   let resolved = markdown
+    // 🆕 确保图表标签和表格之间有换行符
+    .replace(/(\[chart:[^\]]+\])(\s*)(\|[^\n]*\|)/g, '$1\n$3')
+    // 🆕 在表格最后一行后添加空行以提高可读性
+    .replace(/(\|[^\n]*\|)(\n)(?!\|)/g, '$1$2\n')
     // 🆕 为自定义标签添加转义字符，防止 Crepe 误解析
     .replace(/<(card|layout|icon)([^>]*?)>/g, '\\<$1$2\\>')
     .replace(/<\/(card|layout|icon)([^>]*?)>/g, '\\</$1$2\\>')
@@ -126,7 +130,6 @@ const resolveMarkdown = (markdown) => {
     // 🆕 为图表语法添加转义字符
     .replace(/\[chart:([^\]]+)\]/g, '\\[chart:$1\\]');
   
-  console.log('🔧 为 Crepe 编辑器添加转义字符保护');
   return resolved;
 };
 
@@ -165,7 +168,6 @@ const cleanMarkdown = (markdown) => {
     '$1\n$2'
   );
   
-  console.log('🧹 清理转义符完成');
   return cleaned;
 };
 
@@ -174,12 +176,10 @@ const cleanMarkdown = (markdown) => {
  */
 const CrepeEditor = ({ initialMarkdown }) => {
   const { get } = useEditor((root) => {
-    console.log('🔧 初始化 Crepe 编辑器...');
     
     // 🆕 使用 resolveMarkdown 为自定义标签添加转义字符保护
     const resolvedMarkdown = resolveMarkdown(initialMarkdown);
-    console.log('🔧 已为自定义标签添加转义字符保护');
-
+ 
     const crepe = new Crepe({
       root,
       defaultValue: resolvedMarkdown
