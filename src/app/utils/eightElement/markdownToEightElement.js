@@ -5546,6 +5546,23 @@ function parseMarkdown(markdown, options = {}) {
       continue;
     }
 
+    // 检查是否包含内联图标语法 [icon:path]，但不包含其他复杂元素
+    if (trimmedLine.includes('[icon:') && trimmedLine.includes(']') && 
+        !trimmedLine.includes('](') && !trimmedLine.includes('![')) {
+      console.log(`🔍 检测到包含内联图标的纯文本: "${trimmedLine}"`);
+      
+      // 处理之前累积的文本块
+      flushTextBlock();
+      flushConsecutiveButtons();
+
+      // 处理包含内联图标的文本，将图标直接嵌入文本内容中
+      const processedText = processInlineIconText(trimmedLine);
+      const textElement = createTextElement(processedText);
+      stack[stack.length - 1].elements.push(textElement);
+
+      continue;
+    }
+
     // 普通文本行
     if (trimmedLine !== '') {
       // 🔧 修复：清理段落符号
@@ -5784,6 +5801,157 @@ function parseMarkdown(markdown, options = {}) {
       }
       consecutiveButtons = [];
     }
+  }
+
+  // 🆕 辅助函数：处理内联图标文本，将图标语法转换为内联 SVG
+  function processInlineIconText(text) {
+    console.log(`🔍 processInlineIconText 处理文本: "${text}"`);
+    
+    // 预定义的图标 SVG 映射表（与 CrepeMarkdownEditor.js 中的相同）
+    const ICON_SVG_MAP = {
+      'Abstract/ad-product': `<svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline; vertical-align: middle; margin-right: 4px;">
+<path d="M44 14L24 4L4 14V34L24 44L44 34V14Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
+<path d="M4 14L24 24" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24 44V24" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M44 14L24 24" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M34 9L14 19" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`
+    };
+    
+    // 将图标标识替换为内联 SVG
+    const processedText = text.replace(/\[icon:([^\]]+)\]/g, (match, iconPath) => {
+      console.log(`🎯 替换图标标识: ${match} -> ${iconPath}`);
+      
+      // 检查是否有预定义的 SVG
+      if (ICON_SVG_MAP[iconPath]) {
+        console.log(`✅ 找到预定义图标: ${iconPath}`);
+        return ICON_SVG_MAP[iconPath];
+      }
+      
+      // 如果没有预定义的 SVG，返回占位符
+      console.log(`⚠️ 未找到图标定义: ${iconPath}，使用占位符`);
+      return `<span style="display: inline-flex; align-items: center; color: #6b7280; font-size: 12px; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; margin-right: 4px;">🔲 ${iconPath}</span>`;
+    });
+    
+    console.log(`🔧 处理结果: "${processedText}"`);
+    return processedText;
+  }
+
+  // 🆕 辅助函数：处理包含内联图标的混合内容行
+  function processMixedContentWithIcons(line, currentMarkdown = '') {
+    console.log(`🔍 processMixedContentWithIcons 处理行: "${line}"`);
+    
+    // 生成稳定的内容种子
+    const lineHash = line.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
+    const contentSeed = `mixed-icon-content-${line.slice(0, 30)}-len${line.length}`;
+    const position = `horizontal-mixed-icon-hash${lineHash}`;
+    
+    // 创建一个水平布局元素
+    let currentLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL, [], {
+      contentSeed: contentSeed,
+      position: position
+    });
+
+    // 查找所有图标标记 [icon:path]
+    const iconRegex = /\[icon:([^\]]+)\]/g;
+    const iconMatches = [...line.matchAll(iconRegex)];
+    console.log(`🎯 找到 ${iconMatches.length} 个图标标记`);
+
+    // 查找所有按钮类型标记 [variant] [text](url) 或 [variant][text](url) 或 [event:eventName][text](url)
+    const buttonVariantRegex = /\[(\w+(?::\w+)?)\]\s*\[([^\]]+)\]\(([^)]+)\)/g;
+    const buttonVariantMatches = [...line.matchAll(buttonVariantRegex)];
+
+    // 查找所有普通链接 [text](url) 但不是图片链接，也不是按钮类型标记
+    const normalLinkRegex = /(?<!!)\[(.*?)\]\((.*?)\)/g;
+    const linkMatches = [...line.matchAll(normalLinkRegex)];
+    
+    // 过滤掉已经被按钮类型标记匹配的链接
+    const filteredLinkMatches = linkMatches.filter(linkMatch => {
+      return !buttonVariantMatches.some(buttonMatch => {
+        const linkStart = linkMatch.index;
+        const linkEnd = linkMatch.index + linkMatch[0].length;
+        const buttonStart = buttonMatch.index;
+        const buttonEnd = buttonMatch.index + buttonMatch[0].length;
+        return linkStart >= buttonStart && linkEnd <= buttonEnd;
+      });
+    });
+
+    // 查找所有图片 ![alt](url)
+    const imageMatches = [...line.matchAll(/!\[(.*?)\]\((.*?)\)/g)];
+
+    // 合并并按照在原文中的位置排序
+    const allMatches = [
+      ...iconMatches.map(match => ({ type: 'icon', match })),
+      ...buttonVariantMatches.map(match => ({ type: 'buttonVariant', match })),
+      ...filteredLinkMatches.map(match => ({ type: 'link', match })),
+      ...imageMatches.map(match => ({ type: 'image', match }))
+    ].sort((a, b) => a.match.index - b.match.index);
+
+    let lastIndex = 0;
+
+    // 按顺序处理所有匹配项
+    for (const { type, match } of allMatches) {
+      const matchIndex = match.index;
+
+      // 处理匹配项前的文本
+      if (matchIndex > lastIndex) {
+        const textBefore = line.substring(lastIndex, matchIndex);
+        if (textBefore.trim()) {
+          const textElement = createTextElement(textBefore);
+          currentLayout.layout.children.push(textElement);
+        }
+      }
+
+      // 处理匹配项
+      if (type === 'icon') {
+        const iconPath = match[1];
+        console.log(`🎯 处理内联图标: ${iconPath}`);
+        const iconElement = createIconElement(iconPath, 'medium');
+        currentLayout.layout.children.push(iconElement);
+      } else if (type === 'buttonVariant') {
+        const variant = match[1];
+        const buttonText = match[2];
+        const buttonUrl = match[3];
+        const supportedVariants = ['primary', 'secondary', 'success', 'warning', 'error', 'ghost', 'link'];
+        
+        if (variant.startsWith('event:')) {
+          const buttonElement = createButtonElement(match[0], buttonUrl, 'primary', currentMarkdown, buttonText);
+          currentLayout.layout.children.push(buttonElement);
+        } else if (supportedVariants.includes(variant)) {
+          const buttonElement = createButtonElement(buttonText, buttonUrl, variant, currentMarkdown);
+          currentLayout.layout.children.push(buttonElement);
+        } else {
+          const textElement = createTextElement(match[0]);
+          currentLayout.layout.children.push(textElement);
+        }
+      } else if (type === 'link') {
+        const linkText = match[1];
+        const linkUrl = match[2];
+        const buttonElement = createButtonElement(linkText, linkUrl, 'primary', currentMarkdown);
+        currentLayout.layout.children.push(buttonElement);
+      } else if (type === 'image') {
+        const imgAlt = match[1];
+        const imgUrl = match[2];
+        const backgroundElement = createBackgroundElement(imgUrl, 'normal');
+        if (backgroundElement._metadata) {
+          backgroundElement._metadata.alt = imgAlt;
+        }
+        currentLayout.layout.children.push(backgroundElement);
+      }
+
+      lastIndex = matchIndex + match[0].length;
+    }
+
+    // 处理最后一个匹配后的文本
+    if (lastIndex < line.length) {
+      const textAfter = line.substring(lastIndex);
+      if (textAfter.trim()) {
+        const textElement = createTextElement(textAfter);
+        currentLayout.layout.children.push(textElement);
+      }
+    }
+
+    return currentLayout;
   }
 
   // 辅助函数：处理混合内容行
