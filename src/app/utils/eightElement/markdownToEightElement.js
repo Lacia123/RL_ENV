@@ -18,6 +18,8 @@ import markedKatex from 'marked-katex-extension';
 import resolveToken, { isColorDark } from '../tokens/resolveToken.js';
 // 导入事件配置
 import { EVENT_NAME, EVENT_CONFIG } from './eventConfig.js';
+// 导入图标系统
+import { getIcon, renderIcon } from '../icons/index.js';
 
 // 配置Marked实例，支持KaTeX和代码高亮
 const katexOptions = {
@@ -5807,28 +5809,26 @@ function parseMarkdown(markdown, options = {}) {
   function processInlineIconText(text) {
     console.log(`🔍 processInlineIconText 处理文本: "${text}"`);
     
-    // 预定义的图标 SVG 映射表（与 CrepeMarkdownEditor.js 中的相同）
-    const ICON_SVG_MAP = {
-      'Abstract/ad-product': `<svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline; vertical-align: middle; margin-right: 4px;">
-<path d="M44 14L24 4L4 14V34L24 44L44 34V14Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
-<path d="M4 14L24 24" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M24 44V24" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M44 14L24 24" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M34 9L14 19" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`
-    };
-    
     // 将图标标识替换为内联 SVG
     const processedText = text.replace(/\[icon:([^\]]+)\]/g, (match, iconPath) => {
       console.log(`🎯 替换图标标识: ${match} -> ${iconPath}`);
       
-      // 检查是否有预定义的 SVG
-      if (ICON_SVG_MAP[iconPath]) {
-        console.log(`✅ 找到预定义图标: ${iconPath}`);
-        return ICON_SVG_MAP[iconPath];
+      // 使用真实的图标系统获取 SVG
+      const iconSvg = getIcon(iconPath);
+      
+      if (iconSvg) {
+        console.log(`✅ 找到图标: ${iconPath}`);
+        
+        // 为内联显示优化 SVG 样式
+        const inlineSvg = iconSvg.replace(
+          '<svg',
+          '<svg width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 4px;"'
+        ).replace(/stroke="black"/g, 'stroke="currentColor"');
+        
+        return inlineSvg;
       }
       
-      // 如果没有预定义的 SVG，返回占位符
+      // 如果没有找到图标，返回占位符
       console.log(`⚠️ 未找到图标定义: ${iconPath}，使用占位符`);
       return `<span style="display: inline-flex; align-items: center; color: #6b7280; font-size: 12px; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; margin-right: 4px;">🔲 ${iconPath}</span>`;
     });
