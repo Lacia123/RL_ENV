@@ -106,6 +106,38 @@ function escapeHtml(text) {
     .replace(/'/g, '&#039;');
 }
 
+// 🆕 辅助函数：处理内联图标文本，将图标语法转换为内联 SVG
+function processInlineIconText(text) {
+  console.log(`🔍 processInlineIconText 处理文本: "${text}"`);
+  
+  // 将图标标识替换为内联 SVG
+  const processedText = text.replace(/\[icon:([^\]]+)\]/g, (match, iconPath) => {
+    console.log(`🎯 替换图标标识: ${match} -> ${iconPath}`);
+    
+    // 使用真实的图标系统获取 SVG
+    const iconSvg = getIcon(iconPath);
+    
+    if (iconSvg) {
+      console.log(`✅ 找到图标: ${iconPath}`);
+      
+      // 为内联显示优化 SVG 样式
+      const inlineSvg = iconSvg.replace(
+        '<svg',
+        '<svg width="1em" height="1em" style="display: inline; vertical-align: middle; margin-right: 4px;"'
+      )
+      // .replace(/stroke="black"/g, 'stroke="currentColor"');
+      
+      return inlineSvg;
+    }
+    
+    // 如果没有找到图标，返回占位符
+    console.log(`⚠️ 未找到图标定义: ${iconPath}，使用占位符`);
+    return `<span style="display: inline-flex; align-items: center; color: #6b7280; font-size: 12px; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; margin-right: 4px;">🔲 ${iconPath}</span>`;
+  });
+  
+  return processedText;
+}
+
 // 预处理Markdown文本，优化KaTeX解析
 function prepareMarkdownForKatex(text) {
   if (!text || typeof text !== 'string') return '';
@@ -127,7 +159,7 @@ function prepareMarkdownForKatex(text) {
   return preppedMarkdown;
 }
 
-// 处理文本，包括Markdown和KaTeX公式
+// 处理文本，包括Markdown、KaTeX公式和内联图标
 function processText(text) {
   if (!text || typeof text !== 'string') return '';
 
@@ -135,8 +167,11 @@ function processText(text) {
     // 🔧 修复：清理段落符号
     const cleanedText = text.replace(/§PARAGRAPH§/g, '');
     
+    // 🆕 处理内联图标语法 [icon:path]，将其转换为SVG
+    const textWithIcons = processInlineIconText(cleanedText);
+    
     // 预处理文本，优化KaTeX解析
-    const preparedText = prepareMarkdownForKatex(cleanedText);
+    const preparedText = prepareMarkdownForKatex(textWithIcons);
 
     // 使用markedInstance处理Markdown和KaTeX
     const parseResult = markedInstance.parse(preparedText);
@@ -5485,8 +5520,6 @@ function parseMarkdown(markdown, options = {}) {
         flushTextBlock();
         flushConsecutiveButtons();
 
-        console.log(`处理混合内容行: ${trimmedLine}`);
-
         const processedLayout = processMixedContent(trimmedLine);
         stack[stack.length - 1].elements.push(processedLayout);
 
@@ -5495,7 +5528,6 @@ function parseMarkdown(markdown, options = {}) {
 
       // 如果只有一个链接且占据整行，视为按钮（默认primary样式）
       if (multiLinkMatch && multiLinkMatch.length === 1 && isLinkLine) {
-        console.log(`发现单个链接: ${multiLinkMatch[0]}`);
         flushTextBlock();
 
         const singleLinkMatch = multiLinkMatch[0].match(/\[([^\]]+)\]\(([^)]+)\)/);
@@ -5805,154 +5837,6 @@ function parseMarkdown(markdown, options = {}) {
     }
   }
 
-  // 🆕 辅助函数：处理内联图标文本，将图标语法转换为内联 SVG
-  function processInlineIconText(text) {
-    console.log(`🔍 processInlineIconText 处理文本: "${text}"`);
-    
-    // 将图标标识替换为内联 SVG
-    const processedText = text.replace(/\[icon:([^\]]+)\]/g, (match, iconPath) => {
-      console.log(`🎯 替换图标标识: ${match} -> ${iconPath}`);
-      
-      // 使用真实的图标系统获取 SVG
-      const iconSvg = getIcon(iconPath);
-      
-      if (iconSvg) {
-        console.log(`✅ 找到图标: ${iconPath}`);
-        
-        // 为内联显示优化 SVG 样式
-        const inlineSvg = iconSvg.replace(
-          '<svg',
-          '<svg width="20" height="20" style="display: inline; vertical-align: middle; margin-right: 4px;"'
-        ).replace(/stroke="black"/g, 'stroke="currentColor"');
-        
-        return inlineSvg;
-      }
-      
-      // 如果没有找到图标，返回占位符
-      console.log(`⚠️ 未找到图标定义: ${iconPath}，使用占位符`);
-      return `<span style="display: inline-flex; align-items: center; color: #6b7280; font-size: 12px; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; margin-right: 4px;">🔲 ${iconPath}</span>`;
-    });
-    
-    console.log(`🔧 处理结果: "${processedText}"`);
-    return processedText;
-  }
-
-  // 🆕 辅助函数：处理包含内联图标的混合内容行
-  function processMixedContentWithIcons(line, currentMarkdown = '') {
-    console.log(`🔍 processMixedContentWithIcons 处理行: "${line}"`);
-    
-    // 生成稳定的内容种子
-    const lineHash = line.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
-    const contentSeed = `mixed-icon-content-${line.slice(0, 30)}-len${line.length}`;
-    const position = `horizontal-mixed-icon-hash${lineHash}`;
-    
-    // 创建一个水平布局元素
-    let currentLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL, [], {
-      contentSeed: contentSeed,
-      position: position
-    });
-
-    // 查找所有图标标记 [icon:path]
-    const iconRegex = /\[icon:([^\]]+)\]/g;
-    const iconMatches = [...line.matchAll(iconRegex)];
-    console.log(`🎯 找到 ${iconMatches.length} 个图标标记`);
-
-    // 查找所有按钮类型标记 [variant] [text](url) 或 [variant][text](url) 或 [event:eventName][text](url)
-    const buttonVariantRegex = /\[(\w+(?::\w+)?)\]\s*\[([^\]]+)\]\(([^)]+)\)/g;
-    const buttonVariantMatches = [...line.matchAll(buttonVariantRegex)];
-
-    // 查找所有普通链接 [text](url) 但不是图片链接，也不是按钮类型标记
-    const normalLinkRegex = /(?<!!)\[(.*?)\]\((.*?)\)/g;
-    const linkMatches = [...line.matchAll(normalLinkRegex)];
-    
-    // 过滤掉已经被按钮类型标记匹配的链接
-    const filteredLinkMatches = linkMatches.filter(linkMatch => {
-      return !buttonVariantMatches.some(buttonMatch => {
-        const linkStart = linkMatch.index;
-        const linkEnd = linkMatch.index + linkMatch[0].length;
-        const buttonStart = buttonMatch.index;
-        const buttonEnd = buttonMatch.index + buttonMatch[0].length;
-        return linkStart >= buttonStart && linkEnd <= buttonEnd;
-      });
-    });
-
-    // 查找所有图片 ![alt](url)
-    const imageMatches = [...line.matchAll(/!\[(.*?)\]\((.*?)\)/g)];
-
-    // 合并并按照在原文中的位置排序
-    const allMatches = [
-      ...iconMatches.map(match => ({ type: 'icon', match })),
-      ...buttonVariantMatches.map(match => ({ type: 'buttonVariant', match })),
-      ...filteredLinkMatches.map(match => ({ type: 'link', match })),
-      ...imageMatches.map(match => ({ type: 'image', match }))
-    ].sort((a, b) => a.match.index - b.match.index);
-
-    let lastIndex = 0;
-
-    // 按顺序处理所有匹配项
-    for (const { type, match } of allMatches) {
-      const matchIndex = match.index;
-
-      // 处理匹配项前的文本
-      if (matchIndex > lastIndex) {
-        const textBefore = line.substring(lastIndex, matchIndex);
-        if (textBefore.trim()) {
-          const textElement = createTextElement(textBefore);
-          currentLayout.layout.children.push(textElement);
-        }
-      }
-
-      // 处理匹配项
-      if (type === 'icon') {
-        const iconPath = match[1];
-        console.log(`🎯 处理内联图标: ${iconPath}`);
-        const iconElement = createIconElement(iconPath, 'medium');
-        currentLayout.layout.children.push(iconElement);
-      } else if (type === 'buttonVariant') {
-        const variant = match[1];
-        const buttonText = match[2];
-        const buttonUrl = match[3];
-        const supportedVariants = ['primary', 'secondary', 'success', 'warning', 'error', 'ghost', 'link'];
-        
-        if (variant.startsWith('event:')) {
-          const buttonElement = createButtonElement(match[0], buttonUrl, 'primary', currentMarkdown, buttonText);
-          currentLayout.layout.children.push(buttonElement);
-        } else if (supportedVariants.includes(variant)) {
-          const buttonElement = createButtonElement(buttonText, buttonUrl, variant, currentMarkdown);
-          currentLayout.layout.children.push(buttonElement);
-        } else {
-          const textElement = createTextElement(match[0]);
-          currentLayout.layout.children.push(textElement);
-        }
-      } else if (type === 'link') {
-        const linkText = match[1];
-        const linkUrl = match[2];
-        const buttonElement = createButtonElement(linkText, linkUrl, 'primary', currentMarkdown);
-        currentLayout.layout.children.push(buttonElement);
-      } else if (type === 'image') {
-        const imgAlt = match[1];
-        const imgUrl = match[2];
-        const backgroundElement = createBackgroundElement(imgUrl, 'normal');
-        if (backgroundElement._metadata) {
-          backgroundElement._metadata.alt = imgAlt;
-        }
-        currentLayout.layout.children.push(backgroundElement);
-      }
-
-      lastIndex = matchIndex + match[0].length;
-    }
-
-    // 处理最后一个匹配后的文本
-    if (lastIndex < line.length) {
-      const textAfter = line.substring(lastIndex);
-      if (textAfter.trim()) {
-        const textElement = createTextElement(textAfter);
-        currentLayout.layout.children.push(textElement);
-      }
-    }
-
-    return currentLayout;
-  }
 
   // 辅助函数：处理混合内容行
   function processMixedContent(line) {
@@ -5972,10 +5856,7 @@ function parseMarkdown(markdown, options = {}) {
     // 查找所有按钮类型标记 [variant] [text](url) 或 [variant][text](url) 或 [event:eventName][text](url)
     const buttonVariantRegex = /\[(\w+(?::\w+)?)\]\s*\[([^\]]+)\]\(([^)]+)\)/g;
     const buttonVariantMatches = [...line.matchAll(buttonVariantRegex)];
-    console.log(`🎯 按钮变体正则: ${buttonVariantRegex.toString()}`);
-    console.log(`🎯 按钮变体匹配结果:`, buttonVariantMatches);
-    console.log(`找到 ${buttonVariantMatches.length} 个按钮类型标记`);
-
+   
     // 查找所有普通链接 [text](url) 但不是图片链接，也不是按钮类型标记
     const normalLinkRegex = /(?<!!)\[(.*?)\]\((.*?)\)/g;
     const linkMatches = [...line.matchAll(normalLinkRegex)];
@@ -5992,8 +5873,6 @@ function parseMarkdown(markdown, options = {}) {
       });
     });
     
-    console.log(`找到 ${filteredLinkMatches.length} 个普通链接（排除按钮类型标记）`);
-
     // 查找所有图片 ![alt](url)
     const imageMatches = [...line.matchAll(/!\[(.*?)\]\((.*?)\)/g)];
     console.log(`找到 ${imageMatches.length} 个图片链接`);

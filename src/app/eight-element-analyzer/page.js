@@ -28,7 +28,7 @@ const MARKDOWN_TEMPLATES = {
     markdown: `# 优雅青蓝卡片系列展示
 
 ## 设计特点
-[icon:Abstract/ad-product]优雅青蓝卡片系列采用渐变背景、精致装饰和层次化设计，提供三种专业的内容展示方式。
+[icon:Abstract/ad-product]优雅青蓝卡片系列采用渐变背景、[icon:Base/home]精致装饰和层次化设计，[icon:Base/aiming]提供三种专业的内容展示方式。
 
 <card:headerPrecentCard>
    ## 二、市场概述
