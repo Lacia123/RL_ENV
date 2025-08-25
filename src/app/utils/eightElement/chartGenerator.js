@@ -323,7 +323,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     const innerHeight = height - margin.top - margin.bottom;
     
     // 🆕 有标题时整个图表向下移动，为图例留出空间
-    const chartOffsetY = chartTitle ? 45 : 0;
+    const chartOffsetY = chartTitle ? 25 : 0;
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top + chartOffsetY})`);
     
@@ -679,7 +679,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
     // 添加图例 - 🆕 优化图例排版以节省空间
     const legend = g.append('g')
       .attr('class', 'legend')
-      .attr('transform', `translate(0, ${-(margin.top - 5)})`); // 🆕 有标题时图例向下移动更多空间，增加与标题的间距
+      .attr('transform', `translate(0, ${-(margin.top - 13)})`); // 🆕 有标题时图例向下移动更多空间，增加与标题的间距
     
     // 🆕 动态计算图例位置 - 调整间距避免重叠
     const legendItemWidth = displayConfig.isSmallChart ? 150 : 160; // 🆕 增加图例间距避免重叠 (100→150)
