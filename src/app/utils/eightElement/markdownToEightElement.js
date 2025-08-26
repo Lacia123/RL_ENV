@@ -18,6 +18,8 @@ import markedKatex from 'marked-katex-extension';
 import resolveToken, { isColorDark } from '../tokens/resolveToken.js';
 // 导入事件配置
 import { EVENT_NAME, EVENT_CONFIG } from './eventConfig.js';
+// 导入图标系统
+import { getIcon, renderIcon } from '../icons/index.js';
 
 // 配置Marked实例，支持KaTeX和代码高亮
 const katexOptions = {
@@ -104,6 +106,38 @@ function escapeHtml(text) {
     .replace(/'/g, '&#039;');
 }
 
+// 🆕 辅助函数：处理内联图标文本，将图标语法转换为内联 SVG
+function processInlineIconText(text) {
+  console.log(`🔍 processInlineIconText 处理文本: "${text}"`);
+  
+  // 将图标标识替换为内联 SVG
+  const processedText = text.replace(/\[icon:([^\]]+)\]/g, (match, iconPath) => {
+    console.log(`🎯 替换图标标识: ${match} -> ${iconPath}`);
+    
+    // 使用真实的图标系统获取 SVG
+    const iconSvg = getIcon(iconPath);
+    
+    if (iconSvg) {
+      console.log(`✅ 找到图标: ${iconPath}`);
+      
+      // 为内联显示优化 SVG 样式
+      const inlineSvg = iconSvg.replace(
+        '<svg',
+        '<svg width="1em" height="1em" style="display: inline; vertical-align: middle; margin-right: 4px;"'
+      )
+      // .replace(/stroke="black"/g, 'stroke="currentColor"');
+      
+      return inlineSvg;
+    }
+    
+    // 如果没有找到图标，返回占位符
+    console.log(`⚠️ 未找到图标定义: ${iconPath}，使用占位符`);
+    return `<span style="display: inline-flex; align-items: center; color: #6b7280; font-size: 12px; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; margin-right: 4px;">🔲 ${iconPath}</span>`;
+  });
+  
+  return processedText;
+}
+
 // 预处理Markdown文本，优化KaTeX解析
 function prepareMarkdownForKatex(text) {
   if (!text || typeof text !== 'string') return '';
@@ -125,7 +159,7 @@ function prepareMarkdownForKatex(text) {
   return preppedMarkdown;
 }
 
-// 处理文本，包括Markdown和KaTeX公式
+// 处理文本，包括Markdown、KaTeX公式和内联图标
 function processText(text) {
   if (!text || typeof text !== 'string') return '';
 
@@ -133,8 +167,11 @@ function processText(text) {
     // 🔧 修复：清理段落符号
     const cleanedText = text.replace(/§PARAGRAPH§/g, '');
     
+    // 🆕 处理内联图标语法 [icon:path]，将其转换为SVG
+    const textWithIcons = processInlineIconText(cleanedText);
+    
     // 预处理文本，优化KaTeX解析
-    const preparedText = prepareMarkdownForKatex(cleanedText);
+    const preparedText = prepareMarkdownForKatex(textWithIcons);
 
     // 使用markedInstance处理Markdown和KaTeX
     const parseResult = markedInstance.parse(preparedText);
@@ -5483,8 +5520,6 @@ function parseMarkdown(markdown, options = {}) {
         flushTextBlock();
         flushConsecutiveButtons();
 
-        console.log(`处理混合内容行: ${trimmedLine}`);
-
         const processedLayout = processMixedContent(trimmedLine);
         stack[stack.length - 1].elements.push(processedLayout);
 
@@ -5493,7 +5528,6 @@ function parseMarkdown(markdown, options = {}) {
 
       // 如果只有一个链接且占据整行，视为按钮（默认primary样式）
       if (multiLinkMatch && multiLinkMatch.length === 1 && isLinkLine) {
-        console.log(`发现单个链接: ${multiLinkMatch[0]}`);
         flushTextBlock();
 
         const singleLinkMatch = multiLinkMatch[0].match(/\[([^\]]+)\]\(([^)]+)\)/);
@@ -5542,6 +5576,23 @@ function parseMarkdown(markdown, options = {}) {
       console.log(`🔧 创建图标元素: ID=${iconElement.id}, 图标名称=${iconTagInfo.iconName}, 变体=${iconTagInfo.variant}`);
 
       stack[stack.length - 1].elements.push(iconElement);
+
+      continue;
+    }
+
+    // 检查是否包含内联图标语法 [icon:path]，但不包含其他复杂元素
+    if (trimmedLine.includes('[icon:') && trimmedLine.includes(']') && 
+        !trimmedLine.includes('](') && !trimmedLine.includes('![')) {
+      console.log(`🔍 检测到包含内联图标的纯文本: "${trimmedLine}"`);
+      
+      // 处理之前累积的文本块
+      flushTextBlock();
+      flushConsecutiveButtons();
+
+      // 处理包含内联图标的文本，将图标直接嵌入文本内容中
+      const processedText = processInlineIconText(trimmedLine);
+      const textElement = createTextElement(processedText);
+      stack[stack.length - 1].elements.push(textElement);
 
       continue;
     }
@@ -5786,6 +5837,7 @@ function parseMarkdown(markdown, options = {}) {
     }
   }
 
+
   // 辅助函数：处理混合内容行
   function processMixedContent(line) {
     console.log(`🔍 processMixedContent 处理行: "${line}"`);
@@ -5804,10 +5856,7 @@ function parseMarkdown(markdown, options = {}) {
     // 查找所有按钮类型标记 [variant] [text](url) 或 [variant][text](url) 或 [event:eventName][text](url)
     const buttonVariantRegex = /\[(\w+(?::\w+)?)\]\s*\[([^\]]+)\]\(([^)]+)\)/g;
     const buttonVariantMatches = [...line.matchAll(buttonVariantRegex)];
-    console.log(`🎯 按钮变体正则: ${buttonVariantRegex.toString()}`);
-    console.log(`🎯 按钮变体匹配结果:`, buttonVariantMatches);
-    console.log(`找到 ${buttonVariantMatches.length} 个按钮类型标记`);
-
+   
     // 查找所有普通链接 [text](url) 但不是图片链接，也不是按钮类型标记
     const normalLinkRegex = /(?<!!)\[(.*?)\]\((.*?)\)/g;
     const linkMatches = [...line.matchAll(normalLinkRegex)];
@@ -5824,8 +5873,6 @@ function parseMarkdown(markdown, options = {}) {
       });
     });
     
-    console.log(`找到 ${filteredLinkMatches.length} 个普通链接（排除按钮类型标记）`);
-
     // 查找所有图片 ![alt](url)
     const imageMatches = [...line.matchAll(/!\[(.*?)\]\((.*?)\)/g)];
     console.log(`找到 ${imageMatches.length} 个图片链接`);
