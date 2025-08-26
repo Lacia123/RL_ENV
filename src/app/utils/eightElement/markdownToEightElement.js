@@ -159,6 +159,34 @@ function prepareMarkdownForKatex(text) {
   return preppedMarkdown;
 }
 
+// 🆕 为包含SVG的段落标签添加flexbox样式
+function addFlexboxToParagraphsWithSVG(htmlContent) {
+  if (!htmlContent || typeof htmlContent !== 'string') return htmlContent;
+  
+  // 使用正则表达式查找包含SVG的段落标签
+  // 匹配 <p>...</p> 其中包含 <svg 标签
+  return htmlContent.replace(
+    /<p([^>]*)>([^<]*<svg[^>]*>.*?)<\/p>/g,
+    (match, pAttributes, pContent) => {
+      // 检查p标签是否已经有style属性
+      if (pAttributes.includes('style=')) {
+        // 如果已有style属性，添加flexbox样式
+        return `<p${pAttributes.replace(
+          /style="([^"]*)"/,
+          (match, styleValue) => {
+            // 确保style值不以分号结尾，然后添加新的样式
+            const cleanStyle = styleValue.trim().replace(/;$/, '');
+            return `style="${cleanStyle}; display: flex; align-items: center;"`;
+          }
+        )}>${pContent}</p>`;
+      } else {
+        // 如果没有style属性，添加新的style属性
+        return `<p${pAttributes} style="display: flex; align-items: center;">${pContent}</p>`;
+      }
+    }
+  );
+}
+
 // 处理文本，包括Markdown、KaTeX公式和内联图标
 function processText(text) {
   if (!text || typeof text !== 'string') return '';
@@ -176,15 +204,18 @@ function processText(text) {
     // 使用markedInstance处理Markdown和KaTeX
     const parseResult = markedInstance.parse(preparedText);
 
-    if (parseResult.includes('class="katex-error"')) {
-      const titleMatch = parseResult.match(/title="([^"]*)"/);
+    // 🆕 为包含SVG的段落标签添加flexbox样式
+    const processedResult = addFlexboxToParagraphsWithSVG(parseResult);
+
+    if (processedResult.includes('class="katex-error"')) {
+      const titleMatch = processedResult.match(/title="([^"]*)"/);
       const errorMessage = titleMatch ? titleMatch[1] : null;
       console.error('KaTeX解析错误:', errorMessage);
       
       // 🔧 修复：即使有KaTeX错误，也要返回解析结果
-      return parseResult;
+      return processedResult;
     } else {
-      return parseResult;
+      return processedResult;
     }
   
   } catch (error) {
