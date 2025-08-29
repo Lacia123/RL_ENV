@@ -2,11 +2,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { renderEightElementToHtml } from '../utils/eightElement/renderEightElementHtml';
 import { convertEightElementToLayout } from '../utils/layoutAnalysis/eightElementAnalysis';
-import { markdownToEightElement, applyLayoutControlsToEightElement } from '../utils/eightElement/markdownToEightElement';
-
+// import { markdownToEightElement, applyLayoutControlsToEightElement } from '../utils/eightElement/markdownToEightElement';
+// import { analyzeElementsInEightElement, applyActionsToEightElement } from '../utils/eightElement/markdownToEightElement';
+import { markdownToEightElement, applyLayoutControlsToEightElement, analyzeElementsInEightElement, applyActionsToEightElement } from '../utils/eightElement/index';
 import { RL_ACTIONS, createActionSystemManager } from '../utils/seeds/rl_action_engines';
 import { DEFAULT_STYLE_CONFIG } from '../utils/eightElement/styleConfig';
-import { analyzeElementsInEightElement, applyActionsToEightElement } from '../utils/eightElement/markdownToEightElement';
+
 import VisualSpaceEvaluator from '../components/VisualSpaceEvaluator';
 import collectEightElementMeasurements from '../utils/eightElement/collectElementMeasurements.js';
 import CrepeMarkdownEditor from '../components/CrepeMarkdownEditor';

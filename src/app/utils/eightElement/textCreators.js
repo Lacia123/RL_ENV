@@ -9,6 +9,35 @@ import {
 
 import { processText } from './PSUIPParser.js';
 
+// 新增函数：处理文本中的加粗部分
+function processBoldText(text) {
+    // 找出所有加粗文本 **text**
+    const boldRegex = /\*\*(.*?)\*\*/g;
+    const boldMatches = [...text.matchAll(boldRegex)];
+
+    if (boldMatches.length === 0) {
+        return {
+            processedText: text,
+            hasBold: false
+        };
+    }
+
+    // 处理文本，将加粗部分用HTML标签替换
+    let processedText = text;
+    let hasBold = false;
+
+    // 替换加粗文本为带有HTML标签的形式，这将在渲染时被解析
+    processedText = text.replace(boldRegex, (match, p1) => {
+        hasBold = true;
+        return `<span style="font-weight: bold;">${p1}</span>`;  // 使用HTML标签表示加粗
+    });
+
+    return {
+        processedText,
+        hasBold
+    };
+}
+
 // 检测是否为列表项
 function isListItem(line) {
     // 检测无序列表项 (-, *, +)
@@ -347,8 +376,79 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}, custo
     return textElement;
 }
 
+
+// 创建一级标题块容器，设置最小宽度和最大宽度
+function createHeadingBlockContainer(headingLayout) {
+    const layoutId = generateUUID();
+
+    // 创建一个包装容器，设置最小宽度和flex-basis
+    const layout = {
+        dataKeys: [],
+        name: "layout",
+        "name-zh": "标题块容器",
+        "file-type": "template",
+        theme: "default",
+        layout: {
+            style: {
+                display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+                layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                "align-self": "flex-start", // 确保自身左对齐
+                // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+                boxSizing: "border-box",
+                "border-style": "solid",
+                "border-width": "0",
+                "border-color": "initial",
+                height: "auto",
+                width: "100%",
+                minWidth: "375px",  // 设置最小宽度为375px
+                maxWidth: "50%",    // 设置最大宽度为50%，确保一行最多两个
+                // 添加flex-basis属性，使其在流式布局中正确工作
+                "flex-basis": "375px",
+                "flex-grow": "1",
+                "flex-shrink": "0",
+                "box-sizing": "border-box",
+                "back-width": "100%",
+                "back-height": "auto",
+                position: "relative",
+                padding: DIMENSION_CONSTANTS.PADDING.base,
+                margin: DIMENSION_CONSTANTS.MARGIN.tight
+            },
+            children: [headingLayout]
+        },
+        description: "",
+        id: layoutId,
+        events: [{}]
+    };
+
+    // 查找并修改headingLayout中标题文本的对齐方式
+    const updateHeadingTextAlignment = (layout) => {
+        // 检查是否是一级标题布局
+        if (layout && layout.layout && layout.layout.children && layout.layout.children.length > 0) {
+            const firstChild = layout.layout.children[0];
+            if (firstChild && firstChild.name === "text" && firstChild.layout && firstChild.layout.style) {
+                // 将标题文本对齐方式改为左对齐
+                firstChild.layout.style.textAlign = "left";
+
+                if (firstChild.layout.text_body && firstChild.layout.text_body.style) {
+                    firstChild.layout.text_body.style.textAlign = "left";
+                }
+
+                if (firstChild.layout.text_hyperlink && firstChild.layout.text_hyperlink.style) {
+                    firstChild.layout.text_hyperlink.style.textAlign = "left";
+                }
+            }
+        }
+    };
+
+    // 应用对齐方式更改
+    updateHeadingTextAlignment(headingLayout);
+
+    return layout;
+}
+
 export {
     isListItem,
     processListItemAndRichText,
+    createHeadingBlockContainer,
     createTextElement
 }

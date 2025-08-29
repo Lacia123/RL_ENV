@@ -1,4 +1,4 @@
-import { parseMarkdownToTemplate } from './PSUIPParser.js';
+import { parseMarkdownToTemplate, parseMarkdown } from './PSUIPParser.js';
 import { generateUUID } from './util.js';
 import { createCodeElement } from './codeCreators.js';
 import { createTableElement, extractTableOrChartData, getChartVariantFromConfig, createChartElement, generateChartSvg } from './tableCreators.js';
@@ -1466,9 +1466,20 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
     return children;
 }
 
+// 处理模板路径中的通配符替换
+function processTemplatePathWithWildcard(templatePath, wildcardValue) {
+    if (!wildcardValue || !templatePath.includes('*')) {
+        return templatePath;
+    }
+
+    return templatePath.replace(/\*/g, wildcardValue);
+}
+
 export {
     isCardTag,
+    extractWildcardMatch,
     extractCardBlock,
     findWildcardMatch,
-    createCardElement
+    createCardElement,
+    processTemplatePathWithWildcard
 }

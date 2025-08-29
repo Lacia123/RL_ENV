@@ -1,12 +1,13 @@
 import { EVENT_NAME, EVENT_CONFIG } from './eventConfig.js';
+import { LAYOUT_CONSTANTS } from './styleConfig.js';
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance } from './util.js';
 import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './tableCreators.js';
 import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './codeCreators.js';
-import { createLayoutElement, extractLayoutBlock, isLayoutTag } from './layoutCreators.js';
-import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch } from './cardCreators.js';
-import { isListItem, processListItemAndRichText, createTextElement } from './textCreators.js';
-import { parseButtonVariant } from './buttonCreators.js';
+import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot } from './layoutCreators.js';
+import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch, processTemplatePathWithWildcard } from './cardCreators.js';
+import { isListItem, processListItemAndRichText, createTextElement, createHeadingBlockContainer } from './textCreators.js';
+import { parseButtonVariant, createButtonElement } from './buttonCreators.js';
 import { createIconElement } from './iconCreators.js';
 
 // 检测是否为引用文本
@@ -708,36 +709,6 @@ function processText(text) {
         return errorMessage + escapeHtml(cleanedText).replace(/\\n/g, '<br>');
     }
 }
-
-// 新增函数：处理文本中的加粗部分
-function processBoldText(text) {
-    // 找出所有加粗文本 **text**
-    const boldRegex = /\*\*(.*?)\*\*/g;
-    const boldMatches = [...text.matchAll(boldRegex)];
-
-    if (boldMatches.length === 0) {
-        return {
-            processedText: text,
-            hasBold: false
-        };
-    }
-
-    // 处理文本，将加粗部分用HTML标签替换
-    let processedText = text;
-    let hasBold = false;
-
-    // 替换加粗文本为带有HTML标签的形式，这将在渲染时被解析
-    processedText = text.replace(boldRegex, (match, p1) => {
-        hasBold = true;
-        return `<span style="font-weight: bold;">${p1}</span>`;  // 使用HTML标签表示加粗
-    });
-
-    return {
-        processedText,
-        hasBold
-    };
-}
-
 
 
 function processMarkdownWithMathProtection(markdown) {
@@ -1818,7 +1789,76 @@ function parseMarkdown(markdown, options = {}) {
     }
 }
 
+
+// 主函数：将Markdown转换为八要素格式
+function markdownToEightElement(markdown, styleConfig) {
+    // 🆕 保存原始未处理的markdown用于事件解析（清理内部标记）
+    const originalMarkdown = typeof markdown === 'string'
+        ? markdown.replace(/§PARAGRAPH§/g, '')
+        : markdown;
+
+    // 如果提供了样式配置，设置当前配置
+    if (styleConfig) {
+        try {
+            // 动态导入避免循环依赖
+            import('./styleConfig.js').then(({ setStyleConfig }) => {
+                setStyleConfig(styleConfig);
+            });
+        } catch (error) {
+            console.warn('设置样式配置失败:', error);
+        }
+    }
+
+    // 检查并规范化输入
+    let processedMarkdown = markdown;
+
+    // 确保markdown是字符串类型
+    if (typeof processedMarkdown !== 'string') {
+        console.warn('收到非字符串类型的Markdown输入，尝试转换为字符串');
+        try {
+            processedMarkdown = String(processedMarkdown || '');
+        } catch (error) {
+            console.error('转换Markdown输入为字符串失败:', error);
+            processedMarkdown = '';
+        }
+    }
+
+    // 确保最后有一个换行符，以正确处理最后一个段落
+    if (processedMarkdown && !processedMarkdown.endsWith('\n')) {
+        processedMarkdown += '\n';
+    }
+
+    console.log(`处理Markdown文本，长度: ${processedMarkdown.length}`);
+
+    // 🆕 创建解析选项对象，用于收集根layout属性
+    const parseOptions = {
+        rootAttributes: {},
+        currentMarkdown: originalMarkdown  // 🆕 传递原始未处理的markdown用于事件解析
+    };
+
+    // 直接使用parseMarkdown函数解析Markdown为元素数组
+    const parsedElements = parseMarkdown(processedMarkdown, parseOptions);
+    console.log(`解析得到的元素数量: ${parsedElements.length}`);
+
+    // 🆕 使用createEightElementRoot创建八要素根结构，传递根layout属性
+    const eightElementRoot = createEightElementRoot(parsedElements, parseOptions.rootAttributes);
+
+    // 重置为默认配置
+    try {
+        // 动态导入避免循环依赖
+        import('./styleConfig.js').then(({ resetStyleConfig }) => {
+            resetStyleConfig();
+        });
+    } catch (error) {
+        console.warn('重置样式配置失败:', error);
+    }
+
+    return eightElementRoot;
+}
+
 export {
+    markdownToEightElement,
+    parseMarkdown,
     parseMarkdownToTemplate,
     parseEventSyntax,
     removeEventSyntax,
@@ -1826,7 +1866,6 @@ export {
     prepareMarkdownForKatex,
     addFlexboxToParagraphsWithSVG,
     processText,
-    processBoldText,
     isListItem,
     isQuoteText,
     isIconTag
