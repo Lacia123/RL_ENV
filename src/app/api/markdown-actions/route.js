@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { markdownToEightElement } from '@/app/utils/eightElement/markdownToEightElement';
-import { analyzeElementsInEightElement } from '@/app/utils/eightElement/markdownToEightElement';
+import { markdownToEightElement, analyzeElementsInEightElement } from '@/app/utils/eightElement/index';
 import { createActionSystemManager, ActionSystemManager } from '@/app/utils/seeds/rl_action_engines';
 import { getElementStyleConfig, DEFAULT_STYLE_CONFIG } from '@/app/utils/eightElement/styleConfig';
 

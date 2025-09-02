@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { markdownToEightElement } from '@/app/utils/eightElement/markdownToEightElement';
+import { markdownToEightElement } from '@/app/utils/eightElement/index';
 import { renderAndEvaluateEightElement } from '@/app/utils/eightElement/renderAndEvaluate';
 import { calculateTokens } from '@/app/utils/seeds/generateTokenBySeed';
 import { setDynamicTokenSystem, clearDynamicTokenSystem } from '@/app/utils/tokens/resolveToken';
