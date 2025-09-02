@@ -8,6 +8,7 @@ import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayo
 import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch, processTemplatePathWithWildcard } from './cardCreators.js';
 import { isListItem, processListItemAndRichText, createTextElement, createHeadingBlockContainer } from './textCreators.js';
 import { parseButtonVariant, createButtonElement } from './buttonCreators.js';
+import { createBackgroundElement } from './backgroundCreators.js';
 import { createIconElement } from './iconCreators.js';
 
 // 检测是否为引用文本

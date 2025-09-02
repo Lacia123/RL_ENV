@@ -179,15 +179,15 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
     }
     
     // 设置图表尺寸和边距
-    // 🆕 增大基础尺寸，让图表占满容器
+    // 🆕 增大基础尺寸，让图表占满容器，特别是为柱状图增加更多底部空间
     const width = 600;  // 增大宽度，充分利用容器空间
-    const height = 400; // 增大高度，保持合理比例
+    const height = 600; // 增加高度，为图例留出更多空间
     // 🆕 根据图表宽度动态调整显示参数
     const isSmallChart = chartStyleConfig?.variant === 'small'
-    // 🆕 根据是否为小图表优化边距
+    // 🆕 根据是否为小图表优化边距，增加底部边距为图例留空间
     const optimizedMargin = isSmallChart ? 
-      { top: 15, right: 20, bottom: 60, left: 80 } :   // 小图表：减少上下边距，优化空间利用
-      { top: 40, right: 50, bottom: 90, left: 90 };    // 普通图表：保持充足边距
+      { top: 15, right: 20, bottom: 120, left: 80 } :   
+      { top: 40, right: 50, bottom: 120, left: 90 };  
     
     const margin = optimizedMargin;
     const innerWidth = width - margin.left - margin.right;
@@ -469,31 +469,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
         
         const lineGroup = g.append('g').attr('class', 'line-group');
 
-        // 1. Draw Line PATH first
-        // lineGroup.append('path')
-        //     .attr('class', 'line')
-        //     .attr('d', line(lineData))
-        //     .attr('stroke', color)
-        //     .attr('fill', 'none')
-        //     .attr('stroke-width', lineStyle.strokeWidth)
-        //     .attr('stroke-dasharray', lineStyle.dashArray);
-
-        // // 2. Draw DOTS (and their groups) on top of lines
-        // const dots = lineGroup.selectAll('.dot-group')
-        //     .data(lineData)
-        //     .enter()
-        //     .append('g')
-        //     .attr('class', 'dot-group')
-        //     .attr('transform', d => `translate(${xScale(d.x)},${yScale(d.y)})`);
-
-        // dots.append('circle')
-        //     .attr('class', 'dot')
-        //     .attr('r', 4)
-        //     .attr('fill', color)
-        //     .attr('stroke', '#fff')
-        //     .attr('stroke-width', 1.5);
-
-
+    
         lineGroup.append('path')
             .attr('class', `line line-${colorClassSuffix}`)
             .attr('d', line(lineData))
@@ -676,15 +652,15 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
         .text(chartTitle);
     }
 
-    // 添加图例 - 🆕 优化图例排版以节省空间
+    // 添加图例 - 将图例显示在图表下方
     const legend = g.append('g')
       .attr('class', 'legend')
-      .attr('transform', `translate(0, ${-(margin.top - 13)})`); // 🆕 有标题时图例向下移动更多空间，增加与标题的间距
+      .attr('transform', `translate(0, ${innerHeight + 80})`);
     
     // 🆕 动态计算图例位置 - 调整间距避免重叠
-    const legendItemWidth = displayConfig.isSmallChart ? 150 : 160; // 🆕 增加图例间距避免重叠 (100→150)
-    const legendItemHeight = displayConfig.isSmallChart ? 20 : 24;   // 🆕 增加图例高度避免垂直重叠 (16→20)
-    const legendItemsPerRow = Math.min(3, valueFields.length); // 🆕 减少每行图例数量避免拥挤 (4→3)
+    const legendItemWidth = displayConfig.isSmallChart ? 150 : 160; 
+    const legendItemHeight = displayConfig.isSmallChart ? 20 : 24;
+    const legendItemsPerRow = Math.min(3, valueFields.length);
     const legendWidth = legendItemsPerRow * legendItemWidth;
     
     valueFields.forEach((field, i) => {
@@ -943,6 +919,73 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
         .attr('fill', titleFill)
         .text(chartTitle);
     }
+
+    // 添加图例 - 🆕 将图例显示在图表下方
+    const legend = g.append('g')
+      .attr('class', 'legend')
+      .attr('transform', `translate(0, ${innerHeight + 80})`); // 🆕 将图例放置在图表下方，增加间距 (20→40)
+    
+    // 🆕 动态计算图例位置 - 调整间距避免重叠
+    const legendItemWidth = displayConfig.isSmallChart ? 80 : 100; // 🆕 增加图例间距避免重叠
+    const legendItemHeight = displayConfig.isSmallChart ? 20 : 24;   // 🆕 增加图例高度避免垂直重叠
+    const legendItemsPerRow = Math.max(8, valueFields.length); // 🆕 减少每行图例数量避免拥挤
+    const legendWidth = legendItemsPerRow * legendItemWidth;
+    
+    // 🆕 对于柱状图，图例应该显示品牌名称而不是数据字段名
+    categories.forEach((category, i) => {
+      const row = Math.floor(i / legendItemsPerRow);
+      const col = i % legendItemsPerRow;
+      const x = col * legendItemWidth;
+      const y = row * legendItemHeight;
+      const color = colorValues[i % colorValues.length];
+      const colorClassSuffix = colorClass[i % colorClass.length];
+      
+      const legendItem = legend.append('g')
+        .attr('transform', `translate(${x}, ${y})`);
+      
+      // 绘制柱状图样式示例
+      legendItem.append('rect')
+        .attr('width', 15)
+        .attr('height', 12)
+        .attr('class', `bar bar-${colorClassSuffix}`)
+        .attr('fill', '#000');
+      
+      // 获取图例样式配置
+      const legendClassName = chartStyleConfig?.legend?.className || 'legend-label';
+      
+      // 🆕 根据图表大小选择合适的图例配置
+      const currentLegendConfig = displayConfig.isSmallChart ? smalllegendConfig : legendConfig;
+      const resolvedFontSize = resolveToken(currentLegendConfig.fontSize);
+      const resolvedFontWeight = resolveToken(currentLegendConfig.fontWeight);
+      const resolvedFill = resolveToken(currentLegendConfig.fill);
+      
+      // 添加图例文字
+      const text = legendItem.append('text')
+        .attr('class', legendClassName)
+        .attr('x', 20)
+        .attr('y', 9)
+        .attr('font-size', resolvedFontSize || displayConfig.legendLabelSize || '8px') // 🆕 优先使用token，其次使用动态配置
+        .attr('font-weight', resolvedFontWeight || '400')  // 🆕 使用token中的字体粗细
+        .attr('fill', resolvedFill || '#666')  // 🆕 使用token中的颜色
+        .attr('alignment-baseline', 'middle')
+        .text(category);
+      
+      // 如果文字太长，截断并添加省略号
+      const maxTextLength = displayConfig.isSmallChart ? 120 : 130; // 🆕 增加最大文本长度，配合更大的间距
+      const truncateText = (text, maxLength) => {
+        const node = text.node();
+        if (node) {
+          const textLength = node.getComputedTextLength ? node.getComputedTextLength() : category.length * 6;
+          if (textLength > maxLength) {
+            // 根据字符估算长度，尝试截断
+            const approxChars = Math.floor((maxLength / textLength) * category.length) - 3;
+            text.text(category.substring(0, approxChars) + '...');
+          }
+        }
+      };
+      
+      truncateText(text, maxTextLength);
+    });
     
     // 将SVG转换为字符串
     return svg.node().outerHTML;
@@ -1166,6 +1209,72 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
         .attr('fill', titleFill)
         .text(chartTitle);
     }
+
+    // 添加图例 - 🆕 将图例显示在图表下方
+    const legend = g.append('g')
+      .attr('class', 'legend')
+      .attr('transform', `translate(0, ${innerHeight + 80})`); // 🆕 将图例放置在图表下方，增加间距 (60→80)
+    
+    // 🆕 动态计算图例位置 - 调整间距避免重叠
+    const legendItemWidth = displayConfig.isSmallChart ? 80 : 100; // 🆕 增加图例间距避免重叠
+    const legendItemHeight = displayConfig.isSmallChart ? 20 : 24;   // 🆕 增加图例高度避免垂直重叠
+    const legendItemsPerRow = Math.max(8, valueFields.length); 
+    const legendWidth = legendItemsPerRow * legendItemWidth;
+    
+    categories.forEach((category, i) => {
+      const row = Math.floor(i / legendItemsPerRow);
+      const col = i % legendItemsPerRow;
+      const x = col * legendItemWidth;
+      const y = row * legendItemHeight;
+      const color = colorValues[i % colorValues.length];
+      const colorClassSuffix = colorClass[i % colorClass.length];
+      
+      const legendItem = legend.append('g')
+        .attr('transform', `translate(${x}, ${y})`);
+      
+      // 绘制水平柱状图样式示例
+      legendItem.append('rect')
+        .attr('width', 15)
+        .attr('height', 12)
+        .attr('class', `bar bar-${colorClassSuffix}`)
+        .attr('fill', '#000');
+      
+      // 获取图例样式配置
+      const legendClassName = chartStyleConfig?.legend?.className || 'legend-label';
+      
+      // 🆕 根据图表大小选择合适的图例配置
+      const currentLegendConfig = displayConfig.isSmallChart ? smalllegendConfig : legendConfig;
+      const resolvedFontSize = resolveToken(currentLegendConfig.fontSize);
+      const resolvedFontWeight = resolveToken(currentLegendConfig.fontWeight);
+      const resolvedFill = resolveToken(currentLegendConfig.fill);
+      
+      // 添加图例文字
+      const text = legendItem.append('text')
+        .attr('class', legendClassName)
+        .attr('x', 20)
+        .attr('y', 9)
+        .attr('font-size', resolvedFontSize || displayConfig.legendLabelSize || '8px') // 🆕 优先使用token，其次使用动态配置
+        .attr('font-weight', resolvedFontWeight || '400')  // 🆕 使用token中的字体粗细
+        .attr('fill', resolvedFill || '#666')  // 🆕 使用token中的颜色
+        .attr('alignment-baseline', 'middle')
+        .text(category);
+      
+      // 如果文字太长，截断并添加省略号
+      const maxTextLength = displayConfig.isSmallChart ? 120 : 130; // 🆕 增加最大文本长度，配合更大的间距
+      const truncateText = (text, maxLength) => {
+        const node = text.node();
+        if (node) {
+          const textLength = node.getComputedTextLength ? node.getComputedTextLength() : category.length * 6;
+          if (textLength > maxLength) {
+            // 根据字符估算长度，尝试截断
+            const approxChars = Math.floor((maxLength / textLength) * category.length) - 3;
+            text.text(category.substring(0, approxChars) + '...');
+          }
+        }
+      };
+      
+      truncateText(text, maxTextLength);
+    });
     
     // 将SVG转换为字符串
     return svg.node().outerHTML;
