@@ -479,7 +479,7 @@ export const DEFAULT_STYLE_CONFIG = {
       flexWrap: 'nowrap',
       justifyContent: 'flex-start',
       alignItems: 'flex-start',
-      gap: DIMENSION_CONSTANTS.GAP.none,
+      gap: DIMENSION_CONSTANTS.GAP.base,
 
       // 网格布局属性（默认不启用，由动作激活）
       gridTemplateColumns: 'none',
@@ -2757,6 +2757,7 @@ export const DEFAULT_STYLE_CONFIG = {
       },
       style: {
         display: 'flex',
+        flexGrow: '1',
         flexDirection: 'column',
         borderRadius: "{dimension.borderradius.xxxl}",
         padding: "{dimension.padding.semiloose}",
@@ -2926,7 +2927,6 @@ export const DEFAULT_STYLE_CONFIG = {
         borderColor: "{color.surfacecontainer.black12}",
         borderStyle: "solid",
         background: "{color.surfacecontainer.white100}",
-        marginBottom: "{dimension.margin.base}",
         // 嵌套选择器：重置内部ul元素的默认margin
         "& ul": {
           marginBlockStart: "0",
@@ -2977,6 +2977,7 @@ export const DEFAULT_STYLE_CONFIG = {
       style: {
         display: 'flex',
         flexDirection: 'column',
+        flexGrow: '1',
         borderRadius: "{dimension.borderradius.xl}",
         padding: "{dimension.padding.extraloose} 0",
         boxShadow: "{material.hierarchy.main}",
@@ -2984,7 +2985,6 @@ export const DEFAULT_STYLE_CONFIG = {
         borderColor: "{color.surfacecontainer.black12}",
         borderStyle: "solid",
         background: "{color.surfacecontainer.white100}",
-        marginBottom: "{dimension.margin.base}",
         // 嵌套选择器：重置内部ul元素的默认margin
         "& ul": {
           marginBlockStart: "0",

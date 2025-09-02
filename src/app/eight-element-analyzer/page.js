@@ -31,6 +31,9 @@ const MARKDOWN_TEMPLATES = {
 ## 设计特点
 [icon:Abstract/ad-product]优雅青蓝卡片系列采用渐变背景、[icon:Base/home]精致装饰和层次化设计，[icon:Base/aiming]提供三种专业的内容展示方式。
 
+
+[event:download][下载](https://github.com/example/edit)
+
 <card:headerPrecentCard>
    ## 二、市场概述
    AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注

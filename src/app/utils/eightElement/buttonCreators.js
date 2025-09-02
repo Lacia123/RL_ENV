@@ -36,8 +36,10 @@ function parseButtonVariant(text) {
     const eventMatch = text.match(eventPattern);
 
     if (eventMatch) {
+
+        console.log('...... eventMatch', eventMatch)
+
         const [, buttonText, url] = eventMatch;
-        console.log(`✅ 找到事件按钮: 文本="${buttonText}", URL="${url}"`);
         return {
             hasVariant: true,
             variant: 'primary', // 事件按钮默认使用primary样式

@@ -1,5 +1,6 @@
 export const EVENT_NAME = {
     EDIT: 'edit',
+    DOWNLOAD: 'download',
 }
 
 
@@ -12,5 +13,10 @@ export const EVENT_CONFIG = {
         "parameters": {
             "markdown" : "", 
         }
+    },
+    [EVENT_NAME.DOWNLOAD]: {
+        "runtimeEventKey": "download",
+        "nativeEventKey": "click",
+        "dataEventKey": [],
     }
 }

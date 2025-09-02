@@ -104,7 +104,7 @@ function createFlexWrapLayout(children = []) {
 
 // 更新基础布局元素创建函数，支持自定义高宽
 function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, options = {}) {
-    const { width = "100%", height = "100%", alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN } = options;
+    const { width = "100%", height = "auto", alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN } = options;
 
     return {
         style: {
