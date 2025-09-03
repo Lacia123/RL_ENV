@@ -33,12 +33,14 @@ function isIconTag(line) {
 
 // 解析事件语法 [event:eventName] 并返回事件配置
 function parseEventSyntax(text, elementId, currentMarkdown = '') {
-    const eventPattern = /\[event:(\w+)\]/g;
+    // 🆕 更新事件模式以支持带参数的事件：[event:eventName(param1,param2)]
+    const eventPattern = /\[event:(\w+)(?:\(([^)]*)\))?\]/g;
     const events = [];
     let match;
 
     while ((match = eventPattern.exec(text)) !== null) {
         const eventName = match[1];
+        const eventParams = match[2]; // 获取括号内的参数
 
         // 从eventConfig中获取对应的事件配置
         if (EVENT_CONFIG[eventName]) {
@@ -50,6 +52,13 @@ function parseEventSyntax(text, elementId, currentMarkdown = '') {
             // 特殊处理edit事件的markdown参数
             if (eventName === EVENT_NAME.EDIT && currentMarkdown) {
                 eventConfig.parameters.markdown = currentMarkdown;
+            }
+
+            // 🆕 特殊处理chart_changed事件的参数
+            if (eventName === EVENT_NAME.CHART_CHANGED && eventParams) {
+                // 解析参数：chart_changed(barh,bar,pie) -> ["barh", "bar", "pie"]
+                const chartTypes = eventParams.split(',').map(param => param.trim());
+                eventConfig.parameters.chartTypes = chartTypes;
             }
 
             events.push(eventConfig);
@@ -64,14 +73,14 @@ function parseEventSyntax(text, elementId, currentMarkdown = '') {
 // 移除文本中的事件语法标记
 function removeEventSyntax(text) {
     // 首先检查是否是完整的事件按钮语法：[event:eventName][buttonText](url)
-    const fullEventMatch = text.match(/^\[event:\w+\]\s*\[([^\]]+)\]\(([^)]+)\)$/);
+    const fullEventMatch = text.match(/^\[event:\w+(?:\([^)]*\))?\]\s*\[([^\]]+)\]\(([^)]+)\)$/);
     if (fullEventMatch) {
         // 如果是完整的事件按钮语法，返回按钮文本部分
         return fullEventMatch[1].trim();
     }
 
-    // 否则只清理 [event:eventName] 标记
-    return text.replace(/\[event:\w+\]/g, '').trim();
+    // 🆕 清理带参数的事件标记：[event:eventName(param1,param2)]
+    return text.replace(/\[event:\w+(?:\([^)]*\))?\]/g, '').trim();
 }
 
 // 🆕 辅助函数：处理内联图标文本，将图标语法转换为内联 SVG

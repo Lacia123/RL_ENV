@@ -4,6 +4,7 @@ import {
 } from './styleConfig.js';
 import { generateChartFromTableData } from './chartGenerator.js';
 import { extractWildcardMatch } from './cardCreators.js';
+import { parseEventSyntax } from './PSUIPParser.js';
 
 // 解析表格数据为二维数组
 function parseTableData(tableContent) {
@@ -15,6 +16,11 @@ function parseTableData(tableContent) {
     for (let i = 0; i < lines.length; i++) {
         // 跳过分隔行 (包含 --- 的行)
         if (lines[i].match(/\|[-|\s]+\|/)) {
+            continue;
+        }
+
+        // 🆕 跳过事件语法行
+        if (lines[i].trim().match(/^\[event:/)) {
             continue;
         }
 
@@ -73,12 +79,13 @@ function extractTableOrChartData(lines, startIndex) {
 
     }
 
-    // 处理第一行 - 如果是图表，移除图表标记
+    // 处理第一行 - 如果是图表，移除图表标记和事件语法
     const processedFirstLine = isChart
-        ? firstLine.replace(/^\[chart:.+?\]/, '').trim()
+        ? firstLine.replace(/^\[chart:[^\]]+\]/, '').replace(/\[event:[^\]]+\]/, '').trim()
         : firstLine;
 
-    const tableLines = [processedFirstLine];
+    // 🆕 如果处理后的第一行为空，则跳过它
+    const tableLines = processedFirstLine ? [processedFirstLine] : [];
     const remainingLines = lines.slice(startIndex + 1);
 
     // 继续添加后续表格行，直到遇到空行
@@ -107,7 +114,8 @@ function extractTableOrChartData(lines, startIndex) {
         chartTitle: chartTitle, // 🆕 添加图表标题
         tableContent: originalContent,
         tableData: tableData,
-        endIndex: startIndex + i
+        endIndex: startIndex + i,
+        originalFirstLine: firstLine // 🆕 保存原始的第一行用于事件解析
     };
 }
 
@@ -204,7 +212,7 @@ function createTableElement(markdownTableContent) {
 }
 
 // 创建图表元素
-function createChartElement(chartType, svgContent, tableData, rawData, variant = 'normal', chartTitle = null) {
+function createChartElement(chartType, svgContent, tableData, rawData, variant = 'normal', chartTitle = null, events = []) {
     const id = generateUUID();
     const layoutStyleConfig = getElementStyleConfig('layout', 'column');
 
@@ -285,7 +293,7 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
                 }
             }
         },
-        events: [{}]
+        events: events.length > 0 ? events : [{}]
     };
 
     return chartElement;
@@ -309,13 +317,22 @@ function generateChartSvg(chartType, data, chartStyleConfig = null, chartTitle =
 
 // 处理表格数据 - 决定创建普通表格还是图表元素
 function processTableOrChartData(result, stack) {
-    const { isChart, chartType, chartTitle, tableContent, tableData, endIndex } = result;
+    const { isChart, chartType, chartTitle, tableContent, tableData, endIndex, originalFirstLine } = result;
 
     if (isChart) {
         // 处理为图表
         try {
-            // 先创建图表元素（包含样式配置）- 使用默认 variant，传递标题
-            const chartElement = createChartElement(chartType, '', tableData, tableContent, 'normal', chartTitle);
+            // 🆕 解析图表行中的事件
+            const chartEvents = [];
+            if (originalFirstLine) {
+                // 使用导入的parseEventSyntax函数解析事件
+                const chartId = generateUUID();
+                const events = parseEventSyntax(originalFirstLine, chartId);
+                chartEvents.push(...events);
+            }
+
+            // 先创建图表元素（包含样式配置）- 使用默认 variant，传递标题和事件
+            const chartElement = createChartElement(chartType, '', tableData, tableContent, 'normal', chartTitle, chartEvents);
 
             // 提取样式配置
             const chartStyleConfig = {

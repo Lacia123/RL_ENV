@@ -1,13 +1,14 @@
 export const EVENT_NAME = {
     EDIT: 'edit',
     DOWNLOAD: 'download',
+    CHART_CHANGED: 'chart_changed',
 }
 
 
 export const EVENT_CONFIG = {
     [EVENT_NAME.EDIT]: {
         // "EventTargetId": "",
-        "runtimeEventKey": "edit",
+        "runtimeEventKey": EVENT_NAME.EDIT,
         "nativeEventKey": "click",
         "dataEventKey": [],
         "parameters": {
@@ -18,5 +19,13 @@ export const EVENT_CONFIG = {
         "runtimeEventKey": "download",
         "nativeEventKey": "click",
         "dataEventKey": [],
+    },
+    [EVENT_NAME.CHART_CHANGED]: {
+        "runtimeEventKey": EVENT_NAME.CHART_CHANGED,
+        "nativeEventKey": "click",
+        "dataEventKey": [],
+        "parameters": {
+            "chartTypes": [],
+        }
     }
 }

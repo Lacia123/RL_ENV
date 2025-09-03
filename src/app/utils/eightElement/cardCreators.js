@@ -1,4 +1,4 @@
-import { parseMarkdownToTemplate, parseMarkdown } from './PSUIPParser.js';
+import { parseMarkdownToTemplate, parseMarkdown, parseEventSyntax } from './PSUIPParser.js';
 import { generateUUID } from './util.js';
 import { createCodeElement } from './codeCreators.js';
 import { createTableElement, extractTableOrChartData, getChartVariantFromConfig, createChartElement, generateChartSvg } from './tableCreators.js';
@@ -1279,7 +1279,15 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                 // 🆕 获取图表的 variant 配置
                                 const chartVariant = getChartVariantFromConfig(markdownResult.templatePath, cardStyleConfig);
 
-                                const chartElement = createChartElement(chartResult.chartType, '', chartResult.tableData, chartResult.tableContent, chartVariant, chartResult.chartTitle);
+                                // 🆕 解析图表事件
+                                const chartEvents = [];
+                                if (chartResult.originalFirstLine) {
+                                    const chartId = generateUUID();
+                                    const events = parseEventSyntax(chartResult.originalFirstLine, chartId);
+                                    chartEvents.push(...events);
+                                }
+
+                                const chartElement = createChartElement(chartResult.chartType, '', chartResult.tableData, chartResult.tableContent, chartVariant, chartResult.chartTitle, chartEvents);
 
                                 // 生成SVG图表 - 传递 variant 信息和标题
                                 const chartStyleConfig = {

@@ -55,7 +55,7 @@ const MARKDOWN_TEMPLATES = {
 ## 三、头部品牌分析
 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
 
-[chart:barh|AI-PC 市场份额]
+[chart:barh|AI-PC 市场份额][event:chart_changed(barh,bar,pie)]
 | 品牌 | 市场份额 | 增长率 |
 |------|----------|--------|
 | 联想 | 35% | +12% |
@@ -1687,9 +1687,6 @@ const EightElementAnalyzer = () => {
         getElementById: (id) => iframeDocument.getElementById(id),
         getComputedStyle: (el) => iframe.contentWindow.getComputedStyle(el)
       });
-
-      console.log('page measurements:', measurements);
-      console.log('使用的测量尺寸:', measureDimensions);
 
       setDomMeasurements(measurements);
     } catch (error) {
