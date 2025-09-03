@@ -1358,9 +1358,9 @@ const EightElementAnalyzer = () => {
     }
   }, [renderedHtml]);
 
-  // 🆕 监听iframe中的编辑事件
+  // 🆕 监听iframe中的编辑事件和图表切换事件
   useEffect(() => {
-    const handleMessage = (event) => {
+    const handleMessage = async (event) => {
       if (event.data && event.data.type === 'EDIT_EVENT') {
         console.log('🎯 收到iframe编辑事件:', event.data);
 
@@ -1372,11 +1372,38 @@ const EightElementAnalyzer = () => {
         // 确保切换到HTML预览标签页
         setVisibleTab('html');
       }
+      
+      // 🆕 处理图表切换事件
+      if (event.data && event.data.type === 'CHART_CHANGED_EVENT') {
+        console.log('📊 收到iframe图表切换事件:', event.data);
+        
+        // 获取图表元素数据
+        const { eventTargetId, currentChartType, nextChartType, chartTypes } = event.data;
+        
+        // 找到对应的图表元素并更新其类型
+        const updatedEightElement = await updateChartTypeInEightElement(eightElement, eventTargetId, nextChartType);
+        
+        if (updatedEightElement) {
+          // 更新八要素结构
+          setEightElement(updatedEightElement);
+          
+          // 重新渲染HTML
+          const newHtml = renderEightElementToHtml(updatedEightElement, {
+            width: dimensions.width,
+            height: dimensions.height
+          });
+          setRenderedHtml(newHtml.html);
+          
+          console.log('✅ 图表类型切换成功:', currentChartType, '->', nextChartType);
+        } else {
+          console.error('❌ 未找到要更新的图表元素:', eventTargetId);
+        }
+      }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [eightElement, dimensions]);
 
   // 处理动作选择
   const handleActionToggle = (actionName) => {
@@ -1866,14 +1893,12 @@ const EightElementAnalyzer = () => {
         // 垂直分割线 - 调整左右面板比例
         const deltaPercent = ((e.clientX - dragState.resizeStartPos.x) / containerRect.width) * 100;
         newLeftWidth = Math.max(20, Math.min(80, dragState.resizeStartSize.leftWidth + deltaPercent));
-        console.log('垂直拖拽:', e.clientX, deltaPercent, newLeftWidth);
         break;
       }
       case 'horizontal': {
         // 水平分割线 - 调整上下面板比例
         const deltaPercent = ((e.clientY - dragState.resizeStartPos.y) / containerRect.height) * 100;
         newTopHeight = Math.max(30, Math.min(90, dragState.resizeStartSize.topHeight + deltaPercent));
-        console.log('水平拖拽:', e.clientY, deltaPercent, newTopHeight);
         break;
       }
     }
@@ -2634,6 +2659,83 @@ const EightElementAnalyzer = () => {
       </div>
     </div>
   );
+};
+
+// 🆕 更新八要素结构中指定图表的类型
+const updateChartTypeInEightElement = async (eightElement, chartId, newChartType) => {
+  if (!eightElement) return null;
+  
+  // 深拷贝八要素结构
+  const updatedElement = JSON.parse(JSON.stringify(eightElement));
+  
+  // 递归查找并更新图表元素
+  const updateChartElement = async (element) => {
+    if (!element) return false;
+    
+    // 检查当前元素是否为目标图表
+    if (element.id === chartId && element.name === 'chart') {
+      console.log('🎯 找到目标图表元素:', chartId, '当前类型:', element.chartType, '新类型:', newChartType);
+      
+      // 更新图表类型
+      element.chartType = newChartType;
+      
+              // 重新生成SVG内容
+        try {
+          // 先创建图表元素以获取样式配置
+          const { createChartElement, generateChartSvg } = await import('../utils/eightElement/tableCreators.js');
+          const chartElement = createChartElement(
+            newChartType,
+            '', // 空的SVG内容，稍后生成
+            element.tableData || [],
+            element.tableContent || '',
+            element.variant || 'default',
+            element.chartTitle || '',
+            element.events || []
+          );
+          
+          // 提取样式配置
+          const chartStyleConfig = {
+            variant: 'normal',
+            title: chartElement.layout.title,
+            legend: chartElement.layout.legend,
+            axis: chartElement.layout.axis
+          };
+          
+          // 生成新的SVG内容
+          const svgContent = generateChartSvg(newChartType, element.tableData || [], chartStyleConfig, element.chartTitle);
+          
+          // 更新SVG内容
+          element.svgContent = svgContent;
+          
+          console.log('✅ 图表类型和SVG内容更新成功');
+          return true;
+        } catch (error) {
+          console.error('❌ 重新生成图表SVG失败:', error);
+          return false;
+        }
+    }
+    
+    // 递归检查子元素
+    if (element.layout && element.layout.children) {
+      for (const child of element.layout.children) {
+        if (await updateChartElement(child)) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  };
+  
+  // 执行更新
+  const updated = await updateChartElement(updatedElement);
+  
+  if (updated) {
+    return updatedElement;
+  } else {
+    console.error('❌ 未找到要更新的图表元素:', chartId);
+    return null;
+  }
 };
 
 export default EightElementAnalyzer; 

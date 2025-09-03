@@ -487,6 +487,55 @@ export function renderEightElementToHtml(eightElement, options = {}) {
               console.warn('⚠️ 未找到元素:', targetId);
             }
           });
+
+          // 🆕 为所有可点击的图表添加切换事件监听器
+          console.log('📊 开始绑定图表切换事件...');
+          const chartElements = document.querySelectorAll('[data-chart-clickable="true"]');
+          console.log('📊 找到可点击的图表数量:', chartElements.length);
+          
+                     chartElements.forEach(chartElement => {
+             const chartId = chartElement.id;
+             const currentChartType = chartElement.getAttribute('data-chart-type');
+             const chartTypesStr = chartElement.getAttribute('data-chart-types');
+             
+             if (chartTypesStr) {
+               try {
+                 const chartTypes = chartTypesStr.split(',').filter(type => type.trim());
+                 console.log('📊 为图表绑定切换事件:', chartId, '当前类型:', currentChartType, '可用类型:', chartTypes);
+                
+                chartElement.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  
+                  console.log('🎯 触发图表切换事件，图表ID:', chartId);
+                  
+                  // 找到当前类型在数组中的位置
+                  const currentIndex = chartTypes.indexOf(currentChartType);
+                  const nextIndex = (currentIndex + 1) % chartTypes.length;
+                  const nextChartType = chartTypes[nextIndex];
+                  
+                  console.log('🔄 切换图表类型:', currentChartType, '->', nextChartType);
+                  
+                  if (isInIframe) {
+                    // 🆕 在React环境中，发送消息给父窗口
+                    console.log('📤 发送图表切换事件到React父窗口');
+                    window.parent.postMessage({
+                      type: 'CHART_CHANGED_EVENT',
+                      eventTargetId: chartId,
+                      currentChartType: currentChartType,
+                      nextChartType: nextChartType,
+                      chartTypes: chartTypes
+                    }, '*');
+                  } else {
+                    // 🆕 在独立HTML中，调用API重新生成图表
+                    handleChartTypeChange(chartId, currentChartType, nextChartType, chartTypes);
+                  }
+                });
+              } catch (error) {
+                console.error('解析图表类型失败:', error);
+              }
+            }
+          });
         });
         
         // 🆕 监听来自React父窗口的消息
@@ -496,6 +545,83 @@ export function renderEightElementToHtml(eightElement, options = {}) {
             // React环境已经设置好了，不需要额外处理
           }
         });
+        
+        // 🆕 处理图表类型切换
+        async function handleChartTypeChange(chartId, currentChartType, nextChartType, chartTypes) {
+          try {
+            console.log('🔄 开始处理图表类型切换:', chartId, currentChartType, '->', nextChartType);
+            
+            // 获取图表元素数据
+            const elementData = findElementDataById(chartId);
+            if (!elementData) {
+              console.error('未找到图表元素数据:', chartId);
+              return;
+            }
+            
+            // 调用API重新生成图表
+            const response = await fetch('/api/markdown-to-eight-element', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                markdown: elementData.rawData || '',
+                chartType: nextChartType,
+                width: 800,
+                height: 500
+              })
+            });
+            
+            if (!response.ok) {
+              throw new Error('API调用失败: ' + response.status);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success && result.eightElement) {
+              // 找到新的图表元素
+              const newChartElement = findChartElementById(result.eightElement, chartId);
+              if (newChartElement && newChartElement.svgContent) {
+                // 更新图表内容
+                const chartElement = document.getElementById(chartId);
+                if (chartElement) {
+                  // 更新图表类型属性
+                  chartElement.setAttribute('data-chart-type', nextChartType);
+                  
+                  // 更新SVG内容
+                  chartElement.innerHTML = newChartElement.svgContent;
+                  
+                  console.log('✅ 图表切换成功:', currentChartType, '->', nextChartType);
+                }
+              } else {
+                console.error('未找到新的图表元素或SVG内容');
+              }
+            } else {
+              throw new Error(result.error || '图表切换失败');
+            }
+          } catch (error) {
+            console.error('❌ 图表切换失败:', error);
+            alert('图表切换失败: ' + error.message);
+          }
+        }
+        
+        // 🆕 辅助函数：在八要素结构中查找图表元素
+        function findChartElementById(element, targetId) {
+          if (!element) return null;
+          
+          if (element.id === targetId && element.name === 'chart') {
+            return element;
+          }
+          
+          if (element.layout && element.layout.children) {
+            for (const child of element.layout.children) {
+              const found = findChartElementById(child, targetId);
+              if (found) return found;
+            }
+          }
+          
+          return null;
+        }
         
         // 🆕 辅助函数：根据ID查找元素数据（从八要素结构中）
         function findElementDataById(targetId) {
@@ -2062,8 +2188,20 @@ function renderChartElement(element) {
         // 应用图表子元素样式到SVG内容
         const styledSvgContent = applyChartStyles(svgContent, element);
 
+        // 🆕 检查是否有图表切换事件
+        const hasChartChangedEvent = element.events && element.events.some(event => 
+            event.runtimeEventKey === 'chart_changed' && event.parameters && event.parameters.chartTypes
+        );
+
+        // 🆕 如果有图表切换事件，添加点击样式和事件属性
+        const clickStyle = hasChartChangedEvent ? 'cursor: pointer;' : '';
+        const clickAttr = hasChartChangedEvent ? 'data-chart-clickable="true"' : '';
+        const chartTypes = element.events.find(e => e.runtimeEventKey === 'chart_changed')?.parameters?.chartTypes || [];
+        const chartTypesAttr = hasChartChangedEvent ? 
+            `data-chart-types="${chartTypes.join(',')}"` : '';
+
         return `
-      <div id="${element.id || ''}" ${classAttr} data-element-type="chart" data-chart-type="${element.chartType || ''}" ${containerStyleAttr}>
+      <div id="${element.id || ''}" ${classAttr} data-element-type="chart" data-chart-type="${element.chartType || ''}" ${containerStyleAttr} style="${clickStyle}" ${clickAttr} ${chartTypesAttr}>
         ${styledSvgContent}
       </div>
     `;

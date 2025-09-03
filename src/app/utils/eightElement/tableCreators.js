@@ -266,6 +266,7 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
                 position: "relative",
                 width: "100%",
                 height: "auto",
+                cursor: "pointer",
                 ...layoutStyleConfig
             },
             // 图表子元素样式配置
