@@ -22,6 +22,14 @@ import CrepeMarkdownEditor from '../components/CrepeMarkdownEditor';
 // - **粗体** ~~删除线~~ 等 markdown 格式
 // - 数学公式 $inline$ 和 $$block$$
 // - 表格、代码块、引用等标准 markdown 语法
+/** 图表事件
+ * [chart:barh|AI-PC 市场份额][event:chart_changed(barh,bar,pie)]
+| 品牌 | 市场份额 | 增长率 |
+|------|----------|--------|
+| 联想 | 35% | +12% |
+| 苹果 | 28% | +8% |
+| 荣耀 | 18% | +15% |
+ */
 const MARKDOWN_TEMPLATES = {
   elegantCardSeries: {
     name: '🌟 优雅卡片系列',
@@ -55,7 +63,7 @@ const MARKDOWN_TEMPLATES = {
 ## 三、头部品牌分析
 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
 
-[chart:barh|AI-PC 市场份额][event:chart_changed(barh,bar,pie)]
+[chart:barh|AI-PC 市场份额]
 | 品牌 | 市场份额 | 增长率 |
 |------|----------|--------|
 | 联想 | 35% | +12% |
