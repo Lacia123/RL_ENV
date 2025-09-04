@@ -964,7 +964,6 @@ function processStyleReferences(processedElement, originalElement, styleConfig) 
                     }
 
                     
-                    // FOCUS: 这里没有 background 的解析
                     // 应用样式值
                     if (styleValue) {
                         styleValue = resolveToken(styleValue) || styleValue;
@@ -1431,15 +1430,37 @@ function computeElementStyle(element) {
     const isGalleryLayout = element._metadata?.variant === 'gallery' || 
                            (element.layout && element.layout.style && element.layout.style.columnCount);
 
-    // 处理layout.style，通过统一的引用处理逻辑
-    if (element.layout && element.layout.style) {
-        processStyleReferences({ computedStyle }, element, element.layout.style);
+    // 🆕 处理样式优先级：如果classStyle有和style中相同的属性key，就把style上的去掉，以classStyle为主
+    let processedStyle = element.layout?.style ? { ...element.layout.style } : {};
+    let processedClassStyle = element.layout?.classStyle ? { ...element.layout.classStyle } : {};
+
+    console.log('processedStyle', processedStyle)
+    
+    if (element.layout?.style && element.layout?.classStyle) {
+        // 找出classStyle中存在的属性，从style中移除, 另外要移除相关的自定义属性
+        Object.keys(element.layout.classStyle).forEach(classStyleKey => {
+            if (classStyleKey === 'flexDirection') {
+                delete processedStyle['layoutMode'];
+            } else if (classStyleKey === 'flexWrap') {
+                delete processedStyle['layoutWrap'];
+            } else if (classStyleKey === 'flexGrow') {
+                delete processedStyle['layoutGrow'];
+            }
+            if (processedStyle.hasOwnProperty(classStyleKey)) {
+                delete processedStyle[classStyleKey];
+            }
+        });
+    }
+
+    // 处理layout.style（已移除与classStyle冲突的属性）
+    if (Object.keys(processedStyle).length > 0) {
+        processStyleReferences({ computedStyle }, element, processedStyle);
     }
     
-    // 🆕 也处理layout.classStyle，确保属性样式被应用
-    if (element.layout && element.layout.classStyle) {
-        processStyleReferences({ computedStyle }, element, element.layout.classStyle);
-    }
+    // 处理layout.classStyle，确保属性样式被应用
+    // if (Object.keys(processedClassStyle).length > 0) {
+    //     processStyleReferences({ computedStyle }, element, processedClassStyle);
+    // }
 
     // 🆕 画廊布局特殊处理：确保使用多列布局而不是flex
     if (isGalleryLayout) {
@@ -1453,10 +1474,9 @@ function computeElementStyle(element) {
         delete computedStyle.alignItems;
         delete computedStyle.gap;  // 画廊使用marginBottom而不是gap
         
-        console.log(`🎨 画廊布局特殊处理: 强制设置display=block，移除flex属性`);
     } else {
         // 默认值处理：如果设置了display=flex但未设置flex方向，默认为column
-        if (computedStyle.display === 'flex' && !computedStyle.flexDirection) {
+        if (computedStyle.display === 'flex' && !processedClassStyle.flexDirection && !computedStyle.flexDirection) {
             computedStyle.flexDirection = 'column';
         }
     }
@@ -1655,6 +1675,9 @@ function renderElement(element) {
  * @returns {string} - 渲染的HTML字符串
  */
 function renderLayoutElement(element) {
+
+
+
     const styleAttr = generateStyleAttribute(element.computedStyle);
     const className = element.layout && element.layout.className ? element.layout.className : '';
     const classAttr = className ? `class="${className}"` : '';

@@ -37,8 +37,6 @@ function parseButtonVariant(text) {
 
     if (eventMatch) {
 
-        console.log('...... eventMatch', eventMatch)
-
         const [, buttonText, url] = eventMatch;
         return {
             hasVariant: true,
@@ -89,15 +87,15 @@ function createButtonElement(text, url, variant = 'primary', currentMarkdown = '
             },
             className: uniqueClassName,
             style: {
-                "background-color": [],
+                backgroundColor: [],
                 font: [],
                 border: [],
                 scale: [],
-                "white-space": "nowrap",
+                whiteSpace: "nowrap",
                 overflow: "hidden",
-                "text-overflow": "ellipsis",
-                "box-sizing": "border-box",
-                primaryAxisSizingMode: "fixed",
+                textOverflow: "ellipsis",
+                boxSizing: "border-box",
+                // primaryAxisSizingMode: "fixed",
                 position: "relative",
                 ...layoutStyleConfig,
                 padding: buttonStyleConfig.padding,

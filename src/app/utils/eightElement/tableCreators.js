@@ -165,7 +165,7 @@ function createTableElement(markdownTableContent) {
                 border: [],
                 scale: [],
                 "box-sizing": "border-box",
-                primaryAxisSizingMode: "fixed",
+                // primaryAxisSizingMode: "fixed",
                 position: "relative",
                 width: "100%",
                 ...layoutStyleConfig,
@@ -255,14 +255,13 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
             className: uniqueClassName,
             style: {
                 // 基础样式
-                "background-color": [],
+                backgroundColor: [],
                 font: [],
                 border: [],
                 scale: [],
-                "box-sizing": "border-box",
+                boxSizing: "border-box",
                 overflow: "hidden",
-                "box-sizing": "border-box",
-                primaryAxisSizingMode: "fixed",
+                // primaryAxisSizingMode: "fixed",
                 position: "relative",
                 width: "100%",
                 height: "auto",
@@ -367,7 +366,6 @@ function processTableOrChartData(result, stack) {
         }
     } else {
         // 处理为普通表格
-        console.log('处理普通表格数据');
         const tableElement = createTableElement(tableContent);
         stack[stack.length - 1].elements.push(tableElement);
     }

@@ -413,18 +413,6 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
             // 根据属性名称应用到相应的样式
             if (attrKey === 'background' || attrKey === 'backgroundColor') {
                 cardStyleConfig.style.background = resolvedValue;
-            } else if (attrKey === 'color') {
-                cardStyleConfig.style.color = resolvedValue;
-            } else if (attrKey === 'border') {
-                cardStyleConfig.style.border = resolvedValue;
-            } else if (attrKey === 'borderColor') {
-                cardStyleConfig.style.borderColor = resolvedValue;
-            } else if (attrKey === 'borderRadius') {
-                cardStyleConfig.style.borderRadius = resolvedValue;
-            } else if (attrKey === 'padding') {
-                cardStyleConfig.style.padding = resolvedValue;
-            } else if (attrKey === 'margin') {
-                cardStyleConfig.style.margin = resolvedValue;
             } else {
                 // 对于其他未知属性，直接添加到样式
                 cardStyleConfig.style[attrKey] = resolvedValue;
@@ -471,19 +459,19 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
                     display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
                     layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
                     layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
-                    primaryAxisSizingMode: "fixed",
+                    // primaryAxisSizingMode: "fixed",
                     layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
                     boxSizing: "border-box",
-                    "border-style": "solid",
-                    "border-width": "0",
-                    "border-color": "initial",
+                    borderStyle: "solid",
+                    borderWidth: "0",
+                    borderColor: "initial",
                     height: "auto",
                     width: "100%",
-                    "box-sizing": "border-box",
-                    "back-width": "100%",
-                    "back-height": "auto",
+                    boxSizing: "border-box",
+                    // "back-width": "100%",
+                    // "back-height": "auto",
                     position: "relative",
-                    ...cardStyleConfig.style // 应用模板样式
+                    // ...cardStyleConfig.style // 应用模板样式
                 },
                 classStyle: {
                     ...cardStyleConfig.style
@@ -506,11 +494,11 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
         });
 
         // 应用卡片样式到布局
-        Object.entries(cardStyleConfig).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-                baseLayout.style[key] = value;
-            }
-        });
+        // Object.entries(cardStyleConfig).forEach(([key, value]) => {
+        //     if (value !== undefined && value !== null) {
+        //         baseLayout.style[key] = value;
+        //     }
+        // });
 
         const cardElement = {
             dataKeys: [],
@@ -580,7 +568,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
                 className: uniqueClassName,
                 layout: {
                     direction: tagConfig.style?.flexDirection === 'row' ? 'horizontal' : 'vertical',
-                    style: tagConfig.style || {},
+                    // style: tagConfig.style || {},
                     children: nestedElements,
                     classStyle: {
                         ...(tagConfig.style || {})
@@ -704,17 +692,17 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
                         display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
                         layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
                         layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
-                        primaryAxisSizingMode: "fixed",
+                        // primaryAxisSizingMode: "fixed",
                         // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
                         boxSizing: "border-box",
-                        "border-style": "solid",
-                        "border-width": "0",
-                        "border-color": "initial",
+                        borderStyle: "solid",
+                        borderWidth: "0",
+                        borderColor: "initial",
                         height: "auto",
                         width: "100%",
-                        "box-sizing": "border-box",
+                        boxSizing: "border-box",
                         position: "relative",
-                        ...finalStyle // 容器使用基础样式
+                        // ...finalStyle // 容器使用基础样式
                     },
                     classStyle: {
                         ...finalStyle // 容器使用基础样式
@@ -766,19 +754,19 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
                 display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
                 layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
                 layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
-                primaryAxisSizingMode: "fixed",
+                // primaryAxisSizingMode: "fixed",
                 // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
                 boxSizing: "border-box",
-                "border-style": "solid",
-                "border-width": "0",
-                "border-color": "initial",
+                borderStyle: "solid",
+                borderWidth: "0",
+                borderColor: "initial",
                 height: "auto",
                 width: "100%",
-                "box-sizing": "border-box",
-                "back-width": "100%",
-                "back-height": "auto",
+                boxSizing: "border-box",
+                // "back-width": "100%",
+                // "back-height": "auto",
                 position: "relative",
-                ...(tagConfig.style || {}) // 应用标签样式
+                // ...(tagConfig.style || {}) // 应用标签样式
             },
             classStyle: {
                 ...(tagConfig.style || {})

@@ -193,8 +193,8 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}, custo
             },
             className: uniqueClassName,
             style: {
-                "box-sizing": "border-box",
-                primaryAxisSizingMode: "fixed",
+                boxSizing: "border-box",
+                // primaryAxisSizingMode: "fixed",
                 position: "relative",
                 width: elementWidth, // 设置宽度
             },
@@ -251,7 +251,7 @@ function createTextElement(text, variant = 'normal', richTextOptions = {}, custo
                 style: {
                     layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
                     layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
-                    "text-decoration": "underline",
+                    textDecoration: "underline",
                     // "word-break": "break-all",
                     width: elementWidth, // 设置宽度
                     textColor: {
@@ -392,23 +392,21 @@ function createHeadingBlockContainer(headingLayout) {
             style: {
                 display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
                 layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
-                "align-self": "flex-start", // 确保自身左对齐
+                alignSelf: "flex-start",
                 // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
                 boxSizing: "border-box",
-                "border-style": "solid",
-                "border-width": "0",
-                "border-color": "initial",
+                borderStyle: "solid",
+                borderWidth: "0",
+                borderColor: "initial",
                 height: "auto",
                 width: "100%",
                 minWidth: "375px",  // 设置最小宽度为375px
                 maxWidth: "50%",    // 设置最大宽度为50%，确保一行最多两个
                 // 添加flex-basis属性，使其在流式布局中正确工作
-                "flex-basis": "375px",
-                "flex-grow": "1",
-                "flex-shrink": "0",
-                "box-sizing": "border-box",
-                "back-width": "100%",
-                "back-height": "auto",
+                flexBasis: "375px",
+                flexGrow: "1",
+                flexShrink: "0",
+                boxSizing: "border-box",
                 position: "relative",
                 padding: DIMENSION_CONSTANTS.PADDING.base,
                 margin: DIMENSION_CONSTANTS.MARGIN.tight

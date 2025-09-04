@@ -34,13 +34,13 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
             },
             className: uniqueClassName,
             style: {
-                "background-color": [],
+                backgroundColor: [],
                 font: [],
                 border: [],
                 scale: [],
                 overflow: "hidden",
-                "box-sizing": "border-box",
-                primaryAxisSizingMode: "fixed",
+                boxSizing: "border-box",
+                // primaryAxisSizingMode: "fixed",
                 position: "relative",
                 ...layoutStyleConfig
             },
