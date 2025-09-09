@@ -822,8 +822,22 @@ function generateStyleProperties(styleObj) {
     Object.entries(styleObj).forEach(([property, value]) => {
         if (value === null || value === undefined) return;
         
-        // 解析token值
-        let resolvedValue = resolveToken(value) || value;
+        let resolvedValue = value;
+        
+        // 🆕 处理包含多个token的复合值
+        if (typeof value === 'string' && value.includes('{') && value.includes('}')) {
+            // 找到所有token并逐个解析
+            resolvedValue = value.replace(/\{[^}]+\}/g, (match) => {
+                const tokenResult = resolveToken(match);
+                return tokenResult || match; // 如果解析失败，保持原值
+            });
+            
+            // 🐛 调试日志：记录token解析
+            console.log(`🎯 Token解析: ${property}: ${value} -> ${resolvedValue}`);
+        } else {
+            // 单个token解析（保持向后兼容）
+            resolvedValue = resolveToken(value) || value;
+        }
         
         // 转换属性名为CSS格式
         const cssProperty = convertToCSSProperty(property);

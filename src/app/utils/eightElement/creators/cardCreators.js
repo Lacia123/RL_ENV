@@ -174,6 +174,7 @@ function collectGroupItems(lines, startIndex, groupConfig, cardStyleConfig) {
     const groupPattern = groupConfig.pattern;
     const groupItems = [];
     let i = startIndex;
+    
 
     while (i < lines.length) {
         const currentGroupItem = {
@@ -462,9 +463,9 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
                     // primaryAxisSizingMode: "fixed",
                     layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
                     boxSizing: "border-box",
-                    borderStyle: "solid",
-                    borderWidth: "0",
-                    borderColor: "initial",
+                    // borderStyle: "solid",
+                    // borderWidth: "0",
+                    // borderColor: "initial",
                     height: "auto",
                     width: "100%",
                     boxSizing: "border-box",
@@ -543,6 +544,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
         console.warn(`警告: 未找到模板标签 ${tagName} 的配置`);
         return null;
     }
+    
 
     // 🆕 检查是否有嵌套的markdownMapping，如果有，需要递归解析内容
     if (tagConfig.markdownMapping && content && content.trim()) {
@@ -568,7 +570,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
                 className: uniqueClassName,
                 layout: {
                     direction: tagConfig.style?.flexDirection === 'row' ? 'horizontal' : 'vertical',
-                    // style: tagConfig.style || {},
+                    style: tagConfig.style || {},
                     children: nestedElements,
                     classStyle: {
                         ...(tagConfig.style || {})
@@ -695,9 +697,9 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
                         // primaryAxisSizingMode: "fixed",
                         // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
                         boxSizing: "border-box",
-                        borderStyle: "solid",
-                        borderWidth: "0",
-                        borderColor: "initial",
+                        // borderStyle: "solid",
+                        // borderWidth: "0",
+                        // borderColor: "initial",
                         height: "auto",
                         width: "100%",
                         boxSizing: "border-box",
@@ -757,9 +759,9 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
                 // primaryAxisSizingMode: "fixed",
                 // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
                 boxSizing: "border-box",
-                borderStyle: "solid",
-                borderWidth: "0",
-                borderColor: "initial",
+                // borderStyle: "solid",
+                // borderWidth: "0",
+                // borderColor: "initial",
                 height: "auto",
                 width: "100%",
                 boxSizing: "border-box",
@@ -778,6 +780,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
         id,
         events: [{}]
     };
+
 
     return templateElement;
 }

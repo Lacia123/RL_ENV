@@ -2575,9 +2575,8 @@ export const DEFAULT_STYLE_CONFIG = {
       type: 'template',
       markdownMapping: {
         h2: 'title',
-        h3: 'listContainer.listTitle',
-        'li:*': 'listContainer.list.item*',
-        ul: 'listContainer.list',  // 🆕 无序列表映射到列表容器
+        h3: 'content.groupTitle',
+        ul: 'content.groupList',
         p: 'summary.text'
       },
       style: {
@@ -2642,7 +2641,7 @@ export const DEFAULT_STYLE_CONFIG = {
         metaType: 'text',
         variant: 'elegantCardTitle',
       },
-      listContainer: {
+      content: {
         type: 'template',
         style: {
           display: 'flex',
@@ -2681,8 +2680,8 @@ export const DEFAULT_STYLE_CONFIG = {
           '& > *:last-child::before': {
             content: "''",
             position: 'absolute',
-            bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
-            right: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
+            bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`,
+            right: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`,
             width: '6px',
             height: '6px',
             borderRadius: '50%',
@@ -2692,8 +2691,8 @@ export const DEFAULT_STYLE_CONFIG = {
           '& > *:last-child::after': {
             content: "''",
             position: 'absolute',
-            bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
-            left: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`, // 相对于content容器的位置
+            bottom: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`,
+            left: `calc(-{dimension.padding.extraloose} + {dimension.padding.base})`,
             width: '6px',
             height: '6px',
             borderRadius: '50%',
@@ -2701,33 +2700,24 @@ export const DEFAULT_STYLE_CONFIG = {
             boxShadow: `{material.hierarchy.main}`,
           },
         },
-        listTitle: {
-          style: {
-            position: 'relative',
-          },
+        groupTitle: {
           metaType: 'text',
           variant: 'elegantCardSubtitle',
-        },
-        list: {
-          type: 'template',
           style: {
-            display: 'flex',
-            flex: '1',
-            flexDirection: 'column',
-            gap: "{dimension.gap.tight}",
             marginTop: "{dimension.margin.base}",
+            marginBottom: "{dimension.margin.tight}"
+          }
+        },
+        groupList: {
+          metaType: 'text',
+          variant: 'elegantCardSegment',
+          style: {
+            padding: "{dimension.padding.tight} {dimension.padding.base}",
+            background: "{color.secondarycontainer.violet0}",
+            borderRadius: "{dimension.borderradius.medium}",
+            borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`,
             position: 'relative',
-          },
-          'item*': {
-            metaType: 'text',
-            variant: 'elegantCardSegment',
-            style: {
-              padding: "{dimension.padding.tight} {dimension.padding.base}",
-              background: "{color.secondarycontainer.violet0}",
-              borderRadius: "{dimension.borderradius.medium}",
-              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`
-            }
-          },
+          }
         }
       },
       summary: {
