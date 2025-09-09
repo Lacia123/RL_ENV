@@ -144,6 +144,30 @@ function createJsdomEnv(width = 800, height = 500) {
     .bar-color-brand4 {
       fill: ${colorBrand4}; 
     }
+    .area {
+      fill-opacity: 0.6;
+    }
+    .area-color-brand6 {
+      fill: ${colorBrand6}; 
+    }
+    .area-color-brand5 {
+      fill: ${colorBrand5}; 
+    }
+    .area-color-brand4 {
+      fill: ${colorBrand4}; 
+    }
+    .donut {
+      fill-opacity: 1;
+    }
+    .donut-color-brand6 {
+      fill: ${colorBrand6}; 
+    }
+    .donut-color-brand5 {
+      fill: ${colorBrand5}; 
+    }
+    .donut-color-brand4 {
+      fill: ${colorBrand4}; 
+    }
   `);
   
   return {
@@ -178,10 +202,9 @@ function generateLegend(g, innerHeight, items, displayConfig, chartStyleConfig, 
     .attr('transform', `translate(0, ${innerHeight + yOffset})`);
   
   // 🆕 动态计算图例位置 - 调整间距避免重叠
-  const legendItemWidth = displayConfig.isSmallChart ? 150 : 160; 
+  const legendItemWidth = displayConfig.isSmallChart ? 140 : 160; 
   const legendItemHeight = displayConfig.isSmallChart ? 20 : 24;
-  const legendItemsPerRow = Math.min(3, items.length);
-  const legendWidth = legendItemsPerRow * legendItemWidth;
+  const legendItemsPerRow = Math.min(6, items.length);
   
   items.forEach((item, i) => {
     const row = Math.floor(i / legendItemsPerRow);
@@ -221,6 +244,25 @@ function generateLegend(g, innerHeight, items, displayConfig, chartStyleConfig, 
         .attr('height', 12)
         .attr('class', `bar bar-${item.colorClass}`)
         .attr('fill', '#000');
+    } else if (item.type === 'area') {
+      // 绘制面积图样式示例
+      legendItem.append('path')
+        .attr('d', 'M0,12 L15,3 L15,12 Z')
+        .attr('class', `area area-${item.colorClass}`)
+        .attr('fill', '#000')
+        .attr('fill-opacity', item.style?.fillOpacity || 0.6)
+        .attr('stroke', '#000')
+        .attr('stroke-width', item.style?.strokeWidth || 2);
+    } else if (item.type === 'donut') {
+      // 绘制环状图样式示例
+      legendItem.append('circle')
+        .attr('cx', 7.5)
+        .attr('cy', 6)
+        .attr('r', 6)
+        .attr('class', `donut donut-${item.colorClass}`)
+        .attr('fill', '#000')
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 1);
     }
     
     // 获取图例样式配置
@@ -349,12 +391,16 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
         return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'line':
         return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
+      case 'area_chart':
+        return generateAreaChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'bar':
         return generateBarChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'barh':
         return generateBarHChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'pie':
         return generatePieChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
+      case 'donut_chart':
+        return generateDonutChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       default:
         // 默认使用分组折线图
         return generateGroupedLineChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
@@ -1206,6 +1252,419 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
 }
 
 /**
+ * 生成面积图
+ * @param {Array} data - 图表数据
+ * @param {string} dateField - 日期字段名
+ * @param {Array} valueFields - 值字段名数组
+ * @param {number} width - 图表宽度
+ * @param {number} height - 图表高度
+ * @param {Object} margin - 图表边距
+ * @param {Object} chartStyleConfig - 图表样式配置
+ * @param {Object} displayConfig - 显示配置（字体大小、刻度数量等）
+ * @param {string} chartTitle - 图表标题（可选）
+ * @returns {string} - SVG图表的HTML字符串
+ */
+function generateAreaChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
+  try {
+    console.log('生成面积图, 数据点数:', data.length, '数据系列数:', valueFields.length);
+    
+    const { svg, document } = createJsdomEnv(width, height);
+    
+    const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
+    const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
+    const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
+    const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
+    
+    const colorValues = [
+      colorBrand5,
+      colorBrand4,
+      colorBrand3,
+      '#76b7b2', 
+      '#59a14f', 
+      '#edc949', 
+      '#af7aa1', 
+      '#ff9da7', 
+      '#9c755f', 
+      '#bab0ab'
+    ];
+
+    const colorClass = [
+      'color-brand6',
+      'color-brand5',
+      'color-brand4'
+    ];
+    
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    
+    // 🆕 有标题时整个图表向下移动，为图例留出空间
+    const chartOffsetY = chartTitle ? 25 : 0;
+    const g = svg.append('g')
+      .attr('transform', `translate(${margin.left},${margin.top + chartOffsetY})`);
+    
+    const xValues = data.map(d => d[dateField]);
+    
+    let allValues = [];
+    valueFields.forEach(field => {
+      allValues = allValues.concat(data.map(d => d[field]));
+    });
+    
+    // 🆕 优化Y轴范围，面积图通常从0开始
+    const yMin = 0;
+    const yMax = Math.max(...allValues) * 1.05; // 上限留5%空间
+    
+    const xScale = d3.scalePoint()
+      .domain(xValues)
+      .range([0, innerWidth])
+      .padding(0.3);
+    
+    const yScale = d3.scaleLinear()
+      .domain([yMin, yMax])
+      .range([innerHeight, 0]);
+    
+    // 🆕 根据图表大小选择合适的轴配置
+    const currentAxisConfig = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
+    const resolvedAxisFontSize = resolveToken(currentAxisConfig.fontSize);
+    const resolvedAxisFontWeight = resolveToken(currentAxisConfig.fontWeight);
+    const resolvedAxisFill = resolveToken(currentAxisConfig.fill);
+    
+    // 添加X轴网格线
+    g.append('g')
+      .attr('class', 'grid x-grid')
+      .selectAll('line')
+      .data(xValues)
+      .enter()
+      .append('line')
+      .attr('x1', d => xScale(d))
+      .attr('y1', 0)
+      .attr('x2', d => xScale(d))
+      .attr('y2', innerHeight)
+      .attr('stroke', '#e0e0e0')
+      .attr('stroke-opacity', 0.7);
+    
+    // 添加Y轴网格线
+    const yTickCount = displayConfig.yTickCount || 5;
+    const yTicks = yScale.ticks(yTickCount);
+    g.append('g')
+      .attr('class', 'grid y-grid')
+      .selectAll('line')
+      .data(yTicks)
+      .enter()
+      .append('line')
+      .attr('x1', 0)
+      .attr('y1', d => yScale(d))
+      .attr('x2', innerWidth)
+      .attr('y2', d => yScale(d))
+      .attr('stroke', '#e0e0e0')
+      .attr('stroke-opacity', 0.7);
+    
+    // 绘制面积图 - 为每个数据系列创建面积
+    valueFields.forEach((field, fieldIndex) => {
+      const color = colorValues[fieldIndex % colorValues.length];
+      const colorClassSuffix = colorClass[fieldIndex % colorClass.length];
+      
+      const areaData = data.map(d => ({ x: d[dateField], y: d[field] }));
+      
+      // 创建面积生成器
+      const area = d3.area()
+        .x(d => xScale(d.x))
+        .y0(yScale(0)) // 面积图底部始终在y=0处
+        .y1(d => yScale(d.y))
+        .curve(d3.curveMonotoneX); // 使用平滑曲线
+      
+      // 绘制面积
+      g.append('path')
+        .attr('class', `area area-${colorClassSuffix}`)
+        .attr('d', area(areaData))
+        .attr('fill', '#000')
+        .attr('fill-opacity', 0.6)
+        .attr('stroke', '#000')
+        .attr('stroke-width', 2);
+      
+      // 添加数据点
+      g.selectAll(`.dot-${colorClassSuffix}`)
+        .data(areaData)
+        .enter()
+        .append('circle')
+        .attr('class', `dot dot-${colorClassSuffix}`)
+        .attr('cx', d => xScale(d.x))
+        .attr('cy', d => yScale(d.y))
+        .attr('r', displayConfig.dotRadius || 4)
+        .attr('fill', '#000')
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 1.5);
+      
+      // 添加数值标签
+      g.selectAll(`.data-label-${colorClassSuffix}`)
+        .data(areaData)
+        .enter()
+        .append('text')
+        .attr('class', `data-label data-label-${colorClassSuffix}`)
+        .attr('x', d => xScale(d.x))
+        .attr('y', d => yScale(d.y) - 8)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', displayConfig.dataLabelSize || '8px')
+        .attr('fill', '#000')
+        .attr('font-weight', 'normal')
+        .attr('stroke', 'white')
+        .attr('stroke-width', '2px')
+        .attr('stroke-opacity', '0.85')
+        .attr('paint-order', 'stroke')
+        .text(d => d.y.toFixed(1));
+    });
+    
+    // 添加X轴
+    const xAxis = g.append('g')
+      .attr('class', 'axis x-axis')
+      .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px')
+      .attr('transform', `translate(0,${innerHeight})`);
+    
+    // 获取轴样式配置
+    const axisClassName = chartStyleConfig?.axis?.className || 'axis-label';
+    
+    // 🆕 显示所有X轴标签，优化日期显示
+    xAxis.selectAll('g')
+      .data(xValues)
+      .enter()
+      .append('g')
+      .attr('transform', d => `translate(${xScale(d)},0)`)
+      .append('text')
+      .attr('class', axisClassName)
+      .attr('y', 9)
+      .attr('dy', '.71em')
+      .attr('transform', displayConfig.xLabelRotation ? `rotate(${displayConfig.xLabelRotation})` : 'rotate(45)')
+      .attr('text-anchor', displayConfig.xLabelRotation <= 15 ? 'middle' : 'start')
+      .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px')
+      .attr('font-weight', resolvedAxisFontWeight || '400')
+      .attr('fill', resolvedAxisFill || '#666')
+      .text(d => {
+        // 🆕 优化日期显示，截取月-日部分
+        if (d.includes('.')) {
+          const parts = d.split('.');
+          if (parts.length === 3) {
+            return `${parts[1]}.${parts[2]}`; // 显示 "04.10" 而不是 "2025.04.10"
+          }
+        }
+        return d;
+      });
+    
+    // 添加Y轴
+    const yAxis = g.append('g')
+      .attr('class', 'axis y-axis');
+    
+    yAxis.selectAll('g')
+      .data(yTicks)
+      .enter()
+      .append('g')
+      .attr('transform', d => `translate(0,${yScale(d)})`)
+      .call(g => {
+        g.append('line')
+          .attr('x2', -6)
+          .attr('stroke', '#666');
+        g.append('text')
+          .attr('class', axisClassName)
+          .attr('x', -9)
+          .attr('dy', '.32em')
+          .attr('text-anchor', 'end')
+          .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px')
+          .attr('font-weight', resolvedAxisFontWeight || '400')
+          .attr('fill', resolvedAxisFill || '#666')
+          .text(d => {
+            // 🆕 智能格式化数字：整数不显示小数点，小数最多显示1位
+            if (d % 1 === 0) {
+              return d.toString();
+            } else if (Math.abs(d) >= 100) {
+              return d.toFixed(0);
+            } else {
+              return d.toFixed(1);
+            }
+          });
+      });
+    
+    // 🆕 添加图表标题（使用SVG绝对坐标确保所有图表标题在同一行）
+    if (chartTitle) {
+      const titleFontSize = resolveToken(titleConfig.fontSize)
+      const titleFontWeight = titleConfig.fontWeight
+      const titleFill = resolveToken(titleConfig.fill)
+      
+      svg.append('text')
+        .attr('x', width / 2)
+        .attr('y', 25)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', titleFontSize)
+        .attr('font-weight', titleFontWeight)
+        .attr('fill', titleFill)
+        .text(chartTitle);
+    }
+
+    // 生成图例数据
+    const legendItems = valueFields.map((field, i) => ({
+      label: field,
+      color: colorValues[i % colorValues.length],
+      colorClass: colorClass[i % colorClass.length],
+      type: 'area',
+      style: { fillOpacity: 0.6, strokeWidth: 2 }
+    }));
+    
+    // 使用封装的图例生成函数
+    generateLegend(g, innerHeight, legendItems, displayConfig, chartStyleConfig, 80);
+    
+    // 将SVG转换为字符串
+    return svg.node().outerHTML;
+  } catch (error) {
+    console.error('生成面积图时发生错误:', error);
+    return generateErrorSvg('生成面积图失败: ' + error.message);
+  }
+}
+
+/**
+ * 生成环状图（甜甜圈图）
+ * @param {Array} data - 图表数据
+ * @param {string} dateField - 标签字段名（环状图中为类别标签）
+ * @param {Array} valueFields - 值字段名数组（环状图中为数值）
+ * @param {number} width - 图表宽度
+ * @param {number} height - 图表高度
+ * @param {Object} margin - 图表边距
+ * @param {Object} chartStyleConfig - 图表样式配置
+ * @param {Object} displayConfig - 显示配置（字体大小、刻度数量等）
+ * @param {string} chartTitle - 图表标题（可选）
+ * @returns {string} - SVG图表的HTML字符串
+ */
+function generateDonutChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
+  try {
+    console.log('生成环状图, 数据点数:', data.length, '值字段:', valueFields);
+    
+    // 创建JSDOM环境
+    const { svg, document } = createJsdomEnv(width, height);
+    
+    // 解析颜色配置
+    const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
+    const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
+    const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
+    const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
+    
+    // 扩展颜色数组用于多个扇形
+    const colorValues = [
+      colorBrand5,
+      colorBrand4,
+      colorBrand3,
+      colorBrand6,
+      '#76b7b2', 
+      '#59a14f', 
+      '#edc949', 
+      '#af7aa1', 
+      '#ff9da7', 
+      '#9c755f', 
+      '#bab0ab'
+    ];
+    
+    // 处理环状图数据 - 使用第一个值字段
+    const valueField = valueFields[0];
+    const donutData = data.map(d => {
+      let rawValue = d[valueField];
+      // 🆕 处理数值：移除 "万" 等后缀并转换为数字
+      let numericValue = parseFloat(rawValue.toString().replace(/[万千百十]/g, '')) || 0;
+      
+      return {
+        name: d[dateField],
+        value: numericValue,
+        originalValue: rawValue // 保留原始值用于显示
+      };
+    });
+    
+    const currentAxisConfig = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
+    const resolvedAxisFontSize = resolveToken(currentAxisConfig.fontSize);
+    
+    // 计算图表区域
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    
+    // 🆕 优化环状图半径，减少留白，提高空间利用率
+    const baseRadius = Math.min(innerWidth, innerHeight) / 2;
+    const radius = displayConfig.isSmallChart ? 
+      baseRadius - 10 :  // 小图表：减少留白
+      baseRadius - 20;   // 普通图表：保留一些空间给标签
+    
+    // 🆕 添加图表标题
+    if (chartTitle) {
+      const titleFontSize = resolveToken(titleConfig.fontSize)
+      const titleFontWeight = titleConfig.fontWeight
+      const titleFill = resolveToken(titleConfig.fill)
+      
+      svg.append('text')
+        .attr('x', width / 2)  // 环状图使用完整宽度的一半
+        .attr('y', 25)         // 🆕 与其他图表保持一致的Y坐标
+        .attr('text-anchor', 'middle')
+        .attr('font-size', titleFontSize)
+        .attr('font-weight', titleFontWeight)
+        .attr('fill', titleFill)
+        .text(chartTitle);
+    }
+
+    // 创建主图表组，居中定位（如果有标题则向下移动）
+    const g = svg.append('g')
+      .attr('transform', `translate(${width / 2},${height / 2 + (chartTitle ? 15 : 0)})`);
+    
+    // 创建环状图生成器
+    const pie = d3.pie()
+      .value(d => d.value)
+      .sort(null) // 不排序，保持原始顺序
+      .padAngle(1 / radius); // 🆕 添加扇形间距，基于半径动态调整
+    
+    // 创建弧形生成器 - 环状图有内半径
+    const arc = d3.arc()
+      .innerRadius(radius * 0.67) // 🆕 内半径，创建环状效果
+      .outerRadius(radius - 1);   // 外半径，留1px边距
+    
+    // 创建标签弧形（稍微外移）
+    const labelArc = d3.arc()
+      .innerRadius(radius + 10)
+      .outerRadius(radius + 10);
+    
+    // 生成环状图扇形
+    const arcs = g.selectAll('.arc')
+      .data(pie(donutData))
+      .enter()
+      .append('g')
+      .attr('class', 'arc');
+    
+    // 绘制扇形
+    arcs.append('path')
+      .attr('d', arc)
+      .attr('fill', (d, i) => colorValues[i % colorValues.length])
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 2);
+    
+    // 添加标签 - 只在扇形足够大时显示
+    arcs.append('text')
+      .attr('transform', d => `translate(${labelArc.centroid(d)})`)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', resolvedAxisFontSize || displayConfig.dataLabelSize || '8px')
+      .attr('fill', '#333')
+      .attr('font-weight', 'bold')
+      .text(d => d.data.name);
+    
+    // 添加数值标签（显示在扇形内部）
+    arcs.append('text')
+      .attr('transform', d => `translate(${arc.centroid(d)})`)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', resolvedAxisFontSize || displayConfig.dataLabelSize || '8px')
+      .attr('fill', '#fff')
+      .attr('font-weight', 'bold')
+      .attr('stroke', '#000')
+      .attr('stroke-width', '0.5px')
+      .attr('paint-order', 'stroke')
+      .text(d => d.data.originalValue); // 🆕 显示原始值（包含"万"等后缀）
+    
+    // 将SVG转换为字符串
+    return svg.node().outerHTML;
+  } catch (error) {
+    console.error('生成环状图时发生错误:', error);
+    return generateErrorSvg('生成环状图失败: ' + error.message);
+  }
+}
+
+/**
  * 生成饼图
  * @param {Array} data - 图表数据
  * @param {string} dateField - 标签字段名（饼图中为类别标签）
@@ -1451,8 +1910,10 @@ function generateErrorSvg(errorMessage) {
 export default {
   generateChartFromTableData,
   generateGroupedLineChart,
+  generateAreaChart,
   generateBarChart,
   generateBarHChart,
   generatePieChart,
+  generateDonutChart,
   generateErrorSvg
 }; 

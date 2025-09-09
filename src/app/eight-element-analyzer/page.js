@@ -87,6 +87,33 @@ const MARKDOWN_TEMPLATES = {
 
 </card:headerCard>
 
+<card:headerCard background={color.primarycontainer.brand0}>
+## 四、市场图表示例
+为了更直观地展示不同图表类型，这里提供柱状图、面积图和环状图的对比示例。
+
+[chart:bar|季度销售额（万元）]
+| 季度 | 销售额 |
+|------|--------|
+| Q1 | 120 |
+| Q2 | 180 |
+| Q3 | 240 |
+| Q4 | 320 |
+
+[chart:area_chart|AI-PC 趋势]
+| 时间 | 出货量 | 渗透率 |
+|------|--------|--------|
+| 2025.04 | 100 | 20 |
+| 2025.05 | 160 | 24 |
+| 2025.06 | 210 | 28 |
+
+[chart:donut_chart|产品占比]
+| 类型 | 占比 |
+|------|------|
+| 轻薄本 | 45 |
+| 游戏本 | 35 |
+| 工作站 | 20 |
+</card:headerCard>
+
 <layout:bgColumn background={color.onprimary.white100}>
 
 <layout:row>
@@ -1374,28 +1401,28 @@ const EightElementAnalyzer = () => {
         // 确保切换到HTML预览标签页
         setVisibleTab('html');
       }
-      
+
       // 🆕 处理图表切换事件
       if (event.data && event.data.type === 'CHART_CHANGED_EVENT') {
         console.log('📊 收到iframe图表切换事件:', event.data);
-        
+
         // 获取图表元素数据
         const { eventTargetId, currentChartType, nextChartType, chartTypes } = event.data;
-        
+
         // 找到对应的图表元素并更新其类型
         const updatedEightElement = await updateChartTypeInEightElement(eightElement, eventTargetId, nextChartType);
-        
+
         if (updatedEightElement) {
           // 更新八要素结构
           setEightElement(updatedEightElement);
-          
+
           // 重新渲染HTML
           const newHtml = renderEightElementToHtml(updatedEightElement, {
             width: dimensions.width,
             height: dimensions.height
           });
           setRenderedHtml(newHtml.html);
-          
+
           console.log('✅ 图表类型切换成功:', currentChartType, '->', nextChartType);
         } else {
           console.error('❌ 未找到要更新的图表元素:', eventTargetId);
@@ -2666,57 +2693,57 @@ const EightElementAnalyzer = () => {
 // 🆕 更新八要素结构中指定图表的类型
 const updateChartTypeInEightElement = async (eightElement, chartId, newChartType) => {
   if (!eightElement) return null;
-  
+
   // 深拷贝八要素结构
   const updatedElement = JSON.parse(JSON.stringify(eightElement));
-  
+
   // 递归查找并更新图表元素
   const updateChartElement = async (element) => {
     if (!element) return false;
-    
+
     // 检查当前元素是否为目标图表
     if (element.id === chartId && element.name === 'chart') {
       console.log('🎯 找到目标图表元素:', chartId, '当前类型:', element.chartType, '新类型:', newChartType);
-      
+
       // 更新图表类型
       element.chartType = newChartType;
-      
-              // 重新生成SVG内容
-        try {
-          // 先创建图表元素以获取样式配置
-          const { createChartElement, generateChartSvg } = await import('../utils/eightElement/creators/tableCreators.js');
-          const chartElement = createChartElement(
-            newChartType,
-            '', // 空的SVG内容，稍后生成
-            element.tableData || [],
-            element.tableContent || '',
-            element.variant || 'default',
-            element.chartTitle || '',
-            element.events || []
-          );
-          
-          // 提取样式配置
-          const chartStyleConfig = {
-            variant: 'normal',
-            title: chartElement.layout.title,
-            legend: chartElement.layout.legend,
-            axis: chartElement.layout.axis
-          };
-          
-          // 生成新的SVG内容
-          const svgContent = generateChartSvg(newChartType, element.tableData || [], chartStyleConfig, element.chartTitle);
-          
-          // 更新SVG内容
-          element.svgContent = svgContent;
-          
-          console.log('✅ 图表类型和SVG内容更新成功');
-          return true;
-        } catch (error) {
-          console.error('❌ 重新生成图表SVG失败:', error);
-          return false;
-        }
+
+      // 重新生成SVG内容
+      try {
+        // 先创建图表元素以获取样式配置
+        const { createChartElement, generateChartSvg } = await import('../utils/eightElement/creators/tableCreators.js');
+        const chartElement = createChartElement(
+          newChartType,
+          '', // 空的SVG内容，稍后生成
+          element.tableData || [],
+          element.tableContent || '',
+          element.variant || 'default',
+          element.chartTitle || '',
+          element.events || []
+        );
+
+        // 提取样式配置
+        const chartStyleConfig = {
+          variant: 'normal',
+          title: chartElement.layout.title,
+          legend: chartElement.layout.legend,
+          axis: chartElement.layout.axis
+        };
+
+        // 生成新的SVG内容
+        const svgContent = generateChartSvg(newChartType, element.tableData || [], chartStyleConfig, element.chartTitle);
+
+        // 更新SVG内容
+        element.svgContent = svgContent;
+
+        console.log('✅ 图表类型和SVG内容更新成功');
+        return true;
+      } catch (error) {
+        console.error('❌ 重新生成图表SVG失败:', error);
+        return false;
+      }
     }
-    
+
     // 递归检查子元素
     if (element.layout && element.layout.children) {
       for (const child of element.layout.children) {
@@ -2725,13 +2752,13 @@ const updateChartTypeInEightElement = async (eightElement, chartId, newChartType
         }
       }
     }
-    
+
     return false;
   };
-  
+
   // 执行更新
   const updated = await updateChartElement(updatedElement);
-  
+
   if (updated) {
     return updatedElement;
   } else {
