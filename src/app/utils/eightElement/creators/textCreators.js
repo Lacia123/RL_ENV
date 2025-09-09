@@ -1,13 +1,13 @@
-import { generateUUID, detectMathInHTML, applyCustomStyleOverride } from './util.js';
+import { generateUUID, detectMathInHTML, applyCustomStyleOverride } from '../util.js';
 
 import {
     getElementStyleConfig,
     LAYOUT_CONSTANTS,
     DIMENSION_CONSTANTS,
     FONT_CONSTANTS,
-} from './styleConfig.js';
+} from '../styleConfig.js';
 
-import { processText } from './PSUIPParser.js';
+import { processText } from '../PSUIPParser.js';
 
 // 新增函数：处理文本中的加粗部分
 function processBoldText(text) {
@@ -77,7 +77,7 @@ function processListItemAndRichText(line) {
         const { processedText, hasBold } = processBoldText(content);
 
         // 创建一个包含处理后文本的文本元素
-        const textElement = createTextElement(content, 'normal', {
+        const textElement = createTextElement(content, 'p', {
             isList: true,
             listType: listType,
             isBold: hasBold,
@@ -92,7 +92,7 @@ function processListItemAndRichText(line) {
 
     // 如果有加粗文本，创建包含处理后文本的文本元素
     if (hasBold) {
-        const textElement = createTextElement(line, 'normal', {
+        const textElement = createTextElement(line, 'p', {
             isBold: true,
             processedText: processedText // 传递处理后的文本
         });
@@ -105,7 +105,7 @@ function processListItemAndRichText(line) {
 }
 
 // 创建文本元素 - 修改以支持富文本和KaTeX
-function createTextElement(text, variant = 'normal', richTextOptions = {}, customStyles = null) {
+function createTextElement(text, variant = 'p', richTextOptions = {}, customStyles = null) {
     const id = generateUUID();
     // 获取文本元素的样式配置
     let textStyleConfig = getElementStyleConfig('text', variant);

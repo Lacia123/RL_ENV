@@ -1,9 +1,9 @@
-import { generateUUID, escapeHtml, getMarkedInstance } from './util.js';
+import { generateUUID, escapeHtml, getMarkedInstance } from '../util.js';
 import {
     getElementStyleConfig,
     FONT_CONSTANTS,
-} from './styleConfig.js';
-import resolveToken, { isColorDark } from '../tokens/resolveToken.js';
+} from '../styleConfig.js';
+import resolveToken, { isColorDark } from '../../tokens/resolveToken.js';
 
 
 // 创建代码元素

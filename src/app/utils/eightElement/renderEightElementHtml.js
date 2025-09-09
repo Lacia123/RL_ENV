@@ -1433,8 +1433,6 @@ function computeElementStyle(element) {
     // 🆕 处理样式优先级：如果classStyle有和style中相同的属性key，就把style上的去掉，以classStyle为主
     let processedStyle = element.layout?.style ? { ...element.layout.style } : {};
     let processedClassStyle = element.layout?.classStyle ? { ...element.layout.classStyle } : {};
-
-    console.log('processedStyle', processedStyle)
     
     if (element.layout?.style && element.layout?.classStyle) {
         // 找出classStyle中存在的属性，从style中移除, 另外要移除相关的自定义属性

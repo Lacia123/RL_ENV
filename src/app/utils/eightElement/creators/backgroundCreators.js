@@ -1,10 +1,10 @@
-import { generateUUID } from './util.js';
+import { generateUUID } from '../util.js';
 import {
     getElementStyleConfig,
     LAYOUT_CONSTANTS,
     DIMENSION_CONSTANTS,
     COLOR_CONSTANTS,
-  } from './styleConfig.js';
+  } from '../styleConfig.js';
 
 // 创建背景元素（用于图片）
 function createBackgroundElement(imageUrl, variant = 'normal') {

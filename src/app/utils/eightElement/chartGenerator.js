@@ -415,7 +415,7 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       { strokeWidth: 1.8, dashArray: "0" }, 
       { strokeWidth: 2.8, dashArray: "0" },  
       { strokeWidth: 2.2, dashArray: "0" },    
-      { strokeWidth: 3.2, dashArray: "0" },     
+      { strokeWidth: 3.2, dashArray: "0" },      
       { strokeWidth: 2.3, dashArray: "0" },   
       { strokeWidth: 1.9, dashArray: "0" }          
     ];

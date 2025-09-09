@@ -1,10 +1,10 @@
-import { generateUUID } from './util.js';
+import { generateUUID } from '../util.js';
 import {
     getElementStyleConfig,
-} from './styleConfig.js';
-import { generateChartFromTableData } from './chartGenerator.js';
+} from '../styleConfig.js';
+import { generateChartFromTableData } from '../chartGenerator.js';
 import { extractWildcardMatch } from './cardCreators.js';
-import { parseEventSyntax } from './PSUIPParser.js';
+import { parseEventSyntax } from '../PSUIPParser.js';
 
 // 解析表格数据为二维数组
 function parseTableData(tableContent) {

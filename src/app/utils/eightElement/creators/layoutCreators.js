@@ -1,8 +1,8 @@
 import {
     LAYOUT_CONSTANTS,
     getElementStyleConfig
-} from './styleConfig.js';
-import { generateUUID } from './util.js';
+} from '../styleConfig.js';
+import { generateUUID } from '../util.js';
 import { createTextElement } from './textCreators.js';
 
 // 检测是否为布局标签（支持属性）

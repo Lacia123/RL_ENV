@@ -2,14 +2,14 @@ import { EVENT_NAME, EVENT_CONFIG } from './eventConfig.js';
 import { LAYOUT_CONSTANTS } from './styleConfig.js';
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance } from './util.js';
-import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './tableCreators.js';
-import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './codeCreators.js';
-import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot } from './layoutCreators.js';
-import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch, processTemplatePathWithWildcard } from './cardCreators.js';
-import { isListItem, processListItemAndRichText, createTextElement, createHeadingBlockContainer } from './textCreators.js';
-import { parseButtonVariant, createButtonElement } from './buttonCreators.js';
-import { createBackgroundElement } from './backgroundCreators.js';
-import { createIconElement } from './iconCreators.js';
+import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './creators/tableCreators.js';
+import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './creators/codeCreators.js';
+import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot } from './creators/layoutCreators.js';
+import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch, processTemplatePathWithWildcard } from './creators/cardCreators.js';
+import { isListItem, processListItemAndRichText, createTextElement, createHeadingBlockContainer } from './creators/textCreators.js';
+import { parseButtonVariant, createButtonElement } from './creators/buttonCreators.js';
+import { createBackgroundElement } from './creators/backgroundCreators.js';
+import { createIconElement } from './creators/iconCreators.js';
 
 // 检测是否为引用文本
 function isQuoteText(line) {

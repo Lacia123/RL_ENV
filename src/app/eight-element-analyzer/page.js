@@ -2690,7 +2690,7 @@ const updateChartTypeInEightElement = async (eightElement, chartId, newChartType
               // 重新生成SVG内容
         try {
           // 先创建图表元素以获取样式配置
-          const { createChartElement, generateChartSvg } = await import('../utils/eightElement/tableCreators.js');
+          const { createChartElement, generateChartSvg } = await import('../utils/eightElement/creators/tableCreators.js');
           const chartElement = createChartElement(
             newChartType,
             '', // 空的SVG内容，稍后生成

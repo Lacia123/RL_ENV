@@ -1,13 +1,13 @@
-import { parseMarkdownToTemplate, parseMarkdown, parseEventSyntax } from './PSUIPParser.js';
-import { generateUUID } from './util.js';
+import { parseMarkdownToTemplate, parseMarkdown, parseEventSyntax } from '../PSUIPParser.js';
+import { generateUUID } from '../util.js';
 import { createCodeElement } from './codeCreators.js';
 import { createTableElement, extractTableOrChartData, getChartVariantFromConfig, createChartElement, generateChartSvg } from './tableCreators.js';
 import { createBackgroundElement } from './backgroundCreators.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createTextElement } from './textCreators.js';
 import { createElementContainer, createBaseLayout } from './layoutCreators.js';
-import resolveToken from '../tokens/resolveToken.js';
-import { getElementStyleConfig, LAYOUT_CONSTANTS } from './styleConfig.js';
+import resolveToken from '../../tokens/resolveToken.js';
+import { getElementStyleConfig, LAYOUT_CONSTANTS } from '../styleConfig.js';
 
 
 // 检测是否为卡片标签

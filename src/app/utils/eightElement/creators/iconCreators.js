@@ -1,5 +1,5 @@
-import { generateUUID } from './util.js';
-import { getElementStyleConfig } from './styleConfig.js';
+import { generateUUID } from '../util.js';
+import { getElementStyleConfig } from '../styleConfig.js';
 
 // 创建图标元素
 function createIconElement(iconName, variant = 'medium') {

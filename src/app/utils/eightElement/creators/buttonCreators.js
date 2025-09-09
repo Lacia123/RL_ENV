@@ -1,13 +1,13 @@
-import { generateUUID } from './util.js';
+import { generateUUID } from '../util.js';
 import {
     getElementStyleConfig,
     LAYOUT_CONSTANTS,
     DIMENSION_CONSTANTS,
     COLOR_CONSTANTS,
     FONT_CONSTANTS,
-} from './styleConfig.js';
+} from '../styleConfig.js';
 import { createLayoutElement } from './layoutCreators.js';
-import { parseEventSyntax, removeEventSyntax } from './PSUIPParser.js';
+import { parseEventSyntax, removeEventSyntax } from '../PSUIPParser.js';
 
 
 // 解析按钮类型标记
