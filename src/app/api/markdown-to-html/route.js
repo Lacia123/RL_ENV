@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { markdownToEightElement } from '@/app/utils/eightElement/markdownToEightElement';
+import { markdownToEightElement } from '@/app/utils/eightElement/index';
 import { renderEightElementToHtml } from '@/app/utils/eightElement/renderEightElementHtml';
 
 export async function POST(request) {
