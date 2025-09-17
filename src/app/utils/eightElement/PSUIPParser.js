@@ -7,9 +7,10 @@ import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from
 import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot } from './creators/layoutCreators.js';
 import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch, processTemplatePathWithWildcard } from './creators/cardCreators.js';
 import { isListItem, processListItemAndRichText, createTextElement, createHeadingBlockContainer } from './creators/textCreators.js';
-import { parseButtonVariant, createButtonElement } from './creators/buttonCreators.js';
+import { parseButtonVariant, createButtonElement, createVerticalButtonLayout } from './creators/buttonCreators.js';
 import { createBackgroundElement } from './creators/backgroundCreators.js';
 import { createIconElement } from './creators/iconCreators.js';
+import { isTabTag, extractTabBlock, createTabElement } from './creators/tabCreators.js';
 
 // 检测是否为引用文本
 function isQuoteText(line) {
@@ -1080,6 +1081,46 @@ function parseMarkdown(markdown, options = {}) {
             stack[stack.length - 1].elements.push(cardElement);
 
             // 跳过已处理的卡片标签行
+            i = endIndex;
+            continue;
+        }
+
+        // 处理选项卡标签
+        const tabTagInfo = isTabTag(trimmedLine);
+        if (tabTagInfo.isTabTag && !tabTagInfo.isClosing) {
+            console.log(`发现选项卡标签，行号: ${i}`);
+
+            // 处理之前累积的内容
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            // 如果正在处理列表，先结束列表
+            if (inList && listItems.length > 0) {
+                const listLayout = createLayoutElement(
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                    listItems,
+                    {
+                        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                    }
+                );
+                stack[stack.length - 1].elements.push(listLayout);
+                inList = false;
+                listItems = [];
+            }
+
+            // 提取选项卡标签内容
+            const { tabContent, attributes, endIndex } = extractTabBlock(
+                markedLines.map(item => item.line),
+                i
+            );
+
+            // 创建选项卡元素
+            const tabElement = createTabElement(tabContent, attributes, currentMarkdown);
+
+            stack[stack.length - 1].elements.push(tabElement);
+
+            // 跳过已处理的选项卡标签行
             i = endIndex;
             continue;
         }

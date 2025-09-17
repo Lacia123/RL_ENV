@@ -528,7 +528,7 @@ export const DEFAULT_STYLE_CONFIG = {
       columnGap: '15px',
       columnFill: "balance",
       // 子元素样式
-      '& > *': {  
+      '& > *': {
         breakInside: 'avoid',        // 避免元素被分割到不同列
         marginTop: '15px',        // 元素间距用margin而不是gap
         display: 'block',            // 子元素也使用block布局
@@ -840,7 +840,7 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     percentValue: {
       fontSize: "{font.size.xxl}",
-      fontWeight: "bold", 
+      fontWeight: "bold",
       color: "{color.error.red5}",
     },
     percentItemDescription: {
@@ -848,6 +848,17 @@ export const DEFAULT_STYLE_CONFIG = {
       fontSize: "{font.size.tiny}",
       fontWeight: "{font.fontweight.medium}",
       color: "{color.onsurfacecontainer.grey9}",
+    },
+    // tabItemText
+    tabItemText: {
+      fontSize: "{font.size.medium}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.secondary.violet6}",
+    },
+    tabActiveItemText: {
+      fontSize: "{font.size.medium}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onsecondarycontainer.violet8}",
     }
   },
 
@@ -875,8 +886,8 @@ export const DEFAULT_STYLE_CONFIG = {
   },
   chart: {
     small: {
-        margin: "{dimension.margin.base} 0",
-        padding: "{dimension.padding.extratight}",
+      margin: "{dimension.margin.base} 0",
+      padding: "{dimension.padding.extratight}",
     },
     normal: {
       margin: "{dimension.margin.loose} 0",
@@ -888,114 +899,7 @@ export const DEFAULT_STYLE_CONFIG = {
       borderColor: "{color.surfacecontainer.black12}",
       borderStyle: "solid"
     }
-    // normal: {
-    //     // 图表容器  
-    // container: {
-    //   margin: "{dimension.margin.loose} 0",
-    //   padding: "{dimension.padding.extraloose}",
-    //   backgroundColor: "{color.surfacecontainer.white100}",
-    //   borderRadius: "{dimension.borderradius.xl}",
-    //   boxShadow: "{material.hierarchy.2f}",
-    //   borderWidth: "{dimension.borderwidth.narrow}",
-    //   borderColor: "{color.surfacecontainer.black12}",
-    //   borderStyle: "solid"
-    // },
-    // // 图表标题
-    // title: {
-    //   fontSize: "{font.size.large}",
-    //   fontWeight: "{font.fontweight.semibold}",
-    //   color: "{color.surfacecontainer.white100}",
-    //   // color: "{color.onsurface.black88}",
-    //   marginBottom: "{dimension.margin.base}",
-    //   textAlign: 'center'
-    // },
-    // // 图例
-    // legend: {
-    //   fontSize: "{font.size.small}",
-    //   fontWeight: "400",
-    //   fill: "{color.onsurface.black88}",
-    //   display: 'flex',
-    //   justifyContent: 'center',
-    //   gap: "{dimension.gap.loose}",
-    //   marginTop: "{dimension.margin.base}"
-    // },
-    // // 坐标轴  
-    // axis: {
-    //   fontSize: "{font.size.tiny}",
-    //   fontWeight: "400",
-    //   fill: "{color.onsurface.black88}",
-    // },
-    // }
   },
-  // smallChart: {
-  //   container: {
-  //     margin: "{dimension.margin.base} 0",
-  //     padding: "{dimension.padding.extratight}",
-  //   },
-  //    // 图表标题
-  //    title: {
-  //     fontSize: "{font.size.large}",
-  //     fontWeight: "{font.fontweight.semibold}",
-  //     color: "{color.surfacecontainer.white100}",
-  //     // color: "{color.onsurface.black88}",
-  //     marginBottom: "{dimension.margin.base}",
-  //     textAlign: 'center'
-  //   },
-  //   // 图例
-  //   legend: {
-  //     fontSize: "{font.size.small}",
-  //     fontWeight: "400",
-  //     fill: "{color.onsurface.black88}",
-  //     display: 'flex',
-  //     justifyContent: 'center',
-  //     gap: "{dimension.gap.loose}",
-  //     marginTop: "{dimension.margin.base}"
-  //   },
-  //   // 坐标轴  
-  //   axis: {
-  //     fontSize: "{font.size.tiny}",
-  //     fontWeight: "400",
-  //     fill: "{color.onsurface.black88}",
-  //   },
-  // },
-  // chart: {
-  //   // 图表容器  
-  //   container: {
-  //     margin: "{dimension.margin.loose} 0",
-  //     padding: "{dimension.padding.extraloose}",
-  //     backgroundColor: "{color.surfacecontainer.white100}",
-  //     borderRadius: "{dimension.borderradius.xl}",
-  //     boxShadow: "{material.hierarchy.2f}",
-  //     borderWidth: "{dimension.borderwidth.narrow}",
-  //     borderColor: "{color.surfacecontainer.black12}",
-  //     borderStyle: "solid"
-  //   },
-  //   // 图表标题
-  //   title: {
-  //     fontSize: "{font.size.large}",
-  //     fontWeight: "{font.fontweight.semibold}",
-  //     color: "{color.surfacecontainer.white100}",
-  //     // color: "{color.onsurface.black88}",
-  //     marginBottom: "{dimension.margin.base}",
-  //     textAlign: 'center'
-  //   },
-  //   // 图例
-  //   legend: {
-  //     fontSize: "{font.size.small}",
-  //     fontWeight: "400",
-  //     fill: "{color.onsurface.black88}",
-  //     display: 'flex',
-  //     justifyContent: 'center',
-  //     gap: "{dimension.gap.loose}",
-  //     marginTop: "{dimension.margin.base}"
-  //   },
-  //   // 坐标轴  
-  //   axis: {
-  //     fontSize: "{font.size.tiny}",
-  //     fontWeight: "400",
-  //     fill: "{color.onsurface.black88}",
-  //   },
-  // },
   // 表格元素配置
   table: {
     // 表格容器  
@@ -2462,7 +2366,7 @@ export const DEFAULT_STYLE_CONFIG = {
           boxShadow: `{material.hierarchy.B1}, {material.hierarchy.main}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
           position: 'relative',
-          flex: '1',          
+          flex: '1',
           '&::before': {
             content: "''",
             position: 'absolute',
@@ -2953,10 +2857,10 @@ export const DEFAULT_STYLE_CONFIG = {
         "chart*": {
           metaType: 'chart',
           variant: 'small'
-        } 
+        }
       }
     },
-  
+
     headerPrecentCard: {
       type: 'template',
       markdownMapping: {
@@ -3049,6 +2953,125 @@ export const DEFAULT_STYLE_CONFIG = {
         }
       }
     }
+  },
+
+
+  /**
+   * 
+   *  <tab bindingData="tabData" defaultTabKey="tab1">
+   *    <tabPanel tabKey="tab1" tabTitle="市场概述">
+   *       <card:headerPrecentCard>
+   ### 未来预测
+   #### 40%
+   预计增长率
+  </card:headerPrecentCard>
+
+   <card:headerCard >
+    ## 三、头部品牌分析
+    联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
+
+    [chart:pie|笔记本市场占比]
+    | 类型 | 占比 |
+    |------|------|
+    | 游戏本 | 40% |
+    | 轻薄本 | 35% |
+    | 工作站 | 25% |
+           </card:headerCard>
+   *    </tabPanel>
+        <tabPanel tabKey="tab2" tabTitle="市场分析">
+           <card:elegantTable>
+      ## 表格布局卡片
+      ### 数据展示
+      专业的表格数据展示布局，保持优雅青蓝风格的同时确保数据的清晰可读。
+
+      | 功能模块 | 完成度 | 优先级 |
+      |---------|--------|--------|
+      | 卡片系统 | 100% | 高 |
+      | 布局引擎 | 95% | 高 |
+   </card:elegantTable>
+        </tabPanel>
+        <tabPanel tabKey="tab3" tabTitle="市场趋势">
+           <card:elegantTable>
+      ## 表格布局卡片
+      ### 数据展示
+      专业的表格数据展示布局，保持优雅青蓝风格的同时确保数据的清晰可读。
+
+      | 功能模块 | 完成度 | 优先级 |
+      |---------|--------|--------|
+      | 卡片系统 | 100% | 高 |
+      | 布局引擎 | 95% | 高 |
+   </card:elegantTable>
+        </tabPanel>
+        <tabPanel tabKey="tab4" tabTitle="市场预测">'
+           <card:elegantTable>
+      ## 表格布局卡片
+      ### 数据展示
+      专业的表格数据展示布局，保持优雅青蓝风格的同时确保数据的清晰可读。
+
+      | 功能模块 | 完成度 | 优先级 |
+      |---------|--------|--------|
+      | 卡片系统 | 100% | 高 |
+      | 布局引擎 | 95% | 高 |
+   </card:elegantTable>
+        </tabPanel>
+   *  </tab>
+   *  
+   * 
+   * 
+   */
+
+  tab: {
+    standard: {
+      tabContainer: {
+        style: {
+          padding: "{dimension.padding.base}",
+          background: `linear-gradient(145deg, {color.primarycontainer.brand1} 0%, {color.primarycontainer.brand2} 50%, {color.secondarycontainer.violet1} 100%)`,
+          boxShadow: `{material.hierarchy.2f}`,
+          borderRadius: "{dimension.borderradius.large}",
+          border: `{dimension.borderwidth.base} solid {color.primary.brand3}`,
+          position: 'relative',
+          overflow: 'hidden',
+        },
+      },
+      tabList: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: "{dimension.padding.base}",
+          gap: "{dimension.gap.base}",
+          borderRadius: "{dimension.borderradius.large}",
+          boxShadow: `{material.hierarchy.B1}`,
+          background: "{color.secondarycontainer.violet1}",
+          overflow: 'hidden'
+        }
+      },
+      tabListItem: {
+        normal: {
+          metaType: 'text',
+          variant: 'tabItemText',
+          style: {
+            padding: "{dimension.padding.base}",
+          }
+        },
+        active: {
+          metaType: 'text',
+          variant: 'tabActiveItemText',
+          style: {
+            padding: "{dimension.padding.base}",
+            background: "{color.onprimary.white100}",
+            borderRadius: "{dimension.borderradius.large}",
+          }
+        }
+      },
+      tabPanel: {
+        style: {
+          padding: "{dimension.padding.base}",
+          borderRadius: "{dimension.borderradius.large}",
+          background: "{color.surfacecontainer.white100}",
+        }
+      }
+    },
   },
 
   // ==================== 图像元件 ====================
@@ -3396,18 +3419,18 @@ export function getElementStyleConfig(elementType, variant = 'normal', attribute
       Object.entries(attributes).forEach(([attrName, attrValue]) => {
         if (variantConfig.supportedAttributes.includes(attrName)) {
           console.log(`   ✅ 应用支持的属性: ${attrName} = "${attrValue}"`);
-          
+
           // 🆕 解析token值 - 如果不包含大括号，自动添加（但排除URL等特殊值）
           let resolvedValue = attrValue;
-          
+
           // 检查是否是特殊值（URL, 普通CSS值等），这些不需要token解析
-          const isSpecialValue = attrValue.startsWith('url(') || 
-                                attrValue.startsWith('#') || 
-                                attrValue.match(/^\d+px$/) ||
-                                attrValue.match(/^\d+%$/) ||
-                                attrValue === 'none' ||
-                                attrValue === 'auto';
-          
+          const isSpecialValue = attrValue.startsWith('url(') ||
+            attrValue.startsWith('#') ||
+            attrValue.match(/^\d+px$/) ||
+            attrValue.match(/^\d+%$/) ||
+            attrValue === 'none' ||
+            attrValue === 'auto';
+
           if (!isSpecialValue && !attrValue.startsWith('{') && !attrValue.endsWith('}')) {
             // 如果看起来像token路径（包含点），自动添加大括号
             if (attrValue.includes('.')) {
@@ -3438,7 +3461,7 @@ export function getElementStyleConfig(elementType, variant = 'normal', attribute
             console.log(`   📝 特殊值: ${attrValue} (跳过token解析)`);
             resolvedValue = attrValue;
           }
-          
+
           finalStyle[attrName] = resolvedValue;
         } else {
           console.warn(`   ⚠️ 属性 "${attrName}" 不在支持列表中:`, variantConfig.supportedAttributes);

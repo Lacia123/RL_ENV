@@ -344,6 +344,55 @@ function createHeadingLayout(headingContent, subElements = [], headingLevel = 1)
     return layout;
 }
 
+// 递归收集所有数据变量的函数
+function collectDataVariables(elements) {
+    const dataVariables = {};
+
+    const collectFromElement = (element) => {
+        if (!element) return;
+
+        // 检查选项卡元素的绑定数据
+        if (element._metadata && element._metadata.isTab && element._metadata.bindingData && element._metadata.defaultTabKey) {
+            dataVariables[element._metadata.bindingData] = element._metadata.defaultTabKey;
+            console.log(`🔗 收集到数据变量: ${element._metadata.bindingData} = ${element._metadata.defaultTabKey}`);
+        }
+
+        // 递归检查子元素
+        if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
+            element.layout.children.forEach(child => {
+                collectFromElement(child);
+            });
+        }
+
+        // 检查其他可能包含子元素的结构
+        for (const key in element) {
+            if (typeof element[key] === 'object' && element[key] !== null) {
+                if (Array.isArray(element[key])) {
+                    element[key].forEach(item => {
+                        if (typeof item === 'object') {
+                            collectFromElement(item);
+                        }
+                    });
+                } else if (element[key].layout && element[key].layout.children) {
+                    collectFromElement(element[key]);
+                }
+            }
+        }
+    };
+
+    // 收集所有元素中的数据变量
+    if (Array.isArray(elements)) {
+        elements.forEach(element => {
+            collectFromElement(element);
+        });
+    } else {
+        collectFromElement(elements);
+    }
+
+    console.log(`📊 总共收集到 ${Object.keys(dataVariables).length} 个数据变量:`, dataVariables);
+    return dataVariables;
+}
+
 // 递归收集所有EventTargetId的函数
 function collectEventTargetIds(elements) {
     const eventTargetIds = [];
@@ -404,6 +453,9 @@ function createEightElementRoot(markdownElements, rootAttributes = {}) {
     // 使用随机UUID生成根布局ID
     const rootId = generateUUID();
 
+    // 🆕 收集所有数据变量
+    const dataVariables = collectDataVariables(markdownElements);
+
     // 🆕 收集所有EventTargetId
     const eventTargetIds = collectEventTargetIds(markdownElements);
 
@@ -420,6 +472,7 @@ function createEightElementRoot(markdownElements, rootAttributes = {}) {
         "name-zh": "布局",
         "file-type": "template",
         theme: "default",
+        data: dataVariables, // 🆕 收集的所有数据变量
         EventTargetIds: eventTargetIds, // 🆕 收集的所有EventTargetId
         // 🔍 保存根布局元数据用于分析
         _metadata: {
