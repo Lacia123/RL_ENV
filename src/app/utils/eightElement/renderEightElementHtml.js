@@ -434,9 +434,206 @@ export function renderEightElementToHtml(eightElement, options = {}) {
           hideEditor();
         });
         
+        // 🆕 数据绑定系统
+        const dataBindingSystem = {
+          // 存储所有绑定数据的状态
+          dataState: {},
+          
+          // 初始化数据状态
+          initializeDataState(dataVariables) {
+            console.log('🔗 初始化数据绑定状态:', dataVariables);
+            this.dataState = { ...dataVariables };
+          },
+          
+          // 更新数据状态
+          updateDataState(key, value) {
+            console.log('🔄 更新数据状态: ' + key + ' = ' + value);
+            this.dataState[key] = value;
+            
+            // 触发条件样式和显示/隐藏的更新
+            this.updateConditionStyles();
+            this.updateConditionVisibility();
+          },
+          
+          // 获取数据状态
+          getDataState(key) {
+            return this.dataState[key];
+          },
+          
+          // 检查条件是否满足
+          evaluateCondition(condition) {
+            if (!condition || typeof condition !== 'string') return false;
+            
+            // 🔧 调试条件字符串
+            console.log('🔍 原始条件:', {
+              condition: condition,
+              length: condition.length,
+              charCodes: Array.from(condition).map(c => c.charCodeAt(0)),
+              trimmed: condition.trim()
+            });
+            
+            // 🔧 使用简单的字符串分割来避免正则表达式问题
+            const trimmedCondition = condition.trim();
+            const equalIndex = trimmedCondition.indexOf('=');
+            
+            if (equalIndex === -1) {
+              console.warn('🚫 条件格式错误 - 缺少等号:', {
+                original: condition,
+                trimmed: trimmedCondition
+              });
+              return false;
+            }
+            
+            const dataKey = trimmedCondition.substring(0, equalIndex).trim();
+            const expectedValue = trimmedCondition.substring(equalIndex + 1).trim();
+            
+            if (!dataKey || !expectedValue) {
+              console.warn('🚫 条件格式错误 - 键或值为空:', {
+                original: condition,
+                dataKey: dataKey,
+                expectedValue: expectedValue
+              });
+              return false;
+            }
+            const currentValue = this.getDataState(dataKey);
+            const isMatch = currentValue === expectedValue;
+            
+            console.log('🔍 条件评估:', {
+              condition: condition.trim(),
+              dataKey: dataKey,
+              expectedValue: expectedValue,
+              currentValue: currentValue,
+              dataState: this.dataState,
+              result: isMatch
+            });
+            
+            return isMatch;
+          },
+          
+          // 更新条件样式
+          updateConditionStyles() {
+            console.log('🎨 更新条件样式...当前数据状态:', this.dataState);
+            
+            // 查找所有具有条件样式的元素
+            const elementsWithConditionStyles = this.findElementsWithConditionStyles();
+            console.log('🔍 找到 ' + elementsWithConditionStyles.length + ' 个具有条件样式的元素');
+            
+            elementsWithConditionStyles.forEach(({ element, conditionStyle }) => {
+              const isConditionMet = this.evaluateCondition(conditionStyle.condition);
+              
+              if (isConditionMet) {
+                // 条件满足，应用条件样式
+                element.classList.add(conditionStyle.className);
+                console.log('✅ 应用条件样式: ' + element.id + ' -> ' + conditionStyle.className);
+              } else {
+                // 条件不满足，移除条件样式
+                element.classList.remove(conditionStyle.className);
+                console.log('❌ 移除条件样式: ' + element.id + ' -> ' + conditionStyle.className);
+              }
+              
+              console.log('🎯 元素 ' + element.id + ' 条件 "' + conditionStyle.condition + '" ' + (isConditionMet ? '满足' : '不满足'));
+            });
+          },
+          
+          // 更新条件显示/隐藏
+          updateConditionVisibility() {
+            console.log('👁️ 更新条件显示/隐藏...当前数据状态:', this.dataState);
+            
+            // 查找所有具有条件显示的元素
+            const elementsWithConditions = this.findElementsWithConditions();
+            console.log('🔍 找到 ' + elementsWithConditions.length + ' 个具有条件显示的元素');
+            
+            elementsWithConditions.forEach(({ element, condition }) => {
+              const isConditionMet = this.evaluateCondition(condition);
+              
+              if (isConditionMet) {
+                // 条件满足，显示元素
+                element.style.display = '';
+                console.log('✅ 显示元素: ' + element.id);
+              } else {
+                // 条件不满足，隐藏元素
+                element.style.display = 'none';
+                console.log('❌ 隐藏元素: ' + element.id);
+              }
+              
+              console.log('👁️ 元素 ' + element.id + ' 条件 "' + condition + '" ' + (isConditionMet ? '显示' : '隐藏'));
+            });
+          },
+          
+          // 查找所有具有条件样式的元素
+          findElementsWithConditionStyles() {
+            const elements = [];
+            const eightElementData = ${JSON.stringify(eightElement)};
+            
+            const searchElement = (elementData) => {
+              if (!elementData) return;
+              
+              // 检查当前元素是否有条件样式
+              if (elementData.layout && elementData.layout.conditionStyle) {
+                const domElement = document.getElementById(elementData.id);
+                if (domElement) {
+                  elements.push({
+                    element: domElement,
+                    conditionStyle: elementData.layout.conditionStyle
+                  });
+                }
+              }
+              
+              // 递归检查子元素
+              if (elementData.layout && elementData.layout.children) {
+                elementData.layout.children.forEach(child => searchElement(child));
+              }
+            };
+            
+            searchElement(eightElementData);
+            return elements;
+          },
+          
+          // 查找所有具有条件显示的元素
+          findElementsWithConditions() {
+            const elements = [];
+            const eightElementData = ${JSON.stringify(eightElement)};
+            
+            const searchElement = (elementData) => {
+              if (!elementData) return;
+              
+              // 检查当前元素是否有条件显示
+              if (elementData.layout && elementData.layout.condition) {
+                const domElement = document.getElementById(elementData.id);
+                if (domElement) {
+                  elements.push({
+                    element: domElement,
+                    condition: elementData.layout.condition
+                  });
+                }
+              }
+              
+              // 递归检查子元素
+              if (elementData.layout && elementData.layout.children) {
+                elementData.layout.children.forEach(child => searchElement(child));
+              }
+            };
+            
+            searchElement(eightElementData);
+            return elements;
+          }
+        };
+
         // 🆕 为所有具有 edit 事件的元素添加点击监听器
         document.addEventListener('DOMContentLoaded', () => {
           console.log('🎯 页面加载完成，开始绑定编辑事件...');
+          
+          // 🆕 初始化数据绑定系统
+          const dataVariables = ${JSON.stringify(eightElement.data || {})};
+          dataBindingSystem.initializeDataState(dataVariables);
+          
+          // 🆕 初始化条件样式和显示状态
+          // 延迟执行以确保DOM完全加载
+          setTimeout(() => {
+            console.log('🔄 延迟初始化条件样式和显示状态...');
+            dataBindingSystem.updateConditionStyles();
+            dataBindingSystem.updateConditionVisibility();
+          }, 100);
           
           // 获取所有EventTargetIds
           const eventTargetIds = ${JSON.stringify(eightElement.EventTargetIds || [])};
@@ -454,9 +651,32 @@ export function renderEightElementToHtml(eightElement, options = {}) {
               element.addEventListener('click', (e) => {
                 e.preventDefault();
                 
-                // 🆕 从元素的事件配置中获取markdown内容
+                // 🆕 从元素的事件配置中获取事件信息
                 const elementData = findElementDataById(targetId);
                 if (elementData && elementData.events) {
+                  // 🆕 处理选项卡切换事件
+                  const tabChangedEvent = elementData.events.find(event => 
+                    event.runtimeEventKey === 'tab_changed' && event.parameters && event.parameters.tabKey
+                  );
+                  
+                  if (tabChangedEvent) {
+                    console.log('🎯 触发选项卡切换事件，EventTargetId:', targetId);
+                    const tabKey = tabChangedEvent.parameters.tabKey;
+                    
+                    // 🆕 查找对应的数据绑定键
+                    const tabMetadata = elementData._metadata;
+                    if (tabMetadata && tabMetadata.bindingData) {
+                      const bindingKey = tabMetadata.bindingData;
+                      console.log('🔄 切换选项卡: ' + bindingKey + ' -> ' + tabKey);
+                      
+                      // 更新数据绑定状态
+                      dataBindingSystem.updateDataState(bindingKey, tabKey);
+                    }
+                    
+                    return; // 处理完选项卡事件后返回
+                  }
+                  
+                  // 🆕 处理编辑事件
                   const editEvent = elementData.events.find(event => 
                     event.runtimeEventKey === 'edit' && event.parameters && event.parameters.markdown
                   );
@@ -477,7 +697,7 @@ export function renderEightElementToHtml(eightElement, options = {}) {
                       showEditor(editEvent.parameters.markdown, targetId);
                     }
                   } else {
-                    console.warn('⚠️ 未找到edit事件配置:', targetId);
+                    console.warn('⚠️ 未找到有效事件配置:', targetId);
                   }
                 } else {
                   console.warn('⚠️ 未找到元素数据:', targetId);
@@ -706,6 +926,11 @@ function collectClassStyles(element, classStyles = {}) {
         classStyles[element.layout.className] = element.layout.classStyle;
     }
 
+    // 🆕 收集条件样式的classStyle
+    if (element.layout && element.layout.conditionStyle && element.layout.conditionStyle.className && element.layout.conditionStyle.classStyle) {
+        classStyles[element.layout.conditionStyle.className] = element.layout.conditionStyle.classStyle;
+    }
+
     // 特殊处理表格元素的classStyle（新结构：table、th、tr、td在layout下）
     if (element.name === 'table' && element.layout) {
         // 收集table的classStyle
@@ -752,10 +977,15 @@ function collectClassStyles(element, classStyles = {}) {
         }
     }
 
-    // 递归收集子元素的classStyle
+    // 递归收集子元素的classStyle（包括条件样式）
     if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
         element.layout.children.forEach(child => {
             collectClassStyles(child, classStyles);
+            
+            // 🆕 递归收集子元素的条件样式
+            if (child && child.layout && child.layout.conditionStyle && child.layout.conditionStyle.className && child.layout.conditionStyle.classStyle) {
+                classStyles[child.layout.conditionStyle.className] = child.layout.conditionStyle.classStyle;
+            }
         });
     }
 

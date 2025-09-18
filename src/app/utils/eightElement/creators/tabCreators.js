@@ -219,30 +219,30 @@ function createTabElement(content, attributes = {}, currentMarkdown = '') {
     // 创建 tabList 中的 tabListItem
     const tabListItems = tabPanels.map(panel => {
         const itemId = generateUUID();
-        const isActive = panel.tabKey === defaultTabKey;
+        // 🔧 移除：不再在创建时判断激活状态，完全依赖数据绑定系统
         
         // 根据选项卡样式配置获取 tabListItem 样式
         const normalItemConfig = tabStyleConfig.tabListItem?.normal || {};
         const activeItemConfig = tabStyleConfig.tabListItem?.active || {};
-        const currentItemConfig = isActive ? activeItemConfig : normalItemConfig;
+        // 🔧 修复：始终使用普通配置作为基础，激活状态只通过条件样式应用
+        const currentItemConfig = normalItemConfig;
         
         // 调试信息
         // console.log(`选项卡项配置 - ${panel.tabTitle}:`, {
-        //     isActive,
         //     normalItemConfig,
         //     activeItemConfig,
         //     currentItemConfig
         // });
         
-        // 创建选项卡标题文本，使用当前状态的变体
-        const titleText = createTextElement(panel.tabTitle, currentItemConfig.variant || 'body');
+        // 🔧 修复：创建选项卡标题文本，始终使用普通状态的变体
+        const titleText = createTextElement(panel.tabTitle, normalItemConfig.variant || 'body');
         
-        // 应用选项卡文本的 metaType 和 variant
-        if (currentItemConfig.metaType || currentItemConfig.variant) {
+        // 🔧 修复：应用普通状态的 metaType 和 variant
+        if (normalItemConfig.metaType || normalItemConfig.variant) {
             titleText._metadata = {
                 ...titleText._metadata,
-                customMetaType: currentItemConfig.metaType,
-                customVariant: currentItemConfig.variant
+                customMetaType: normalItemConfig.metaType,
+                customVariant: normalItemConfig.variant
             };
         }
         
@@ -299,7 +299,7 @@ function createTabElement(content, attributes = {}, currentMarkdown = '') {
                     position: "relative",
                     cursor: "pointer"
                 },
-                classStyle: currentItemConfig.style || {},
+                classStyle: normalItemConfig.style || {},
                 className: `tab-item-${itemId}`,
                 // 添加条件样式支持
                 conditionStyle: {
