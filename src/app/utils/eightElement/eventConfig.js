@@ -2,6 +2,7 @@ export const EVENT_NAME = {
     EDIT: 'edit',
     DOWNLOAD: 'download',
     CHART_CHANGED: 'chart_changed',
+    TAB_CHANGED: 'tab_changed',
 }
 
 
@@ -26,6 +27,14 @@ export const EVENT_CONFIG = {
         "dataEventKey": [],
         "parameters": {
             "chartTypes": [],
+        }
+    },
+    [EVENT_NAME.TAB_CHANGED]: {
+        "runtimeEventKey": EVENT_NAME.TAB_CHANGED,  
+        "nativeEventKey": "click",
+        "dataEventKey": [],
+        "parameters": {
+            "tabKey": "",
         }
     }
 }

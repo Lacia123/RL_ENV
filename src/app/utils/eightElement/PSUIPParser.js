@@ -62,6 +62,13 @@ function parseEventSyntax(text, elementId, currentMarkdown = '') {
                 eventConfig.parameters.chartTypes = chartTypes;
             }
 
+            // 🆕 特殊处理tab_changed事件的参数
+            if (eventName === EVENT_NAME.TAB_CHANGED && eventParams) {
+                // 解析参数：tab_changed(tab1) -> "tab1"
+                const tabKey = eventParams.trim();
+                eventConfig.parameters.tabKey = tabKey;
+            }
+
             events.push(eventConfig);
         } else {
             console.warn(`⚠️ 未找到事件配置: ${eventName}`);

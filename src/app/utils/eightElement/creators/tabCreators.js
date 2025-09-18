@@ -1,8 +1,9 @@
-import { parseMarkdown } from '../PSUIPParser.js';
+import { parseMarkdown, parseEventSyntax } from '../PSUIPParser.js';
 import { generateUUID } from '../util.js';
 import { createLayoutElement } from './layoutCreators.js';
 import { createTextElement } from './textCreators.js';
 import { getElementStyleConfig, LAYOUT_CONSTANTS } from '../styleConfig.js';
+import { EVENT_NAME } from '../eventConfig.js';
 
 // 检测是否为选项卡标签
 function isTabTag(line) {
@@ -270,6 +271,9 @@ function createTabElement(content, attributes = {}, currentMarkdown = '') {
             }
         }
         
+        // 创建选项卡点击事件
+        const tabClickEvent = parseEventSyntax(`[event:${EVENT_NAME.TAB_CHANGED}(${panel.tabKey})]`, itemId);
+        
         return {
             dataKeys: [],
             name: "layout",
@@ -307,7 +311,7 @@ function createTabElement(content, attributes = {}, currentMarkdown = '') {
             },
             description: `选项卡项 - ${panel.tabTitle}`,
             id: itemId,
-            events: [{}]
+            events: tabClickEvent.length > 0 ? tabClickEvent : [{}]
         };
     });
     
