@@ -1154,38 +1154,7 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 
 ## 企业数据分析平台
 
-<tab bindingData="mainTabs" defaultTabKey="overview">
-    <tabPanel tabKey="overview" tabTitle="市场概述">
-        <card:headerPrecentCard>
-### 市场现状分析
-AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注。
-
-#### 中国市场占比
-##### 15%
-AI-PC 出货量
-
-#### 全球渗透率
-##### 25%
-预计市场份额
-
-### 未来预测
-#### 40%
-预计增长率
-        </card:headerPrecentCard>
-
-        <card:headerCard>
-## 头部品牌分析
-联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。
-
-[chart:pie|笔记本市场占比]
-| 类型 | 占比 |
-|------|------|
-| 游戏本 | 40% |
-| 轻薄本 | 35% |
-| 工作站 | 25% |
-        </card:headerCard>
-    </tabPanel>
-    
+<tab bindingData="mainTabs" defaultTabKey="analysis">
     <tabPanel tabKey="analysis" tabTitle="数据分析">
         <card:elegantTable>
 ## 销售数据表格

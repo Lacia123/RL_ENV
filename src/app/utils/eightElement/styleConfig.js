@@ -853,12 +853,14 @@ export const DEFAULT_STYLE_CONFIG = {
     tabItemText: {
       fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.secondary.violet6}",
+      textAlign: "center",
+      color: "{color.basic.brand.3}"
     },
     tabActiveItemText: {
       fontSize: "{font.size.medium}",
-      fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onsecondarycontainer.violet8}",
+      fontWeight: "{font.fontweight.bold}",
+      textAlign: "center", 
+      color: "{color.basic.brand.6}",
     }
   },
 
@@ -3024,11 +3026,11 @@ export const DEFAULT_STYLE_CONFIG = {
     standard: {
       tabContainer: {
         style: {
-          padding: "{dimension.padding.base}",
-          background: `linear-gradient(145deg, {color.primarycontainer.brand1} 0%, {color.primarycontainer.brand2} 50%, {color.secondarycontainer.violet1} 100%)`,
-          boxShadow: `{material.hierarchy.2f}`,
-          borderRadius: "{dimension.borderradius.large}",
-          border: `{dimension.borderwidth.base} solid {color.primary.brand3}`,
+          padding: "{dimension.padding.superloose} {dimension.padding.extraloose}",
+          background: `{color.basic.brand.0}`,
+          borderRadius: "{dimension.borderradius.xl}",
+          border: `{dimension.borderwidth.base} solid {color.basic.opacity.black.7}`,
+          gap: "{dimension.gap.extraloose}",
           position: 'relative',
           overflow: 'hidden',
         },
@@ -3038,11 +3040,10 @@ export const DEFAULT_STYLE_CONFIG = {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          padding: "{dimension.padding.base}",
+          padding: "{dimension.padding.tight}",
           gap: "{dimension.gap.base}",
-          borderRadius: "{dimension.borderradius.large}",
-          boxShadow: `{material.hierarchy.B1}`,
-          background: "{color.secondarycontainer.violet1}",
+          borderRadius: "{dimension.borderradius.xxxxl}",
+          background: "{color.basic.brand.1}",
           overflow: 'hidden'
         }
       },
@@ -3051,14 +3052,16 @@ export const DEFAULT_STYLE_CONFIG = {
           metaType: 'text',
           variant: 'tabItemText',
           style: {
-            padding: "{dimension.padding.base}",
+            flexGrow: "1",
+            padding: "{dimension.padding.tight}",
           }
         },
         active: {
           metaType: 'text',
           variant: 'tabActiveItemText',
           style: {
-            padding: "{dimension.padding.base}",
+            flexGrow: "1",
+            padding: "{dimension.padding.tight}",
             background: "{color.onprimary.white100}",
             borderRadius: "{dimension.borderradius.large}",
           }
@@ -3066,7 +3069,7 @@ export const DEFAULT_STYLE_CONFIG = {
       },
       tabPanel: {
         style: {
-          padding: "{dimension.padding.base}",
+          padding: "{dimension.padding.base} {dimension.padding.semiloose}",
           borderRadius: "{dimension.borderradius.large}",
           background: "{color.surfacecontainer.white100}",
         }
