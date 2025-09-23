@@ -273,6 +273,10 @@ function createTabElement(content, attributes = {}, currentMarkdown = '') {
         
         // 创建选项卡点击事件
         const tabClickEvent = parseEventSyntax(`[event:${EVENT_NAME.TAB_CHANGED}(${panel.tabKey})]`, itemId);
+        // 注入绑定的数据名称到事件参数中
+        if (Array.isArray(tabClickEvent) && tabClickEvent.length > 0 && tabClickEvent[0] && tabClickEvent[0].parameters) {
+            tabClickEvent[0].parameters.dataKey = bindingData;
+        }
         
         return {
             dataKeys: [],

@@ -34,6 +34,7 @@ export const EVENT_CONFIG = {
         "nativeEventKey": "click",
         "dataEventKey": [],
         "parameters": {
+            "dataKey": "",
             "tabKey": "",
         }
     }
