@@ -13,32 +13,32 @@ import { JSDOM } from 'jsdom';
 
 
 const legendConfig = {
-  fontSize: "10px",
+  fontSize: "14px",
   fontWeight: "400",
   fill: "{color.onsurface.black88}",
 }
 
 const axisConfig = {
-  fontSize: "10px",
+  fontSize: "14px",
   fontWeight: "400",
   fill: "{color.onsurface.black88}",
 }
 
 
 const smallAxisConfig = {
-  fontSize: "{font.size.small}",
+  fontSize: "{font.size.medium}",
   fontWeight: "400",
   fill: "{color.onsurface.black88}",
 }
 
 const smalllegendConfig = {
-  fontSize: "{font.size.small}",
+  fontSize: "{font.size.medium}",
   fontWeight: "400",
   fill: "{color.onsurface.black88}",
 }
 
 const titleConfig = {
-  fontSize: "{font.size.small}",
+  fontSize: "{font.size.xl}",
   fontWeight: "400",
   fill: "{color.onsurface.black88}",
 }

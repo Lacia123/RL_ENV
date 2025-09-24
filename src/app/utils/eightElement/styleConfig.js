@@ -922,7 +922,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.semibold}",
       fontSize: "{font.size.small}",
       padding: "{dimension.padding.base} {dimension.padding.semiloose}",
-      textAlign: 'left',
+      textAlign: 'center',
       borderBottom: `{dimension.borderwidth.base} solid {color.surfacecontainer.black20}`,
       backgroundImage: 'none',
       textTransform: 'uppercase',
@@ -932,6 +932,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontSize: "{font.size.medium}",
       padding: "{dimension.padding.base} {dimension.padding.semiloose}",
       color: "{color.onsurface.black76}",
+      textAlign: 'left',
       verticalAlign: 'top'
     },
     // 表格行  
