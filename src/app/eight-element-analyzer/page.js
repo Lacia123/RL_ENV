@@ -734,26 +734,12 @@ Pinterest作为瀑布流布局的典型代表，通过这种布局方式重新�
 
 </layout:row>
 
-
-<layout:row>
-
-<card:custom>
-  <title>MOST POPULAR</title>
-  <content>
-    <title>Profesional</title>
-    <segment>Best for growing startups and growth companies</segment>
-    <segment>Best for growing startups and growth companies</segment>
-  </content>
-</card:custom>
-
 <card:custom>
 ## MOST POPULAR
 ### Profesional
 Best for growing startups and growth companies
 Best for growing startups and growth companies
 </card:custom>
-
-</layout:row>
 
 
 ### 核心优势
