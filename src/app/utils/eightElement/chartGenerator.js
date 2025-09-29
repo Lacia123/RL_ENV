@@ -373,17 +373,21 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
       return item;
     });
 
-    // Sort chartData by date ascending to ensure X-axis is chronological LTR
-    chartData.sort((a, b) => {
-        // Assuming dateField contains date strings in a format sortable (e.g., YYYY-MM-DD)
-        if (a[dateField] < b[dateField]) {
-            return -1;
-        }
-        if (a[dateField] > b[dateField]) {
-            return 1;
-        }
-        return 0;
-    });
+    // Sort chartData by date ascending ONLY for line charts to ensure X-axis is chronological LTR
+    // For bar charts, maintain original data order
+    if (chartType === 'line' || chartType === 'grouped_line' || chartType === 'area_chart') {
+        chartData.sort((a, b) => {
+            // Assuming dateField contains date strings in a format sortable (e.g., YYYY-MM-DD)
+            if (a[dateField] < b[dateField]) {
+                return -1;
+            }
+            if (a[dateField] > b[dateField]) {
+                return 1;
+            }
+            return 0;
+        });
+    }
+    // For bar charts (bar, barh, pie, donut_chart), maintain original order
     
     // 根据图表类型生成不同的图表
     switch(chartType) {
@@ -873,7 +877,7 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top + chartOffsetY})`);
     
-    // X轴类别（品牌名称）
+    // X轴类别（品牌名称）- 严格按照原始数据顺序
     const categories = data.map(d => d[dateField]);
     
     // 处理单个数据系列的情况
@@ -882,12 +886,12 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
     // 寻找所有数据系列的最大值，用于设置比例尺
     let maxValue = 0;
     valueFields.forEach(field => {
-      const fieldMax = d3.max(data, d => parseFloat(d[field].toString().replace('%', '')) || 0);
+      const fieldMax = d3.max(data, d => parseFloat(d[field].toString().replace(/[,%]/g, '')) || 0);
       maxValue = Math.max(maxValue, fieldMax);
     });
     maxValue = maxValue * 1.1; // 增加10%的空间
     
-    // 创建x和y轴的比例尺
+    // 创建x和y轴的比例尺 - 确保严格按照原始数据顺序
     const xScale = d3.scaleBand()
       .domain(categories)
       .range([0, innerWidth])
@@ -964,9 +968,9 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
       .append('rect')
       .attr('class', `bar bar-${colorClassSuffix}`)
       .attr('x', d => xScale(d[dateField]))
-      .attr('y', d => yScale(parseFloat(d[valueField].toString().replace('%', '')) || 0))
+      .attr('y', d => yScale(parseFloat(d[valueField].toString().replace(/[,%]/g, '')) || 0))
       .attr('width', xScale.bandwidth())
-      .attr('height', d => innerHeight - yScale(parseFloat(d[valueField].toString().replace('%', '')) || 0))
+      .attr('height', d => innerHeight - yScale(parseFloat(d[valueField].toString().replace(/[,%]/g, '')) || 0))
       .attr('fill', '#000');
     
     // 添加数值标签
@@ -976,7 +980,7 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
       .append('text')
       .attr('class', 'bar-label')
       .attr('x', d => xScale(d[dateField]) + xScale.bandwidth() / 2)
-      .attr('y', d => yScale(parseFloat(d[valueField].toString().replace('%', '')) || 0) - 5)
+      .attr('y', d => yScale(parseFloat(d[valueField].toString().replace(/[,%]/g, '')) || 0) - 5)
       .attr('text-anchor', 'middle')
       .attr('fill', '#333')
       .attr('font-size', displayConfig.dataLabelSize || '8px') // 🆕 使用动态数据标签字体大小
@@ -1071,13 +1075,13 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top + chartOffsetY})`);
     
-    // X轴类别（日期）
+    // Y轴类别（标签）- 严格按照原始数据顺序
     const categories = data.map(d => d[dateField]);
     
     // 寻找所有数据系列的最大值，用于设置比例尺
     let maxValue = 0;
     valueFields.forEach(field => {
-      const fieldMax = d3.max(data, d => d[field]);
+      const fieldMax = d3.max(data, d => parseFloat(d[field].toString().replace(',', '')) || 0);
       maxValue = Math.max(maxValue, fieldMax);
     });
     maxValue = maxValue * 1.1; // 增加10%的空间
@@ -1091,7 +1095,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
     const resolvedAxisFontWeight3 = resolveToken(currentAxisConfig3.fontWeight);
     const resolvedAxisFill3 = resolveToken(currentAxisConfig3.fill);
     
-    // 创建x和y轴的比例尺
+    // 创建x和y轴的比例尺 - 确保严格按照原始数据顺序
     const xScale = d3.scaleLinear()
       .domain([0, maxValue])
       .range([0, innerWidth]);
@@ -1166,7 +1170,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('y', d => yScale(d[dateField]))
       .attr('x', 0)
       .attr('height', yScale.bandwidth())
-      .attr('width', d => xScale(d[valueField]))
+      .attr('width', d => xScale(parseFloat(d[valueField].toString().replace(',', '')) || 0))
       .attr('fill', '#000');
     
     // 添加数值标签
@@ -1176,7 +1180,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .append('text')
       .attr('class', 'bar-label')
       .attr('y', d => yScale(d[dateField]) + yScale.bandwidth() / 2)
-      .attr('x', d => xScale(d[valueField]) + 5)
+      .attr('x', d => xScale(parseFloat(d[valueField].toString().replace(',', '')) || 0) + 5)
       .attr('dy', '.35em')
       .attr('text-anchor', 'start')
       .attr('fill', '#333')

@@ -36,6 +36,38 @@ function parseTableData(tableContent) {
     return data;
 }
 
+// 🆕 根据排序参数对表格数据进行排序
+function sortTableData(tableData, sortOrder) {
+    if (!sortOrder || !tableData || tableData.length < 2) {
+        return tableData; // 如果没有排序参数或数据不足，返回原始数据
+    }
+    
+    // 获取标题行
+    const headers = tableData[0];
+    // 获取数据行
+    const dataRows = tableData.slice(1);
+    
+    // 检查是否有第二列（索引为1）
+    if (headers.length < 2) {
+        return tableData; // 如果列数不足，返回原始数据
+    }
+    
+    // 对数据行按第二列进行排序
+    const sortedDataRows = dataRows.sort((a, b) => {
+        const valueA = parseFloat(a[1].toString().replace(/[,%]/g, '')) || 0;
+        const valueB = parseFloat(b[1].toString().replace(/[,%]/g, '')) || 0;
+        
+        if (sortOrder.toLowerCase() === 'desc') {
+            return valueB - valueA; // 降序
+        } else {
+            return valueA - valueB; // 升序 (asc 或默认)
+        }
+    });
+    
+    // 返回排序后的数据（标题行 + 排序后的数据行）
+    return [headers, ...sortedDataRows];
+}
+
 // 检测是否为表格或图表数据（统一检测）
 function isTableOrChartData(line) {
     // 首先检查是否是图表数据标记
@@ -69,14 +101,15 @@ function extractTableOrChartData(lines, startIndex) {
 
     let chartType = null;
     let chartTitle = null;
+    let sortOrder = null;
 
     if (isChart) {
         const fullChartSpec = chartMatch[1];
-        // 🆕 解析图表类型和可选标题
-        [chartType, chartTitle] = fullChartSpec.includes('|')
-            ? fullChartSpec.split('|', 2).map(s => s.trim())
-            : [fullChartSpec.trim(), null];
-
+        // 🆕 解析图表类型、可选标题和可选排序参数
+        const parts = fullChartSpec.split('|').map(s => s.trim());
+        chartType = parts[0];
+        chartTitle = parts[1] || null;
+        sortOrder = parts[2] || null; // asc 或 desc
     }
 
     // 处理第一行 - 如果是图表，移除图表标记和事件语法
@@ -112,6 +145,7 @@ function extractTableOrChartData(lines, startIndex) {
         isChart: isChart,
         chartType: chartType,
         chartTitle: chartTitle, // 🆕 添加图表标题
+        sortOrder: sortOrder, // 🆕 添加排序参数
         tableContent: originalContent,
         tableData: tableData,
         endIndex: startIndex + i,
@@ -317,7 +351,7 @@ function generateChartSvg(chartType, data, chartStyleConfig = null, chartTitle =
 
 // 处理表格数据 - 决定创建普通表格还是图表元素
 function processTableOrChartData(result, stack) {
-    const { isChart, chartType, chartTitle, tableContent, tableData, endIndex, originalFirstLine } = result;
+    const { isChart, chartType, chartTitle, sortOrder, tableContent, tableData, endIndex, originalFirstLine } = result;
 
     if (isChart) {
         // 处理为图表
@@ -331,8 +365,11 @@ function processTableOrChartData(result, stack) {
                 chartEvents.push(...events);
             }
 
+            // 🆕 根据排序参数对表格数据进行排序
+            const sortedTableData = sortTableData(tableData, sortOrder);
+            
             // 先创建图表元素（包含样式配置）- 使用默认 variant，传递标题和事件
-            const chartElement = createChartElement(chartType, '', tableData, tableContent, 'normal', chartTitle, chartEvents);
+            const chartElement = createChartElement(chartType, '', sortedTableData, tableContent, 'normal', chartTitle, chartEvents);
 
             // 提取样式配置
             const chartStyleConfig = {
@@ -342,8 +379,8 @@ function processTableOrChartData(result, stack) {
                 axis: chartElement.layout.axis
             };
 
-            // 生成SVG图表，传入样式配置和标题
-            const svgContent = generateChartSvg(chartType, tableData, chartStyleConfig, chartTitle);
+            // 生成SVG图表，传入样式配置和标题，使用排序后的数据
+            const svgContent = generateChartSvg(chartType, sortedTableData, chartStyleConfig, chartTitle);
 
             // 更新图表元素的SVG内容
             chartElement.svgContent = svgContent;
@@ -407,5 +444,6 @@ export {
     extractTableOrChartData,
     processTableOrChartData,
     getChartVariantFromConfig,
-    generateChartSvg
+    generateChartSvg,
+    sortTableData
 }

@@ -576,14 +576,15 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
         }
     }
 
-    // 🆕 检查图表格式 [chart:type|title] 或 [chart:type] (新增标题支持)
+    // 🆕 检查图表格式 [chart:type|title|sort] 或 [chart:type|title] 或 [chart:type] (新增标题和排序支持)
     const chartMatch = line.match(/^\[chart:(.+?)\]/);
     if (chartMatch) {
         const fullChartSpec = chartMatch[1];
-        // 🆕 解析图表类型和可选标题
-        const [chartType, chartTitle] = fullChartSpec.includes('|')
-            ? fullChartSpec.split('|', 2).map(s => s.trim())
-            : [fullChartSpec.trim(), null];
+        // 🆕 解析图表类型、可选标题和可选排序参数
+        const parts = fullChartSpec.split('|').map(s => s.trim());
+        const chartType = parts[0];
+        const chartTitle = parts[1] || null;
+        const sortOrder = parts[2] || null; // asc 或 desc
 
         const chartKey = `chart:${chartType}`;
 
@@ -600,6 +601,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
                     type: 'chart',
                     chartType: chartType,
                     chartTitle: chartTitle, // 🆕 添加图表标题
+                    sortOrder: sortOrder, // 🆕 添加排序参数
                     templatePath: processedTemplatePath,
                     content: line.trim(),
                     wildcard: wildcardResult.wildcard,
@@ -618,6 +620,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
                     type: 'chart',
                     chartType: chartType,
                     chartTitle: chartTitle, // 🆕 添加图表标题
+                    sortOrder: sortOrder, // 🆕 添加排序参数
                     templatePath: templatePath,
                     content: line.trim()
                 },
