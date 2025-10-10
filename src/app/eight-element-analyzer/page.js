@@ -1300,6 +1300,42 @@ const userRoles = {
 
 [查看技术文档](https://example.com/docs)
 [secondary][源码示例](https://github.com/example/tab-component)`
+  },
+  minimalistCardSeries: {
+    name: "简约卡片系列",
+    description: "测试新增的简约卡片系列",
+    markdown: `
+    <card:minimalistBorderLessCard>
+    ### 招聘JD
+    ## 算法工程师
+    负责核心算法模型的设计、优化与落地，推动产品智能化升级。需要具备扎实数学功底和工程实现能力，能将理论转化为业务价值。
+    </card:minimalistBorderLessCard>
+    <card:minimalistListCard>
+    ## 职位详情
+
+    ### 薪资范围
+    #### 1.6K-1.8K
+
+    ### 工作地点
+    #### 北京
+
+    ### 招聘人数
+    #### 5人
+
+    ### 各种类型
+    #### 全职
+
+    更多岗位可以关注公司招聘官方链接
+    </card:minimalistListCard> 
+    <card:minimalistButtonCard>
+    ## 加入我们
+    成为我们图队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长，共同打造行业领先的解决方案。如果你对算法充满热情，渴望挑战，欢迎加入我们！
+    ## 应聘方式
+    [官网在线申请](https://example.com/apply)
+    [公众号后台申请](https://example.com/about)
+    [发送邮件申请](https://example.com/contact)
+    </card:minimalistButtonCard>
+    `
   }
 };
 

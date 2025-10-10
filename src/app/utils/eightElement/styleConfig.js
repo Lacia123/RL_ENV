@@ -4,6 +4,7 @@
  * 提供了对不同元素类型样式的完整配置
  */
 
+import { fontSize } from '../icons/Edit/index.js';
 import resolveToken from '../tokens/resolveToken.js';
 
 // CSS变量系统
@@ -849,6 +850,50 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.medium}",
       color: "{color.onsurfacecontainer.grey9}",
     },
+    // 简约风格卡片
+    minimalistBorderLessCardTitle: {
+      fontSize: "{font.size.xxl}",
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.onsurface.black88}",
+    },
+    minimalistBorderLessCardPageTitle: {
+      fontSize: "{font.size.large}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onsurface.black88}",
+    },
+    minimalistBorderLessCardContent: {
+      lineHeight: "1.4",
+      fontSize: "{font.size.medium}",
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.onsurfacecontainer.grey9}",
+    },
+    minimalistListCardTitle: {
+      lineHeight: "1.4",
+      fontSize: "{font.size.medium}",
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.basic.brand.6}",
+    },
+
+    minimalistListCardContent: {
+      lineHeight: "1.4",
+      fontSize: "{font.size.large}",
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.onsurfacecontainer.grey9}",
+    },
+
+    minimalistListCardItemTitle: {
+      lineHeight: "1.4",
+      fontSize: "{font.size.medium}",
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.onsurface.black88}",
+    },
+    minimalistListCardItemDescription: {
+      lineHeight: "1.4",
+      fontSize: "{font.size.xl}",
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.onsurface.black88}",
+    },
+
     // tabItemText
     tabItemText: {
       fontSize: "{font.size.medium}",
@@ -859,7 +904,7 @@ export const DEFAULT_STYLE_CONFIG = {
     tabActiveItemText: {
       fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.bold}",
-      textAlign: "center", 
+      textAlign: "center",
       color: "{color.basic.brand.6}",
     }
   },
@@ -2371,7 +2416,7 @@ export const DEFAULT_STYLE_CONFIG = {
       }
     },
     // Copy End
-
+    // ==================== headerCard 系列 ====================
     headerCard: {
       type: 'template',
       markdownMapping: {
@@ -2520,72 +2565,159 @@ export const DEFAULT_STYLE_CONFIG = {
           }
         }
       }
+    },
+
+    // ==================== 简约系列 ====================
+
+    minimalistBorderLessCard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        h3: 'pageTitle',
+        p: 'content',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: "{dimension.gap.tight}",
+      },
+      title: {
+        metaType: 'text',
+        variant: 'minimalistBorderLessCardTitle',
+      },
+      pageTitle: {
+        metaType: 'text',
+        variant: 'minimalistBorderLessCardPageTitle',
+      },
+      content: {
+        style: {
+          paddingTop: "{dimension.padding.base}",
+        },
+        metaType: 'text',
+        variant: 'minimalistBorderLessCardContent',
+      }
+    },
+    minimalistListCard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        p: 'content',
+        'h3+h4:group': 'listItems.listItem*',
+      },
+      style: {
+        marginTop: "{dimension.margin.base}",
+        display: 'flex',
+        flexDirection: 'column',
+        padding: "{dimension.padding.base}",
+        gap: "{dimension.gap.base}",
+        borderRadius: "{dimension.borderradius.xl}",
+        background: "{color.basic.brand.0}",
+      },
+      title: {
+        metaType: 'text',
+        style: {
+          paddingTop: "{dimension.padding.base}",
+          paddingLeft: "{dimension.padding.loose}",
+        },
+        variant: 'minimalistListCardTitle',
+      },
+      content: {
+        metaType: 'text',
+        style: {
+          paddingLeft: "{dimension.padding.base}",
+        },
+        variant: 'minimalistListCardContent',
+      },
+      listItems: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          gap: "{dimension.gap.loose}",
+          padding: "{dimension.padding.base}",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+        },
+        "listItem*": {
+          type: 'template',
+          style: {
+            flex: "0 0 48%",
+            borderRadius: "{dimension.borderradius.large}",
+            background: "{color.basic.brand.1}",
+            display: 'flex',
+            padding: "{dimension.padding.base}",
+            flexDirection: 'column',
+          },
+          markdownMapping: {
+            h3: 'itemTitle',
+            h4: 'itemDescription',
+          },
+          itemTitle: {
+            metaType: 'text',
+            variant: 'minimalistListCardItemTitle',
+          },
+          itemDescription: {
+            metaType: 'text',
+            variant: 'minimalistListCardItemDescription',
+          }
+        }
+      }
+    },
+    minimalistButtonCard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        p: 'content',
+        'button:primary': 'buttonContainer.button',
+        'button:secondary':'buttonContainer.secondaryButton',
+      },
+      style: {
+        display: 'flex',
+        marginTop: "{dimension.margin.base}",
+        flexDirection: 'column',
+        gap: "{dimension.gap.base}",
+        borderRadius: "{dimension.borderradius.xl}",
+        padding: "{dimension.padding.base}",
+        background: "{color.basic.grey.0}",
+      },
+      title: {
+        metaType: 'text',
+        style: {
+          paddingLeft: "{dimension.padding.base}",
+        },
+        variant: 'minimalistListCardTitle',
+      },
+      content: {
+        metaType: 'text',
+        variant: 'minimalistBorderLessCardContent',
+        style: {
+          marginTop: "{dimension.margin.base}",
+          marginBottom: "{dimension.margin.base}",
+          paddingLeft: "{dimension.padding.base}",
+          paddingRight: "{dimension.padding.base}",
+          paddingBottom: "{dimension.padding.base}",
+          borderBottom: `{dimension.borderwidth.base} solid {color.basic.grey.1}`,
+        }
+      },
+      buttonContainer: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+        },
+        button: {
+          metaType: 'button',
+          variant: 'primary',
+        },
+        secondaryButton: {
+          metaType: 'button',
+          variant: 'secondary',
+        }
+      }
     }
+
+
   },
-  /**
-   * 
-   *  <tab bindingData="tabData" defaultTabKey="tab1">
-   *    <tabPanel tabKey="tab1" tabTitle="市场概述">
-   *       <card:headerPrecentCard>
-   ### 未来预测
-   #### 40%
-   预计增长率
-  </card:headerPrecentCard>
-
-   <card:headerCard >
-    ## 三、头部品牌分析
-    联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
-
-    [chart:pie|笔记本市场占比]
-    | 类型 | 占比 |
-    |------|------|
-    | 游戏本 | 40% |
-    | 轻薄本 | 35% |
-    | 工作站 | 25% |
-           </card:headerCard>
-   *    </tabPanel>
-        <tabPanel tabKey="tab2" tabTitle="市场分析">
-           <card:elegantTable>
-      ## 表格布局卡片
-      ### 数据展示
-      专业的表格数据展示布局，保持优雅青蓝风格的同时确保数据的清晰可读。
-
-      | 功能模块 | 完成度 | 优先级 |
-      |---------|--------|--------|
-      | 卡片系统 | 100% | 高 |
-      | 布局引擎 | 95% | 高 |
-   </card:elegantTable>
-        </tabPanel>
-        <tabPanel tabKey="tab3" tabTitle="市场趋势">
-           <card:elegantTable>
-      ## 表格布局卡片
-      ### 数据展示
-      专业的表格数据展示布局，保持优雅青蓝风格的同时确保数据的清晰可读。
-
-      | 功能模块 | 完成度 | 优先级 |
-      |---------|--------|--------|
-      | 卡片系统 | 100% | 高 |
-      | 布局引擎 | 95% | 高 |
-   </card:elegantTable>
-        </tabPanel>
-        <tabPanel tabKey="tab4" tabTitle="市场预测">'
-           <card:elegantTable>
-      ## 表格布局卡片
-      ### 数据展示
-      专业的表格数据展示布局，保持优雅青蓝风格的同时确保数据的清晰可读。
-
-      | 功能模块 | 完成度 | 优先级 |
-      |---------|--------|--------|
-      | 卡片系统 | 100% | 高 |
-      | 布局引擎 | 95% | 高 |
-   </card:elegantTable>
-        </tabPanel>
-   *  </tab>
-   *  
-   * 
-   * 
-   */
-
   tab: {
     standard: {
       tabContainer: {
