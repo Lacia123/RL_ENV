@@ -881,18 +881,27 @@ export const DEFAULT_STYLE_CONFIG = {
       color: "{color.onsurfacecontainer.grey9}",
     },
 
+    minimalistCardMainTitle: {
+      lineHeight: "1.4",
+      fontSize: "{font.size.xl}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onsurface.black88}",
+    },
+
     minimalistListCardItemTitle: {
       lineHeight: "1.4",
       fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.bold}",
       color: "{color.onsurface.black88}",
     },
+
     minimalistListCardItemDescription: {
       lineHeight: "1.4",
       fontSize: "{font.size.xl}",
       fontWeight: "{font.fontweight.bold}",
       color: "{color.onsurface.black88}",
     },
+    
 
     // tabItemText
     tabItemText: {
@@ -2663,6 +2672,88 @@ export const DEFAULT_STYLE_CONFIG = {
         }
       }
     },
+    
+    minimalistImageCard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        h3: 'pageTitle',
+        'img+h4+p:group': 'imageItems.imageItem*',
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: "{dimension.gap.base}",
+        marginTop: "{dimension.margin.base}",
+        padding: "{dimension.padding.base}",
+        borderRadius: "{dimension.borderradius.xl}",
+        background: "{color.basic.grey.0}",
+      },
+      title: {
+        metaType: 'text',
+        style: {
+          paddingLeft: "{dimension.padding.loose}",
+        },
+        variant: 'minimalistCardMainTitle',
+      },
+      pageTitle: {
+        metaType: 'text',
+        style: {
+          paddingTop: "{dimension.padding.base}",
+          paddingLeft: "{dimension.padding.loose}",
+        },
+        variant: 'minimalistListCardTitle',
+      },
+      imageItems: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          gap: "{dimension.gap.base}",
+          justifyContent: "space-between",
+        },
+        "imageItem*": {
+          type: 'template',
+          style: {
+            borderRadius: "{dimension.borderradius.xl}",
+            background: "{color.surfacecontainer.white100}",
+            overflow: 'hidden',
+            flex: "0 0 49%",
+            display: 'flex',
+            flexDirection: 'column',
+          },
+          markdownMapping: {
+            img: 'image',
+            h4: 'itemTitle',
+            p: 'itemDescription',
+          },
+          image: {
+            metaType: 'image',
+            variant: 'minimalist',
+          },
+          itemTitle: {
+            metaType: 'text',
+            style: {
+              marginTop: "{dimension.margin.base}",
+              paddingBottom: "{dimension.padding.base}",
+              paddingLeft: "{dimension.padding.base}",
+              paddingRight: "{dimension.padding.base}",
+            },
+            variant: 'minimalistListCardItemTitle',
+          },
+          itemDescription: {
+            metaType: 'text',
+            style: {
+              paddingLeft: "{dimension.padding.base}",
+              paddingRight: "{dimension.padding.base}",
+              marginBottom: "{dimension.margin.base}",
+            },
+            variant: 'minimalistBorderLessCardContent'
+          }
+        }
+      }
+    },
+
     minimalistButtonCard: {
       type: 'template',
       markdownMapping: {
@@ -2874,6 +2965,13 @@ export const DEFAULT_STYLE_CONFIG = {
         background: `linear-gradient(45deg, {color.surfacecontainer.black16} 0%, transparent 50%)`,
         borderRadius: "{dimension.borderradius.xxl}"
       }
+    },
+
+    minimalist: {
+      width: "100%",
+      height: "300px",
+      objectFit: "cover",
+      clipPath: "none",
     }
   },
 

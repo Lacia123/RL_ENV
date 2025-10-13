@@ -597,7 +597,9 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
         } else if (markdownData.type === 'img') {
             // 图片类型
             const imageUrl = markdownData.url || '';
-            elementInstance = createBackgroundElement(imageUrl, 'normal');
+            // 🔧 修复：优先使用tagConfig中的variant，回退到markdownData中的variant或默认值
+            const imageVariant = (tagConfig && tagConfig.variant) ? tagConfig.variant : (markdownData.variant || 'normal');
+            elementInstance = createBackgroundElement(imageUrl, imageVariant);
         } else if (markdownData.type === 'button') {
             // 按钮类型
             const buttonText = content;

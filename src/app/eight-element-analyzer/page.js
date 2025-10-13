@@ -1326,7 +1326,22 @@ const userRoles = {
     #### 全职
 
     更多岗位可以关注公司招聘官方链接
-    </card:minimalistListCard> 
+    </card:minimalistListCard>
+
+    <card:minimalistImageCard>
+    ### 公司简介
+    ## 致力于提供最先进的数字化解决方案
+
+    ![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)
+    #### 关于企业
+    我们是一家专注于人工智能和大数据领域的创新科技公司
+
+    ![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)
+    #### 关于团队
+    我们拥有一支充满活力和创新精神的技术团队。
+  
+    </card:minimalistImageCard>
+    
     <card:minimalistButtonCard>
     ## 加入我们
     成为我们图队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长，共同打造行业领先的解决方案。如果你对算法充满热情，渴望挑战，欢迎加入我们！

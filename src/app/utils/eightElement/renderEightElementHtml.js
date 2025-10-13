@@ -2016,6 +2016,7 @@ function renderButtonElement(element) {
  * @returns {string} - 渲染的HTML字符串
  */
 function renderImageElement(element) {
+    console.log('🖼️ 渲染图片元素:', element);
     const styleAttr = generateStyleAttribute(element.computedStyle);
     const className = element.layout && element.layout.className ? element.layout.className : '';
     const classAttr = className ? `class="${className}"` : '';
