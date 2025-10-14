@@ -422,25 +422,18 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
 
 // 🆕 将层级表格转换为树状结构
 function buildHierarchyFromTable(headers, rows, title = 'Tree') {
-  const valueIndex = headers.length - 1;
+  const lastIndex = headers.length - 1;
 
-  function normalizeNumber(v) {
-    if (v === undefined || v === null) return 0;
-    const s = String(v).replace(/[,\s$Kk￥，]/g, '');
-    const num = parseFloat(s);
-    return isNaN(num) ? 0 : num;
-  }
+  const root = { name: title || headers[0] || 'Tree', children: [] };
 
-  const root = { name: title || headers[0] || 'Tree', children: [], value: 0 };
-
-  // 使用嵌套映射累积节点
+  // 使用映射避免重复节点
   const map = new Map(); // key -> node
 
   function getOrCreateChild(parent, name) {
     if (!parent.children) parent.children = [];
     let child = parent.children.find(c => c.name === name);
     if (!child) {
-      child = { name, children: [], value: 0 };
+      child = { name, children: [] };
       parent.children.push(child);
     }
     return child;
@@ -448,38 +441,29 @@ function buildHierarchyFromTable(headers, rows, title = 'Tree') {
 
   rows.forEach(row => {
     if (!row) return;
-    const levels = row.slice(0, valueIndex);
-    const value = normalizeNumber(row[valueIndex]);
+    // 将整行视为层级路径，最后一列也作为末级子节点名称
+    const levels = row.slice(0, headers.length).map(v => String(v));
 
     let current = root;
     for (const lvl of levels) {
       const key = `${current.name}::${lvl}`;
       let next = map.get(key);
       if (!next) {
-        next = getOrCreateChild(current, String(lvl));
+        next = getOrCreateChild(current, lvl);
         map.set(key, next);
       }
       current = next;
     }
-    current.value = (current.value || 0) + value;
-  });
-
-  // 向上累计父节点值
-  function accumulate(node) {
-    if (!node.children || node.children.length === 0) {
-      return node.value || 0;
+    // 最末级为叶子节点，保持空 children 数组（后续修剪会去掉空 children 属性）
+    if (current.children && current.children.length === 0) {
+      delete current.children;
     }
-    const sum = node.children.reduce((acc, c) => acc + accumulate(c), 0);
-    node.value = (node.value || 0) + sum;
-    return node.value;
-  }
-  accumulate(root);
+  });
 
   // 清理空 children
   function prune(node) {
     if (node.children && node.children.length > 0) {
       node.children.forEach(prune);
-      // 如果所有子节点没有名称，过滤
       node.children = node.children.filter(c => c && c.name != null);
       if (node.children.length === 0) delete node.children;
     }
