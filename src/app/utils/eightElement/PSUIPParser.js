@@ -15,7 +15,7 @@ import { isTabTag, extractTabBlock, createTabElement } from './creators/tabCreat
 // 检测是否为引用文本
 function isQuoteText(line) {
     return line.trim().match(/^>\s*(.*)$/);
-}
+}``
 
 // 检测是否为图标标签
 function isIconTag(line) {
@@ -81,7 +81,7 @@ function parseEventSyntax(text, elementId, currentMarkdown = '') {
 // 移除文本中的事件语法标记
 function removeEventSyntax(text) {
     // 首先检查是否是完整的事件按钮语法：[event:eventName][buttonText](url)
-    const fullEventMatch = text.match(/^\[event:\w+(?:\([^)]*\))?\]\s*\[([^\]]+)\]\(([^)]+)\)$/);
+    const fullEventMatch = text.match(/^\[event:\w+(?:\([^)]*\))?\]\s*\[([^\]]+)\]\(([^)]+)\)$/); 
     if (fullEventMatch) {
         // 如果是完整的事件按钮语法，返回按钮文本部分
         return fullEventMatch[1].trim();
@@ -582,7 +582,9 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
         const fullChartSpec = chartMatch[1];
         // 🆕 解析图表类型、可选标题和可选排序参数
         const parts = fullChartSpec.split('|').map(s => s.trim());
-        const chartType = parts[0];
+        let chartType = parts[0];
+        // 🆕 统一命名：将 TreeMind 兼容为 tree_mind
+        if (chartType === 'TreeMind') chartType = 'tree_mind';
         const chartTitle = parts[1] || null;
         const sortOrder = parts[2] || null; // asc 或 desc
 

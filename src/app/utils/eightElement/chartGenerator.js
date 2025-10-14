@@ -321,6 +321,11 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
       throw new Error('图表数据不足，至少需要标题行和一行数据');
     }
     
+    // 🆕 特殊类型：tree_mind 树状图（兼容旧写法 'TreeMind'）
+    if (chartType === 'tree_mind' || chartType === 'TreeMind') {
+      return generateTreeMindChart(tableData, chartTitle);
+    }
+
     // 设置图表尺寸和边距
     // 🆕 增大基础尺寸，让图表占满容器，特别是为柱状图增加更多底部空间
     const width = 600;  // 增大宽度，充分利用容器空间
@@ -413,6 +418,255 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
     console.error('生成图表时发生错误:', error);
     return generateErrorSvg(error.message);
   }
+}
+
+// 🆕 将层级表格转换为树状结构
+function buildHierarchyFromTable(headers, rows, title = 'Tree') {
+  const valueIndex = headers.length - 1;
+
+  function normalizeNumber(v) {
+    if (v === undefined || v === null) return 0;
+    const s = String(v).replace(/[,\s$Kk￥，]/g, '');
+    const num = parseFloat(s);
+    return isNaN(num) ? 0 : num;
+  }
+
+  const root = { name: title || headers[0] || 'Tree', children: [], value: 0 };
+
+  // 使用嵌套映射累积节点
+  const map = new Map(); // key -> node
+
+  function getOrCreateChild(parent, name) {
+    if (!parent.children) parent.children = [];
+    let child = parent.children.find(c => c.name === name);
+    if (!child) {
+      child = { name, children: [], value: 0 };
+      parent.children.push(child);
+    }
+    return child;
+  }
+
+  rows.forEach(row => {
+    if (!row) return;
+    const levels = row.slice(0, valueIndex);
+    const value = normalizeNumber(row[valueIndex]);
+
+    let current = root;
+    for (const lvl of levels) {
+      const key = `${current.name}::${lvl}`;
+      let next = map.get(key);
+      if (!next) {
+        next = getOrCreateChild(current, String(lvl));
+        map.set(key, next);
+      }
+      current = next;
+    }
+    current.value = (current.value || 0) + value;
+  });
+
+  // 向上累计父节点值
+  function accumulate(node) {
+    if (!node.children || node.children.length === 0) {
+      return node.value || 0;
+    }
+    const sum = node.children.reduce((acc, c) => acc + accumulate(c), 0);
+    node.value = (node.value || 0) + sum;
+    return node.value;
+  }
+  accumulate(root);
+
+  // 清理空 children
+  function prune(node) {
+    if (node.children && node.children.length > 0) {
+      node.children.forEach(prune);
+      // 如果所有子节点没有名称，过滤
+      node.children = node.children.filter(c => c && c.name != null);
+      if (node.children.length === 0) delete node.children;
+    }
+  }
+  prune(root);
+
+  return root;
+}
+
+// 🆕 生成 TreeMind 树状图（静态展开版）
+function generateTreeMindChart(tableData, chartTitle = null) {
+  const headers = tableData[0];
+  const rows = tableData.slice(1);
+
+  const treeData = buildHierarchyFromTable(headers, rows, chartTitle || headers[0] || 'Tree');
+
+  // 计算布局参数
+  const baseWidth = 928;
+  const marginTop = 20;
+  const marginRight = 20;
+  const marginBottom = 20;
+  const marginLeft = 80;
+
+  const root = d3.hierarchy(treeData);
+  const dx = 18;
+  const dy = (baseWidth - marginLeft - marginRight) / (1 + (root.height || 1));
+  const tree = d3.tree().nodeSize([dx, dy]);
+  const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+
+  // 首次布局以获取高度
+  tree(root);
+  let left = root;
+  let right = root;
+  root.eachBefore(node => {
+    if (node.x < left.x) left = node;
+    if (node.x > right.x) right = node;
+  });
+  const contentHeight = (right.x - left.x) + dx * 2;
+  const titleYOffset = chartTitle ? 24 : 0;
+  const height = contentHeight + marginTop + marginBottom + titleYOffset;
+
+  // 创建JSDOM SVG
+  const { svg } = createJsdomEnv(baseWidth, Math.max(240, height));
+
+  // 标题
+  if (chartTitle) {
+    const resolvedTitleWeight = resolveToken(titleConfig.fontWeight);
+    const resolvedTitleFill = resolveToken(titleConfig.fill);
+    const titleFontSize = '14px'; // 与其他图表标题保持一致的小一号字号
+    svg.append('text')
+      .attr('x', baseWidth / 2)
+      .attr('y', titleYOffset)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', titleFontSize)
+      .attr('font-weight', resolvedTitleWeight || '600')
+      .attr('fill', resolvedTitleFill || '#111')
+      .text(chartTitle);
+  }
+
+  // 将树整体向右和向下平移，避免左上角溢出；同时根据最上节点(left.x)调整纵向基线
+  const extraPadX = 110;
+  const g = svg.append('g')
+    .attr('transform', `translate(${marginLeft + extraPadX}, ${marginTop + titleYOffset - left.x + dx})`);
+
+  // 链接
+  const gLink = g.append('g')
+    .attr('fill', 'none')
+    .attr('stroke', '#555')
+    .attr('stroke-opacity', 0.4)
+    .attr('stroke-width', 1.5);
+
+  // 节点组
+  const gNode = g.append('g')
+    .attr('cursor', 'pointer')
+    .attr('pointer-events', 'all');
+
+  // 绘制链接
+  const links = root.links();
+  gLink.selectAll('path')
+    .data(links)
+    .enter()
+    .append('path')
+    .attr('d', diagonal)
+    .attr('data-link-source-id', d => String(d.source._treeId || 0))
+    .attr('data-link-target-id', d => String(d.target._treeId || 0));
+
+  // 绘制节点
+  const descendants = root.descendants().reverse();
+
+  // 为每个节点分配稳定的 id
+  descendants.forEach((d, i) => { d._treeId = i; });
+
+  // 收集某节点所有后代ID
+  function collectDescendantIds(d) {
+    const ids = [];
+    d.each(node => {
+      if (node !== d) ids.push(node._treeId);
+    });
+    return ids;
+  }
+
+  const node = gNode.selectAll('g')
+    .data(descendants)
+    .enter()
+    .append('g')
+    .attr('transform', d => `translate(${d.y},${d.x})`)
+    .attr('fill-opacity', 1)
+    .attr('stroke-opacity', 1)
+    .attr('class', 'node')
+    .attr('data-node-id', d => String(d._treeId))
+    .attr('data-has-children', d => (d.children && d.children.length) ? 'true' : 'false')
+    .attr('data-descendants', d => collectDescendantIds(d).join(','))
+    .attr('onclick', 'toggleNode(evt)');
+
+  node.append('circle')
+    .attr('r', 3)
+    .attr('fill', d => d.children ? '#555' : '#999')
+    .attr('stroke-width', 8)
+    .attr('stroke', 'white');
+
+  // 名称与数值
+  node.append('text')
+    .attr('dy', '0.31em')
+    .attr('x', d => d.children ? -8 : 8)
+    .attr('text-anchor', d => d.children ? 'end' : 'start')
+    .text(d => {
+      const name = d.data && d.data.name ? String(d.data.name) : '';
+      const val = (d.data && typeof d.data.value === 'number') ? d.data.value : null;
+      return val != null && !isNaN(val) ? `${name} (${val.toLocaleString()})` : name;
+    })
+    .attr('stroke-linejoin', 'round')
+    .attr('stroke-width', 3)
+    .attr('stroke', 'white')
+    .attr('paint-order', 'stroke')
+    .attr('font-size', '10px')
+    .attr('fill', '#111');
+
+  // 返回SVG字符串
+  // 注入交互脚本（仅作用于当前SVG）
+  const script = svg.append('script')
+    .attr('type', 'application/ecmascript')
+    .text(`
+      <![CDATA[
+      function toggleNode(evt){
+        try{
+          var g = evt.currentTarget || evt.target;
+          while (g && g.tagName && g.tagName.toLowerCase() !== 'g') { g = g.parentNode; }
+          if(!g) return;
+          var svg = g.ownerSVGElement;
+          var isCollapsed = g.getAttribute('data-collapsed') === 'true';
+          var desc = g.getAttribute('data-descendants') || '';
+          if(!desc) return;
+          var ids = desc.split(',').filter(Boolean);
+          if(!isCollapsed){
+            // 折叠：隐藏所有子孙节点与相关连线
+            ids.forEach(function(id){
+              var nd = svg.querySelector('g[data-node-id="'+id+'"]');
+              if (nd) nd.style.display = 'none';
+            });
+            // 隐藏指向这些节点的连线
+            ['data-link-target-id','data-link-source-id'].forEach(function(attr){
+              var sel = ids.map(function(id){return 'path['+attr+'="'+id+'"]';}).join(',');
+              if (sel){
+                svg.querySelectorAll(sel).forEach(function(p){ p.style.display='none'; });
+              }
+            });
+            g.setAttribute('data-collapsed','true');
+          }else{
+            // 展开：显示所有子孙节点与相关连线
+            ids.forEach(function(id){
+              var nd = svg.querySelector('g[data-node-id="'+id+'"]');
+              if (nd) nd.style.display = '';
+            });
+            ['data-link-target-id','data-link-source-id'].forEach(function(attr){
+              var sel = ids.map(function(id){return 'path['+attr+'="'+id+'"]';}).join(',');
+              if (sel){
+                svg.querySelectorAll(sel).forEach(function(p){ p.style.display=''; });
+              }
+            });
+            g.setAttribute('data-collapsed','false');
+          }
+        }catch(e){ /* 忽略错误，防止阻断页面 */ }
+      }
+      ]]>
+    `);
+
+  return svg.node().outerHTML;
 }
 
 /**

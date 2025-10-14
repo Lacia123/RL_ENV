@@ -894,7 +894,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.bold}",
       color: "{color.onsurface.black88}",
     },
-
+      
     minimalistListCardItemDescription: {
       lineHeight: "1.4",
       fontSize: "{font.size.xl}",
