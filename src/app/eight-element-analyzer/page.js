@@ -134,6 +134,49 @@ const MARKDOWN_TEMPLATES = {
       | 创新业务板块   | 可持续发展解决方案ESG   | ESG咨询报告        | 4,522.40       |
       </card:headerCard>
 
+      <card:headerCard background={color.primarycontainer.brand0}>
+      ## 额外示例：小型（2 层少量节点）
+
+      [chart:tree_mind|小型层级-示例A]
+      | 层级1   | 层级2       | 值 |
+      |---------|-------------|----|
+      | 产品线  | A系列        | 12 |
+      | 产品线  | B系列        | 8  |
+      | 服务线  | 交付服务     | 5  |
+      </card:headerCard>
+
+      <card:headerCard background={color.primarycontainer.brand0}>
+      ## 额外示例：深层（4-5 层）
+
+      [chart:tree_mind|深层结构-示例B]
+      | L1     | L2       | L3         | L4        | L5         |
+      |--------|----------|------------|-----------|------------|
+      | 事业群 | 云平台   | 计算       | 高性能计算 | GPU节点     |
+      | 事业群 | 云平台   | 计算       | 高性能计算 | CPU节点     |
+      | 事业群 | 云平台   | 存储       | 分布式存储 | 热存储      |
+      | 事业群 | 云平台   | 存储       | 分布式存储 | 冷存储      |
+      | 事业群 | 云平台   | 网络       | 负载均衡   | L7         |
+      | 事业群 | 云平台   | 网络       | 负载均衡   | L4         |
+      </card:headerCard>
+
+      <card:headerCard background={color.primarycontainer.brand0}>
+      ## 额外示例：不平衡结构（兄弟数差异大）
+
+      [chart:tree_mind|不平衡结构-示例D]
+      | Root  | Branch     | Leaf               | 值    |
+      |-------|------------|--------------------|-------|
+      | 根    | A          | A1                 | 100   |
+      | 根    | A          | A2                 | 80    |
+      | 根    | A          | A3                 | 60    |
+      | 根    | A          | A4                 | 40    |
+      | 根    | B          | B1                 | 20    |
+      | 根    | C          | C1                 | 10    |
+      | 根    | C          | C2                 | 5     |
+      | 根    | C          | C3                 | 2     |
+      | 根    | C          | C4                 | 1     |
+      | 根    | C          | C5                 | 1     |
+      </card:headerCard>
+
 <layout:bgColumn background={color.onprimary.white100}>
 
 <layout:row>
