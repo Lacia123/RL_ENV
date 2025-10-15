@@ -3,6 +3,7 @@ export const EVENT_NAME = {
     DOWNLOAD: 'download',
     CHART_CHANGED: 'chart_changed',
     TAB_CHANGED: 'tab_changed',
+    THEME_CHANGED: 'theme_changed',
 }
 
 
@@ -36,6 +37,14 @@ export const EVENT_CONFIG = {
         "parameters": {
             "dataKey": "",
             "tabKey": "",
+        }
+    },
+    [EVENT_NAME.THEME_CHANGED]: {
+        "runtimeEventKey": EVENT_NAME.THEME_CHANGED,
+        "nativeEventKey": 'contextmenu',
+        "dataEventKey": [],
+        "parameters": {
+            "imageUrl": "",
         }
     }
 }
