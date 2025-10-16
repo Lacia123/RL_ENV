@@ -4,6 +4,7 @@
  * 提供了对不同元素类型样式的完整配置
  */
 
+import { text } from 'd3';
 import { fontSize } from '../icons/Edit/index.js';
 import resolveToken from '../tokens/resolveToken.js';
 
@@ -894,14 +895,14 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.bold}",
       color: "{color.onsurface.black88}",
     },
-      
+
     minimalistListCardItemDescription: {
       lineHeight: "1.4",
       fontSize: "{font.size.xl}",
       fontWeight: "{font.fontweight.bold}",
       color: "{color.onsurface.black88}",
     },
-    
+
 
     // tabItemText
     tabItemText: {
@@ -948,12 +949,25 @@ export const DEFAULT_STYLE_CONFIG = {
     normal: {
       margin: "{dimension.margin.loose} 0",
       padding: "{dimension.padding.extraloose}",
+      position: "relative",
       backgroundColor: "{color.surfacecontainer.white100}",
       borderRadius: "{dimension.borderradius.xl}",
       boxShadow: "{material.hierarchy.2f}",
       borderWidth: "{dimension.borderwidth.narrow}",
       borderColor: "{color.surfacecontainer.black12}",
       borderStyle: "solid"
+    },
+    event: {
+      button: {
+        text: '新样式',
+        metaType: 'button',
+        variant: 'chartButton',
+        style: {
+          position: 'absolute',
+          right: "{dimension.padding.loose}",
+          top: "{dimension.padding.loose}"
+        }
+      }
     }
   },
   // 表格元素配置
@@ -1036,7 +1050,6 @@ export const DEFAULT_STYLE_CONFIG = {
         background: `linear-gradient(135deg, {color.primary.brand5} 0%, {color.onprimarycontainer.brand7} 100%)`
       }
     },
-
     // 次要按钮  TODO: 需要确定解析的权重
     secondary: {
       fontSize: "{font.size.medium}",
@@ -1073,7 +1086,6 @@ export const DEFAULT_STYLE_CONFIG = {
         boxShadow: "{material.hierarchy.2f}"
       }
     },
-
     // 成功按钮 TODO：需要确定解析的规则
     success: {
       fontSize: "{font.size.medium}",
@@ -1098,7 +1110,6 @@ export const DEFAULT_STYLE_CONFIG = {
         background: `linear-gradient(135deg, {color.success.green5} 0%, {color.success.green7} 100%)`
       }
     },
-
     // 警告按钮 TODO: 需要确定解析的规则
     warning: {
       fontSize: "{font.size.medium}",
@@ -1201,13 +1212,49 @@ export const DEFAULT_STYLE_CONFIG = {
         textDecorationColor: "{color.primarycontainer.brand2}"
       }
     },
+
+    chartButton: {
+      // 基础视觉
+      background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.primary.brand6} 100%)`,
+      color: "{color.onprimary.white100}",
+      fontWeight: "{font.fontweight.semibold}",
+      boxShadow: "{material.hierarchy.2f}",
+      borderRadius: "{dimension.borderradius.large}",
+      textDecoration: 'none',
+      // 仅展示首字：窄宽度 + nowrap + overflow
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+      letterSpacing: '18px',
+      whiteSpace: 'nowrap',
+      padding: "{dimension.padding.base} 0",
+      textIndent: '18px',
+      maxWidth: '50px',
+      fontSize: "{font.size.medium}",
+      // 动效与层级
+      transition: 'all 0.5s ease',
+      cursor: 'pointer',
+      margin: "{dimension.margin.tight}",
+      opacity: '1.0',
+      backdropFilter: 'none',
+      transform: 'scale(1.0)',
+      zIndex: '1000',
+      // 悬停展开显示文字
+      '&:hover': {
+        letterSpacing: '1px',
+        textIndent: '0',
+        maxWidth: '240px',
+        padding: "{dimension.padding.base} {dimension.padding.extraloose}"
+      }
+    },
   },
 
   // ==================== 列表元件 ====================
   list: {
     // 无序列表 
     unordered: {
-      paddingLeft: "{dimension.padding.loose}",
+      paddingLeft: "{dimension.padding.loose}",           
       marginBottom: "{dimension.margin.base}",
       fontSize: "{font.size.medium}",
       lineHeight: "1.6",
@@ -2672,7 +2719,7 @@ export const DEFAULT_STYLE_CONFIG = {
         }
       }
     },
-    
+
     minimalistImageCard: {
       type: 'template',
       markdownMapping: {
@@ -2760,7 +2807,7 @@ export const DEFAULT_STYLE_CONFIG = {
         h2: 'title',
         p: 'content',
         'button:primary': 'buttonContainer.button',
-        'button:secondary':'buttonContainer.secondaryButton',
+        'button:secondary': 'buttonContainer.secondaryButton',
       },
       style: {
         display: 'flex',
@@ -2863,7 +2910,6 @@ export const DEFAULT_STYLE_CONFIG = {
       }
     },
   },
-
   // ==================== 图像元件 ====================
   image: {
     // 普通图片  
@@ -3234,7 +3280,7 @@ export function getElementStyleConfig(elementType, variant = 'normal', attribute
               const tokenToResolve = `{${attrValue}}`;
               const tokenResult = resolveToken(tokenToResolve);
               if (tokenResult !== tokenToResolve) {
-                console.log(`   🎯 Token解析: ${attrValue} -> ${tokenToResolve} -> ${tokenResult}`);
+                // console.log(`   🎯 Token解析: ${attrValue} -> ${tokenToResolve} -> ${tokenResult}`);
                 resolvedValue = tokenResult;
               } else {
                 console.log(`   📝 Token未找到，使用原值: ${attrValue}`);
@@ -3248,7 +3294,7 @@ export function getElementStyleConfig(elementType, variant = 'normal', attribute
             // 显式的token格式
             const tokenResult = resolveToken(attrValue);
             if (tokenResult !== attrValue) {
-              console.log(`   🎯 Token解析: ${attrValue} -> ${tokenResult}`);
+              // console.log(`   🎯 Token解析: ${attrValue} -> ${tokenResult}`);
               resolvedValue = tokenResult;
             } else {
               console.log(`   📝 Token未找到，使用原值: ${attrValue}`);

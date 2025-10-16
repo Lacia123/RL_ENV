@@ -1063,7 +1063,7 @@ function generateStyleProperties(styleObj) {
             });
             
             // 🐛 调试日志：记录token解析
-            console.log(`🎯 Token解析: ${property}: ${value} -> ${resolvedValue}`);
+            // console.log(`🎯 Token解析: ${property}: ${value} -> ${resolvedValue}`);
         } else {
             // 单个token解析（保持向后兼容）
             resolvedValue = resolveToken(value) || value;

@@ -1,13 +1,14 @@
 import { parseMarkdownToTemplate, parseMarkdown, parseEventSyntax } from '../PSUIPParser.js';
 import { generateUUID } from '../util.js';
 import { createCodeElement } from './codeCreators.js';
-import { createTableElement, extractTableOrChartData, getChartVariantFromConfig, createChartElement, generateChartSvg } from './tableCreators.js';
+import { createTableElement, extractTableOrChartData, getChartVariantFromConfig, createChartElement, generateChartSvg, addChartEventButton } from './tableCreators.js';
 import { createBackgroundElement } from './backgroundCreators.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createTextElement } from './textCreators.js';
-import { createElementContainer, createBaseLayout } from './layoutCreators.js';
+import { createElementContainer, createBaseLayout, createLayoutElement } from './layoutCreators.js';
+import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 import resolveToken from '../../tokens/resolveToken.js';
-import { getElementStyleConfig, LAYOUT_CONSTANTS } from '../styleConfig.js';
+import { getElementStyleConfig } from '../styleConfig.js';
 
 
 // 检测是否为卡片标签
@@ -1282,6 +1283,23 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
 
                                 const chartElement = createChartElement(chartResult.chartType, '', chartResult.tableData, chartResult.tableContent, chartVariant, chartResult.chartTitle, chartEvents);
 
+                                // 🆕 生成按钮元素（如果需要）
+                                const buttonElement = addChartEventButton(chartElement, chartResult.originalFirstLine);
+
+                                // 🆕 用父级layout容器包裹（相对定位，按钮绝对定位）
+                                const wrapperLayout = createLayoutElement(
+                                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                                    [],
+                                    {
+                                        variant: 'column',
+                                        style: { position: 'relative' }
+                                    }
+                                );
+                                if (buttonElement) {
+                                    wrapperLayout.layout.children.push(buttonElement);
+                                }
+                                wrapperLayout.layout.children.push(chartElement);
+
                                 // 生成SVG图表 - 传递 variant 信息和标题
                                 const chartStyleConfig = {
                                     variant: chartVariant,
@@ -1293,6 +1311,28 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                 const svgContent = generateChartSvg(chartResult.chartType, chartResult.tableData, chartStyleConfig, chartResult.chartTitle);
                                 chartElement.svgContent = svgContent;
 
+                                // 将 SVG 作为子元素添加到图表容器中
+                                const svgElement = {
+                                    id: generateUUID(),
+                                    name: "svg",
+                                    "name-zh": "SVG图表",
+                                    "file-type": "cell-element",
+                                    type: "svg",
+                                    _metadata: {
+                                        actualType: 'svg',
+                                        isChartSvg: true
+                                    },
+                                    layout: {
+                                        style: {
+                                            width: "100%",
+                                            height: "auto",
+                                            display: "block"
+                                        }
+                                    },
+                                    svgContent: svgContent
+                                };
+                                chartElement.layout.children.push(svgElement);
+
                                 // 使用通配符处理的路径创建模板元素
                                 const templateElement = createOrMergeTemplateElement(
                                     markdownResult.templatePath,
@@ -1300,7 +1340,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                     cardStyleConfig,
                                     containerMap,
                                     children,
-                                    chartElement, // 传入已创建的图表元素
+                                    wrapperLayout, // 传入包裹容器
                                     { ...markdownResult, chartElement: chartElement, chartData: chartResult }
                                 );
 

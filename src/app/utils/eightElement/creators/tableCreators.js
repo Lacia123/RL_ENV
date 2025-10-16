@@ -5,6 +5,9 @@ import {
 import { generateChartFromTableData } from '../chartGenerator.js';
 import { extractWildcardMatch } from './cardCreators.js';
 import { parseEventSyntax } from '../PSUIPParser.js';
+import { createButtonElement } from './buttonCreators.js';
+import { createLayoutElement } from './layoutCreators.js';
+import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 
 // 解析表格数据为二维数组
 function parseTableData(tableContent) {
@@ -245,6 +248,59 @@ function createTableElement(markdownTableContent) {
     return tableElement;
 }
 
+// 🆕 为图表添加事件按钮（如果需要）
+function addChartEventButton(chartElement, originalFirstLine) {
+    if (!originalFirstLine) return;
+
+    // 检测是否有 style:button 标记
+    const hasStyleButton = /\[event:[^\]]*style\s*:\s*button/i.test(originalFirstLine);
+    
+    console.log('🔍 检查 style:button:', {
+        originalFirstLine,
+        hasStyleButton,
+        chartId: chartElement.id
+    });
+
+    if (!hasStyleButton) return;
+
+    console.log('✅ 检测到 style:button，开始创建按钮');
+    
+    // 从样式配置读取按钮文本与变体
+    const buttonStyleFromConfig = getElementStyleConfig('chart', 'event');
+    const buttonConfig = buttonStyleFromConfig && buttonStyleFromConfig.button;
+    const buttonText = (buttonConfig && buttonConfig.text) ? buttonConfig.text : '操作';
+    const buttonVariant = (buttonConfig && buttonConfig.variant) ? buttonConfig.variant : 'primary';
+
+    console.log('📝 按钮配置:', {
+        buttonStyleFromConfig,
+        buttonConfig,
+        buttonText,
+        buttonVariant
+    });
+
+    // 用整行解析事件，绑定目标为图表 id
+    const parsedButtonEvents = parseEventSyntax(originalFirstLine, chartElement.id, originalFirstLine) || [];
+    
+    console.log('🎯 解析的按钮事件:', parsedButtonEvents);
+    
+    // 构造按钮：不传递 currentMarkdown，避免在 createButtonElement 内部重复解析事件
+    const buttonElement = createButtonElement(buttonText, '#', buttonVariant, '', buttonText);
+    
+    console.log('🔧 创建的按钮元素:', buttonElement);
+    
+    // 覆盖按钮的事件为从图表行解析的事件
+    buttonElement.events = parsedButtonEvents.length > 0 ? parsedButtonEvents : [{}];
+
+    // 应用按钮的样式配置（position: absolute 等）
+    if (buttonConfig && buttonConfig.style) {
+        Object.assign(buttonElement.layout.style, buttonConfig.style);
+        console.log('🎨 应用按钮样式:', buttonConfig.style);
+    }
+
+    // 返回按钮元素，由调用方决定放置位置
+    return buttonElement;
+}
+
 // 创建图表元素
 function createChartElement(chartType, svgContent, tableData, rawData, variant = 'normal', chartTitle = null, events = []) {
     const id = generateUUID();
@@ -302,6 +358,8 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
                 cursor: "pointer",
                 ...layoutStyleConfig
             },
+            // 子元素数组，用于存放按钮和 SVG
+            children: [],
             // 图表子元素样式配置
             chart: {
                 style: {
@@ -356,20 +414,37 @@ function processTableOrChartData(result, stack) {
     if (isChart) {
         // 处理为图表
         try {
-            // 🆕 解析图表行中的事件
-            const chartEvents = [];
-            if (originalFirstLine) {
-                // 使用导入的parseEventSyntax函数解析事件
-                const chartId = generateUUID();
-                const events = parseEventSyntax(originalFirstLine, chartId);
-                chartEvents.push(...events);
-            }
-
             // 🆕 根据排序参数对表格数据进行排序
             const sortedTableData = sortTableData(tableData, sortOrder);
             
-            // 先创建图表元素（包含样式配置）- 使用默认 variant，传递标题和事件
+            // 先创建基础图表元素（无事件），以便拿到图表 id 作为事件载体
+            const tempChartElement = createChartElement(chartType, '', sortedTableData, tableContent, 'normal', chartTitle, []);
+
+            // 解析图表行中的事件，EventTargetId 设为图表 id
+            const chartEvents = [];
+            if (originalFirstLine) {
+                const events = parseEventSyntax(originalFirstLine, tempChartElement.id);
+                chartEvents.push(...events);
+            }
+
+            // 重新创建最终图表元素，带事件
             const chartElement = createChartElement(chartType, '', sortedTableData, tableContent, 'normal', chartTitle, chartEvents);
+
+            // 🆕 生成按钮元素（如果需要）
+            const buttonElement = addChartEventButton(chartElement, originalFirstLine);
+
+            // 🆕 用一个父级 layout 容器包裹按钮与图表，使其成为同级子元素
+            const wrapperLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.VERTICAL, [], {
+                variant: 'column',
+                // 确保相对定位，按钮绝对定位可生效
+                style: { position: 'relative' }
+            });
+
+            // 将按钮（若存在）与图表作为 children 加入
+            if (buttonElement) {
+                wrapperLayout.layout.children.push(buttonElement);
+            }
+            wrapperLayout.layout.children.push(chartElement);
 
             // 提取样式配置
             const chartStyleConfig = {
@@ -385,7 +460,30 @@ function processTableOrChartData(result, stack) {
             // 更新图表元素的SVG内容
             chartElement.svgContent = svgContent;
 
-            stack[stack.length - 1].elements.push(chartElement);
+            // 将 SVG 作为子元素添加到图表容器中
+            const svgElement = {
+                id: generateUUID(),
+                name: "svg",
+                "name-zh": "SVG图表",
+                "file-type": "cell-element",
+                type: "svg",
+                _metadata: {
+                    actualType: 'svg',
+                    isChartSvg: true
+                },
+                layout: {
+                    style: {
+                        width: "100%",
+                        height: "auto",
+                        display: "block"
+                    }
+                },
+                svgContent: svgContent
+            };
+            chartElement.layout.children.push(svgElement);
+
+            // 🆕 将 wrapperLayout 放入元素栈
+            stack[stack.length - 1].elements.push(wrapperLayout);
         } catch (error) {
             console.error('生成图表时出错:', error);
             // 创建一个带有错误信息的图表元素
@@ -440,6 +538,7 @@ function getChartVariantFromConfig(templatePath, cardStyleConfig) {
 export {
     createTableElement,
     createChartElement,
+    addChartEventButton,
     isTableOrChartData,
     extractTableOrChartData,
     processTableOrChartData,
