@@ -903,6 +903,23 @@ export const DEFAULT_STYLE_CONFIG = {
       color: "{color.onsurface.black88}",
     },
 
+    minimalistChartCardHeaderTitle: {
+      fontSize: "{dimension.basic.dimension.80}",
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.basic.brand.1}"
+    },
+
+    minimalistChartCardPageTitle: {
+      fontSize: "{font.size.large}",
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.onsurface.black88}",
+    },
+
+    minimalistChartCardDescription: {
+      lineHeight: "1.4",
+      fontSize: "{font.size.small}",
+      color: "{color.onsurface.black64}",
+    },
 
     // tabItemText
     tabItemText: {
@@ -945,6 +962,11 @@ export const DEFAULT_STYLE_CONFIG = {
     small: {
       margin: "{dimension.margin.base} 0",
       padding: "{dimension.padding.extratight}",
+    },
+    minimalist: {
+      padding: "{dimension.padding.loose}",
+      background: "{color.basic.grey.0}",
+      borderRadius: "{dimension.borderradius.xl}",
     },
     normal: {
       margin: "{dimension.margin.loose} 0",
@@ -1215,7 +1237,8 @@ export const DEFAULT_STYLE_CONFIG = {
 
     chartButton: {
       // 基础视觉
-      background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.primary.brand6} 100%)`,
+      // background: `linear-gradient(135deg, {color.primary.brand4} 0%, {color.primary.brand6} 100%)`,
+      background: `linear-gradient(90deg, #9064FF 0%, #66B0FF 100%)`,
       color: "{color.onprimary.white100}",
       fontWeight: "{font.fontweight.semibold}",
       boxShadow: "{material.hierarchy.2f}",
@@ -2850,6 +2873,71 @@ export const DEFAULT_STYLE_CONFIG = {
         secondaryButton: {
           metaType: 'button',
           variant: 'secondary',
+        }
+      }
+    },
+
+    minimalistChartCard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'headerContainer.headerTitle',
+        h3: 'headerContainer.right.pageTitle',
+        p: 'headerContainer.right.description',
+        "chart:*": 'chartContainer.chart*'
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: "{dimension.gap.base}",
+        borderRadius: "{dimension.borderradius.xl}",
+        padding: "{dimension.padding.base}",
+        background: "{color.surfacecontainer.white100}",
+      },
+      headerContainer: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: "{dimension.gap.base}",
+        },
+        
+        // 左侧标题
+        headerTitle: {
+          metaType: 'text',
+          variant: 'minimalistChartCardHeaderTitle',
+        },
+
+        // 右侧区域
+        right: {
+          type: 'template',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: "{dimension.gap.base}",
+          },
+          pageTitle: {
+            metaType: 'text',
+            variant: 'minimalistChartCardPageTitle',
+          },
+          description: {
+            metaType: 'text',
+            variant: 'minimalistChartCardDescription',
+          }
+        }
+      },
+      
+      chartContainer: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          gap: "{dimension.gap.base}",
+        },
+        "chart*": {
+          metaType: 'chart',
+          variant: 'minimalist'
         }
       }
     }
