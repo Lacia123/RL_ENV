@@ -2845,6 +2845,11 @@ export const DEFAULT_STYLE_CONFIG = {
         metaType: 'text',
         style: {
           paddingLeft: "{dimension.padding.base}",
+          paddingTop: "{dimension.padding.base}",
+          borderTop: `{dimension.borderwidth.base} solid {color.basic.grey.1}`,
+          '&:first-child': {
+            borderTop: 'none',
+          }
         },
         variant: 'minimalistListCardTitle',
       },
@@ -2856,8 +2861,6 @@ export const DEFAULT_STYLE_CONFIG = {
           marginBottom: "{dimension.margin.base}",
           paddingLeft: "{dimension.padding.base}",
           paddingRight: "{dimension.padding.base}",
-          paddingBottom: "{dimension.padding.base}",
-          borderBottom: `{dimension.borderwidth.base} solid {color.basic.grey.1}`,
         }
       },
       buttonContainer: {
