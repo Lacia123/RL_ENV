@@ -8,6 +8,7 @@ import { parseEventSyntax } from '../PSUIPParser.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createLayoutElement } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
+import { EVENT_NAME } from '../eventConfig.js';
 
 // 解析表格数据为二维数组
 function parseTableData(tableContent) {
@@ -288,8 +289,47 @@ function addChartEventButton(chartElement, originalFirstLine) {
     
     console.log('🔧 创建的按钮元素:', buttonElement);
     
-    // 覆盖按钮的事件为从图表行解析的事件
-    buttonElement.events = parsedButtonEvents.length > 0 ? parsedButtonEvents : [{}];
+    // 覆盖按钮的事件为从图表行解析的事件（若无解析结果则回退构造 chart_changed 事件）
+    let finalEvents = parsedButtonEvents;
+
+    // 确保存在 chart_changed 事件；如果没有从行中解析到，则从图表元素事件中复制/构造
+    const chartChangedFromChart = (chartElement.events || []).find(ev => ev && ev.runtimeEventKey === EVENT_NAME.CHART_CHANGED);
+    const hasParsedChartChanged = finalEvents.some(ev => ev && ev.runtimeEventKey === EVENT_NAME.CHART_CHANGED);
+
+    if (!hasParsedChartChanged) {
+        // 优先从图表事件复制
+        let chartTypes = (chartChangedFromChart && chartChangedFromChart.parameters && chartChangedFromChart.parameters.chartTypes) || null;
+
+        // 如果图表上也未携带，则直接从原始行中正则抽取 [event:chart_changed(a,b,c)]
+        if (!chartTypes) {
+            const m = originalFirstLine && originalFirstLine.match(/\[event:\s*chart_changed\(([^)]*)\)/i);
+            if (m && m[1]) {
+                chartTypes = m[1].split(',').map(s => s.trim()).filter(Boolean);
+            }
+        }
+
+        if (!chartTypes) chartTypes = [];
+
+        finalEvents = [
+            {
+                runtimeEventKey: EVENT_NAME.CHART_CHANGED,
+                nativeEventKey: 'click',
+                dataEventKey: [],
+                parameters: { chartTypes },
+                EventTargetId: chartElement.id
+            }
+        ];
+    }
+
+    // 兜底：若仍然为空，创建空事件占位避免渲染器漏绑
+    if (!finalEvents || finalEvents.length === 0) {
+        finalEvents = [{ runtimeEventKey: EVENT_NAME.CHART_CHANGED, nativeEventKey: 'click', dataEventKey: [], parameters: { chartTypes: [] }, EventTargetId: chartElement.id }];
+    }
+
+    // 统一确保 EventTargetId 指向图表 id
+    finalEvents.forEach(ev => { ev.EventTargetId = chartElement.id; });
+
+    buttonElement.events = finalEvents;
 
     // 应用按钮的样式配置（position: absolute 等）
     if (buttonConfig && buttonConfig.style) {

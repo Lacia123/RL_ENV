@@ -756,6 +756,61 @@ export function renderEightElementToHtml(eightElement, options = {}) {
               }
             }
           });
+
+          // 🆕 为带有 chart_changed 事件的按钮绑定切换逻辑
+          console.log('🔘 开始绑定按钮 chart_changed 事件...');
+          const buttonElements = document.querySelectorAll('[data-element-type="button"]');
+          console.log('🔘 找到按钮数量:', buttonElements.length);
+
+          buttonElements.forEach(buttonEl => {
+            const buttonId = buttonEl.id;
+            const buttonData = findElementDataById(buttonId);
+
+            if (!buttonData || !buttonData.events) return;
+
+            const chartChangedEvent = buttonData.events.find(ev => 
+              ev && ev.runtimeEventKey === 'chart_changed' && ev.parameters && Array.isArray(ev.parameters.chartTypes)
+            );
+
+            if (!chartChangedEvent) return;
+
+            const targetChartId = chartChangedEvent.EventTargetId;
+            const chartTypes = chartChangedEvent.parameters.chartTypes || [];
+
+            if (!targetChartId || chartTypes.length === 0) return;
+
+            console.log('🔗 绑定按钮到图表切换:', { buttonId, targetChartId, chartTypes });
+
+            buttonEl.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              const chartEl = document.getElementById(targetChartId);
+              if (!chartEl) {
+                console.warn('⚠️ 未找到目标图表元素:', targetChartId);
+                return;
+              }
+
+              const currentChartType = chartEl.getAttribute('data-chart-type') || '';
+              const currentIndex = chartTypes.indexOf(currentChartType);
+              const nextIndex = (currentIndex + 1) % chartTypes.length;
+              const nextChartType = chartTypes[nextIndex];
+
+              console.log('🔄 按钮触发图表切换:', targetChartId, currentChartType, '->', nextChartType);
+
+              if (isInIframe) {
+                window.parent.postMessage({
+                  type: 'CHART_CHANGED_EVENT',
+                  eventTargetId: targetChartId,
+                  currentChartType,
+                  nextChartType,
+                  chartTypes
+                }, '*');
+              } else {
+                handleChartTypeChange(targetChartId, currentChartType, nextChartType, chartTypes);
+              }
+            });
+          });
         });
         
         // 🆕 监听来自React父窗口的消息

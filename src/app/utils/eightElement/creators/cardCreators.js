@@ -7,6 +7,7 @@ import { createButtonElement } from './buttonCreators.js';
 import { createTextElement } from './textCreators.js';
 import { createElementContainer, createBaseLayout, createLayoutElement } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
+import { EVENT_NAME } from '../eventConfig.js';
 import resolveToken from '../../tokens/resolveToken.js';
 import { getElementStyleConfig } from '../styleConfig.js';
 
@@ -1284,7 +1285,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                 const chartElement = createChartElement(chartResult.chartType, '', chartResult.tableData, chartResult.tableContent, chartVariant, chartResult.chartTitle, chartEvents);
 
                                 // 🆕 生成按钮元素（如果需要）
-                                const buttonElement = addChartEventButton(chartElement, chartResult.originalFirstLine);
+                                let buttonElement = addChartEventButton(chartElement, chartResult.originalFirstLine);
 
                                 // 🆕 用父级layout容器包裹（相对定位，按钮绝对定位）
                                 const wrapperLayout = createLayoutElement(
@@ -1296,6 +1297,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                     }
                                 );
                                 if (buttonElement) {
+                                    // 事件绑定与兜底逻辑已在 tableCreators.addChartEventButton 中封装
                                     wrapperLayout.layout.children.push(buttonElement);
                                 }
                                 wrapperLayout.layout.children.push(chartElement);
