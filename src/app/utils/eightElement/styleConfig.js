@@ -2199,6 +2199,7 @@ export const DEFAULT_STYLE_CONFIG = {
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(90deg, {color.surfacecontainer.white100} 0%, {color.secondarycontainer.violet0} 100%)`,
           boxShadow: `{material.hierarchy.1f}`,
+          marginTop: "{dimension.margin.tight}",
           marginBottom: "{dimension.margin.tight}",
           border: `{dimension.borderwidth.narrow} solid {color.primary.brand4}`,
           position: 'relative',
