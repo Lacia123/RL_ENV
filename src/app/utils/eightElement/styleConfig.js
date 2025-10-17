@@ -689,16 +689,6 @@ export const DEFAULT_STYLE_CONFIG = {
       backgroundImage: 'none',
       opacity: '1.0',
       backdropFilter: 'none',
-
-      '&::before': {
-        content: '"""',
-        fontSize: '3rem',
-        color: "{color.primarycontainer.brand2}",
-        position: 'absolute',
-        top: '-10px',
-        left: '20px',
-        fontFamily: 'serif'
-      }
     },
 
     // 代码块  
@@ -2015,6 +2005,7 @@ export const DEFAULT_STYLE_CONFIG = {
           borderRadius: "{dimension.borderradius.xl}",
           background: `linear-gradient(90deg, {color.surfacecontainer.white100} 0%, {color.secondarycontainer.violet0} 100%)`,
           boxShadow: `{material.hierarchy.1f}`,
+          marginTop: "{dimension.margin.tight}",
           marginBottom: "{dimension.margin.tight}",
           border: `{dimension.borderwidth.narrow} solid {color.primary.brand4}`,
           position: 'relative',
