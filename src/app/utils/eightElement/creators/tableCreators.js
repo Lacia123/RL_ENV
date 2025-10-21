@@ -174,16 +174,19 @@ function extractTableOrChartData(lines, startIndex) {
 
     // 提取原始表格内容（用于显示和调试）
     const originalContent = tableLines.join('\n');
+    
+    // 🆕 清理背景语法标记，确保保存的是清理后的内容
+    const cleanedContent = originalContent.replace(/\[background:\s*\{[^}]+\}\]/g, '');
 
     // 解析表格数据为二维数组（用于图表数据处理）
-    const tableData = parseTableData(originalContent);
+    const tableData = parseTableData(cleanedContent);
 
     return {
         isChart: isChart,
         chartType: chartType,
         chartTitle: chartTitle, // 🆕 添加图表标题
         sortOrder: sortOrder, // 🆕 添加排序参数
-        tableContent: originalContent,
+        tableContent: cleanedContent, // 🆕 使用清理后的内容
         tableData: tableData,
         endIndex: startIndex + i,
         originalFirstLine: firstLine // 🆕 保存原始的第一行用于事件解析
@@ -202,9 +205,12 @@ function createTableElement(markdownTableContent) {
 
     // 🆕 解析表头背景颜色语法
     const headerBackgroundColor = parseHeaderBackgroundSyntax(markdownTableContent);
+    
+    // 🆕 清理背景语法标记，确保保存的是清理后的内容
+    const cleanedTableContent = markdownTableContent.replace(/\[background:\s*\{[^}]+\}\]/g, '');
 
     // 确保表格内容不为空
-    if (!markdownTableContent.trim()) {
+    if (!cleanedTableContent.trim()) {
         console.error('警告: 尝试创建表格元素但内容为空');
     }
 
@@ -232,7 +238,7 @@ function createTableElement(markdownTableContent) {
             variant: 'container',
             isTable: true
         },
-        rawData: markdownTableContent,
+        rawData: cleanedTableContent, // 🆕 使用清理后的内容
         layout: {
             // classStyle: {
             //   ...tableContainerStyleConfig

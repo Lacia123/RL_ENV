@@ -1012,6 +1012,7 @@ export const DEFAULT_STYLE_CONFIG = {
     td: {
       fontSize: "{font.size.medium}",
       borderRight: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black20}`,
+      borderBottom: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black20}`,
       padding: "{dimension.padding.base} {dimension.padding.semiloose}",
       color: "{color.onsurface.black76}",
       textAlign: 'left',
