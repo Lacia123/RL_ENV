@@ -2229,6 +2229,8 @@ function renderTableElement(element) {
     }
 
     try {
+        // 🆕 清理背景语法标记，确保marked能正确解析表格
+        const cleanMarkdown = rawMarkdown.replace(/\[background:\s*\{[^}]+\}\]/g, '');
 
         // 配置marked选项
         const markedOptions = {
@@ -2238,8 +2240,8 @@ function renderTableElement(element) {
             mangle: false        // 不转义HTML
         };
 
-        // 使用marked解析markdown
-        let html = marked(rawMarkdown, markedOptions);
+        // 使用marked解析清理后的markdown
+        let html = marked(cleanMarkdown, markedOptions);
 
         // 从HTML中提取表格
         const tableMatch = html.match(/<table>[\s\S]*?<\/table>/);

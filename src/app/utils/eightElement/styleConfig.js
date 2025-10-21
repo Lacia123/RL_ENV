@@ -7,6 +7,7 @@
 import { text } from 'd3';
 import { fontSize } from '../icons/Edit/index.js';
 import resolveToken from '../tokens/resolveToken.js';
+import border from '../tokens/color/border.js';
 
 // CSS变量系统
 export const CSS_VARIABLE_SYSTEM = {
@@ -1010,6 +1011,7 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     td: {
       fontSize: "{font.size.medium}",
+      borderRight: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black20}`,
       padding: "{dimension.padding.base} {dimension.padding.semiloose}",
       color: "{color.onsurface.black76}",
       textAlign: 'left',

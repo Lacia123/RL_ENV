@@ -10,6 +10,36 @@ import { createLayoutElement } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 import { EVENT_NAME } from '../eventConfig.js';
 
+// 🆕 解析表头中的背景颜色语法 [background:{color.primarycontainer.brand0}]
+function parseHeaderBackgroundSyntax(tableContent) {
+    const lines = tableContent.trim().split('\n');
+    let headerBackgroundColor = null;
+    
+    // 查找第一行（表头行）
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        // 跳过分隔行和事件语法行
+        if (line.match(/\|[-|\s]+\|/) || line.match(/^\[event:/)) {
+            continue;
+        }
+        
+        // 检查是否包含背景语法
+        const backgroundMatch = line.match(/\[background:\s*\{([^}]+)\}\]/);
+        if (backgroundMatch) {
+            headerBackgroundColor = `{${backgroundMatch[1]}}`;
+            break;
+        }
+        
+        // 如果找到了第一行且没有背景语法，退出循环
+        if (line.includes('|')) {
+            break;
+        }
+    }
+    
+    return headerBackgroundColor;
+}
+
 // 解析表格数据为二维数组
 function parseTableData(tableContent) {
     // 分割表格内容为行
@@ -28,8 +58,11 @@ function parseTableData(tableContent) {
             continue;
         }
 
+        // 🆕 移除背景语法标记
+        let cleanLine = lines[i].trim().replace(/\[background:\s*\{[^}]+\}\]/g, '');
+
         // 移除行首尾的|，并分割单元格
-        const cells = lines[i].trim()
+        const cells = cleanLine
             .replace(/^\||\|$/g, '')  // 移除首尾的|
             .split('|')                // 按|分割
             .map(cell => cell.trim()); // 移除单元格内容的空白
@@ -162,11 +195,13 @@ function createTableElement(markdownTableContent) {
     const id = generateUUID();
     const layoutStyleConfig = getElementStyleConfig('layout', 'column');
 
-
     const tableContainerStyleConfig = getElementStyleConfig('table', 'container');
     const tableHeaderStyleConfig = getElementStyleConfig('table', 'th');
     const tableRowStyleConfig = getElementStyleConfig('table', 'tr');
     const tableCellStyleConfig = getElementStyleConfig('table', 'td');
+
+    // 🆕 解析表头背景颜色语法
+    const headerBackgroundColor = parseHeaderBackgroundSyntax(markdownTableContent);
 
     // 确保表格内容不为空
     if (!markdownTableContent.trim()) {
@@ -176,6 +211,13 @@ function createTableElement(markdownTableContent) {
     // 生成唯一的className
     const uniqueClassName = `table-${id}`;
     const uniqueTrClassName = `tr-${id}`;
+
+    // 🆕 构建th样式配置，如果有自定义背景颜色则覆盖默认配置
+    let finalThStyleConfig = { ...tableHeaderStyleConfig };
+    if (headerBackgroundColor) {
+        finalThStyleConfig.backgroundColor = headerBackgroundColor;
+        console.log('🎨 应用表头背景颜色:', headerBackgroundColor);
+    }
 
     // 创建符合要求的表格元素结构
     const tableElement = {
@@ -223,10 +265,7 @@ function createTableElement(markdownTableContent) {
                 // marginBottom: '1rem'
             },
             th: {
-                style: {
-                    ...tableHeaderStyleConfig
-                }
-
+                style: finalThStyleConfig
             },
             tr: {
                 className: uniqueTrClassName,
@@ -584,5 +623,6 @@ export {
     processTableOrChartData,
     getChartVariantFromConfig,
     generateChartSvg,
-    sortTableData
+    sortTableData,
+    parseHeaderBackgroundSyntax
 }
