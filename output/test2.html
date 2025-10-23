@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>扇形进度条</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    
+    .progress-container {
+      position: relative;
+      width: 200px;
+      height: 100px;
+      /* 通用进度变量：--p 为百分比(0-100)，--progress-deg 自动换算为角度 */
+      --p: 0;
+      --progress-deg: calc(var(--p) * 1.8deg);
+    }
+    
+    /* 半圆背景轨道 */
+    .progress-track {
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      border-radius: 100px 100px 0 0;
+      background: #fee2e2;
+    }
+    
+    /* 扇形进度条 - 使用 conic-gradient */
+    .progress-fill {
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      border-radius: 100px 100px 0 0;
+      overflow: hidden;
+    }
+    
+    .progress-fill::before {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      top: 0;
+      left: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 270deg,
+        #ef4444 0deg,
+        #ef4444 var(--progress-deg),
+        transparent var(--progress-deg)
+      );
+    }
+    
+    /* 内层白色遮罩 */
+    .progress-inner {
+      position: absolute;
+      width: 160px;
+      height: 80px;
+      top: 20px;
+      left: 20px;
+      background: white;
+      border-radius: 84px 84px 0 0;
+      z-index: 1;
+    }
+    
+    /* 进度值文字 */
+    .progress-value {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 36px;
+      font-weight: bold;
+      color: #ef4444;
+      z-index: 2;
+    }
+    
+    /* 不同进度（仅设置百分比，角度自动计算） */
+    .p15  { --p: 15; }
+    .p25  { --p: 25; }
+    .p50  { --p: 50; }
+    .p75  { --p: 75; }
+    .p100 { --p: 100; }
+    
+    /* 不同颜色方案 */
+    .orange .progress-track {
+      background: #fed7aa;
+    }
+    .orange .progress-fill::before {
+      background: conic-gradient(
+        from 270deg,
+        #f97316 0deg,
+        #f97316 var(--progress-deg),
+        transparent var(--progress-deg)
+      );
+    }
+    .orange .progress-value {
+      color: #f97316;
+    }
+    
+    .green .progress-track {
+      background: #d1fae5;
+    }
+    .green .progress-fill::before {
+      background: conic-gradient(
+        from 270deg,
+        #10b981 0deg,
+        #10b981 var(--progress-deg),
+        transparent var(--progress-deg)
+      );
+    }
+    .green .progress-value {
+      color: #10b981;
+    }
+    
+    .blue .progress-track {
+      background: #dbeafe;
+    }
+    .blue .progress-fill::before {
+      background: conic-gradient(
+        from 270deg,
+        #3b82f6 0deg,
+        #3b82f6 var(--progress-deg),
+        transparent var(--progress-deg)
+      );
+    }
+    .blue .progress-value {
+      color: #3b82f6;
+    }
+    
+    .purple .progress-track {
+      background: #e9d5ff;
+    }
+    .purple .progress-fill::before {
+      background: conic-gradient(
+        from 270deg,
+        #a855f7 0deg,
+        #a855f7 var(--progress-deg),
+        transparent var(--progress-deg)
+      );
+    }
+    .purple .progress-value {
+      color: #a855f7;
+    }
+    
+    .row {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .card h3 {
+      text-align: center;
+      color: #666;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    
+    .note {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      max-width: 600px;
+      text-align: center;
+      color: #666;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <h1>扇形进度条效果</h1>
+  
+  <div class="note">
+    进度条使用扇形填充，从底部中心向两侧扩展
+  </div>
+  
+  <div class="row">
+    <div class="card">
+      <h3>15% 进度</h3>
+      <div class="progress-container p15">
+        <div class="progress-track"></div>
+        <div class="progress-fill"></div>
+        <div class="progress-inner"></div>
+        <div class="progress-value">15%</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h3>25% 进度</h3>
+      <div class="progress-container p25 orange">
+        <div class="progress-track"></div>
+        <div class="progress-fill"></div>
+        <div class="progress-inner"></div>
+        <div class="progress-value">25%</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h3>50% 进度</h3>
+      <div class="progress-container p50 green">
+        <div class="progress-track"></div>
+        <div class="progress-fill"></div>
+        <div class="progress-inner"></div>
+        <div class="progress-value">50%</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="card">
+      <h3>75% 进度</h3>
+      <div class="progress-container p75 blue">
+        <div class="progress-track"></div>
+        <div class="progress-fill"></div>
+        <div class="progress-inner"></div>
+        <div class="progress-value">75%</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h3>100% 进度</h3>
+      <div class="progress-container p100 purple">
+        <div class="progress-track"></div>
+        <div class="progress-fill"></div>
+        <div class="progress-inner"></div>
+        <div class="progress-value">100%</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

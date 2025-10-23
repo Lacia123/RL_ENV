@@ -289,7 +289,6 @@ const MARKDOWN_TEMPLATES = {
 const a = 1;
 \`\`\`
 
-
 [event:edit][事件编辑](https://github.com/example/edit)
 [设计指南](https://example.com/design-guide)
 </card:elegantStandard>
@@ -1442,6 +1441,30 @@ const userRoles = {
     | 工作站 | 25% |
 
     </card:minimalistChartCard>
+    `
+  },
+  expriement: {
+    name: "实验功能",
+    description: "实验一些测试功能",
+    markdown: `
+      <card:headerPrecentCardExpe>
+
+       ## 二、市场概述
+       AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注
+
+       ### 中国市场
+       #### 15%
+       AI-PC 出货量
+
+       ### 全球市场  
+       #### 25%
+       AI-PC 渗透率
+
+       ### 未来预测
+       #### 40%
+       预计增长率
+        
+      </card:headerPrecentCardExpe>
     `
   }
 };

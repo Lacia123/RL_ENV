@@ -10,6 +10,7 @@ import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 import { EVENT_NAME } from '../eventConfig.js';
 import resolveToken from '../../tokens/resolveToken.js';
 import { getElementStyleConfig } from '../styleConfig.js';
+import { DEFAULT_STYLE_CONFIG } from '../styleConfig.js';
 
 
 // 检测是否为卡片标签
@@ -548,41 +549,70 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
     }
     
 
-    // 🆕 检查是否有嵌套的markdownMapping，如果有，需要递归解析内容
-    if (tagConfig.markdownMapping && content && content.trim()) {
+    // 🆕 检查是否有嵌套的markdownMapping或required配置，如果有，需要处理
+    if (tagConfig.markdownMapping || tagConfig.required) {
 
-        // 递归解析嵌套的markdown内容
-        const nestedChildren = [];
-        const nestedContainerMap = new Map();
+        // 使用递归调用parseTemplateCardContent来处理嵌套内容（即使content为空）
+        const nestedElements = parseTemplateCardContent(content || '', tagConfig, true);
 
-        // 使用递归调用parseTemplateCardContent来处理嵌套内容
-        const nestedElements = parseTemplateCardContent(content, tagConfig, true);
-
-        if (nestedElements && nestedElements.length > 0) {
-
-            // 创建容器元素来包装嵌套的子元素
-            const containerElement = {
-                dataKeys: [],
-                name: "layout",
-                "name-zh": `嵌套模板容器-${tagName}`,
-                "file-type": "template",
-                type: "layout",
-                variant: "normal",
-                id: id,
-                className: uniqueClassName,
-                layout: {
-                    direction: tagConfig.style?.flexDirection === 'row' ? 'horizontal' : 'vertical',
-                    style: tagConfig.style || {},
-                    children: nestedElements,
-                    classStyle: {
-                        ...(tagConfig.style || {})
-                    },
-                    className: uniqueClassName,
+        // 创建容器元素来包装嵌套的子元素（即使nestedElements为空也要创建，因为可能有required容器）
+        const containerElement = {
+            dataKeys: [],
+            name: "layout",
+            "name-zh": `嵌套模板容器-${tagName}`,
+            "file-type": "template",
+            type: "layout",
+            variant: "normal",
+            id: id,
+            className: uniqueClassName,
+            layout: {
+                direction: tagConfig.style?.flexDirection === 'row' ? 'horizontal' : 'vertical',
+                style: tagConfig.style || {},
+                children: nestedElements || [],
+                classStyle: {
+                    ...(tagConfig.style || {})
                 },
+                className: uniqueClassName,
+            },
 
-            };
+        };
 
-            return containerElement;
+        return containerElement;
+    }
+
+    // 🆕 特殊处理：如果只有metaType: 'component'，也要检查是否需要处理markdownMapping
+    if (tagConfig.metaType === 'component' && tagConfig.markdownMapping) {
+        // 对于组件引用，需要先获取被引用的组件配置
+        const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[tagConfig.variant];
+        
+        if (componentConfig) {
+            // 使用被引用组件的配置来处理markdownMapping
+            const nestedElements = parseTemplateCardContent(content || '', componentConfig, true);
+            
+            if (nestedElements && nestedElements.length > 0) {
+                // 创建容器元素来包装组件和解析的元素
+                const containerElement = {
+                    dataKeys: [],
+                    name: "layout",
+                    "name-zh": `组件容器-${tagName}`,
+                    "file-type": "template",
+                    type: "layout",
+                    variant: "normal",
+                    id: id,
+                    className: uniqueClassName,
+                    layout: {
+                        direction: tagConfig.style?.flexDirection === 'row' ? 'horizontal' : 'vertical',
+                        style: tagConfig.style || {},
+                        children: nestedElements,
+                        classStyle: {
+                            ...(tagConfig.style || {})
+                        },
+                        className: uniqueClassName,
+                    },
+                };
+
+                return containerElement;
+            }
         }
     }
 
@@ -664,6 +694,9 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             // 🆕 处理code类型，创建代码元素
             const language = markdownData && markdownData.language ? markdownData.language : 'plaintext';
             elementInstance = createCodeElement(content, language);
+        } else if (tagConfig.metaType === 'component') {
+            // 🆕 处理component类型，引用通用组件配置
+            elementInstance = createComponentElement(content, tagConfig.variant, markdownData, styleOverride);
         }
         // 可以在这里添加其他元件类型的支持
 
@@ -895,7 +928,7 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
         // 检查是否已经存在该容器
         let parentElement = containerMap.get(parentTagName);
         if (!parentElement) {
-            // 创建新的父容器
+            // 创建新的父容器，使用父容器的完整配置
             parentElement = createTemplateTagElement(parentTagName, '', cardStyleConfig);
             if (!parentElement) {
                 return null;
@@ -1018,6 +1051,141 @@ function createOrMergeTemplateElement(templatePath, content, cardStyleConfig, co
     } else {
         console.warn(`警告: 不支持的模板路径深度: ${templatePath}`);
         return null;
+    }
+}
+
+/**
+ * 处理表达式，对内容进行转换
+ * @param {string} content - 原始内容
+ * @param {string} expression - 处理表达式（如 'replace("%", "")'）
+ * @returns {string} 处理后的内容
+ */
+function processExpression(content, expression) {
+    if (!expression || !content) {
+        return content;
+    }
+    
+    try {
+        // 解析 replace 表达式：支持多种格式
+        // 格式1: replace("search", "replacement")
+        // 格式2: replace('search', 'replacement')
+        // 格式3: replace(search, "replacement")
+        const replaceMatch = expression.match(/replace\s*\(\s*["']?([^"',)]+)["']?\s*,\s*["']?([^"']*)["']?\s*\)/);
+        if (replaceMatch) {
+            const [, searchValue, replaceValue] = replaceMatch;
+            // 转义特殊字符
+            const escapedSearch = searchValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            return content.replace(new RegExp(escapedSearch, 'g'), replaceValue);
+        }
+        
+        // trim() 表达式
+        if (expression.match(/^\s*trim\s*\(\s*\)\s*$/)) {
+            return content.trim();
+        }
+        
+        // toLowerCase() 表达式
+        if (expression.match(/^\s*toLowerCase\s*\(\s*\)\s*$/)) {
+            return content.toLowerCase();
+        }
+        
+        // toUpperCase() 表达式
+        if (expression.match(/^\s*toUpperCase\s*\(\s*\)\s*$/)) {
+            return content.toUpperCase();
+        }
+        
+        console.warn(`不支持的表达式: ${expression}`);
+        return content;
+    } catch (error) {
+        console.error(`处理表达式时出错: ${expression}`, error);
+        return content;
+    }
+}
+
+/**
+ * 提取组件参数值
+ * @param {Object} parameters - 参数配置对象
+ * @param {Object} markdownData - Markdown数据（包含 type 和 content）
+ * @param {string} content - 内容
+ * @returns {Object} 参数值对象 { paramName: value }
+ */
+function extractComponentParameters(parameters, markdownData, content) {
+    const paramValues = {};
+    
+    if (!parameters || !markdownData) {
+        return paramValues;
+    }
+    
+    // 遍历所有参数定义
+    for (const [paramName, paramConfig] of Object.entries(parameters)) {
+        // 检查参数的 source 是否匹配 markdownData.type
+        if (paramConfig.source === markdownData.type) {
+            // 获取内容
+            let value = content;
+            
+            // 如果有 expression，应用表达式处理
+            if (paramConfig.expression) {
+                value = processExpression(value, paramConfig.expression);
+            }
+            
+            paramValues[paramName] = value;
+        }
+    }
+    
+    return paramValues;
+}
+
+/**
+ * 应用参数到样式对象
+ * @param {Object} style - 样式对象
+ * @param {Object} paramValues - 参数值对象 { paramName: value }
+ * @returns {Object} 应用参数后的样式对象
+ */
+function applyParametersToStyle(style, paramValues) {
+    if (!style || !paramValues || Object.keys(paramValues).length === 0) {
+        return style;
+    }
+    
+    const processedStyle = {};
+    
+    for (const [key, value] of Object.entries(style)) {
+        if (typeof value === 'string' && value.startsWith('$')) {
+            // 替换参数引用
+            const paramName = value.substring(1); // 去掉 $ 符号
+            if (paramValues.hasOwnProperty(paramName)) {
+                processedStyle[key] = paramValues[paramName];
+            } else {
+                console.warn(`未找到参数: ${paramName}`);
+                processedStyle[key] = value;
+            }
+        } else if (typeof value === 'object' && value !== null) {
+            // 递归处理嵌套对象
+            processedStyle[key] = applyParametersToStyle(value, paramValues);
+        } else {
+            processedStyle[key] = value;
+        }
+    }
+    
+    return processedStyle;
+}
+
+/**
+ * 处理required容器：确保必需的样式承载容器被渲染
+ * @param {Object} config - 配置对象（可能包含 required 数组）
+ * @param {Array} children - 子元素数组，required 容器将被添加到此数组
+ * @param {Object} styleConfig - 样式配置对象，用于查找 required 容器的配置
+ */
+function processRequiredContainers(config, children, styleConfig) {
+    if (config.required && Array.isArray(config.required)) {
+        config.required.forEach(requiredContainerName => {
+            const requiredConfig = config[requiredContainerName];
+            if (requiredConfig) {
+                // 创建必需的容器元素
+                const requiredElement = createTemplateTagElement(requiredContainerName, '', config);
+                if (requiredElement) {
+                    children.push(requiredElement);
+                }
+            }
+        });
     }
 }
 
@@ -1502,6 +1670,9 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
         }
     }
 
+    // 🆕 处理required容器：确保必需的样式承载容器被渲染
+    processRequiredContainers(cardStyleConfig, children, cardStyleConfig);
+
     if (returnElements) {
         return children;
     }
@@ -1518,11 +1689,112 @@ function processTemplatePathWithWildcard(templatePath, wildcardValue) {
     return templatePath.replace(/\*/g, wildcardValue);
 }
 
+/**
+ * 创建组件元素，支持引用通用组件配置
+ * @param {string} content - 组件内容
+ * @param {string} variant - 组件变体名称
+ * @param {Object} markdownData - Markdown数据
+ * @param {Object} styleOverride - 样式覆盖
+ * @returns {Object} 组件元素实例
+ */
+function createComponentElement(content, variant, markdownData = null, styleOverride = null) {
+    // 获取组件配置
+    const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[variant];
+    
+    if (!componentConfig) {
+        console.warn(`未找到组件变体 "${variant}" 的配置`);
+        // 返回一个基础的文本元素作为回退
+        return createTextElement(content);
+    }
+    
+    // 🆕 提取组件参数（如果有 parameters 配置和 markdownData）
+    let paramValues = {};
+    if (componentConfig.parameters && markdownData) {
+        paramValues = extractComponentParameters(componentConfig.parameters, markdownData, content);
+    }
+    
+    // 🆕 应用参数到样式
+    let processedStyle = componentConfig.style || {};
+    if (Object.keys(paramValues).length > 0) {
+        processedStyle = applyParametersToStyle(processedStyle, paramValues);
+    }
+    
+    // 创建组件容器元素
+    const componentElement = {
+        dataKeys: [],
+        name: "layout",
+        "name-zh": `组件容器-${variant}`,
+        "file-type": "template",
+        theme: "default",
+        _metadata: {
+            actualType: 'component',
+            variant: variant,
+            isComponent: true,
+            componentName: variant,
+            // 🆕 存储参数值，供调试使用
+            parameters: paramValues
+        },
+        layout: {
+            children: [],
+            style: processedStyle,
+            className: `component-${variant}`,
+            classStyle: {}
+        }
+    };
+    
+    // 应用样式覆盖
+    if (styleOverride) {
+        Object.assign(componentElement.layout.style, styleOverride);
+    }
+    
+    // 处理组件的子元素映射
+    if (componentConfig.markdownMapping && content) {
+        // 如果有 markdownData，使用它来确定内容类型
+        if (markdownData && markdownData.type) {
+            // 根据 markdownData.type 查找对应的映射
+            const targetPath = componentConfig.markdownMapping[markdownData.type];
+            
+            if (targetPath) {
+                // 直接创建对应的元素，传递原始的 markdownData
+                const containerMap = new Map();
+                const targetElement = createOrMergeTemplateElement(
+                    targetPath, 
+                    content, 
+                    componentConfig, 
+                    containerMap, 
+                    componentElement.layout.children,
+                    null, // existingElement
+                    markdownData // 传递原始的 markdownData
+                );
+            } else {
+                console.warn(`组件 "${variant}" 的 markdownMapping 中没有定义 "${markdownData.type}" 的映射`);
+            }
+            
+            // 🆕 处理required容器：确保必需的样式承载容器被渲染
+            processRequiredContainers(componentConfig, componentElement.layout.children, componentConfig);
+        } else {
+            // 如果没有 markdownData，尝试使用 parseTemplateCardContent 解析完整的 markdown 内容
+            const componentChildren = parseTemplateCardContent(content, componentConfig, true);
+            
+            if (componentChildren && componentChildren.length > 0) {
+                componentElement.layout.children.push(...componentChildren);
+            }
+        }
+    } else if (content) {
+        // 如果没有markdownMapping，直接创建文本元素
+        const textElement = createTextElement(content);
+        componentElement.layout.children.push(textElement);
+    }
+    
+    return componentElement;
+}
+
 export {
     isCardTag,
     extractWildcardMatch,
     extractCardBlock,
     findWildcardMatch,
     createCardElement,
-    processTemplatePathWithWildcard
+    processTemplatePathWithWildcard,
+    createComponentElement
 }

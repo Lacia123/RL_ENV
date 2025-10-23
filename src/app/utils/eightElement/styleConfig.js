@@ -835,6 +835,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontSize: "{font.size.xxl}",
       fontWeight: "bold",
       color: "{color.error.red5}",
+      textAlign: 'center',
     },
     percentItemDescription: {
       lineHeight: "1.4",
@@ -924,7 +925,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.bold}",
       textAlign: "center",
       color: "{color.basic.brand.6}",
-    }
+    },
   },
 
   // ==================== 数学公式元件 ==================== (新增)
@@ -1004,6 +1005,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontSize: "{font.size.small}",
       padding: "{dimension.padding.base} {dimension.padding.semiloose}",
       textAlign: 'center',
+      // borderRight: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black20}`,
       borderBottom: `{dimension.borderwidth.base} solid {color.surfacecontainer.black20}`,
       backgroundImage: 'none',
       textTransform: 'uppercase',
@@ -1018,7 +1020,7 @@ export const DEFAULT_STYLE_CONFIG = {
       textAlign: 'left',
       verticalAlign: 'top'
     },
-    // 表格行  
+    // 表格行
     tr: {
       fontSize: "{font.size.medium}",
       borderBottom: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
@@ -1270,7 +1272,7 @@ export const DEFAULT_STYLE_CONFIG = {
   list: {
     // 无序列表 
     unordered: {
-      paddingLeft: "{dimension.padding.loose}",           
+      paddingLeft: "{dimension.padding.loose}",
       marginBottom: "{dimension.margin.base}",
       fontSize: "{font.size.medium}",
       lineHeight: "1.6",
@@ -2641,6 +2643,73 @@ export const DEFAULT_STYLE_CONFIG = {
       }
     },
 
+
+    // ==================== header Precent Card 新的实验样式 ====================
+
+    headerPrecentCardExpe: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        p: 'text',
+        'h3+h4+p:group': 'percentItems.percentItem*', // 将h3+h4+p组合分组到percentItems容器中的percentItem
+      },
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        flexGrow: '1',
+        borderRadius: "{dimension.borderradius.xl}",
+        padding: "{dimension.padding.extraloose} 0",
+        boxShadow: "{material.hierarchy.main}",
+        borderWidth: "{dimension.borderwidth.narrow}",
+        borderColor: "{color.surfacecontainer.black12}",
+        borderStyle: "solid",
+        background: "{color.surfacecontainer.white100}",
+        // 嵌套选择器：重置内部ul元素的默认margin
+        "& ul": {
+          marginBlockStart: "0",
+          marginBlockEnd: "0",
+          marginTop: "0",
+          marginBottom: "0"
+        }
+      },
+      title: {
+        style: {
+          width: '100%',
+          padding: "0 {dimension.padding.base}",
+          borderLeftWidth: "{dimension.borderwidth.wide}",
+          borderLeftStyle: "solid",
+          borderLeftColor: "{color.primary.brand5}",
+        },
+        metaType: 'text',
+        variant: 'headerCardTitle',
+      },
+      text: {
+        style: {
+          padding: "0 {dimension.padding.base}",
+          marginTop: "{dimension.margin.base}",
+        },
+        metaType: 'text',
+        variant: 'headerCardText',
+      },
+      percentItems: {
+        type: 'template',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          gap: "{dimension.gap.loose}",
+          padding: "{dimension.padding.base}",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+        },
+        "percentItem*": {
+          metaType: 'component',
+          variant: 'newPrecentItem'
+        }
+      }
+    },
+
+    // ==================== 新的实验样式位置 ====================
+
     // ==================== 简约系列 ====================
 
     minimalistBorderLessCard: {
@@ -2900,7 +2969,7 @@ export const DEFAULT_STYLE_CONFIG = {
           alignItems: 'center',
           gap: "{dimension.gap.base}",
         },
-        
+
         // 左侧标题
         headerTitle: {
           metaType: 'text',
@@ -2925,7 +2994,7 @@ export const DEFAULT_STYLE_CONFIG = {
           }
         }
       },
-      
+
       chartContainer: {
         type: 'template',
         style: {
@@ -2942,6 +3011,7 @@ export const DEFAULT_STYLE_CONFIG = {
 
 
   },
+
   tab: {
     standard: {
       tabContainer: {
@@ -3255,6 +3325,222 @@ export const DEFAULT_STYLE_CONFIG = {
           opacity: '1',
           transform: 'translateY(0)'
         }
+      }
+    }
+  },
+
+  // ==================== 封装组件 ====================（用于支持通用组件的样式配置）
+  component: {
+    // 半分比 item 组件
+    precentItem: {
+      type: 'template',
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        flex: "1",
+        minWidth: "200px",
+        padding: "{dimension.padding.base}",
+        alignItems: "center",
+        textAlign: "center",
+      },
+      markdownMapping: {
+        h3: 'itemTitle',
+        h4: 'percentValue',
+        p: 'itemDescription',
+      },
+      itemTitle: {
+        style: {
+          marginBottom: "{dimension.margin.tight}",
+        },
+        metaType: 'text',
+        variant: 'percentItemTitle',
+      },
+      percentValue: {
+        style: {
+          marginBottom: "{dimension.margin.tight}",
+        },
+        metaType: 'text',
+        variant: 'percentValue',
+      },
+       itemDescription: {
+        metaType: 'text',
+        variant: 'percentItemDescription',
+      }
+    },
+    newPrecentItem: {
+      type: 'template',
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        flex: "1",
+        minWidth: "200px",
+        padding: "{dimension.padding.base}",
+        alignItems: "center",
+        textAlign: "center",
+      },
+      markdownMapping: {
+        h3: 'itemTitle',
+        h4: 'precentContainer',
+        p: 'itemDescription',
+      },
+      itemTitle: {
+        style: {
+          marginBottom: "{dimension.margin.tight}",
+        },
+        metaType: 'text',
+        variant: 'percentItemTitle',
+      },
+      itemDescription: {
+        metaType: 'text',
+        variant: 'percentItemDescription',
+      },
+      precentContainer: {
+        metaType: 'component',
+        variant: 'halfCirclePrecent',
+      },
+      // precentContainer: {
+      //   type: 'template',
+      //   style: {
+      //     position: 'relative',
+      //     width: '200px',
+      //     height: '100px',
+      //     '--p': '15',
+      //     '--progress-deg': 'calc(var(--p) * 1.8deg)',
+      //   },
+      //   required: ['progressTrack', 'progressFill', 'progressInner'],
+      //   markdownMapping: {
+      //     'h4': 'progressValue',
+      //   },
+      //   progressTrack: {
+      //     type: 'template',
+      //     style: {
+      //       position: 'absolute',
+      //       width: '200px',
+      //       height: '100px',
+      //       borderRadius: '100px 100px 0 0',
+      //       background: '#fee2e2',
+      //     }
+      //   },
+      //   progressFill: {
+      //     type: 'template',
+      //     style: {
+      //       position: 'absolute',
+      //       width: '200px',
+      //       height: '100px',
+      //       borderRadius: '100px 100px 0 0',
+      //       overflow: 'hidden',
+      //       '&::before': {
+      //         content: "''",
+      //         position: 'absolute',
+      //         width: '200px',
+      //         height: '200px',
+      //         top: '0',
+      //         left: '0',
+      //         borderRadius: '50%',
+      //         background: 'conic-gradient(from 270deg, #ef4444 0deg, #ef4444 var(--progress-deg), transparent var(--progress-deg))',
+      //       }
+      //     }
+      //   },
+      //   progressInner: {
+      //     type: 'template',
+      //     style: {
+      //       position: 'absolute',
+      //       width: '160px',
+      //       height: '80px',
+      //       top: '20px',
+      //       left: '20px',
+      //       background: '{color.surfacecontainer.white100}',
+      //       borderRadius: '84px 84px 0 0',
+      //       zIndex: '1',
+      //     }
+      //   },
+      //   progressValue: {
+      //     style: {
+      //       position: 'absolute',
+      //       bottom: '10px',
+      //       left: '50%',
+      //       transform: 'translateX(-50%)',
+      //       zIndex: '2',
+      //     },
+      //     metaType: 'text',
+      //     variant: 'percentValue',
+      //   }
+      // },
+    },
+    // 半圆进度条组件
+    halfCirclePrecent: {
+      type: 'template',
+      parameters: {
+        progressValue: {
+          source: 'h4',
+          expression: 'replace("%", "")',
+        }
+      },
+      style: {
+        position: 'relative',
+        width: '200px',
+        height: '100px',
+        '--p': '$progressValue',
+        '--progress-deg': 'calc(var(--p) * 1.8deg)',
+      },
+      required: ['progressTrack', 'progressFill', 'progressInner'],
+      markdownMapping: {
+        'h4': 'progressValue',
+      },
+      progressTrack: {
+        type: 'template',
+        style: {
+          position: 'absolute',
+          width: '200px',
+          height: '100px',
+          borderRadius: '100px 100px 0 0',
+          background: '#fee2e2',
+        }
+      },
+      progressFill: {
+        type: 'template',
+        style: {
+          position: 'absolute',
+          width: '200px',
+          height: '100px',
+          borderRadius: '100px 100px 0 0',
+          overflow: 'hidden',
+          '&::before': {
+            content: "''",
+            position: 'absolute',
+            width: '200px',
+            height: '200px',
+            top: '0',
+            left: '0',
+            borderRadius: '50%',
+            background: 'conic-gradient(from 270deg, #ef4444 0deg, #ef4444 var(--progress-deg), transparent var(--progress-deg))',
+          }
+        }
+      },
+      progressInner: {
+        type: 'template',
+        style: {
+          position: 'absolute',
+          width: '160px',
+          height: '80px',
+          top: '20px',
+          left: '20px',
+          background: '{color.surfacecontainer.white100}',
+          borderRadius: '84px 84px 0 0',
+          zIndex: '1',
+        }
+      },
+      progressValue: {
+        type: 'template',
+        style: {
+          position: 'absolute',
+          bottom: '10px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: '2',
+        },
+        metaType: 'text',
+        variant: 'percentValue'
       }
     }
   }
