@@ -468,7 +468,7 @@ export const DEFAULT_STYLE_CONFIG = {
         gridTemplateAreas: 'none',
         justifyItems: 'stretch',
       },
-      supportedAttributes: ['backgroundImage', 'backgroundRepeat', 'backgroundSize', 'backgroundPosition', 'backgroundColor']
+      supportedAttributes: ['backgroundImage', 'backgroundRepeat', 'backgroundSize', 'backgroundPosition', 'backgroundColor', 'background']
     },
     // 列布局元素（默认垂直布局）
     column: {
@@ -524,6 +524,12 @@ export const DEFAULT_STYLE_CONFIG = {
         background: "{color.primary.brand3}",
       },
       supportedAttributes: ['background', 'backgroundColor', 'padding', 'margin', 'borderRadius', 'borderColor', 'borderWidth', 'boxShadow']
+    },
+    minimalContainer: {
+      borderTopRightRadius: "{dimension.borderradius.xl}",
+      borderBottomRightRadius: "{dimension.borderradius.xl}",
+      borderBottomLeftRadius: "{dimension.borderradius.xl}",
+      background: "{color.onprimary.white100}",
     },
     gallery: {
       // 使用CSS多列布局，不使用flexbox
@@ -614,6 +620,7 @@ export const DEFAULT_STYLE_CONFIG = {
       //   fontWeight: "{font.fontweight.bold}"
       // }
     },
+
     h4: {
       width: "auto",
       fontSize: "{font.size.large}",
@@ -874,7 +881,7 @@ export const DEFAULT_STYLE_CONFIG = {
 
     minimalistListCardContent: {
       lineHeight: "1.4",
-      fontSize: "{font.size.large}",
+      fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.medium}",
       color: "{color.onsurfacecontainer.grey9}",
     },
@@ -2774,6 +2781,38 @@ export const DEFAULT_STYLE_CONFIG = {
         variant: 'minimalistBorderLessCardContent',
       }
     },
+    minimalistHeaderCard: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title',
+        h3: 'label'
+      },
+      style: {
+        width: '360px',
+        padding: "{dimension.padding.base}",
+        borderTopRightRadius: "{dimension.borderradius.xl}",
+        borderTopLeftRadius: "{dimension.borderradius.xl}",
+        background: "{color.surfacecontainer.white100}",
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+      },
+      title: {
+        metaType: 'text',
+        style: {
+          paddingLeft: "{dimension.padding.base}",
+        },
+        variant: 'minimalistBorderLessCardTitle',
+      },
+      label: {
+        metaType: 'component',
+        variant: 'labelTitle',
+        parameters: {
+          labelBgColor: "{color.basic.brand.4}"
+        }
+      }
+    },
     minimalistListCard: {
       type: 'template',
       markdownMapping: {
@@ -2782,13 +2821,12 @@ export const DEFAULT_STYLE_CONFIG = {
         'h3+h4:group': 'listItems.listItem*',
       },
       style: {
-        marginTop: "{dimension.margin.base}",
+        // marginTop: "{dimension.margin.base}",
         display: 'flex',
         flexDirection: 'column',
         padding: "{dimension.padding.base}",
         gap: "{dimension.gap.base}",
         borderRadius: "{dimension.borderradius.xl}",
-        background: "{color.basic.brand.0}",
       },
       title: {
         metaType: 'text',
@@ -2855,12 +2893,11 @@ export const DEFAULT_STYLE_CONFIG = {
         marginTop: "{dimension.margin.base}",
         padding: "{dimension.padding.base}",
         borderRadius: "{dimension.borderradius.xl}",
-        background: "{color.basic.grey.0}",
       },
       title: {
         metaType: 'text',
         style: {
-          paddingLeft: "{dimension.padding.loose}",
+          paddingLeft: "{dimension.padding.base}",
         },
         variant: 'minimalistCardMainTitle',
       },
@@ -2868,7 +2905,7 @@ export const DEFAULT_STYLE_CONFIG = {
         metaType: 'text',
         style: {
           paddingTop: "{dimension.padding.base}",
-          paddingLeft: "{dimension.padding.loose}",
+          paddingLeft: "{dimension.padding.base}",
         },
         variant: 'minimalistListCardTitle',
       },
@@ -2884,7 +2921,7 @@ export const DEFAULT_STYLE_CONFIG = {
           type: 'template',
           style: {
             borderRadius: "{dimension.borderradius.xl}",
-            background: "{color.surfacecontainer.white100}",
+            background: "{color.basic.grey.0}",
             overflow: 'hidden',
             flex: "0 0 49%",
             display: 'flex',
@@ -2906,6 +2943,7 @@ export const DEFAULT_STYLE_CONFIG = {
               paddingBottom: "{dimension.padding.base}",
               paddingLeft: "{dimension.padding.base}",
               paddingRight: "{dimension.padding.base}",
+              
             },
             variant: 'minimalistListCardItemTitle',
           },
@@ -2937,7 +2975,6 @@ export const DEFAULT_STYLE_CONFIG = {
         gap: "{dimension.gap.base}",
         borderRadius: "{dimension.borderradius.xl}",
         padding: "{dimension.padding.base}",
-        background: "{color.basic.grey.0}",
       },
       title: {
         metaType: 'text',
@@ -3449,10 +3486,17 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     // lable 标题组件
     labelTitle: {
+      parameters: {
+        labelBgColor: {
+          source: 'outer',
+          default: '{color.basic.red.9}'
+        }
+      },
       style: {
+        '--bg-color': '$labelBgColor',
         padding: "{dimension.padding.tight} {dimension.padding.base}",
         borderRadius: "{dimension.borderradius.xl}",
-        background: "{color.basic.red.9}",
+        background: "var(--bg-color)",
       },
       metaType: 'text',
       variant: 'precentItemLabel',

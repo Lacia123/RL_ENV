@@ -1368,12 +1368,15 @@ const userRoles = {
     name: "简约卡片系列",
     description: "测试新增的简约卡片系列",
     markdown: `
-    <card:minimalistBorderLessCard>
-    ### 招聘JD
-    ## 算法工程师
-    负责核心算法模型的设计、优化与落地，推动产品智能化升级。需要具备扎实数学功底和工程实现能力，能将理论转化为业务价值。
-    </card:minimalistBorderLessCard>
+    <layout:root background="{color.basic.brand.0}">
+    <card:minimalistHeaderCard>
+      ## 算法工程师
+      ### 招聘 JD
+    </card:minimalistHeaderCard>
+    <layout:minimalContainer>
     <card:minimalistListCard>
+    负责核心算法模型的设计、优化与落地，推动产品智能化升级。需要具备扎实数学功底和工程实现能力，能将理论转化为业务价值。
+
     ## 职位详情
 
     ### 薪资范围
@@ -1413,7 +1416,32 @@ const userRoles = {
     [公众号后台申请](https://example.com/about)
     [发送邮件申请](https://example.com/contact)
     </card:minimalistButtonCard>
-    <card:minimalistChartCard>
+    </layout:minimalContainer>
+    </layout:root>
+    `
+  },
+  expriement: {
+    name: "实验功能",
+    description: "实验一些测试功能",
+    markdown: `
+      <card:bannerPanel>
+        ## 智能云平台竞对动态分析
+      </card:bannerPanel>
+      <card:headerPrecentCardExpe>
+       ### 中国市场
+       #### 15%
+       AI-PC 出货量
+
+       ### 全球市场  
+       #### 25%
+       AI-PC 渗透率
+
+       ### 未来预测
+       #### 40%
+       预计增长率
+        
+      </card:headerPrecentCardExpe>
+          <card:minimalistChartCard>
     ## 03
     ### 头部品牌分析
     联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
@@ -1441,29 +1469,6 @@ const userRoles = {
     | 工作站 | 25% |
 
     </card:minimalistChartCard>
-    `
-  },
-  expriement: {
-    name: "实验功能",
-    description: "实验一些测试功能",
-    markdown: `
-      <card:bannerPanel>
-        ## 智能云平台竞对动态分析
-      </card:bannerPanel>
-      <card:headerPrecentCardExpe>
-       ### 中国市场
-       #### 15%
-       AI-PC 出货量
-
-       ### 全球市场  
-       #### 25%
-       AI-PC 渗透率
-
-       ### 未来预测
-       #### 40%
-       预计增长率
-        
-      </card:headerPrecentCardExpe>
     `
   }
 };

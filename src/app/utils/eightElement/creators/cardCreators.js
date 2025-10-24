@@ -1738,11 +1738,27 @@ function createComponentElement(content, variant, markdownData = null, styleOver
     // 🆕 如果组件配置有 metaType（如 text, button 等），说明这是一个元件引用，而不是模板组件
     // 应该直接创建对应的元件，如果有 style 则用容器包装
     if (componentConfig.metaType) {
+        // 🆕 提取参数（如果有 parameters 配置）
+        let paramValues = {};
+        if (componentConfig.parameters) {
+            paramValues = extractComponentParameters(
+                componentConfig.parameters, 
+                markdownData, 
+                content,
+                externalParameters || {}
+            );
+        }
+        
         // 合并样式：componentConfig.style + styleOverride
-        const finalStyle = {
+        let finalStyle = {
             ...(componentConfig.style || {}),
             ...(styleOverride || {})
         };
+        
+        // 🆕 应用参数到样式
+        if (Object.keys(paramValues).length > 0) {
+            finalStyle = applyParametersToStyle(finalStyle, paramValues);
+        }
         
         let elementInstance = null;
         
@@ -1777,7 +1793,9 @@ function createComponentElement(content, variant, markdownData = null, styleOver
                     componentName: variant,
                     isElementContainer: true,
                     containedElementType: componentConfig.metaType,
-                    containedElementVariant: componentConfig.variant
+                    containedElementVariant: componentConfig.variant,
+                    // 🆕 存储参数值，供调试使用
+                    parameters: paramValues
                 },
                 layout: {
                     style: {
