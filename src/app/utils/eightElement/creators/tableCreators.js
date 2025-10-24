@@ -9,36 +9,10 @@ import { createButtonElement } from './buttonCreators.js';
 import { createLayoutElement } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 import { EVENT_NAME } from '../eventConfig.js';
+import { parseHeaderBackgroundSyntax, parseTableHeaderStyles, removeInlineStyles } from '../styleParser.js';
+import resolveToken from '../../tokens/resolveToken.js';
 
-// 🆕 解析表头中的背景颜色语法 [background:{color.primarycontainer.brand0}]
-function parseHeaderBackgroundSyntax(tableContent) {
-    const lines = tableContent.trim().split('\n');
-    let headerBackgroundColor = null;
-    
-    // 查找第一行（表头行）
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        
-        // 跳过分隔行和事件语法行
-        if (line.match(/\|[-|\s]+\|/) || line.match(/^\[event:/)) {
-            continue;
-        }
-        
-        // 检查是否包含背景语法
-        const backgroundMatch = line.match(/\[background:\s*\{([^}]+)\}\]/);
-        if (backgroundMatch) {
-            headerBackgroundColor = `{${backgroundMatch[1]}}`;
-            break;
-        }
-        
-        // 如果找到了第一行且没有背景语法，退出循环
-        if (line.includes('|')) {
-            break;
-        }
-    }
-    
-    return headerBackgroundColor;
-}
+// 注意：parseHeaderBackgroundSyntax 和相关函数已移至 styleParser.js 作为通用工具
 
 // 解析表格数据为二维数组
 function parseTableData(tableContent) {
@@ -58,8 +32,8 @@ function parseTableData(tableContent) {
             continue;
         }
 
-        // 🆕 移除背景语法标记
-        let cleanLine = lines[i].trim().replace(/\[background:\s*\{[^}]+\}\]/g, '');
+        // 🆕 使用通用工具移除样式语法标记
+        let cleanLine = removeInlineStyles(lines[i].trim());
 
         // 移除行首尾的|，并分割单元格
         const cells = cleanLine
@@ -175,10 +149,10 @@ function extractTableOrChartData(lines, startIndex) {
     // 提取原始表格内容（用于显示和调试）
     const originalContent = tableLines.join('\n');
     
-    // 🆕 清理背景语法标记，确保保存的是清理后的内容
-    const cleanedContent = originalContent.replace(/\[background:\s*\{[^}]+\}\]/g, '');
+    // 🆕 使用通用工具清理样式语法标记（仅用于数据解析）
+    const cleanedContent = removeInlineStyles(originalContent);
 
-    // 解析表格数据为二维数组（用于图表数据处理）
+    // 解析表格数据为二维数组（用于图表数据处理，使用清理后的内容）
     const tableData = parseTableData(cleanedContent);
 
     return {
@@ -186,7 +160,7 @@ function extractTableOrChartData(lines, startIndex) {
         chartType: chartType,
         chartTitle: chartTitle, // 🆕 添加图表标题
         sortOrder: sortOrder, // 🆕 添加排序参数
-        tableContent: cleanedContent, // 🆕 使用清理后的内容
+        tableContent: originalContent, // 🔧 修复：返回原始内容（包含样式语法），让 createTableElement 来解析和清理
         tableData: tableData,
         endIndex: startIndex + i,
         originalFirstLine: firstLine // 🆕 保存原始的第一行用于事件解析
@@ -203,11 +177,12 @@ function createTableElement(markdownTableContent) {
     const tableRowStyleConfig = getElementStyleConfig('table', 'tr');
     const tableCellStyleConfig = getElementStyleConfig('table', 'td');
 
-    // 🆕 解析表头背景颜色语法
-    const headerBackgroundColor = parseHeaderBackgroundSyntax(markdownTableContent);
+    // 🆕 使用通用工具解析表头样式
+    const { headerStyles, cleanContent } = parseTableHeaderStyles(markdownTableContent);
+    const cleanedTableContent = cleanContent;
     
-    // 🆕 清理背景语法标记，确保保存的是清理后的内容
-    const cleanedTableContent = markdownTableContent.replace(/\[background:\s*\{[^}]+\}\]/g, '');
+    // 🆕 扩展样式应用：不仅支持 background，还支持其他样式属性
+    const headerBackgroundColor = headerStyles.background || null;
 
     // 确保表格内容不为空
     if (!cleanedTableContent.trim()) {
@@ -218,11 +193,27 @@ function createTableElement(markdownTableContent) {
     const uniqueClassName = `table-${id}`;
     const uniqueTrClassName = `tr-${id}`;
 
-    // 🆕 构建th样式配置，如果有自定义背景颜色则覆盖默认配置
+    // 🆕 构建th样式配置，应用所有自定义样式
     let finalThStyleConfig = { ...tableHeaderStyleConfig };
-    if (headerBackgroundColor) {
-        finalThStyleConfig.backgroundColor = headerBackgroundColor;
-        console.log('🎨 应用表头背景颜色:', headerBackgroundColor);
+    if (Object.keys(headerStyles).length > 0) {
+        // 应用所有解析出的样式，并解析 token
+        Object.entries(headerStyles).forEach(([key, value]) => {
+            // 解析 token 值
+            let resolvedValue = value;
+            if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
+                resolvedValue = resolveToken(value);
+                console.log(`🎯 Token解析: ${value} -> ${resolvedValue}`);
+            }
+            
+            // 将样式属性名转换为对应的配置键
+            if (key === 'background') {
+                finalThStyleConfig.backgroundColor = resolvedValue;
+            } else {
+                // 其他样式属性直接应用
+                finalThStyleConfig[key] = resolvedValue;
+            }
+        });
+        console.log('🎨 应用表头自定义样式:', headerStyles);
     }
 
     // 创建符合要求的表格元素结构
