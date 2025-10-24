@@ -670,6 +670,12 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
                 styleOverride = markdownData.customStyles;
             }
         }
+        
+        // 🆕 如果 tagConfig 本身有 style，也应该作为样式覆盖
+        // 优先级：markdownData.customStyles > tagConfig.style
+        if (!styleOverride && tagConfig.style) {
+            styleOverride = tagConfig.style;
+        }
 
         // 根据 metaType 创建对应的元件
         let elementInstance = null;
@@ -696,7 +702,9 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             elementInstance = createCodeElement(content, language);
         } else if (tagConfig.metaType === 'component') {
             // 🆕 处理component类型，引用通用组件配置
-            elementInstance = createComponentElement(content, tagConfig.variant, markdownData, styleOverride);
+            // 从 tagConfig 中获取外部参数（如果有的话）
+            const externalParameters = tagConfig.parameters || null;
+            elementInstance = createComponentElement(content, tagConfig.variant, markdownData, styleOverride, externalParameters);
         }
         // 可以在这里添加其他元件类型的支持
 
@@ -738,7 +746,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
                         // borderWidth: "0",
                         // borderColor: "initial",
                         height: "auto",
-                        width: "100%",
+                        // width: "100%",
                         boxSizing: "border-box",
                         position: "relative",
                         // ...finalStyle // 容器使用基础样式
@@ -1103,30 +1111,49 @@ function processExpression(content, expression) {
 
 /**
  * 提取组件参数值
- * @param {Object} parameters - 参数配置对象
+ * @param {Object} parameterDefinitions - 参数定义对象（来自组件配置的 parameters）
  * @param {Object} markdownData - Markdown数据（包含 type 和 content）
  * @param {string} content - 内容
+ * @param {Object} externalParameters - 外部传递的参数值（来自使用方的 parameters）
  * @returns {Object} 参数值对象 { paramName: value }
  */
-function extractComponentParameters(parameters, markdownData, content) {
+function extractComponentParameters(parameterDefinitions, markdownData, content, externalParameters = {}) {
     const paramValues = {};
     
-    if (!parameters || !markdownData) {
+    if (!parameterDefinitions) {
         return paramValues;
     }
     
     // 遍历所有参数定义
-    for (const [paramName, paramConfig] of Object.entries(parameters)) {
-        // 检查参数的 source 是否匹配 markdownData.type
-        if (paramConfig.source === markdownData.type) {
-            // 获取内容
-            let value = content;
+    for (const [paramName, paramConfig] of Object.entries(parameterDefinitions)) {
+        let value = null;
+        
+        // 处理不同的参数来源
+        if (paramConfig.source === 'outer') {
+            // 🆕 从外部参数中获取值
+            if (externalParameters && externalParameters.hasOwnProperty(paramName)) {
+                value = externalParameters[paramName];
+            } else if (paramConfig.default !== undefined) {
+                // 使用默认值
+                value = paramConfig.default;
+            } else {
+                console.warn(`外部参数 "${paramName}" 未提供，且没有默认值`);
+                continue;
+            }
+        } else if (markdownData && paramConfig.source === markdownData.type) {
+            // 从 markdown 内容中提取
+            value = content;
             
             // 如果有 expression，应用表达式处理
             if (paramConfig.expression) {
                 value = processExpression(value, paramConfig.expression);
             }
-            
+        } else {
+            // 参数来源不匹配，跳过
+            continue;
+        }
+        
+        if (value !== null) {
             paramValues[paramName] = value;
         }
     }
@@ -1695,9 +1722,10 @@ function processTemplatePathWithWildcard(templatePath, wildcardValue) {
  * @param {string} variant - 组件变体名称
  * @param {Object} markdownData - Markdown数据
  * @param {Object} styleOverride - 样式覆盖
+ * @param {Object} externalParameters - 外部传递的参数（用于 source: 'outer' 的参数）
  * @returns {Object} 组件元素实例
  */
-function createComponentElement(content, variant, markdownData = null, styleOverride = null) {
+function createComponentElement(content, variant, markdownData = null, styleOverride = null, externalParameters = null) {
     // 获取组件配置
     const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[variant];
     
@@ -1707,10 +1735,84 @@ function createComponentElement(content, variant, markdownData = null, styleOver
         return createTextElement(content);
     }
     
-    // 🆕 提取组件参数（如果有 parameters 配置和 markdownData）
+    // 🆕 如果组件配置有 metaType（如 text, button 等），说明这是一个元件引用，而不是模板组件
+    // 应该直接创建对应的元件，如果有 style 则用容器包装
+    if (componentConfig.metaType) {
+        // 合并样式：componentConfig.style + styleOverride
+        const finalStyle = {
+            ...(componentConfig.style || {}),
+            ...(styleOverride || {})
+        };
+        
+        let elementInstance = null;
+        
+        // 根据 metaType 创建对应的元件（不传递样式，样式由容器承载）
+        if (componentConfig.metaType === 'text') {
+            elementInstance = createTextElement(content, componentConfig.variant, {}, null);
+        } else if (componentConfig.metaType === 'button') {
+            const buttonUrl = markdownData?.url || '#';
+            const buttonVariant = componentConfig.variant;
+            elementInstance = createButtonElement(content, buttonUrl, buttonVariant, '', null);
+        } else if (componentConfig.metaType === 'image') {
+            const imageUrl = markdownData?.url || '';
+            elementInstance = createBackgroundElement(imageUrl, componentConfig.variant, null);
+        }
+        // 可以添加更多类型...
+        
+        // 如果有样式配置，创建容器来包装元件
+        if (elementInstance && Object.keys(finalStyle).length > 0) {
+            const id = generateUUID();
+            const uniqueClassName = `component-${variant}-${id}`;
+            
+            const containerElement = {
+                dataKeys: [],
+                name: "layout",
+                "name-zh": `组件容器-${variant}`,
+                "file-type": "template",
+                theme: "default",
+                _metadata: {
+                    actualType: 'component',
+                    variant: variant,
+                    isComponent: true,
+                    componentName: variant,
+                    isElementContainer: true,
+                    containedElementType: componentConfig.metaType,
+                    containedElementVariant: componentConfig.variant
+                },
+                layout: {
+                    style: {
+                        display: "{layout.state.display.flex}",
+                        layoutMode: "{layout.direction.VERTICAL}",
+                        layoutWrap: "{layout.wrap.NO_WRAP}",
+                        boxSizing: "border-box",
+                        height: "auto",
+                        position: "relative"
+                    },
+                    classStyle: finalStyle, // 应用自定义样式
+                    className: uniqueClassName,
+                    children: [elementInstance]
+                },
+                description: `组件容器 - ${variant}`,
+                id: id,
+                events: [{}]
+            };
+            
+            return containerElement;
+        }
+        
+        // 如果没有样式，直接返回元件
+        return elementInstance;
+    }
+    
+    // 🆕 提取组件参数（如果有 parameters 配置）
     let paramValues = {};
-    if (componentConfig.parameters && markdownData) {
-        paramValues = extractComponentParameters(componentConfig.parameters, markdownData, content);
+    if (componentConfig.parameters) {
+        paramValues = extractComponentParameters(
+            componentConfig.parameters, 
+            markdownData, 
+            content,
+            externalParameters || {} // 传递外部参数
+        );
     }
     
     // 🆕 应用参数到样式

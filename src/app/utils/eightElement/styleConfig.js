@@ -831,6 +831,11 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "bold",
       color: "{color.onsurfacecontainer.grey9}",
     },
+    precentItemLabel: {
+      fontSize: "{font.size.small}",
+      fontWeight: "bold",
+      color: "{color.onprimary.white100}",
+    },
     percentValue: {
       fontSize: "{font.size.xxl}",
       fontWeight: "bold",
@@ -925,6 +930,13 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.bold}",
       textAlign: "center",
       color: "{color.basic.brand.6}",
+    },
+
+    // bannerPanel 标题
+    bannerTitle: {
+      fontSize: "{font.size.xxl}",
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.onprimary.white100}",
     },
   },
 
@@ -1723,6 +1735,28 @@ export const DEFAULT_STYLE_CONFIG = {
           variant: 'codeBlock'
         }
       },
+    },
+
+
+    bannerPanel: {
+      type: 'template',
+      markdownMapping: {
+        h2: 'title'
+      },
+      style: {
+        width: '100%',
+        padding: "{dimension.padding.extraloose} {dimension.padding.loose}",
+        borderRadius: "{dimension.borderradius.xl}",
+        background: "linear-gradient(135deg, {color.primary.brand4} 0%, {color.secondary.violet5} 35%, {color.primary.brand6} 100%)",
+        boxShadow: "{material.hierarchy.1f}",
+        position: 'relative',
+        overflow: 'hidden',
+        marginBottom: "{dimension.margin.loose}",
+      },
+      title: {
+        metaType: 'text',
+        variant: 'bannerTitle',
+      }
     },
 
     // ==================== 科技渐变风格卡片系列 ====================
@@ -2703,7 +2737,7 @@ export const DEFAULT_STYLE_CONFIG = {
         },
         "percentItem*": {
           metaType: 'component',
-          variant: 'newPrecentItem'
+          variant: 'newPrecentItem',
         }
       }
     },
@@ -3377,96 +3411,53 @@ export const DEFAULT_STYLE_CONFIG = {
         padding: "{dimension.padding.base}",
         alignItems: "center",
         textAlign: "center",
+        background: "{color.basic.red.0}",
+        borderRadius: "{dimension.borderradius.xl}",
+        
       },
+
       markdownMapping: {
-        h3: 'itemTitle',
+        h3: 'header.title',
+        p: 'header.description',
         h4: 'precentContainer',
-        p: 'itemDescription',
       },
-      itemTitle: {
+      header: {
+        type: 'template',
         style: {
-          marginBottom: "{dimension.margin.tight}",
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: "{dimension.margin.base}",
         },
-        metaType: 'text',
-        variant: 'percentItemTitle',
-      },
-      itemDescription: {
-        metaType: 'text',
-        variant: 'percentItemDescription',
+        title: {
+          metaType: 'component',
+          variant: 'labelTitle',
+        },
+        description: {
+          metaType: 'text',
+          variant: 'percentItemDescription'
+        }
       },
       precentContainer: {
         metaType: 'component',
         variant: 'halfCirclePrecent',
+        parameters: {
+          fillColor: "{color.basic.red.0}"
+        }
       },
-      // precentContainer: {
-      //   type: 'template',
-      //   style: {
-      //     position: 'relative',
-      //     width: '200px',
-      //     height: '100px',
-      //     '--p': '15',
-      //     '--progress-deg': 'calc(var(--p) * 1.8deg)',
-      //   },
-      //   required: ['progressTrack', 'progressFill', 'progressInner'],
-      //   markdownMapping: {
-      //     'h4': 'progressValue',
-      //   },
-      //   progressTrack: {
-      //     type: 'template',
-      //     style: {
-      //       position: 'absolute',
-      //       width: '200px',
-      //       height: '100px',
-      //       borderRadius: '100px 100px 0 0',
-      //       background: '#fee2e2',
-      //     }
-      //   },
-      //   progressFill: {
-      //     type: 'template',
-      //     style: {
-      //       position: 'absolute',
-      //       width: '200px',
-      //       height: '100px',
-      //       borderRadius: '100px 100px 0 0',
-      //       overflow: 'hidden',
-      //       '&::before': {
-      //         content: "''",
-      //         position: 'absolute',
-      //         width: '200px',
-      //         height: '200px',
-      //         top: '0',
-      //         left: '0',
-      //         borderRadius: '50%',
-      //         background: 'conic-gradient(from 270deg, #ef4444 0deg, #ef4444 var(--progress-deg), transparent var(--progress-deg))',
-      //       }
-      //     }
-      //   },
-      //   progressInner: {
-      //     type: 'template',
-      //     style: {
-      //       position: 'absolute',
-      //       width: '160px',
-      //       height: '80px',
-      //       top: '20px',
-      //       left: '20px',
-      //       background: '{color.surfacecontainer.white100}',
-      //       borderRadius: '84px 84px 0 0',
-      //       zIndex: '1',
-      //     }
-      //   },
-      //   progressValue: {
-      //     style: {
-      //       position: 'absolute',
-      //       bottom: '10px',
-      //       left: '50%',
-      //       transform: 'translateX(-50%)',
-      //       zIndex: '2',
-      //     },
-      //     metaType: 'text',
-      //     variant: 'percentValue',
-      //   }
-      // },
     },
+    // lable 标题组件
+    labelTitle: {
+      style: {
+        padding: "{dimension.padding.tight} {dimension.padding.base}",
+        borderRadius: "{dimension.borderradius.xl}",
+        background: "{color.basic.red.9}",
+      },
+      metaType: 'text',
+      variant: 'precentItemLabel',
+    },
+    
     // 半圆进度条组件
     halfCirclePrecent: {
       type: 'template',
@@ -3474,6 +3465,10 @@ export const DEFAULT_STYLE_CONFIG = {
         progressValue: {
           source: 'h4',
           expression: 'replace("%", "")',
+        },
+        fillColor: {
+          source: 'outer',
+          default: '{color.surfacecontainer.white100}'
         }
       },
       style: {
@@ -3482,6 +3477,7 @@ export const DEFAULT_STYLE_CONFIG = {
         height: '100px',
         '--p': '$progressValue',
         '--progress-deg': 'calc(var(--p) * 1.8deg)',
+        '--bg-color': '$fillColor'
       },
       required: ['progressTrack', 'progressFill', 'progressInner'],
       markdownMapping: {
@@ -3525,7 +3521,7 @@ export const DEFAULT_STYLE_CONFIG = {
           height: '80px',
           top: '20px',
           left: '20px',
-          background: '{color.surfacecontainer.white100}',
+          background: 'var(--bg-color)',
           borderRadius: '84px 84px 0 0',
           zIndex: '1',
         }

@@ -1447,11 +1447,10 @@ const userRoles = {
     name: "实验功能",
     description: "实验一些测试功能",
     markdown: `
+      <card:bannerPanel>
+        ## 智能云平台竞对动态分析
+      </card:bannerPanel>
       <card:headerPrecentCardExpe>
-
-       ## 二、市场概述
-       AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注
-
        ### 中国市场
        #### 15%
        AI-PC 出货量
