@@ -10,7 +10,6 @@ import { createLayoutElement } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 import { EVENT_NAME } from '../eventConfig.js';
 import { parseHeaderBackgroundSyntax, parseTableHeaderStyles, removeInlineStyles } from '../styleParser.js';
-import resolveToken from '../../tokens/resolveToken.js';
 
 // 注意：parseHeaderBackgroundSyntax 和相关函数已移至 styleParser.js 作为通用工具
 
@@ -196,24 +195,18 @@ function createTableElement(markdownTableContent) {
     // 🆕 构建th样式配置，应用所有自定义样式
     let finalThStyleConfig = { ...tableHeaderStyleConfig };
     if (Object.keys(headerStyles).length > 0) {
-        // 应用所有解析出的样式，并解析 token
+        // 应用所有解析出的样式，保持 token 格式
         Object.entries(headerStyles).forEach(([key, value]) => {
-            // 解析 token 值
-            let resolvedValue = value;
-            if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
-                resolvedValue = resolveToken(value);
-                console.log(`🎯 Token解析: ${value} -> ${resolvedValue}`);
-            }
-            
+            // 🔧 不解析 token，保持原始格式，token 解析应该在渲染时进行
             // 将样式属性名转换为对应的配置键
             if (key === 'background') {
-                finalThStyleConfig.backgroundColor = resolvedValue;
+                finalThStyleConfig.backgroundColor = value;
             } else {
                 // 其他样式属性直接应用
-                finalThStyleConfig[key] = resolvedValue;
+                finalThStyleConfig[key] = value;
             }
         });
-        console.log('🎨 应用表头自定义样式:', headerStyles);
+        console.log('🎨 应用表头自定义样式 (保持 token 格式):', headerStyles);
     }
 
     // 创建符合要求的表格元素结构
