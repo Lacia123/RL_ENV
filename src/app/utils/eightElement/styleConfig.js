@@ -3043,6 +3043,9 @@ export const DEFAULT_STYLE_CONFIG = {
 
         // 左侧标题
         headerTitle: {
+          style: {
+            width: '90px',
+          },
           metaType: 'text',
           variant: 'minimalistChartCardHeaderTitle',
         },
