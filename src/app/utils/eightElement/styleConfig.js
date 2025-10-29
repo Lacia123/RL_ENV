@@ -1753,12 +1753,27 @@ export const DEFAULT_STYLE_CONFIG = {
       style: {
         width: '100%',
         padding: "{dimension.padding.extraloose} {dimension.padding.loose}",
-        borderRadius: "{dimension.borderradius.xl}",
+        borderRadius: "{dimension.borderradius.large}",
         background: "linear-gradient(135deg, {color.primary.brand4} 0%, {color.secondary.violet5} 35%, {color.primary.brand6} 100%)",
         boxShadow: "{material.hierarchy.1f}",
         position: 'relative',
         overflow: 'hidden',
         marginBottom: "{dimension.margin.loose}",
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: `
+          /* 几何线条纹理 */
+          linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%),
+          linear-gradient(-45deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%)
+        `,
+          backgroundSize: '30px 30px',
+          pointerEvents: 'none'
+        }
       },
       title: {
         metaType: 'text',
@@ -2943,7 +2958,7 @@ export const DEFAULT_STYLE_CONFIG = {
               paddingBottom: "{dimension.padding.base}",
               paddingLeft: "{dimension.padding.base}",
               paddingRight: "{dimension.padding.base}",
-              
+
             },
             variant: 'minimalistListCardItemTitle',
           },
@@ -3436,7 +3451,7 @@ export const DEFAULT_STYLE_CONFIG = {
         metaType: 'text',
         variant: 'percentValue',
       },
-       itemDescription: {
+      itemDescription: {
         metaType: 'text',
         variant: 'percentItemDescription',
       }
@@ -3453,7 +3468,7 @@ export const DEFAULT_STYLE_CONFIG = {
         textAlign: "center",
         background: "{color.basic.red.0}",
         borderRadius: "{dimension.borderradius.xl}",
-        
+
       },
 
       markdownMapping: {
@@ -3504,7 +3519,7 @@ export const DEFAULT_STYLE_CONFIG = {
       metaType: 'text',
       variant: 'precentItemLabel',
     },
-    
+
     // 半圆进度条组件
     halfCirclePrecent: {
       type: 'template',
