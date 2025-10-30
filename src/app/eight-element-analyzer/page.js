@@ -1515,13 +1515,13 @@ const EightElementAnalyzer = () => {
     { name: '桌面 (1920x1080)', width: 1920, height: 1080 },
     { name: '笔记本 (1440x900)', width: 1440, height: 900 },
     { name: '平板 (1024x768)', width: 1024, height: 768 },
-    { name: '手机 (375x667)', width: 375, height: 667 }
+    { name: '手机 (650x800)', width: 650, height: 800 }
   ];
 
   // 然后使用commonDimensions中的值初始化dimensions
   const [dimensions, setDimensions] = useState({
-    width: commonDimensions[2].width,  // 使用平板尺寸作为默认值
-    height: commonDimensions[2].height
+    width: commonDimensions[0].width,  // 使用桌面尺寸作为默认值
+    height: commonDimensions[0].height
   });
 
   // 面板布局状态
@@ -2856,12 +2856,12 @@ const EightElementAnalyzer = () => {
               ) : (
                 // 预览模式
                 <div className="border border-gray-300 rounded overflow-hidden bg-gray-100 h-full flex flex-col">
-                  <div className="flex-1 flex items-center justify-center p-4">
+                  <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
                     <div
                       className="bg-white shadow-lg"
                       style={{
-                        width: '95%',
-                        height: '95%',
+                        width: `${dimensions.width}px`,
+                        height: `${dimensions.height}px`,
                         minWidth: '300px',
                         minHeight: '200px',
                         overflow: 'auto'
@@ -2881,7 +2881,7 @@ const EightElementAnalyzer = () => {
 
                   {/* 内容尺寸信息 */}
                   <div className="px-2 py-1 bg-gray-50 border-t text-xs text-gray-600 text-center">
-                    预览区域占比: 80% × 80% | 渲染尺寸: {dimensions.width} x {dimensions.height} px
+                    渲染尺寸: {dimensions.width} x {dimensions.height} px
                   </div>
                 </div>
               )}
