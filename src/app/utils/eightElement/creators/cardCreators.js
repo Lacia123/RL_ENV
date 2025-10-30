@@ -390,18 +390,41 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
     // 获取卡片元素的样式配置
     let cardStyleConfig = getElementStyleConfig('card', variant);
 
-    // 应用属性到样式配置（深拷贝以避免修改原配置）
-    if (Object.keys(attributes).length > 0) {
-        cardStyleConfig = JSON.parse(JSON.stringify(cardStyleConfig));
+    // 🆕 处理 classList 和 defaultClass
+    // 深拷贝以避免修改原配置
+    cardStyleConfig = JSON.parse(JSON.stringify(cardStyleConfig));
 
-        // 确保样式对象存在
-        if (!cardStyleConfig.style) {
-            cardStyleConfig.style = {};
+    // 确保样式对象存在
+    if (!cardStyleConfig.style) {
+        cardStyleConfig.style = {};
+    }
+
+    // 🆕 如果有 classList 和 defaultClass，应用默认 class 样式
+    if (cardStyleConfig.classList && cardStyleConfig.defaultClass) {
+        const defaultClassStyle = cardStyleConfig.classList[cardStyleConfig.defaultClass];
+        if (defaultClassStyle) {
+            // 合并 defaultClass 样式到 style
+            Object.assign(cardStyleConfig.style, defaultClassStyle);
         }
+    }
 
+    // 应用属性到样式配置
+    if (Object.keys(attributes).length > 0) {
         // 处理各种可能的属性
         Object.keys(attributes).forEach(attrKey => {
             const attrValue = attributes[attrKey];
+
+            // 🆕 特殊处理 class 属性
+            if (attrKey === 'class' && cardStyleConfig.classList) {
+                const classStyle = cardStyleConfig.classList[attrValue];
+                if (classStyle) {
+                    // 使用指定的 class 样式覆盖
+                    Object.assign(cardStyleConfig.style, classStyle);
+                } else {
+                    console.warn(`未找到 class "${attrValue}"，可用的 class:`, Object.keys(cardStyleConfig.classList));
+                }
+                return; // class 属性不作为普通属性处理
+            }
 
             // 解析token值 - 如果不包含大括号，自动添加
             let tokenToResolve = attrValue;

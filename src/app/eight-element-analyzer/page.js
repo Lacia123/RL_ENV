@@ -1424,7 +1424,7 @@ const userRoles = {
     name: "实验功能",
     description: "实验一些测试功能",
     markdown: `
-      <card:bannerPanel>
+      <card:bannerPanel class="square">
         ## 智能云平台竞对动态分析
       </card:bannerPanel>
       <card:headerPrecentCardExpe>
