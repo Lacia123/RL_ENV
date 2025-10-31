@@ -2889,7 +2889,7 @@ const EightElementAnalyzer = () => {
               ) : (
                 // 预览模式
                 <div className="border border-gray-300 rounded overflow-hidden bg-gray-100 h-full flex flex-col">
-                  <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
+                  <div className="flex-1 flex items-start justify-center p-4 overflow-auto">
                     <div
                       className="bg-white shadow-lg"
                       style={{
