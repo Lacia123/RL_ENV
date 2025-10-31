@@ -2355,9 +2355,7 @@ const EightElementAnalyzer = () => {
 
 
   return (
-    <div className="h-screen bg-gray-50 p-4 flex flex-col">
-      <h1 className="text-2xl font-bold mb-4 flex-shrink-0">强化学习环境</h1>
-
+    <div className="h-full bg-gray-50 p-4 flex flex-col">
       <div className="flex-1 flex min-h-0 main-container relative">
         {/* 左侧编辑器区域 */}
         <div
