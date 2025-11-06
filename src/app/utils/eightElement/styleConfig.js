@@ -507,6 +507,161 @@ export const DEFAULT_STYLE_CONFIG = {
       gridTemplateAreas: 'none',
       justifyItems: 'stretch'
     },
+    // 🆕 类似 Tailwind 的 row 变体
+    'row-center': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      justifyContent: 'flex-start',
+      alignItems: 'center',  // 垂直居中
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    'row-between': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      justifyContent: 'space-between',  // 两端对齐
+      alignItems: 'stretch',
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    'row-around': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      justifyContent: 'space-around',  // 周围分散对齐
+      alignItems: 'stretch',
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    'row-evenly': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      justifyContent: 'space-evenly',  // 均匀分布
+      alignItems: 'stretch',
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    'row-center-center': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      justifyContent: 'center',  // 水平居中
+      alignItems: 'center',  // 垂直居中
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    'row-between-center': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      justifyContent: 'space-between',  // 两端对齐
+      alignItems: 'center',  // 垂直居中
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    'row-end': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      justifyContent: 'flex-end',  // 靠右对齐
+      alignItems: 'stretch',
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    'row-end-center': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      justifyContent: 'flex-end',  // 靠右对齐
+      alignItems: 'center',  // 垂直居中
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    'column-center': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'column',
+      flexWrap: 'nowrap',
+      justifyContent: 'flex-start',
+      alignItems: 'center',  // 水平居中
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    'column-between': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'column',
+      flexWrap: 'nowrap',
+      justifyContent: 'space-between',  // 上下两端对齐
+      alignItems: 'flex-start',
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
+    'column-center-center': {
+      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+      backgroundColor: "none",
+      display: 'flex',
+      flexDirection: 'column',
+      flexWrap: 'nowrap',
+      justifyContent: 'center',  // 垂直居中
+      alignItems: 'center',  // 水平居中
+      gap: DIMENSION_CONSTANTS.GAP.base,
+      gridTemplateColumns: 'none',
+      gridTemplateAreas: 'none',
+      justifyItems: 'stretch'
+    },
     bgColumn: {
       style: {
         padding: `${DIMENSION_CONSTANTS.PADDING.base}`,

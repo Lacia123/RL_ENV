@@ -1504,6 +1504,65 @@ const userRoles = {
     <itemDescription>企业级数据保护</itemDescription>
     </simpleCard>
     </layout:row>
+
+    ### 方式三：组件内部使用 layout（基础）
+
+    <simpleCard>
+    <layout:row-center>
+    <itemTitle>安全加密</itemTitle>
+    <itemDescription>企业级数据保护</itemDescription>
+    </layout:row-center>
+    </simpleCard>
+
+    <simpleCard>
+    <layout:row-between>
+    <itemTitle>云同步</itemTitle>
+    <itemDescription>实时备份</itemDescription>
+    </layout:row-between>
+    </simpleCard>
+
+    <simpleCard>
+    <layout:row-center-center>
+    <itemTitle>智能识别</itemTitle>
+    <itemDescription>AI 驱动的图像识别</itemDescription>
+    </layout:row-center-center>
+    </simpleCard>
+
+    <simpleCard>
+    <layout:row-end>
+    <itemTitle>高速传输</itemTitle>
+    <itemDescription>5G 网络支持</itemDescription>
+    </layout:row-end>
+    </simpleCard>
+
+    <simpleCard>
+    <layout:column-center>
+    <itemTitle>语音助手</itemTitle>
+    <itemDescription>多语言支持</itemDescription>
+    </layout:column-center>
+    </simpleCard>
+
+    <simpleCard>
+    <layout:row-between-center>
+    <itemTitle>节能模式</itemTitle>
+    <itemDescription>延长续航时间</itemDescription>
+    </layout:row-between-center>
+    </simpleCard>
+
+    <simpleCard>
+    <layout:row-around justify="around" align="center">
+    <itemTitle>指纹解锁</itemTitle>
+    <itemDescription>安全便捷</itemDescription>
+    </layout:row-around>
+    </simpleCard>
+
+    <simpleCard>
+    <layout:column-center-center>
+    <itemTitle>无线充电</itemTitle>
+    <itemDescription>随放随充</itemDescription>
+    </layout:column-center-center>
+    </simpleCard>
+
     `
   }
 };

@@ -1039,7 +1039,7 @@ function parseMarkdown(markdown, options = {}) {
                 if (layoutContent.trim()) {
                     const layoutChildren = parseMarkdown(layoutContent, {
                         disableButtonGrouping: true,
-                        disableSiblingGrouping: variant === 'row',  // 🔧 只在 row 布局中禁用同级标题分组
+                        disableSiblingGrouping: variant.startsWith('row'),  // 🔧 只在 row 布局中禁用同级标题分组
                         currentMarkdown
                     });
 
@@ -1048,14 +1048,15 @@ function parseMarkdown(markdown, options = {}) {
                     let alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
                     let counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
 
-                    if (variant === 'row') {
+                    // 🔧 修复：检查 variant 是否以 'row' 或 'column' 开头，支持 row-center、column-center 等变体
+                    if (variant.startsWith('row')) {
                         direction = LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL;
                         // changed center to stretch
                         // alignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
                         alignItems = 'stretch';
                         // alignItems = 'flex-start';
                         counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER;
-                    } else if (variant === 'column') {
+                    } else if (variant.startsWith('column')) {
                         direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL;
                         alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
                         counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
@@ -1065,18 +1066,51 @@ function parseMarkdown(markdown, options = {}) {
                     const contentSeed = `${variant}-${layoutContent}`;
                     const position = `line-${i}`;
 
+                    // 🆕 处理 justify 和 align 属性，类似 Tailwind 的灵活组合
+                    const layoutOptions = {
+                        variant: variant,
+                        alignItems: alignItems,
+                        counterAxisAlign: counterAxisAlign,
+                        contentSeed: contentSeed,
+                        position: position,
+                        attributes: attributes // 🆕 传递属性
+                    };
+
+                    // 映射 justify 属性到 justifyContent
+                    if (attributes.justify) {
+                        const justifyMap = {
+                            'start': 'flex-start',
+                            'end': 'flex-end',
+                            'center': 'center',
+                            'between': 'space-between',
+                            'around': 'space-around',
+                            'evenly': 'space-evenly'
+                        };
+                        layoutOptions.justifyContent = justifyMap[attributes.justify] || attributes.justify;
+                    }
+
+                    // 映射 align 属性到 alignItems
+                    if (attributes.align) {
+                        const alignMap = {
+                            'start': 'flex-start',
+                            'end': 'flex-end',
+                            'center': 'center',
+                            'stretch': 'stretch',
+                            'baseline': 'baseline'
+                        };
+                        layoutOptions.alignItems = alignMap[attributes.align] || attributes.align;
+                    }
+
+                    // 支持 gap 属性
+                    if (attributes.gap) {
+                        layoutOptions.gap = attributes.gap;
+                    }
+
                     // 创建布局容器，传递属性
                     const layoutContainer = createLayoutElement(
                         direction,
                         layoutChildren,
-                        {
-                            variant: variant,
-                            alignItems: alignItems,
-                            counterAxisAlign: counterAxisAlign,
-                            contentSeed: contentSeed,
-                            position: position,
-                            attributes: attributes // 🆕 传递属性
-                        }
+                        layoutOptions
                     );
 
                     // 🔧 确保元数据正确保存了variant信息

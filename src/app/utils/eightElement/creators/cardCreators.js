@@ -5,7 +5,7 @@ import { createTableElement, extractTableOrChartData, getChartVariantFromConfig,
 import { createBackgroundElement } from './backgroundCreators.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createTextElement } from './textCreators.js';
-import { createElementContainer, createBaseLayout, createLayoutElement } from './layoutCreators.js';
+import { createElementContainer, createBaseLayout, createLayoutElement, isLayoutTag, extractLayoutBlock } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';
 import resolveToken from '../../tokens/resolveToken.js';
@@ -1983,6 +1983,64 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                 i = collectResult.endIndex;
                 continue;
             }
+        }
+
+        // 🆕 检查是否为 layout 标签（如 <layout:row>）
+        const layoutTagInfo = isLayoutTag(line);
+        if (layoutTagInfo.isLayoutTag && !layoutTagInfo.isClosing) {
+            // 提取 layout 标签内容
+            const { layoutContent, variant, attributes, endIndex } = extractLayoutBlock(lines, i);
+
+            // 递归解析 layout 内部的内容
+            const layoutChildren = parseTemplateCardContent(layoutContent, cardStyleConfig, true, currentMarkdown);
+
+            // 创建 layout 元素
+            // 🔧 修复：检查 variant 是否以 'row' 开头，支持 row-center 等变体
+            const direction = variant.startsWith('row') ? LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL : LAYOUT_CONSTANTS.DIRECTION.VERTICAL;
+            
+            // 🆕 处理 justify 和 align 属性，类似 Tailwind 的灵活组合
+            const layoutOptions = {
+                variant: variant,
+                attributes: attributes
+            };
+
+            // 映射 justify 属性到 justifyContent
+            if (attributes.justify) {
+                const justifyMap = {
+                    'start': 'flex-start',
+                    'end': 'flex-end',
+                    'center': 'center',
+                    'between': 'space-between',
+                    'around': 'space-around',
+                    'evenly': 'space-evenly'
+                };
+                layoutOptions.justifyContent = justifyMap[attributes.justify] || attributes.justify;
+            }
+
+            // 映射 align 属性到 alignItems
+            if (attributes.align) {
+                const alignMap = {
+                    'start': 'flex-start',
+                    'end': 'flex-end',
+                    'center': 'center',
+                    'stretch': 'stretch',
+                    'baseline': 'baseline'
+                };
+                layoutOptions.alignItems = alignMap[attributes.align] || attributes.align;
+            }
+
+            // 支持 gap 属性
+            if (attributes.gap) {
+                layoutOptions.gap = attributes.gap;
+            }
+
+            const layoutElement = createLayoutElement(direction, layoutChildren, layoutOptions);
+
+            children.push(layoutElement);
+
+            // 跳过已处理的 layout 标签行
+            i = endIndex + 1;
+            continue;
         }
 
         // 检查是否为内联模板标签（如 <title>内容</title>）

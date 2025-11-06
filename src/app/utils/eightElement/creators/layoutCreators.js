@@ -8,7 +8,8 @@ import { createTextElement } from './textCreators.js';
 // 检测是否为布局标签（支持属性）
 function isLayoutTag(line) {
     // 匹配带属性的开始标签: <layout:variant attr1="value1" attr2="value2">
-    const layoutTagWithAttrsMatch = line.trim().match(/^<layout:(\w+)([^>]*)>$/);
+    // 🔧 修复：使用 [\w-]+ 来支持包含连字符的变体名（如 row-center）
+    const layoutTagWithAttrsMatch = line.trim().match(/^<layout:([\w-]+)([^>]*)>$/);
     if (layoutTagWithAttrsMatch) {
         const variant = layoutTagWithAttrsMatch[1];
         const attributesStr = layoutTagWithAttrsMatch[2].trim();
@@ -36,7 +37,8 @@ function isLayoutTag(line) {
     }
 
     // 匹配简单的开始标签: <layout:variant>
-    const layoutTagMatch = line.trim().match(/^<layout:(\w+)>$/);
+    // 🔧 修复：使用 [\w-]+ 来支持包含连字符的变体名
+    const layoutTagMatch = line.trim().match(/^<layout:([\w-]+)>$/);
     if (layoutTagMatch) {
         return {
             isLayoutTag: true,
@@ -46,7 +48,8 @@ function isLayoutTag(line) {
         };
     }
 
-    const closingTagMatch = line.trim().match(/^<\/layout:(\w+)>$/);
+    // 🔧 修复：使用 [\w-]+ 来支持包含连字符的变体名
+    const closingTagMatch = line.trim().match(/^<\/layout:([\w-]+)>$/);
     if (closingTagMatch) {
         return {
             isLayoutTag: true,
