@@ -664,6 +664,41 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             // 🆕 如果有原始文本，使用原始文本来解析事件；否则使用按钮文本
             const textForEventParsing = markdownData.originalText || buttonText;
             elementInstance = createButtonElement(textForEventParsing, buttonUrl, buttonVariant, currentMarkdown);
+        } else if (markdownData.type === 'p') {
+            // 🆕 段落类型：检查是否包含链接，如果有则用 parseMarkdown 处理
+            if (content && (content.includes('](') || content.includes('[') || content.includes('**'))) {
+                // 包含可能的 markdown 格式，使用 parseMarkdown 处理
+                const parsedElements = parseMarkdown(content, { currentMarkdown });
+                if (parsedElements && parsedElements.length > 0) {
+                    // 如果解析出多个元素，用容器包装
+                    if (parsedElements.length === 1) {
+                        elementInstance = parsedElements[0];
+                    } else {
+                        // 创建容器包装多个元素
+                        const containerId = generateUUID();
+                        elementInstance = {
+                            dataKeys: [],
+                            name: "layout",
+                            "name-zh": "段落容器",
+                            "file-type": "template",
+                            theme: "default",
+                            id: containerId,
+                            layout: {
+                                style: {
+                                    display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+                                    layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                                    layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
+                                    boxSizing: "border-box",
+                                    height: "auto",
+                                    width: "100%"
+                                },
+                                children: parsedElements
+                            }
+                        };
+                    }
+                }
+            }
+            // 如果没有特殊格式或解析失败，继续使用原逻辑（后续会创建普通文本元素）
         }
 
         // 如果成功创建了元素实例，跳过后续的 tagConfig 处理
@@ -1707,11 +1742,18 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                     }
                 } else if (!hasMarkdownMapping) {
                     // 如果没有 markdownMapping，按普通卡片处理
-                    // 🔧 修复：清理段落符号
+                    // 🔧 修复：清理段落符号并使用 parseMarkdown 处理（支持超链接等）
                     const cleanedLine = line.replace(/§PARAGRAPH§/g, '');
                     if (cleanedLine.trim()) {
-                        const textElement = createTextElement(cleanedLine);
-                        children.push(textElement);
+                        // 🆕 使用 parseMarkdown 处理，这样可以正确解析超链接等内容
+                        const parsedElements = parseMarkdown(cleanedLine, { currentMarkdown });
+                        if (parsedElements && parsedElements.length > 0) {
+                            children.push(...parsedElements);
+                        } else {
+                            // 如果解析失败，回退到创建普通文本元素
+                            const textElement = createTextElement(cleanedLine);
+                            children.push(textElement);
+                        }
                     }
                 }
                 // 🆕 如果有 markdownMapping 但没有 p 映射，且没有 others 映射，则跳过不处理

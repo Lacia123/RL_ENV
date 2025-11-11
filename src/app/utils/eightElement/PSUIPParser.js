@@ -1,12 +1,13 @@
 import { EVENT_NAME, EVENT_CONFIG } from './eventConfig.js';
-import { LAYOUT_CONSTANTS } from './styleConfig.js';
+import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG } from './styleConfig.js';
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance } from './util.js';
+import resolveToken from '../tokens/resolveToken.js';
 import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './creators/tableCreators.js';
 import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './creators/codeCreators.js';
 import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot } from './creators/layoutCreators.js';
 import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch, processTemplatePathWithWildcard } from './creators/cardCreators.js';
-import { isListItem, processListItemAndRichText, createTextElement, createHeadingBlockContainer } from './creators/textCreators.js';
+import { isListItem, processListItemAndRichText, createTextElement, createHeadingBlockContainer, createHyperlinkElement } from './creators/textCreators.js';
 import { parseButtonVariant, createButtonElement, createVerticalButtonLayout } from './creators/buttonCreators.js';
 import { createBackgroundElement } from './creators/backgroundCreators.js';
 import { createIconElement } from './creators/iconCreators.js';
@@ -443,35 +444,50 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
         }
     }
 
-    // 检查链接格式 [text](url) - 默认创建为 primary 按钮
-    const linkMatch = line.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    // 🆕 检查链接格式 [text](url) - 根据情况决定是超链接还是按钮
+    const linkMatch = line.match(/^\[([^\]]+)\]\(([^)]*)\)$/);
     if (linkMatch) {
-        // 🔧 优先查找 button:primary 映射，如果没有则使用 a 映射
-        const primaryButtonMapping = markdownMapping['button:primary'];
-        const linkMapping = markdownMapping.a;
-
-        if (primaryButtonMapping) {
-            return {
-                markdownResult: {
-                    type: 'button',
-                    variant: 'primary',
-                    templatePath: primaryButtonMapping,
-                    content: linkMatch[1].trim(), // 按钮文本
-                    url: linkMatch[2].trim()      // 按钮URL
-                },
-                newListItemCounter: currentListItemCounter
-            };
-        } else if (linkMapping) {
+        const linkText = linkMatch[1].trim();
+        const linkUrl = linkMatch[2].trim();
+        
+        // 🆕 判断是否有 URL
+        const hasUrl = linkUrl && linkUrl.length > 0;
+        
+        // 🆕 没有 URL -> 创建按钮
+        if (!hasUrl) {
+            const primaryButtonMapping = markdownMapping['button:primary'];
+            if (primaryButtonMapping) {
+                return {
+                    markdownResult: {
+                        type: 'button',
+                        variant: 'primary',
+                        templatePath: primaryButtonMapping,
+                        content: linkText,
+                        url: '#'  // 默认 URL
+                    },
+                    newListItemCounter: currentListItemCounter
+                };
+            }
+        }
+        
+        // 🆕 有 URL -> 优先创建超链接（不依赖 markdownMapping）
+        // 如果 markdownMapping 中有定义，使用它；否则返回 null 让主解析循环处理
+        const hyperlinkMapping = markdownMapping['a'] || markdownMapping['hyperlink'];
+        if (hyperlinkMapping) {
             return {
                 markdownResult: {
                     type: 'a',
-                    templatePath: linkMapping,
-                    content: linkMatch[1].trim(), // 链接文本
-                    url: linkMatch[2].trim()      // 链接URL
+                    templatePath: hyperlinkMapping,
+                    content: linkText,
+                    url: linkUrl
                 },
                 newListItemCounter: currentListItemCounter
             };
         }
+        
+        // 🔧 如果没有超链接映射，返回 null 让主解析循环直接创建超链接元素
+        // 这样超链接就不会依赖于 markdownMapping 的配置
+        return null;
     }
 
     // 检查带变体的按钮格式 [variant][text](url)
@@ -1432,20 +1448,40 @@ function parseMarkdown(markdown, options = {}) {
                 continue;
             }
 
-            // 如果只有一个链接且占据整行，视为按钮（默认primary样式）
+            // 🆕 如果只有一个链接且占据整行，根据情况决定是超链接还是按钮
             if (multiLinkMatch && multiLinkMatch.length === 1 && isLinkLine) {
                 flushTextBlock();
 
-                const singleLinkMatch = multiLinkMatch[0].match(/\[([^\]]+)\]\(([^)]+)\)/);
+                // 🆕 支持空括号的匹配：[text]()
+                const singleLinkMatch = multiLinkMatch[0].match(/\[([^\]]+)\]\(([^)]*)\)/);
                 if (singleLinkMatch) {
                     const linkText = singleLinkMatch[1];
                     const linkUrl = singleLinkMatch[2];
-
-                    console.log(`创建默认按钮: 文本="${linkText}", URL="${linkUrl}"`);
-
-                    const buttonElement = createButtonElement(linkText, linkUrl, 'primary', currentMarkdown); // 默认使用primary样式
-                    console.log(`按钮ID: ${buttonElement.id}, 名称: ${buttonElement.name}, 样式: primary`);
-                    consecutiveButtons.push(buttonElement);
+                    
+                    // 🆕 检查是否有事件语法
+                    const hasEvent = trimmedLine.includes('[event:');
+                    
+                    // 🆕 判断是否有 URL
+                    const hasUrl = linkUrl && linkUrl.trim().length > 0;
+                    
+                    console.log(`🔗 链接解析: 文本="${linkText}", URL="${linkUrl}", 有事件=${hasEvent}, 有URL=${hasUrl}`);
+                    
+                    // 🆕 有事件 OR 没有 URL -> 创建按钮
+                    if (hasEvent || !hasUrl) {
+                        console.log(`  → 创建按钮（${hasEvent ? '有事件' : '无 URL'}）`);
+                        const buttonElement = createButtonElement(trimmedLine, linkUrl || '#', 'primary', currentMarkdown);
+                        consecutiveButtons.push(buttonElement);
+                    } 
+                    // 🆕 有 URL 且无事件 -> 创建超链接
+                    else {
+                        console.log(`  → 创建超链接`);
+                        const hyperlinkElement = createHyperlinkElement(linkText, linkUrl, 'hyperlink');
+                        console.log(`  → 超链接ID: ${hyperlinkElement.id}`);
+                        
+                        // 🆕 超链接作为文本元素处理，不添加到按钮组
+                        flushConsecutiveButtons();
+                        stack[stack.length - 1].elements.push(hyperlinkElement);
+                    }
 
                     continue;
                 }
@@ -1740,22 +1776,36 @@ function parseMarkdown(markdown, options = {}) {
     }
 
 
+    /**
+     * 生成带样式的超链接 HTML
+     * @param {string} text - 链接文本
+     * @param {string} url - 链接 URL
+     * @returns {string} 带样式的 <a> 标签 HTML（CSS 类 + 内联样式）
+     */
+    function generateStyledHyperlink(text, url) {
+        // 从 styleConfig 获取 hyperlink 样式并解析 tokens
+        const hyperlinkStyle = DEFAULT_STYLE_CONFIG.text?.hyperlink || {};
+        
+        const fontSize = hyperlinkStyle.fontSize ? (resolveToken(hyperlinkStyle.fontSize) || hyperlinkStyle.fontSize) : 'inherit';
+        const fontWeight = hyperlinkStyle.fontWeight ? (resolveToken(hyperlinkStyle.fontWeight) || hyperlinkStyle.fontWeight) : '500';
+        const color = hyperlinkStyle.color ? (resolveToken(hyperlinkStyle.color) || hyperlinkStyle.color) : '#615eec';
+        const textDecoration = hyperlinkStyle.textDecoration || 'none';
+        // 🔧 borderBottom 也需要解析 token（可能包含颜色 token）
+        const borderBottom = hyperlinkStyle.borderBottom ? (resolveToken(hyperlinkStyle.borderBottom) || hyperlinkStyle.borderBottom) : '2px solid #bcbef7';
+        const transition = hyperlinkStyle.transition ? (resolveToken(hyperlinkStyle.transition) || hyperlinkStyle.transition) : 'all 0.3s ease';
+        
+        // 同时使用 CSS 类（支持 hover）和内联样式（作为备用）
+        const inlineStyle = `font-size: ${fontSize}; font-weight: ${fontWeight}; color: ${color}; text-decoration: ${textDecoration}; border-bottom: ${borderBottom}; transition: ${transition};`;
+        
+        return `<a href="${url}" class="hyperlink-styled" style="${inlineStyle}">${text}</a>`;
+    }
+
     // 辅助函数：处理混合内容行
     function processMixedContent(line) {
-
-        // 🔧 生成稳定的内容种子，添加行内容哈希
-        const lineHash = line.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
-        const contentSeed = `mixed-content-${line.slice(0, 30)}-len${line.length}`;
-        const position = `horizontal-mixed-hash${lineHash}`;
-
-        // 创建一个水平布局元素
-        let currentLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL, [], {
-            contentSeed: contentSeed,
-            position: position
-        });
+        console.log(`🔍 处理混合内容: "${line}"`);
 
         // 查找所有按钮类型标记 [variant] [text](url) 或 [variant][text](url) 或 [event:eventName][text](url)
-        const buttonVariantRegex = /\[(\w+(?::\w+)?)\]\s*\[([^\]]+)\]\(([^)]+)\)/g;
+        const buttonVariantRegex = /\[(\w+(?::\w+)?)\]\s*\[([^\]]+)\]\(([^)]*)\)/g;
         const buttonVariantMatches = [...line.matchAll(buttonVariantRegex)];
 
         // 查找所有普通链接 [text](url) 但不是图片链接，也不是按钮类型标记
@@ -1765,7 +1815,6 @@ function parseMarkdown(markdown, options = {}) {
         // 过滤掉已经被按钮类型标记匹配的链接
         const filteredLinkMatches = linkMatches.filter(linkMatch => {
             return !buttonVariantMatches.some(buttonMatch => {
-                // 检查链接是否在按钮类型标记的范围内
                 const linkStart = linkMatch.index;
                 const linkEnd = linkMatch.index + linkMatch[0].length;
                 const buttonStart = buttonMatch.index;
@@ -1776,6 +1825,83 @@ function parseMarkdown(markdown, options = {}) {
 
         // 查找所有图片 ![alt](url)
         const imageMatches = [...line.matchAll(/!\[(.*?)\]\((.*?)\)/g)];
+
+        // 🆕 检查是否有按钮或图片（需要单独处理）
+        const hasButtonsOrImages = buttonVariantMatches.length > 0 || imageMatches.length > 0;
+
+        // 🆕 检查是否所有链接都有 URL（如果有链接没有URL，需要创建按钮）
+        let hasLinksWithoutUrl = false;
+        let hasLinksWithEvent = false;
+        for (const match of filteredLinkMatches) {
+            const linkUrl = match[2];
+            const matchIndex = match.index;
+            const hasEvent = line.substring(Math.max(0, matchIndex - 20), matchIndex).includes('[event:');
+            const hasUrl = linkUrl && linkUrl.trim().length > 0;
+            
+            if (hasEvent) {
+                hasLinksWithEvent = true;
+            }
+            if (!hasUrl) {
+                hasLinksWithoutUrl = true;
+            }
+        }
+
+        // 🆕 如果只有文本和超链接（所有链接都有URL且无事件），创建单个文本元素
+        if (!hasButtonsOrImages && !hasLinksWithoutUrl && !hasLinksWithEvent && filteredLinkMatches.length > 0) {
+            console.log(`  → 纯文本+超链接，创建单个文本元素`);
+            
+            // 将整行转换为 HTML 字符串
+            let htmlContent = '<p>';
+            let lastIndex = 0;
+            
+            // 对所有超链接按位置排序
+            const sortedLinks = filteredLinkMatches.sort((a, b) => a.index - b.index);
+            
+            for (const match of sortedLinks) {
+                const matchIndex = match.index;
+                const linkText = match[1];
+                const linkUrl = match[2];
+                
+                // 添加链接前的文本
+                if (matchIndex > lastIndex) {
+                    const textBefore = line.substring(lastIndex, matchIndex);
+                    htmlContent += textBefore;
+                }
+                
+                // 添加超链接
+                console.log(`    → 添加超链接: "${linkText}" -> ${linkUrl}`);
+                htmlContent += generateStyledHyperlink(linkText, linkUrl);
+                
+                lastIndex = matchIndex + match[0].length;
+            }
+            
+            // 添加最后的文本
+            if (lastIndex < line.length) {
+                htmlContent += line.substring(lastIndex);
+            }
+            
+            htmlContent += '</p>\n';
+            
+            console.log(`  → 生成的 HTML: ${htmlContent}`);
+            
+            // 创建文本元素
+            const textElement = createTextElement(htmlContent);
+            return textElement;
+        }
+
+        // 🆕 如果有按钮或图片，使用原来的 layout 方式
+        console.log(`  → 包含按钮/图片，使用 layout 容器`);
+        
+        // 🔧 生成稳定的内容种子，添加行内容哈希
+        const lineHash = line.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
+        const contentSeed = `mixed-content-${line.slice(0, 30)}-len${line.length}`;
+        const position = `horizontal-mixed-hash${lineHash}`;
+
+        // 创建一个水平布局元素
+        let currentLayout = createLayoutElement(LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL, [], {
+            contentSeed: contentSeed,
+            position: position
+        });
 
         // 合并并按照在原文中的位置排序
         const allMatches = [
@@ -1821,8 +1947,28 @@ function parseMarkdown(markdown, options = {}) {
             } else if (type === 'link') {
                 const linkText = match[1];
                 const linkUrl = match[2];
-                const buttonElement = createButtonElement(linkText, linkUrl, 'primary', currentMarkdown); // 默认使用primary样式
-                currentLayout.layout.children.push(buttonElement);
+                
+                // 🆕 检查是否有事件语法（通过检查整行）
+                const hasEvent = line.substring(Math.max(0, matchIndex - 20), matchIndex).includes('[event:');
+                
+                // 🆕 判断是否有 URL
+                const hasUrl = linkUrl && linkUrl.trim().length > 0;
+                
+                console.log(`🔗 混合内容中的链接: 文本="${linkText}", URL="${linkUrl}", 有事件=${hasEvent}, 有URL=${hasUrl}`);
+                
+                // 🆕 有事件 OR 没有 URL -> 创建按钮
+                if (hasEvent || !hasUrl) {
+                    console.log(`  → 创建按钮（${hasEvent ? '有事件' : '无 URL'}）`);
+                    const buttonElement = createButtonElement(linkText, linkUrl || '#', 'primary', currentMarkdown);
+                    currentLayout.layout.children.push(buttonElement);
+                } 
+                // 🆕 有 URL 且无事件 -> 创建带样式的超链接文本元素
+                else {
+                    console.log(`  → 创建带样式超链接的文本元素`);
+                    const hyperlinkHtml = generateStyledHyperlink(linkText, linkUrl);
+                    const textElement = createTextElement(hyperlinkHtml);
+                    currentLayout.layout.children.push(textElement);
+                }
             } else if (type === 'image') {
                 const imgAlt = match[1];
                 const imgUrl = match[2];

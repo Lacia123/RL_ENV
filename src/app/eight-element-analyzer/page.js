@@ -37,8 +37,11 @@ const MARKDOWN_TEMPLATES = {
 ## 设计特点
 [icon:Abstract/ad-product]优雅青蓝卡片系列采用渐变背景、[icon:Base/home]精致装饰和层次化设计，[icon:Base/aiming]提供三种专业的内容展示方式。
 
+### 快速链接
+访问我们的 [官方文档](https://psuip-docs-alpha.dingdaoos.com/docs) 了解更多信息，或者 [加入社区](https://psuip-docs-alpha.dingdaoos.com/docs) 与其他用户交流。
 
-[event:download][下载](https://github.com/example/edit)
+[event:download][下载资源](https://github.com/example/download)
+[联系我们]()
 
 <card:headerPrecentCard>
    ## 二、市场概述
@@ -192,9 +195,9 @@ const MARKDOWN_TEMPLATES = {
 
 ![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)
 
-这种设计风格特别适合商务场景、品牌展示和高端产品介绍。
-[了解更多](https://example.com/elegant)
-[secondary][了解更多](https://example.com/elegant)
+这种设计风格特别适合商务场景、品牌展示和高端产品介绍。如需了解更多设计理念，请访问 [设计指南](https://example.com/design-guide) 或 [最佳实践](https://example.com/best-practices) 页面。
+
+[secondary][联系销售](https://example.com/contact)
 </card:elegantStandard>
 
 <card:elegantList>
@@ -282,15 +285,16 @@ const MARKDOWN_TEMPLATES = {
 <card:elegantStandard>
 ## 混合内容展示
 ### 综合应用
-优雅青蓝标准布局支持各种内容类型的混合展示，包括文本、图片、按钮、代码等。
+优雅青蓝标准布局支持各种内容类型的混合展示，包括文本、图片、按钮、代码等。更多技术细节请参考 [开发者文档](https://dev.example.com) 和 [API 参考](https://api.example.com/reference)。
 
 **代码示例：**
 \`\`\`javascript
 const a = 1;
 \`\`\`
 
-[event:edit][事件编辑](https://github.com/example/edit)
-[设计指南](https://example.com/design-guide)
+
+[event:edit][编辑配置](https://github.com/example/edit)
+[提交问题]()
 </card:elegantStandard>
 
 </layout:row>
@@ -762,12 +766,13 @@ Pinterest作为瀑布流布局的典型代表，通过这种布局方式重新�
 ## 创新科技，引领未来
 <layout:row>
 <icon:small>send</icon:small>
-我们致力于为企业提供最先进的数字化解决方案，助力业务增长和数字化转型。
+我们致力于为企业提供最先进的数字化解决方案，助力业务增长和数字化转型。访问 [产品介绍页](https://example.com/products) 了解更多详情。
 </layout:row>
 <layout:row>
-[免费试用](https://example.com/trial)
+[primary][免费试用](https://example.com/trial)
 [了解更多](https://example.com/learn)
 [观看演示](https://example.com/demo)
+[联系顾问]()
 </layout:row>
 
 <layout:row>

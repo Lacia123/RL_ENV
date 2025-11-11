@@ -83,6 +83,23 @@ export function renderEightElementToHtml(eightElement, options = {}) {
         * {
           box-sizing: border-box;
         }
+        
+        /* 🆕 超链接样式 */
+        .hyperlink-styled {
+          font-size: inherit;
+          font-weight: 500;
+          color: #615eec;
+          text-decoration: none;
+          border-bottom: 2px solid #bcbef7;
+          transition: all 0.3s ease;
+        }
+        .hyperlink-styled:hover {
+          color: #4f4ac8;
+          border-bottom-color: #bcbef7;
+        }
+        .hyperlink-styled:active {
+          color: #2f2a95;
+        }
 
         pre code.hljs {
             display: block;
@@ -1372,8 +1389,8 @@ function processTextElement(processedElement, originalElement) {
         // 🔧 修复：清理段落符号
         rawTextContent = rawTextContent.replace(/§PARAGRAPH§/g, '');
         
-        // 如果内容已经包含HTML标签（如<p>, <math>, <span>等），说明已经被处理过了
-        if (rawTextContent.includes('<') && (rawTextContent.includes('<p>') || rawTextContent.includes('<math') || rawTextContent.includes('<span') || rawTextContent.includes('<li>'))) {
+        // 如果内容已经包含HTML标签（如<p>, <math>, <span>, <a>等），说明已经被处理过了
+        if (rawTextContent.includes('<') && (rawTextContent.includes('<p>') || rawTextContent.includes('<math') || rawTextContent.includes('<span') || rawTextContent.includes('<li>') || rawTextContent.includes('<a'))) {
             // 直接使用已处理的HTML内容
             processedElement.katexProcessedContent = rawTextContent;
         } else {

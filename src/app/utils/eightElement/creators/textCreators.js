@@ -8,6 +8,7 @@ import {
 } from '../styleConfig.js';
 
 import { processText } from '../PSUIPParser.js';
+import resolveToken from '../../tokens/resolveToken.js'
 
 // 新增函数：处理文本中的加粗部分
 function processBoldText(text) {
@@ -444,9 +445,100 @@ function createHeadingBlockContainer(headingLayout) {
     return layout;
 }
 
+/**
+ * 创建超链接元素
+ * @param {string} text - 链接文本
+ * @param {string} url - 链接 URL
+ * @param {string} variant - 样式变体，默认为 'hyperlink'
+ * @returns {Object} 超链接元素
+ */
+function createHyperlinkElement(text, url, variant = 'hyperlink') {
+    const id = generateUUID();
+    
+    // 获取超链接的样式配置
+    let hyperlinkStyle = getElementStyleConfig('text', variant);
+    
+    // 🆕 如果没有找到超链接样式，使用默认文本样式
+    if (!hyperlinkStyle || Object.keys(hyperlinkStyle).length === 0) {
+        console.warn(`未找到超链接样式 "${variant}"，使用默认样式`);
+        hyperlinkStyle = {
+            fontSize: "inherit",
+            fontWeight: "{font.fontweight.medium}",
+            color: "{color.primary.brand5}",
+            textDecoration: 'none',
+            borderBottom: '2px solid transparent',
+            transition: "{animation.smooth}",
+            '&:hover': {
+                color: "{color.primary.brand6}",
+                borderBottomColor: "{color.primarycontainer.brand2}",
+                textDecoration: "none"
+            },
+            '&:active': {
+                color: "{color.onprimarycontainer.brand8}"
+            }
+        };
+    }
+    
+    // 🆕 生成带有 <a> 标签的 content（CSS 类 + 内联样式）
+    // 解析样式 tokens
+    const fontSize = hyperlinkStyle.fontSize ? (resolveToken(hyperlinkStyle.fontSize) || hyperlinkStyle.fontSize) : 'inherit';
+    const fontWeight = hyperlinkStyle.fontWeight ? (resolveToken(hyperlinkStyle.fontWeight) || hyperlinkStyle.fontWeight) : '500';
+    const color = hyperlinkStyle.color ? (resolveToken(hyperlinkStyle.color) || hyperlinkStyle.color) : '#615eec';
+    const textDecoration = hyperlinkStyle.textDecoration || 'none';
+    // 🔧 borderBottom 也需要解析 token（可能包含颜色 token）
+    const borderBottom = hyperlinkStyle.borderBottom ? (resolveToken(hyperlinkStyle.borderBottom) || hyperlinkStyle.borderBottom) : '2px solid #bcbef7';
+    const transition = hyperlinkStyle.transition ? (resolveToken(hyperlinkStyle.transition) || hyperlinkStyle.transition) : 'all 0.3s ease';
+    
+    const inlineStyle = `font-size: ${fontSize}; font-weight: ${fontWeight}; color: ${color}; text-decoration: ${textDecoration}; border-bottom: ${borderBottom}; transition: ${transition};`;
+    
+    const hyperlinkContent = `<a href="${url}" class="hyperlink-styled" style="${inlineStyle}">${text}</a>`;
+    
+    // 创建超链接元素
+    const hyperlinkElement = {
+        id: id,
+        name: 'text',
+        'name-zh': '超链接',
+        'file-type': 'cell-element',
+        description: `超链接文本元素 - ${variant}`,
+        dataKeys: [],
+        theme: 'default',
+        type: 'text_body', // 🆕 设置为 text_body 类型
+        _metadata: {
+            actualType: 'hyperlink',
+            variant: variant,
+            isHyperlink: true,
+            url: url
+        },
+        layout: {
+            text_body: {
+                content: [
+                    {
+                        element: 'font',
+                        value: 'fontsize',
+                        prop: 'default'
+                    }
+                ],
+                style: hyperlinkStyle
+            }
+        },
+        font: {
+            fontsize: {
+                default: {
+                    'data-key': '',
+                    content: hyperlinkContent // 🆕 将 HTML content 放在正确的位置
+                }
+            },
+            fontweight: hyperlinkStyle.fontWeight || 'inherit'
+        }
+    };
+    
+    return hyperlinkElement;
+}
+
 export {
     isListItem,
     processListItemAndRichText,
     createHeadingBlockContainer,
-    createTextElement
+    createTextElement,
+    createHyperlinkElement
 }

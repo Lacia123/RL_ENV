@@ -735,7 +735,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.medium}",
       color: "{color.primary.brand5}",
       textDecoration: 'none',
-      borderBottom: '2px solid transparent',
+      borderBottom: '2px solid {color.primarycontainer.brand2}',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       '&:hover': {
         color: "{color.primary.brand6}",
