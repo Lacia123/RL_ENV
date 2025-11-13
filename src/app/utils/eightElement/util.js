@@ -83,6 +83,8 @@ function applyCustomStyleOverride(baseStyle, customStyles, customVariant) {
     const overriddenStyle = { ...baseStyle };
 
     Object.entries(customStyles).forEach(([property, value]) => {
+        // 🔧 修复：直接使用原始值，不再包裹 {}
+        // variantStyle 中的值应该已经是正确的格式了（token 或普通值）
         overriddenStyle[property] = value;
     });
 

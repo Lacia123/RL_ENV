@@ -1634,6 +1634,390 @@ const userRoles = {
     - ✅ 更适合复杂的卡片设计
 
     `
+  },
+
+  slotSystemDemo: {
+    name: '🎰 插槽标签系统',
+    description: '展示全新的插槽标签系统（slotConfigs）- 更灵活的组件内容定义方式',
+    markdown: `# 插槽标签系统演示
+
+## 什么是插槽标签系统？
+
+插槽标签系统是一种更现代、更灵活的组件内容定义方式。通过使用命名标签来明确指定内容应该放置在哪个位置，而不是依赖 Markdown 的语义标签进行自动映射。
+
+## 产品卡片示例
+
+### 单个产品卡片
+
+<productCard>
+  <image src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=400"></image>
+  <title>经典设计手表</title>
+  <description>精致工艺，优雅外观，适合各种场合佩戴的经典款式。采用瑞士机芯，316L不锈钢表壳。</description>
+  <price>¥999.00</price>
+  <button href="https://example.com/buy">立即购买</button>
+</productCard>
+
+### 多个产品卡片展示
+
+<layout:row>
+<productCard>
+  <image src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=400"></image>
+  <title>时尚耳机</title>
+  <description>高品质音质，舒适佩戴，支持主动降噪功能。</description>
+  <price>¥599.00</price>
+  <button href="https://example.com/buy">查看详情</button>
+</productCard>
+
+<productCard>
+  <image src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=400"></image>
+  <title>智能背包</title>
+  <description>内置USB充电接口，多层收纳空间，防水材质。</description>
+  <price>¥299.00</price>
+  <button href="https://example.com/buy">立即购买</button>
+</productCard>
+</layout:row>
+
+## 插槽标签的优势
+
+### 1. 明确性和可读性
+使用插槽标签，内容的位置和用途一目了然：
+- ✅ \`<image>\` 明确表示这是图片插槽
+- ✅ \`<title>\` 明确表示这是标题插槽  
+- ✅ \`<price>\` 明确表示这是价格插槽
+
+### 2. 灵活性
+每个插槽都可以有自己的：
+- 🎨 样式配置（\`variantStyle\`）
+- 🔧 元素类型（\`metaType\`）
+- 📦 容器配置（\`type: 'template'\`）
+- 🎯 变体引用（\`variant\`）
+
+### 3. 属性传递
+插槽标签支持属性传递，如：
+- \`<image src="..." alt="...">\`
+- \`<button href="..." target="_blank">\`
+
+这些属性会自动被提取并应用到对应的八要素上。
+
+## 技术细节
+
+### slotConfigs 配置示例
+
+\`\`\`javascript
+productCard: {
+  type: 'template',
+  style: {
+    // 容器样式
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '{dimension.gap.tight}'
+  },
+  slotConfigs: {
+    image: {
+      metaType: 'image',
+      variant: 'rounded',
+      variantStyle: {
+        width: '100%',
+        height: '200px',
+        objectFit: 'cover'
+      }
+    },
+    title: {
+      metaType: 'text',
+      variant: 'h4',
+      variantStyle: {
+        margin: '{dimension.margin.tight} 0'
+      }
+    },
+    price: {
+      type: 'template',
+      style: {
+        // 容器样式
+        display: 'flex',
+        gap: '{dimension.gap.tight}'
+      },
+      metaType: 'text',
+      variant: 'p',
+      variantStyle: {
+        // 元素样式
+        color: '{color.primary.brand5}',
+        fontWeight: 'bold'
+      }
+    }
+  }
+}
+\`\`\`
+
+### 三种配置模式
+
+#### 1. 直接元素（无容器）
+\`\`\`javascript
+title: {
+  metaType: 'text',
+  variant: 'h4',
+  variantStyle: { /* 元素样式 */ }
+}
+\`\`\`
+
+#### 2. 元素+容器
+\`\`\`javascript
+price: {
+  type: 'template',
+  style: { /* 容器样式 */ },
+  metaType: 'text',
+  variant: 'p',
+  variantStyle: { /* 元素样式 */ }
+}
+\`\`\`
+
+#### 3. 纯容器
+\`\`\`javascript
+wrapper: {
+  type: 'template',
+  style: { /* 容器样式 */ }
+}
+\`\`\`
+
+## 对比传统方式
+
+### 传统 markdownMapping 方式
+\`\`\`markdown
+<card:productCard>
+## 产品标题
+![产品图片](url)
+产品描述文本
+\`\`\`
+
+- ❌ 依赖 Markdown 语义（h2, img, p）
+- ❌ 位置顺序不灵活
+- ❌ 难以传递属性
+
+### 新插槽标签方式
+\`\`\`markdown
+<productCard>
+  <image src="url"></image>
+  <title>产品标题</title>
+  <description>产品描述</description>
+</productCard>
+\`\`\`
+
+- ✅ 明确的语义标签
+- ✅ 灵活的内容顺序
+- ✅ 方便的属性传递
+
+## 总结
+
+插槽标签系统为组件开发提供了更现代、更灵活的方式。它保持了向后兼容性（仍然支持 \`markdownMapping\`），同时提供了更好的开发体验和更清晰的代码结构。
+
+---
+
+💡 **提示**: 插槽标签系统完全生成标准八要素结构，可以被标准的 \`renderEightElementHtml.js\` 正常渲染。`
+  },
+
+  smartCardDemo: {
+    name: '🤖 智能自适应卡片',
+    description: '展示根据插槽存在性自动调整布局的智能产品卡片',
+    markdown: `
+### 场景 1：完整信息卡片（横向布局）
+
+<layout:row>
+<smartProductCard>
+  <badge>🔥 新品</badge>
+  <image src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=400"></image>
+  <title>无线蓝牙耳机 Pro</title>
+  <rating>⭐⭐⭐⭐⭐ 4.8</rating>
+  <tags>降噪 · 长续航 · 快充</tags>
+  <description>采用最新蓝牙5.3技术，主动降噪深度达40dB，续航时间长达30小时，支持无线快充。</description>
+  <price>$299</price>
+  <actions href="https://example.com/buy">立即购买</actions>
+</smartProductCard>
+
+<smartProductCard>
+  <badge>⚡ 热销</badge>
+  <image src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=400"></image>
+  <title>智能手表 Ultra</title>
+  <rating>⭐⭐⭐⭐⭐ 4.9</rating>
+  <tags>健康监测 · 运动追踪</tags>
+  <description>全天候健康监测，支持50+运动模式，7天超长续航，50米防水设计。</description>
+  <price>$399</price>
+  <actions href="https://example.com/buy">立即购买</actions>
+</smartProductCard>
+</layout:row>
+
+**特点**：
+- ✅ 有图片 → 横向布局（图片在左，内容在右）
+- ✅ 徽章绝对定位在右上角
+- ✅ 评分和标签自动排列
+- ✅ 描述文字自动截断为3行
+
+---
+
+### 场景 2：无图片卡片（纵向布局）
+
+<layout:row>
+<smartProductCard>
+  <title>云存储服务</title>
+  <rating>⭐⭐⭐⭐ 4.2</rating>
+  <tags>安全 · 快速 · 可靠</tags>
+  <description>企业级云存储解决方案，支持多端同步，数据加密存储，永久保存您的重要文件。支持团队协作，版本管理。</description>
+  <price>$9.9/月</price>
+  <actions href="https://example.com/subscribe">立即订阅</actions>
+</smartProductCard>
+
+<smartProductCard>
+  <badge>💎 推荐</badge>
+  <title>专业版会员</title>
+  <rating>⭐⭐⭐⭐⭐ 5.0</rating>
+  <description>解锁所有高级功能，无限制使用所有工具，优先技术支持，专属客户经理服务。</description>
+  <price>$299/年</price>
+  <actions href="https://example.com/upgrade">升级会员</actions>
+</smartProductCard>
+</layout:row>
+
+**特点**：
+- ✅ 无图片 → 纵向布局（全宽内容）
+- ✅ 内容区域自动扩展
+- ✅ 描述可以显示更多行
+- ✅ 徽章仍然保持在右上角
+
+---
+
+### 场景 3：极简卡片（最小信息）
+
+<layout:row>
+<smartProductCard>
+  <image src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=400"></image>
+  <title>创意设计模板</title>
+  <price>免费</price>
+</smartProductCard>
+
+<smartProductCard>
+  <image src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=400"></image>
+  <title>运动跑鞋</title>
+  <price>$89</price>
+</smartProductCard>
+
+<smartProductCard>
+  <image src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=600&h=400"></image>
+  <title>摄影作品集</title>
+  <price>查看详情</price>
+</smartProductCard>
+</layout:row>
+
+**特点**：
+- ✅ 最小化信息展示
+- ✅ 横向布局（有图片）
+- ✅ 卡片高度自动压缩
+- ✅ 只显示必要元素
+
+---
+
+### 场景 4：促销卡片（突出价格和行动）
+
+<layout:row>
+<smartProductCard>
+  <badge>⚡ 限时</badge>
+  <title>年度会员特惠</title>
+  <description>原价$299/年，现在只需$99！包含所有高级功能，无限制使用。活动仅限本周！</description>
+  <price>$99（限时）</price>
+  <actions href="https://example.com/promo">立即抢购</actions>
+</smartProductCard>
+
+<smartProductCard>
+  <badge>🎁 赠送</badge>
+  <title>新用户福利</title>
+  <tags>新人专享</tags>
+  <description>注册即送100元优惠券，首次购买可使用，无门槛限制。</description>
+  <price>免费领取</price>
+  <actions href="https://example.com/gift">立即领取</actions>
+</smartProductCard>
+</layout:row>
+
+**特点**：
+- ✅ 徽章吸引注意力
+- ✅ 纵向布局（无图片）
+- ✅ 描述文字突出促销信息
+- ✅ 按钮醒目易点击
+
+---
+
+### 场景 5：评分优先（突出口碑）
+
+<layout:row>
+<smartProductCard>
+  <image src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&h=400"></image>
+  <title>高评分好物</title>
+  <rating>⭐⭐⭐⭐⭐ 4.9（2.3k评价）</rating>
+  <tags>畅销 · 好评如潮</tags>
+  <description>用户一致好评，性价比之选，值得信赖的品质保证。</description>
+  <price>$199</price>
+  <actions href="https://example.com/view">查看详情</actions>
+</smartProductCard>
+</layout:row>
+
+**特点**：
+- ✅ 评分信息突出显示
+- ✅ 标签强化产品优势
+- ✅ 完整的信息展示
+
+---
+
+## 技术实现
+
+### 自动数据属性
+
+智能卡片使用 \`autoDataAttributes\` 自动生成 data 属性：
+
+\`\`\`javascript
+autoDataAttributes: ['badge', 'image', 'rating', 'tags', 'description', 'price', 'actions']
+\`\`\`
+
+当提供某个插槽时，会自动添加对应的 \`data-{slotName}="true"\` 属性到容器元素上。
+
+### 条件样式
+
+基于这些 data 属性，可以定义条件样式：
+
+\`\`\`javascript
+style: {
+  // 基础样式
+  flexDirection: 'column',
+  padding: '{dimension.padding.base}',
+  
+  // 条件样式
+  '&[data-image="true"]': {
+    flexDirection: 'row',  // 有图片时改为横向
+    padding: '0'
+  }
+}
+\`\`\`
+
+### 核心优势
+
+1. **自动适配** - 无需手动指定布局，卡片根据内容自动调整
+2. **灵活组合** - 任意组合插槽，都能得到合理的布局
+3. **样式继承** - 条件样式覆盖基础样式，实现渐进增强
+4. **AI 友好** - 明确的规则便于学习和预测
+
+---
+
+## 对比：基础卡片 vs 智能卡片
+
+### 基础 productCard
+
+- 固定布局（纵向）
+- 适合标准化展示
+- 配置简单
+
+### 智能 smartProductCard
+
+- 动态布局（横向/纵向自动切换）
+- 适合多场景复用
+- 配置灵活
+
+---
+
+💡 **提示**: 智能卡片的条件样式会在渲染时自动应用，开发者只需关注内容，不需要手动管理布局逻辑。`
   }
 };
 

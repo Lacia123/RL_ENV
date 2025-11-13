@@ -1790,8 +1790,14 @@ function computeElementStyle(element) {
         
     } else {
         // 默认值处理：如果设置了display=flex但未设置flex方向，默认为column
-        if (computedStyle.display === 'flex' && !processedClassStyle.flexDirection && !computedStyle.flexDirection) {
-            computedStyle.flexDirection = 'column';
+        // 🔧 修复：需要检查短横线命名格式（因为 applyStylesToElement 会转换为短横线）
+        const hasFlexDirection = processedClassStyle.flexDirection || 
+                                 computedStyle.flexDirection || 
+                                 computedStyle['flex-direction'];
+        
+        if (computedStyle.display === 'flex' && !hasFlexDirection) {
+            // 使用短横线格式以保持一致性
+            computedStyle['flex-direction'] = 'column';
         }
     }
 
@@ -2075,7 +2081,7 @@ function renderButtonElement(element) {
     // 构建按钮HTML
     return `
     <div id="${element.id || ''}" ${classAttr} data-element-type="button" ${styleAttr}>
-      <a href="${buttonUrl}" style="display:block;width:100%;height:100%;text-decoration:none;color:inherit;">
+      <a href="${buttonUrl}" style="display:block;width:100%;height:100%;text-align:center;text-decoration:none;color:inherit;">
         ${buttonText}
       </a>
       </div>
