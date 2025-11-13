@@ -83,8 +83,7 @@ function applyCustomStyleOverride(baseStyle, customStyles, customVariant) {
     const overriddenStyle = { ...baseStyle };
 
     Object.entries(customStyles).forEach(([property, value]) => {
-        // const resolvedValue = resolveToken(`{${value}}`);
-        overriddenStyle[property] = `{${value}}`;
+        overriddenStyle[property] = value;
     });
 
     return overriddenStyle;
