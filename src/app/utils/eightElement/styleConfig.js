@@ -3724,6 +3724,7 @@ export const DEFAULT_STYLE_CONFIG = {
         style: {
           position: 'absolute',
           bottom: '10px',
+          textWrap: 'nowrap',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: '2',
