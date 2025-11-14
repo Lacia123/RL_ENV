@@ -4350,7 +4350,6 @@ export const DEFAULT_STYLE_CONFIG = {
           metaType: 'button',
           variant: 'primary',
           variantStyle: {
-            width: 'calc(100% - {dimension.padding.base} * 2)',
             margin: '0 {dimension.margin.base} {dimension.margin.base} {dimension.margin.base}'
           }
         }
