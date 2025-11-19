@@ -729,16 +729,14 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             }
         }
         
-        // 🆕 如果 tagConfig 本身有 style，也应该作为样式覆盖
-        // 优先级：markdownData.customStyles > tagConfig.style
-        if (!styleOverride && tagConfig.style) {
-            styleOverride = tagConfig.style;
-        }
+        // 🔧 修复：tagConfig.style 是容器样式，不应该作为 styleOverride 传递给文本元素
+        // 容器样式会通过容器的 classStyle 应用，文本元素应该只使用 variant 对应的样式
+        // styleOverride 只应该来自 markdownData.customStyles（如果存在）
 
         // 根据 metaType 创建对应的元件
         let elementInstance = null;
         if (tagConfig.metaType === 'text') {
-            // 🆕 将自定义样式传递给文本元件
+            // 🔧 修复：不传递 tagConfig.style 作为 styleOverride，只传递 markdownData.customStyles
             elementInstance = createTextElement(content, finalVariant, {}, styleOverride);
         } else if (tagConfig.metaType === 'button') {
             // 🆕 处理button类型，从markdownData中获取URL和变体信息

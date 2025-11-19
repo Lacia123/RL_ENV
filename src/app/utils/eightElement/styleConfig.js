@@ -827,6 +827,10 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.bold}",
       color: "{color.onprimary.black88}",
       fontSize: "{font.size.large}",
+      padding: "0 {dimension.padding.base}",
+      borderLeftWidth: "{dimension.borderwidth.wide}",
+      borderLeftStyle: "solid",
+      borderLeftColor: "{color.primary.brand5}",
     },
     headerCardText: {
       fontWeight: "{font.fontweight.semibold}",
@@ -2708,10 +2712,6 @@ export const DEFAULT_STYLE_CONFIG = {
       title: {
         style: {
           width: '100%',
-          padding: "0 {dimension.padding.base}",
-          borderLeftWidth: "{dimension.borderwidth.wide}",
-          borderLeftStyle: "solid",
-          borderLeftColor: "{color.primary.brand5}",
         },
         metaType: 'text',
         variant: 'headerCardTitle',
@@ -2766,10 +2766,7 @@ export const DEFAULT_STYLE_CONFIG = {
       title: {
         style: {
           width: '100%',
-          padding: "0 {dimension.padding.base}",
-          borderLeftWidth: "{dimension.borderwidth.wide}",
-          borderLeftStyle: "solid",
-          borderLeftColor: "{color.primary.brand5}",
+          
         },
         metaType: 'text',
         variant: 'headerCardTitle',
