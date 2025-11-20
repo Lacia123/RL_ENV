@@ -4,6 +4,7 @@ export const EVENT_NAME = {
     CHART_CHANGED: 'chart_changed',
     TAB_CHANGED: 'tab_changed',
     THEME_CHANGED: 'theme_changed',
+    UPDATE: 'update',
 }
 
 
@@ -45,6 +46,15 @@ export const EVENT_CONFIG = {
         "dataEventKey": [],
         "parameters": {
             "imageUrl": "",
+        }
+    },
+    [EVENT_NAME.UPDATE]: {
+        "runtimeEventKey": EVENT_NAME.UPDATE,
+        "nativeEventKey": 'mouseenter',
+        "dataEventKey": [],
+        "parameters": {
+            "markdown": "",
+            "cardId": ""
         }
     }
 }

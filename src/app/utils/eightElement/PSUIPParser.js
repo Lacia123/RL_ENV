@@ -192,7 +192,24 @@ function parseCustomStyleTag(line) {
         let attrMatch;
         while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
             const attrName = attrMatch[1];
-            const attrValue = attrMatch[2];
+            let attrValue = attrMatch[2];
+
+            // 🔧 修复：如果属性值看起来像设计令牌（包含点号分隔的路径），且没有花括号，则添加花括号
+            // 检查是否是特殊值（URL、普通CSS值等），这些不需要token解析
+            const isSpecialValue = attrValue.startsWith('url(') ||
+                attrValue.startsWith('#') ||
+                attrValue.match(/^\d+px$/) ||
+                attrValue.match(/^\d+%$/) ||
+                attrValue === 'none' ||
+                attrValue === 'auto' ||
+                attrValue.startsWith('linear-gradient') ||
+                attrValue.startsWith('rgb(') ||
+                attrValue.startsWith('rgba(');
+
+            // 如果值看起来像设计令牌路径（包含点号，如 color.success.green6），且不是特殊值，则添加花括号
+            if (!isSpecialValue && attrValue.includes('.') && !attrValue.startsWith('{') && !attrValue.endsWith('}')) {
+                attrValue = `{${attrValue}}`;
+            }
 
             // 将属性名转换为CSS样式属性
             const cssProperty = attrName === 'color' ? 'color' : attrName;
@@ -1097,13 +1114,22 @@ function parseMarkdown(markdown, options = {}) {
             }
 
             // 提取卡片标签内容
-            const { cardContent, variant, attributes, endIndex } = extractCardBlock(
+            const { cardContent, variant, attributes, attributeMeta, rawTag, endIndex } = extractCardBlock(
                 markedLines.map(item => item.line),
                 i
             );
 
             // 创建卡片元素
-            const cardElement = createCardElement(cardContent, variant, attributes, currentMarkdown);
+            const cardElement = createCardElement(
+                cardContent,
+                variant,
+                attributes,
+                currentMarkdown,
+                {
+                    rawTag,
+                    attributeMeta
+                }
+            );
 
 
             stack[stack.length - 1].elements.push(cardElement);

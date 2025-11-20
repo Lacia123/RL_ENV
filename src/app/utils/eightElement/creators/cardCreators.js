@@ -7,7 +7,7 @@ import { createButtonElement } from './buttonCreators.js';
 import { createTextElement } from './textCreators.js';
 import { createElementContainer, createBaseLayout, createLayoutElement } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
-import { EVENT_NAME } from '../eventConfig.js';
+import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';
 import resolveToken from '../../tokens/resolveToken.js';
 import { getElementStyleConfig } from '../styleConfig.js';
 import { DEFAULT_STYLE_CONFIG } from '../styleConfig.js';
@@ -23,14 +23,21 @@ function isCardTag(line) {
 
         // 解析属性
         const attributes = {};
+        const attributeMeta = {};
         if (attributesStr) {
             // 匹配 key="value" 或 key={token.value} 格式的属性
             const attrRegex = /(\w+)=(?:["']([^"']*?)["']|\{([^}]*?)\})/g;
             let attrMatch;
             while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
                 const key = attrMatch[1];
-                const value = attrMatch[2] || attrMatch[3]; // 支持引号和大括号格式
+                const quotedValue = attrMatch[2];
+                const bracedValue = attrMatch[3];
+                const value = quotedValue !== undefined ? quotedValue : bracedValue;
                 attributes[key] = value;
+                attributeMeta[key] = {
+                    format: quotedValue !== undefined ? 'quoted' : 'braced',
+                    value
+                };
             }
         }
 
@@ -38,6 +45,8 @@ function isCardTag(line) {
             isCardTag: true,
             variant: variant,
             attributes: attributes,
+            attributeMeta,
+            rawTag: cardTagWithAttrsMatch[0],
             isClosing: false
         };
     }
@@ -379,14 +388,123 @@ function extractCardBlock(lines, startIndex) {
         cardContent: contentLines.join('\n').trim(),
         variant: variant,
         attributes: attributes,
+        attributeMeta: startTagInfo.attributeMeta || {},
+        rawTag: startTagInfo.rawTag || '',
         endIndex: i - 1
     };
 }
 
 
+function sanitizeCardContent(content = '') {
+    if (!content) {
+        return '';
+    }
+    return content.replace(/§PARAGRAPH§/g, '\n\n').trim();
+}
+
+function buildCardTagName(variant = 'standard') {
+    if (variant && variant !== 'standard') {
+        return `card:${variant}`;
+    }
+    return 'card';
+}
+
+function serializeCardAttributes(attributes = {}, attributeMeta = {}) {
+    const parts = [];
+
+    Object.entries(attributes).forEach(([key, value]) => {
+        if (value === undefined || value === null) {
+            return;
+        }
+
+        const meta = attributeMeta?.[key];
+        const baseValue = value.toString().trim();
+
+        if (meta?.format === 'braced') {
+            const rawValue = meta.value ?? baseValue;
+            parts.push(`${key}={${rawValue}}`);
+            return;
+        }
+
+        if (meta?.format === 'quoted') {
+            const rawValue = meta.value ?? baseValue;
+            parts.push(`${key}="${rawValue}"`);
+            return;
+        }
+
+        const shouldUseBraces = baseValue.includes('.') &&
+            !baseValue.startsWith('http') &&
+            !baseValue.includes('://') &&
+            !baseValue.includes('/');
+
+        if (shouldUseBraces) {
+            parts.push(`${key}={${baseValue}}`);
+        } else {
+            parts.push(`${key}="${baseValue}"`);
+        }
+    });
+
+    return parts.join(' ');
+}
+
+function buildCardStartTag(variant, attributes, attributeMeta = {}) {
+    const tagName = buildCardTagName(variant);
+    const attrString = serializeCardAttributes(attributes, attributeMeta);
+    if (attrString) {
+        return `<${tagName} ${attrString}>`;
+    }
+    return `<${tagName}>`;
+}
+
+function buildCardClosingTag(variant) {
+    const tagName = buildCardTagName(variant);
+    return `</${tagName}>`;
+}
+
+function buildCardMarkdownPayload(variant, sanitizedContent, options = {}) {
+    const { rawTag = '', attributes = {}, attributeMeta = {} } = options || {};
+    const startTag = rawTag?.trim() || buildCardStartTag(variant, attributes, attributeMeta);
+    const closingTag = buildCardClosingTag(variant);
+    const body = sanitizedContent ? `\n${sanitizedContent}\n` : '\n';
+    return `${startTag}${body}${closingTag}`;
+}
+
+function createCardUpdateEvent(cardId, variant, sanitizedContent, options = {}) {
+    if (!cardId) {
+        return null;
+    }
+
+    const baseUpdateConfig = EVENT_CONFIG?.[EVENT_NAME.UPDATE];
+    if (!baseUpdateConfig) {
+        return null;
+    }
+
+    const eventConfig = JSON.parse(JSON.stringify(baseUpdateConfig));
+    eventConfig.EventTargetId = cardId;
+
+    if (!eventConfig.parameters) {
+        eventConfig.parameters = {};
+    }
+
+    eventConfig.parameters.markdown = buildCardMarkdownPayload(
+        variant,
+        sanitizedContent,
+        {
+            rawTag: options.rawTag,
+            attributes: options.attributes,
+            attributeMeta: options.attributeMeta
+        }
+    );
+    eventConfig.parameters.cardId = cardId;
+
+    return eventConfig;
+}
+
 // 创建卡片元素
-function createCardElement(content, variant = 'standard', attributes = {}, currentMarkdown = '') {
+function createCardElement(content, variant = 'standard', attributes = {}, currentMarkdown = '', options = {}) {
     const id = generateUUID();
+    const sanitizedCardContent = sanitizeCardContent(content || '');
+    const { rawTag = '', attributeMeta = {} } = options || {};
     // 获取卡片元素的样式配置
     let cardStyleConfig = getElementStyleConfig('card', variant);
 
@@ -465,6 +583,18 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
         }
     }
 
+    const cardUpdateEvent = createCardUpdateEvent(
+        id,
+        variant,
+        sanitizedCardContent,
+        {
+            rawTag,
+            attributes,
+            attributeMeta
+        }
+    );
+    const cardEvents = cardUpdateEvent ? [cardUpdateEvent] : [{}];
+
     if (isTemplateCard) {
         // 模板类型卡片的结构
         const cardElement = {
@@ -479,7 +609,7 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
                 isCard: true,
                 isLayout: true,
                 isTemplateCard: true,
-                cardContent: content
+                cardContent: sanitizedCardContent
             },
             layout: {
                 style: {
@@ -508,7 +638,7 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
             },
             description: `模板卡片元素 - ${variant}`,
             id,
-            events: [{}]
+            events: cardEvents
         };
 
         return cardElement;
@@ -538,7 +668,7 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
                 variant: variant,
                 isCard: true,
                 isLayout: true,
-                cardContent: content
+                cardContent: sanitizedCardContent
             },
             layout: {
                 ...baseLayout,
@@ -550,7 +680,7 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
             },
             description: `卡片元素 - ${variant}`,
             id,
-            events: [{}]
+            events: cardEvents
         };
 
         return cardElement;
