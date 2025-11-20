@@ -2360,7 +2360,9 @@ export const DEFAULT_STYLE_CONFIG = {
         h2: 'title',
         h3: 'content.groupTitle',
         ul: 'content.groupList',
-        p: 'summary.text'
+        p: 'summary.text',
+        'p+ul:group': 'content.groupBlock*',
+        'p+ol:group': 'content.groupBlock*'
       },
       style: {
         display: 'flex',
@@ -2437,7 +2439,7 @@ export const DEFAULT_STYLE_CONFIG = {
           gap: "{dimension.gap.base}",
           boxShadow: `{material.hierarchy.B1}, {material.hierarchy.main}`,
           border: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}`,
-          marginBottom: "{dimension.margin.base}",
+          margin: "{dimension.margin.base} 0",
           position: 'relative',
           '&::before': {
             content: "''",
@@ -2501,6 +2503,39 @@ export const DEFAULT_STYLE_CONFIG = {
             borderRadius: "{dimension.borderradius.medium}",
             borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`,
             position: 'relative',
+          }
+        },
+        "groupBlock*": {
+          type: 'template',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: "{dimension.gap.tight}",
+            padding: "{dimension.padding.base}",
+          },
+          markdownMapping: {
+            p: 'groupTitle',
+            ul: 'groupList',
+            ol: 'groupList'
+          },
+          groupTitle: {
+            metaType: 'text',
+            variant: 'elegantCardSubtitle',
+            style: {
+              margin: "{dimension.margin.base} 0",
+              fontWeight: "{font.fontweight.semibold}"
+            }
+          },
+          groupList: {
+            metaType: 'text',
+            variant: 'elegantCardSegment',
+            style: {
+              padding: "{dimension.padding.tight} {dimension.padding.base}",
+              background: "{color.secondarycontainer.violet0}",
+              borderRadius: "{dimension.borderradius.medium}",
+              borderLeft: `{dimension.borderwidth.base} solid {color.secondary.violet4}`,
+              position: 'relative'
+            }
           }
         }
       },

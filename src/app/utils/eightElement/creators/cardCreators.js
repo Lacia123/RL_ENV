@@ -200,7 +200,8 @@ function collectGroupItems(lines, startIndex, groupConfig, cardStyleConfig) {
         let consecutiveEmptyLines = 0; // 🆕 跟踪连续空行数量
 
         while (j < lines.length && elementIndex < groupPattern.length) {
-            const line = lines[j].trim();
+            const originalLine = lines[j];
+            const line = originalLine.trim();
 
             // 🆕 处理空行：允许分组内的空行，但限制连续空行数量
             if (!line) {
@@ -222,9 +223,39 @@ function collectGroupItems(lines, startIndex, groupConfig, cardStyleConfig) {
 
             if (parseResult && parseResult.markdownResult && parseResult.markdownResult.type === expectedType) {
                 // 匹配期望的元素类型
-                currentGroupItem.elements[expectedType] = parseResult.markdownResult.content;
-                currentGroupItem.rawLines.push(line);
+                if (expectedType === 'ul' || expectedType === 'ol') {
+                    // 🆕 列表类型：收集连续的列表行作为一个整体
+                    const listLines = [lines[j]];
+                    let k = j + 1;
+                    while (k < lines.length) {
+                        const nextOriginalLine = lines[k];
+                        const nextTrimmedLine = nextOriginalLine.trim();
+                        if (!nextTrimmedLine) {
+                            // 空行视为列表的一部分，保留以维持原始结构
+                            listLines.push(nextOriginalLine);
+                            k++;
+                            continue;
+                        }
+
+                        const nextParseResult = parseMarkdownToTemplate(nextTrimmedLine, { [expectedType]: 'temp' }, 0);
+                        if (nextParseResult && nextParseResult.markdownResult && nextParseResult.markdownResult.type === expectedType) {
+                            listLines.push(nextOriginalLine);
+                            k++;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    currentGroupItem.elements[expectedType] = listLines.join('\n');
+                    currentGroupItem.rawLines.push(...listLines);
+                    j = k;
+                } else {
+                    currentGroupItem.elements[expectedType] = parseResult.markdownResult.content;
+                    currentGroupItem.rawLines.push(originalLine);
+                    j++;
+                }
                 elementIndex++;
+                continue;
             } else if (expectedType === 'p') {
                 // 🆕 对于p类型，需要特殊处理
                 if (line === '§PARAGRAPH§') {
@@ -235,7 +266,7 @@ function collectGroupItems(lines, startIndex, groupConfig, cardStyleConfig) {
                     // 匹配非标题行、非链接行、非表格行
                     // 排除以 # 开头的标题、以 [ 开头的链接、以 | 开头的表格
                     currentGroupItem.elements['p'] = line;
-                    currentGroupItem.rawLines.push(line);
+                    currentGroupItem.rawLines.push(originalLine);
                     elementIndex++;
                 } else {
                     // 不匹配段落格式，跳过这行继续寻找

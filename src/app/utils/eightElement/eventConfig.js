@@ -7,7 +7,6 @@ export const EVENT_NAME = {
     UPDATE: 'update',
 }
 
-
 export const EVENT_CONFIG = {
     [EVENT_NAME.EDIT]: {
         // "EventTargetId": "",
