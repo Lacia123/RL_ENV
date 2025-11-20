@@ -921,6 +921,41 @@ export const DEFAULT_STYLE_CONFIG = {
       color: "{color.onprimary.black88}",
       fontSize: "{font.size.medium}",
     },
+    metricCardValue: {
+      fontSize: "{font.size.xxxl}",
+      fontWeight: "{font.fontweight.bold}",
+      color: "{color.primary.brand6}",
+      letterSpacing: "-0.02em",
+      lineHeight: "1",
+      margin: "0"
+    },
+    heroTitle: {
+      fontSize: "{font.size.xxxl}",
+      fontWeight: "{font.fontweight.bold}",
+      letterSpacing: "-0.02em",
+      color: "{color.onprimary.white100}",
+      margin: "0",
+      lineHeight: "1.1"
+    },
+    heroSubtitle: {
+      fontSize: "{font.size.large}",
+      fontWeight: "{font.fontweight.medium}",
+      color: "{color.onprimary.white88}",
+      margin: "0",
+      lineHeight: "1.5",
+      maxWidth: "580px"
+    },
+    heroMetric: {
+      fontSize: "{font.size.medium}",
+      fontWeight: "{font.fontweight.semibold}",
+      color: "{color.onprimary.white100}",
+      margin: "0",
+      padding: "{dimension.padding.supertight} {dimension.padding.tight}",
+      borderRadius: "{dimension.borderradius.large}",
+      background: "rgba(255,255,255,0.16)",
+      border: "1px solid rgba(255,255,255,0.24)",
+      letterSpacing: "0.02em"
+    },
     cardSegment: {
       color: "{color.onprimary.black88}",
       fontSize: "{font.size.medium}",
@@ -2955,7 +2990,7 @@ export const DEFAULT_STYLE_CONFIG = {
       title: {
         style: {
           width: '100%',
-          
+
         },
         metaType: 'text',
         variant: 'headerCardTitle',
@@ -3553,6 +3588,22 @@ export const DEFAULT_STYLE_CONFIG = {
       }
     },
 
+    background: {
+      width: '100%',
+      height: '100% ',
+      objectFit: 'cover',
+      filter: 'brightness(0.65)',
+      transform: 'scale(1.05)',
+      borderRadius: "{dimension.borderradius.medium}",
+      borderWidth: "{dimension.borderwidth.narrow}",
+      borderColor: "{color.surfacecontainer.black16}",
+      borderStyle: "solid",
+      boxShadow: "{material.hierarchy.main}",
+      clipPath: "none",
+      transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
+      maxWidth: "100%",
+    },
+
     // 英雄图片 TODO: 需要确定解析的规则
     hero: {
       borderRadius: "{dimension.borderradius.xxl}",
@@ -3946,7 +3997,7 @@ export const DEFAULT_STYLE_CONFIG = {
     },
 
     // ==================== 插槽标签示例组件 ====================
-    
+
     // 产品卡片 - 使用插槽标签系统
     productCard: {
       type: 'template',
@@ -4017,24 +4068,24 @@ export const DEFAULT_STYLE_CONFIG = {
       },
       // 可选：定义插槽元数据（用于验证）
       slots: {
-        image: { 
+        image: {
           required: false,
           optional: true,
           supportedAttributes: ['src', 'alt']
         },
-        title: { 
+        title: {
           required: true,
           optional: false
         },
-        description: { 
+        description: {
           required: false,
           optional: true
         },
-        price: { 
+        price: {
           required: false,
           optional: true
         },
-        button: { 
+        button: {
           required: false,
           optional: true,
           supportedAttributes: ['href', 'target']
@@ -4045,7 +4096,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 🎯 智能产品卡片 - 条件布局模式
     smartProductCard: {
       type: 'template',
-      
+
       // 🆕 布局模式配置（按优先级排列）
       layoutModes: [
         // 模式1：完整信息布局（有图片时，纵向布局）
@@ -4129,8 +4180,8 @@ export const DEFAULT_STYLE_CONFIG = {
                   // 底部：价格和操作按钮
                   {
                     name: 'footer',
-                    condition: 'has:price || has:actions',
-                    slots: ['price', 'actions'],
+                    condition: 'has:price || has:actions || has:footer',
+                    slots: ['price', 'actions', 'footer'],
                     type: 'template',
                     style: {
                       display: 'flex',
@@ -4148,7 +4199,7 @@ export const DEFAULT_STYLE_CONFIG = {
             ]
           }
         },
-        
+
         // 模式2：简化布局（无图片时）
         {
           name: 'simple',
@@ -4206,8 +4257,8 @@ export const DEFAULT_STYLE_CONFIG = {
               // 底部
               {
                 name: 'footer',
-                condition: 'has:price || has:actions',
-                slots: ['price', 'actions'],
+                condition: 'has:price || has:actions || has:footer',
+                slots: ['price', 'actions', 'footer'],
                 type: 'template',
                 style: {
                   display: 'flex',
@@ -4224,7 +4275,7 @@ export const DEFAULT_STYLE_CONFIG = {
           }
         }
       ],
-      
+
       // 🔧 保留旧的 style 作为后备（如果没有 layoutModes）
       style: {
         display: 'flex',
@@ -4238,13 +4289,13 @@ export const DEFAULT_STYLE_CONFIG = {
         maxWidth: '400px',
         padding: '0',
         gap: '0',
-        
+
         '&:hover': {
           boxShadow: '{material.hierarchy.3f}',
           transform: 'translateY(-2px)'
         }
       },
-      
+
       slotConfigs: {
         // 徽章 - 绝对定位，不影响布局
         badge: {
@@ -4264,7 +4315,7 @@ export const DEFAULT_STYLE_CONFIG = {
             margin: '0'
           }
         },
-        
+
         // 图片 - 顶部，固定高度
         image: {
           metaType: 'image',
@@ -4278,7 +4329,7 @@ export const DEFAULT_STYLE_CONFIG = {
             padding: '0'
           }
         },
-        
+
         // 标题 - 大而醒目
         title: {
           metaType: 'text',
@@ -4290,7 +4341,7 @@ export const DEFAULT_STYLE_CONFIG = {
             fontSize: '{font.size.large}'
           }
         },
-        
+
         // 评分 - 小而淡
         rating: {
           metaType: 'text',
@@ -4301,7 +4352,7 @@ export const DEFAULT_STYLE_CONFIG = {
             margin: '0 {dimension.margin.base} {dimension.margin.tight} {dimension.margin.base}'
           }
         },
-        
+
         // 标签 - 灰色背景
         tags: {
           metaType: 'text',
@@ -4316,7 +4367,7 @@ export const DEFAULT_STYLE_CONFIG = {
             display: 'inline-block'
           }
         },
-        
+
         // 描述 - 限制3行
         description: {
           metaType: 'text',
@@ -4332,7 +4383,8 @@ export const DEFAULT_STYLE_CONFIG = {
             WebkitBoxOrient: 'vertical'
           }
         },
-        
+
+
         // 价格 - 大而醒目
         price: {
           metaType: 'text',
@@ -4344,17 +4396,58 @@ export const DEFAULT_STYLE_CONFIG = {
             margin: 'auto {dimension.margin.base} {dimension.margin.tight} {dimension.margin.base}'
           }
         },
-        
-        // 操作按钮 - 全宽
+
+        // 操作按钮 - 支持多个按钮
         actions: {
+          type: 'template',
+          style: {
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: '{dimension.gap.tight}',
+            margin: '0 {dimension.margin.base} {dimension.margin.base} {dimension.margin.base}',
+            marginLeft: 'auto'
+          },
           metaType: 'button',
           variant: 'primary',
           variantStyle: {
-            margin: '0 {dimension.margin.base} {dimension.margin.base} {dimension.margin.base}'
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            whiteSpace: 'nowrap',
+            padding: '{dimension.padding.base}',
+            flexShrink: '0'
+          }
+        },
+
+        // 自定义页脚容器 - 也支持多个按钮
+        footer: {
+          type: 'template',
+          style: {
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: '{dimension.gap.tight}',
+            margin: '0 {dimension.margin.base} {dimension.margin.base} {dimension.margin.base}',
+            marginLeft: 'auto'
+          },
+          metaType: 'button',
+          variant: 'primary',
+          variantStyle: {
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            whiteSpace: 'nowrap',
+            padding: '{dimension.padding.base}',
+            flexShrink: '0'
           }
         }
       },
-      
+
       slots: {
         badge: { required: false, optional: true },
         image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
@@ -4363,7 +4456,2031 @@ export const DEFAULT_STYLE_CONFIG = {
         tags: { required: false, optional: true },
         description: { required: false, optional: true },
         price: { required: false, optional: true },
-        actions: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
+        actions: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
+        footer: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
+      }
+    },
+
+    // 📊 指标 / KPI 卡片
+    metricCard: {
+      type: 'template',
+      layoutModes: [
+        {
+          name: 'withChart',
+          condition: 'has:chart_mini',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'metaRow',
+                condition: 'has:status_tag || has:time_range',
+                slots: ['status_tag', 'time_range'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '{dimension.gap.tight}',
+                  flexWrap: 'wrap',
+                  borderBottom: '1px solid {color.surfacecontainer.black8}',
+                  paddingBottom: '{dimension.padding.supertight}',
+                  marginBottom: '{dimension.margin.tight}'
+                }
+              },
+              {
+                name: 'contentRow',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '{dimension.gap.loose}',
+                  alignItems: 'stretch'
+                },
+                groups: [
+                  {
+                    name: 'metricColumn',
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '{dimension.gap.tight}',
+                      flex: '1'
+                    },
+                    groups: [
+                      {
+                        name: 'labelRow',
+                        slots: ['metric_label']
+                      },
+                      {
+                        name: 'valueRow',
+                        slots: ['metric_value']
+                      },
+                      {
+                        name: 'trendRow',
+                        condition: 'has:trend_icon || has:trend_value',
+                        slots: ['trend_icon', 'trend_value'],
+                        type: 'template',
+                        style: {
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: '{dimension.gap.supertight}'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    name: 'chartMini',
+                    slots: ['chart_mini'],
+                    type: 'template',
+                    style: {
+                      width: '240px',
+                      minHeight: '120px',
+                      padding: '{dimension.padding.base}',
+                      background: '{color.surfacecontainer.white96}',
+                      borderRadius: '{dimension.borderradius.large}',
+                      border: '1px solid {color.surfacecontainer.black8}',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          name: 'default',
+          condition: 'default',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'metaRow',
+                condition: 'has:status_tag || has:time_range',
+                slots: ['status_tag', 'time_range'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '{dimension.gap.tight}',
+                  flexWrap: 'wrap',
+                  borderBottom: '1px solid {color.surfacecontainer.black8}',
+                  paddingBottom: '{dimension.padding.supertight}',
+                  marginBottom: '{dimension.margin.tight}'
+                }
+              },
+              {
+                name: 'metricColumn',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '{dimension.gap.tight}'
+                },
+                groups: [
+                  {
+                    name: 'labelRow',
+                    slots: ['metric_label']
+                  },
+                  {
+                    name: 'valueRow',
+                    slots: ['metric_value']
+                  },
+                  {
+                    name: 'trendRow',
+                    condition: 'has:trend_icon || has:trend_value',
+                    slots: ['trend_icon', 'trend_value'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: '{dimension.gap.supertight}'
+                    }
+                  }
+                ]
+              },
+              {
+                name: 'chartMiniDefault',
+                condition: 'has:chart_mini',
+                slots: ['chart_mini'],
+                type: 'template',
+                style: {
+                  width: '100%',
+                  minHeight: '120px',
+                  padding: '{dimension.padding.base}',
+                  background: '{color.surfacecontainer.white96}',
+                  borderRadius: '{dimension.borderradius.large}',
+                  border: '1px solid {color.surfacecontainer.black8}',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }
+              }
+            ]
+          }
+        }
+      ],
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '{dimension.gap.base}',
+        borderRadius: '{dimension.borderradius.xl}',
+        padding: '{dimension.padding.loose}',
+        background: '{color.surfacecontainer.white100}',
+        boxShadow: '{material.hierarchy.1f}',
+        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+      },
+      slotConfigs: {
+        metric_value: {
+          metaType: 'text',
+          variant: 'metricCardValue'
+        },
+        metric_label: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            fontSize: '{font.size.tiny}',
+            fontWeight: '{font.fontweight.medium}',
+            color: '{color.onsurface.black64}',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            margin: '0',
+            opacity: '0.85'
+          }
+        },
+        trend_icon: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: '32px',
+            height: '32px',
+            fontSize: '{font.size.medium}',
+            fontWeight: '{font.fontweight.semibold}',
+            margin: '0',
+            padding: '0',
+            borderRadius: '50%',
+            background: '{color.surface.green1}',
+            color: '{color.success.green6}'
+          }
+        },
+        trend_value: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            fontSize: '{font.size.small}',
+            fontWeight: '{font.fontweight.semibold}',
+            color: '{color.success.green6}',
+            margin: '0',
+            letterSpacing: '0.02em'
+          }
+        },
+        chart_mini: {
+          type: 'template',
+          style: {
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, {color.surface.grey0} 0%, {color.surfacecontainer.white100} 100%)',
+            borderRadius: '{dimension.borderradius.large}',
+            border: '1px dashed {color.surfacecontainer.black8}'
+          },
+          metaType: 'chart',
+          variant: 'mini'
+        },
+        time_range: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            fontSize: '{font.size.tiny}',
+            fontWeight: '{font.fontweight.medium}',
+            color: '{color.onsurface.black48}',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            margin: '0'
+          }
+        },
+        status_tag: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            fontSize: '{font.size.tiny}',
+            fontWeight: '{font.fontweight.bold}',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
+            borderRadius: '{dimension.borderradius.medium}',
+            background: '{color.surface.blue1}',
+            color: '{color.primary.brand5}',
+            margin: '0',
+            boxShadow: '{material.hierarchy.B1}'
+          }
+        }
+      },
+      slots: {
+        metric_value: { required: true, optional: false },
+        metric_label: { required: true, optional: false },
+        trend_icon: { required: false, optional: true },
+        trend_value: { required: false, optional: true },
+        chart_mini: { required: false, optional: true, supportedAttributes: ['chart', 'title', 'sort'] },
+        time_range: { required: false, optional: true },
+        status_tag: { required: false, optional: true }
+      }
+    },
+
+    // 🌄 主视觉说明卡
+    heroCard: {
+      type: 'template',
+      layoutModes: [
+        {
+          name: 'withCover',
+          condition: 'has:cover_image',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xxxl}',
+            padding: '{dimension.padding.extraloose}',
+            color: '{color.onprimary.white100}',
+            position: 'relative',
+            overflow: 'hidden',
+            minHeight: '320px',
+            height: '100%',
+            boxShadow: '{material.hierarchy.2f}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'coverLayer',
+                slots: ['cover_image'],
+                type: 'template',
+                style: {
+                  position: 'absolute',
+                  inset: '0',
+                  zIndex: '0',
+                  overflow: 'hidden',
+                  borderRadius: '{dimension.borderradius.xxxl}'
+                }
+              },
+              {
+                name: 'contentLayer',
+                type: 'template',
+                style: {
+                  position: 'relative',
+                  zIndex: '1',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '{dimension.gap.base}'
+                },
+                groups: [
+                  {
+                    name: 'badgeRow',
+                    condition: 'has:badge',
+                    slots: ['badge'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: '{dimension.gap.tight}',
+                      flexWrap: 'wrap'
+                    }
+                  },
+                  {
+                    name: 'titleBlock',
+                    slots: ['title']
+                  },
+                  {
+                    name: 'subtitleBlock',
+                    condition: 'has:subtitle',
+                    slots: ['subtitle']
+                  },
+                  {
+                    name: 'metricsRow',
+                    condition: 'has:metrics',
+                    slots: ['metrics*'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '{dimension.gap.tight}'
+                    }
+                  },
+                  {
+                    name: 'ctaRow',
+                    condition: 'has:cta_primary || has:cta_secondary',
+                    slots: ['cta_primary', 'cta_secondary'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: '{dimension.gap.tight}',
+                      flexWrap: 'wrap'
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          name: 'default',
+          condition: 'default',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xxxl}',
+            padding: '{dimension.padding.extraloose}',
+            background: `linear-gradient(135deg, {color.primary.brand6} 0%, {color.secondary.violet5} 60%, {color.surfacecontainer.black12} 100%)`,
+            color: '{color.onprimary.white100}',
+            position: 'relative',
+            minHeight: '280px',
+            boxShadow: '{material.hierarchy.2f}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'badgeRow',
+                condition: 'has:badge',
+                slots: ['badge'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '{dimension.gap.tight}',
+                  flexWrap: 'wrap'
+                }
+              },
+              {
+                name: 'titleBlock',
+                slots: ['title']
+              },
+              {
+                name: 'subtitleBlock',
+                condition: 'has:subtitle',
+                slots: ['subtitle']
+              },
+              {
+                name: 'metricsRow',
+                condition: 'has:metrics',
+                slots: ['metrics*'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '{dimension.gap.tight}'
+                }
+              },
+              {
+                name: 'ctaRow',
+                condition: 'has:cta_primary || has:cta_secondary',
+                slots: ['cta_primary', 'cta_secondary'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '{dimension.gap.tight}',
+                  flexWrap: 'wrap'
+                }
+              }
+            ]
+          }
+        }
+      ],
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '{dimension.gap.base}',
+        borderRadius: '{dimension.borderradius.xxxl}',
+        padding: '{dimension.padding.extraloose}',
+        background: `linear-gradient(135deg, {color.primary.brand6} 0%, {color.secondary.violet5} 60%, {color.surfacecontainer.black12} 100%)`,
+        color: '{color.onprimary.white100}',
+        position: 'relative',
+        overflow: 'hidden',
+        minHeight: '280px',
+        boxShadow: '{material.hierarchy.2f}'
+      },
+      slotConfigs: {
+        cover_image: {
+          type: 'template',
+          style: {
+            position: 'absolute',
+            inset: '0',
+            zIndex: '0',
+            overflow: 'hidden'
+          },
+          metaType: 'image',
+          variant: 'background',
+        },
+        badge: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            fontSize: '{font.size.tiny}',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
+            borderRadius: '{dimension.borderradius.large}',
+            background: 'rgba(255,255,255,0.15)',
+            border: '1px solid rgba(255,255,255,0.35)',
+            margin: '0'
+          }
+        },
+        title: {
+          metaType: 'text',
+          variant: 'heroTitle'
+        },
+        subtitle: {
+          metaType: 'text',
+          variant: 'heroSubtitle'
+        },
+        metrics: {
+          metaType: 'text',
+          variant: 'heroMetric'
+        },
+        cta_primary: {
+          metaType: 'button',
+          variant: 'primary',
+          variantStyle: {
+            minWidth: '160px',
+            boxShadow: '{material.hierarchy.1f}'
+          }
+        },
+        cta_secondary: {
+          metaType: 'button',
+          variant: 'secondary',
+          variantStyle: {
+            minWidth: '160px',
+            background: 'transparent',
+            color: '{color.onprimary.white100}',
+            border: '1px solid rgba(255,255,255,0.5)'
+          }
+        }
+      },
+      slots: {
+        cover_image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
+        badge: { required: false, optional: true },
+        title: { required: true, optional: false },
+        subtitle: { required: false, optional: true },
+        metrics: { required: false, optional: true },
+        cta_primary: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
+        cta_secondary: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
+      }
+    },
+
+    // 🖼️ 内容展示卡（可视媒体信息卡片）
+    contentDisplayCard: {
+      type: 'template',
+      layoutModes: [
+        {
+          name: 'withImage',
+          condition: 'has:image',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'mediaBlock',
+                slots: ['image'],
+                type: 'template',
+                style: {
+                  width: '100%',
+                  borderRadius: '{dimension.borderradius.large}',
+                  overflow: 'hidden',
+                  aspectRatio: '4 / 3',
+                  background: '{color.surfacecontainer.black7}'
+                }
+              },
+              {
+                name: 'contentBlock',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '{dimension.gap.base}'
+                },
+                groups: [
+                  {
+                    name: 'titleGroup',
+                    slots: ['title']
+                  },
+                  {
+                    name: 'subtitleGroup',
+                    condition: 'has:subtitle',
+                    slots: ['subtitle']
+                  },
+                  {
+                    name: 'tagRow',
+                    condition: 'has:tags',
+                    slots: ['tags*'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '{dimension.gap.tight}'
+                    }
+                  },
+                  {
+                    name: 'infoRow',
+                    condition: 'has:rating || has:location || has:price',
+                    slots: ['rating', 'location', 'price'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '{dimension.gap.base}',
+                      flexWrap: 'wrap'
+                    }
+                  },
+                  {
+                    name: 'ctaRow',
+                    condition: 'has:cta',
+                    slots: ['cta'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      justifyContent: 'flex-end'
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          name: 'default',
+          condition: 'default',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'contentBlock',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '{dimension.gap.base}'
+                },
+                groups: [
+                  {
+                    name: 'titleGroup',
+                    slots: ['title']
+                  },
+                  {
+                    name: 'subtitleGroup',
+                    condition: 'has:subtitle',
+                    slots: ['subtitle']
+                  },
+                  {
+                    name: 'tagRow',
+                    condition: 'has:tags',
+                    slots: ['tags*'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '{dimension.gap.tight}'
+                    }
+                  },
+                  {
+                    name: 'infoRow',
+                    condition: 'has:rating || has:location || has:price',
+                    slots: ['rating', 'location', 'price'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '{dimension.gap.base}',
+                      flexWrap: 'wrap'
+                    }
+                  },
+                  {
+                    name: 'ctaRow',
+                    condition: 'has:cta',
+                    slots: ['cta'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      justifyContent: 'flex-end'
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '{dimension.gap.base}',
+        borderRadius: '{dimension.borderradius.xl}',
+        padding: '{dimension.padding.loose}',
+        background: '{color.surfacecontainer.white100}',
+        boxShadow: '{material.hierarchy.1f}',
+        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+      },
+      slotConfigs: {
+        image: {
+          metaType: 'image',
+          variant: 'cover',
+          variantStyle: {
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block'
+          },
+          supportedAttributes: ['src', 'alt']
+        },
+        title: {
+          metaType: 'text',
+          variant: 'h3',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.xl}',
+            fontWeight: '{font.fontweight.bold}',
+            color: '{color.onsurface.black88}'
+          }
+        },
+        subtitle: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            color: '{color.onsurface.black64}',
+            lineHeight: '1.5'
+          }
+        },
+        tags: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.tiny}',
+            fontWeight: '{font.fontweight.semibold}',
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            color: '{color.onsurface.black76}',
+            background: '{color.surfacecontainer.black4}',
+            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
+            borderRadius: '{dimension.borderradius.large}'
+          }
+        },
+        rating: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '{dimension.gap.tight}',
+            fontSize: '{font.size.small}',
+            fontWeight: '{font.fontweight.semibold}',
+            color: '{color.onsurface.black88}'
+          }
+        },
+        price: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.large}',
+            fontWeight: '{font.fontweight.bold}',
+            color: '{color.primary.brand6}'
+          }
+        },
+        location: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '{dimension.gap.tight}',
+            fontSize: '{font.size.small}',
+            color: '{color.onsurface.black64}'
+          }
+        },
+        cta: {
+          metaType: 'button',
+          variant: 'primary',
+          variantStyle: {
+            minWidth: '140px',
+            padding: '{dimension.padding.base} {dimension.padding.loose}',
+            borderRadius: '{dimension.borderradius.large}',
+            fontWeight: '{font.fontweight.bold}'
+          },
+          supportedAttributes: ['href', 'target']
+        }
+      },
+      slots: {
+        image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
+        title: { required: true, optional: false },
+        subtitle: { required: false, optional: true },
+        tags: { required: false, optional: true },
+        rating: { required: false, optional: true },
+        price: { required: false, optional: true },
+        location: { required: false, optional: true },
+        cta: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
+      }
+    },
+
+    // 🎯 操作与引导卡（Action / CTA Card）
+    actionCard: {
+      type: 'template',
+      layoutModes: [
+        {
+          name: 'withIcon',
+          condition: 'has:icon',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'headerRow',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'flex-start',
+                  gap: '{dimension.gap.base}'
+                },
+                groups: [
+                  {
+                    name: 'iconBlock',
+                    slots: ['icon'],
+                    type: 'template',
+                    style: {
+                      flexShrink: '0'
+                    }
+                  },
+                  {
+                    name: 'contentBlock',
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '{dimension.gap.supertight}',
+                      flex: '1'
+                    },
+                    groups: [
+                      {
+                        name: 'badgeRow',
+                        condition: 'has:badge',
+                        slots: ['badge'],
+                        type: 'template',
+                        style: {
+                          display: 'flex',
+                          flexDirection: 'row',
+                          gap: '{dimension.gap.tight}',
+                          flexWrap: 'wrap'
+                        }
+                      },
+                      {
+                        name: 'titleBlock',
+                        slots: ['title']
+                      },
+                      {
+                        name: 'descriptionBlock',
+                        condition: 'has:description',
+                        slots: ['description']
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                name: 'ctaRow',
+                condition: 'has:cta_primary || has:cta_secondary',
+                slots: ['cta_primary', 'cta_secondary'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '{dimension.gap.tight}',
+                  flexWrap: 'wrap',
+                  marginTop: '{dimension.margin.tight}'
+                }
+              }
+            ]
+          }
+        },
+        {
+          name: 'default',
+          condition: 'default',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'badgeRow',
+                condition: 'has:badge',
+                slots: ['badge'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '{dimension.gap.tight}',
+                  flexWrap: 'wrap'
+                }
+              },
+              {
+                name: 'titleBlock',
+                slots: ['title']
+              },
+              {
+                name: 'descriptionBlock',
+                condition: 'has:description',
+                slots: ['description']
+              },
+              {
+                name: 'ctaRow',
+                condition: 'has:cta_primary || has:cta_secondary',
+                slots: ['cta_primary', 'cta_secondary'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '{dimension.gap.tight}',
+                  flexWrap: 'wrap',
+                  marginTop: '{dimension.margin.tight}'
+                }
+              }
+            ]
+          }
+        }
+      ],
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '{dimension.gap.base}',
+        borderRadius: '{dimension.borderradius.xl}',
+        padding: '{dimension.padding.loose}',
+        background: '{color.surfacecontainer.white100}',
+        boxShadow: '{material.hierarchy.1f}',
+        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+      },
+      slotConfigs: {
+        icon: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.xxxl}',
+            lineHeight: '1',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '56px',
+            height: '56px',
+            borderRadius: '{dimension.borderradius.large}',
+            background: '{color.surfacecontainer.black4}',
+            flexShrink: '0'
+          }
+        },
+        badge: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            fontSize: '{font.size.tiny}',
+            fontWeight: '{font.fontweight.semibold}',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
+            borderRadius: '{dimension.borderradius.large}',
+            background: '{color.surfacecontainer.black4}',
+            color: '{color.onsurface.black76}',
+            margin: '0'
+          }
+        },
+        title: {
+          metaType: 'text',
+          variant: 'h3',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.xl}',
+            fontWeight: '{font.fontweight.bold}',
+            color: '{color.onsurface.black88}',
+            lineHeight: '1.3'
+          }
+        },
+        description: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.medium}',
+            color: '{color.onsurface.black64}',
+            lineHeight: '1.6'
+          }
+        },
+        cta_primary: {
+          metaType: 'button',
+          variant: 'primary',
+          variantStyle: {
+            minWidth: '140px',
+            padding: '{dimension.padding.base} {dimension.padding.loose}',
+            borderRadius: '{dimension.borderradius.large}',
+            fontWeight: '{font.fontweight.bold}',
+            boxShadow: '{material.hierarchy.1f}'
+          }
+        },
+        cta_secondary: {
+          metaType: 'button',
+          variant: 'secondary',
+          variantStyle: {
+            minWidth: '140px',
+            padding: '{dimension.padding.base} {dimension.padding.loose}',
+            borderRadius: '{dimension.borderradius.large}',
+            fontWeight: '{font.fontweight.semibold}'
+          }
+        }
+      },
+      slots: {
+        icon: { required: false, optional: true },
+        badge: { required: false, optional: true },
+        title: { required: true, optional: false },
+        description: { required: false, optional: true },
+        cta_primary: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
+        cta_secondary: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
+      }
+    },
+
+    // 📅 事件/活动卡（Event / Announcement Card）
+    eventCard: {
+      type: 'template',
+      layoutModes: [
+        {
+          name: 'withImage',
+          condition: 'has:image',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '0',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}',
+            overflow: 'hidden'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'imageBlock',
+                slots: ['image'],
+                type: 'template',
+                style: {
+                  width: '100%',
+                  borderRadius: '{dimension.borderradius.xl} {dimension.borderradius.xl} 0 0',
+                  overflow: 'hidden',
+                  aspectRatio: '16 / 9',
+                  background: '{color.surfacecontainer.black7}',
+                  position: 'relative'
+                }
+              },
+              {
+                name: 'contentBlock',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '{dimension.gap.base}',
+                  padding: '{dimension.padding.loose}'
+                },
+                groups: [
+                  {
+                    name: 'tagRow',
+                    condition: 'has:tag',
+                    slots: ['tag'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: '{dimension.gap.tight}',
+                      flexWrap: 'wrap'
+                    }
+                  },
+                  {
+                    name: 'titleBlock',
+                    slots: ['event_title']
+                  },
+                  {
+                    name: 'timeBlock',
+                    condition: 'has:event_time',
+                    slots: ['event_time']
+                  },
+                  {
+                    name: 'ctaRow',
+                    condition: 'has:cta',
+                    slots: ['cta'],
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      justifyContent: 'flex-start',
+                      marginTop: '{dimension.margin.tight}'
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          name: 'default',
+          condition: 'default',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'tagRow',
+                condition: 'has:tag',
+                slots: ['tag'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: '{dimension.gap.tight}',
+                  flexWrap: 'wrap'
+                }
+              },
+              {
+                name: 'titleBlock',
+                slots: ['event_title']
+              },
+              {
+                name: 'timeBlock',
+                condition: 'has:event_time',
+                slots: ['event_time']
+              },
+              {
+                name: 'ctaRow',
+                condition: 'has:cta',
+                slots: ['cta'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  marginTop: '{dimension.margin.tight}'
+                }
+              }
+            ]
+          }
+        }
+      ],
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '{dimension.gap.base}',
+        borderRadius: '{dimension.borderradius.xl}',
+        padding: '{dimension.padding.loose}',
+        background: '{color.surfacecontainer.white100}',
+        boxShadow: '{material.hierarchy.1f}',
+        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+      },
+      slotConfigs: {
+        image: {
+          metaType: 'image',
+          variant: 'cover',
+          variantStyle: {
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block'
+          },
+          supportedAttributes: ['src', 'alt']
+        },
+        tag: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            fontSize: '{font.size.tiny}',
+            fontWeight: '{font.fontweight.semibold}',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
+            borderRadius: '{dimension.borderradius.large}',
+            background: '{color.primary.brand1}',
+            color: '{color.primary.brand6}',
+            margin: '0'
+          }
+        },
+        event_title: {
+          metaType: 'text',
+          variant: 'h3',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.xl}',
+            fontWeight: '{font.fontweight.bold}',
+            color: '{color.onsurface.black88}',
+            lineHeight: '1.3'
+          }
+        },
+        event_time: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.medium}',
+            color: '{color.onsurface.black64}',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '{dimension.gap.supertight}'
+          }
+        },
+        cta: {
+          metaType: 'button',
+          variant: 'primary',
+          variantStyle: {
+            minWidth: '140px',
+            padding: '{dimension.padding.base} {dimension.padding.loose}',
+            borderRadius: '{dimension.borderradius.large}',
+            fontWeight: '{font.fontweight.bold}'
+          },
+          supportedAttributes: ['href', 'target']
+        }
+      },
+      slots: {
+        image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
+        tag: { required: false, optional: true },
+        event_title: { required: true, optional: false },
+        event_time: { required: false, optional: true },
+        cta: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
+      }
+    },
+
+    // 🔔 系统状态卡（System Status / Update Card）
+    statusCard: {
+      type: 'template',
+      layoutModes: [
+        {
+          name: 'withProgress',
+          condition: 'has:progress',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'statusHeader',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: '{dimension.gap.base}',
+                  flexWrap: 'wrap'
+                },
+                groups: [
+                  {
+                    name: 'statusTypeBlock',
+                    slots: ['status_type'],
+                    type: 'template',
+                    style: {
+                      flexShrink: '0'
+                    }
+                  },
+                  {
+                    name: 'messageBlock',
+                    slots: ['message'],
+                    type: 'template',
+                    style: {
+                      flex: '1'
+                    }
+                  }
+                ]
+              },
+              {
+                name: 'progressBlock',
+                slots: ['progress'],
+                type: 'template',
+                style: {
+                  marginTop: '{dimension.margin.tight}'
+                }
+              },
+              {
+                name: 'footerRow',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '{dimension.gap.base}',
+                  flexWrap: 'wrap',
+                  marginTop: '{dimension.margin.tight}'
+                },
+                groups: [
+                  {
+                    name: 'timestampBlock',
+                    condition: 'has:timestamp',
+                    slots: ['timestamp']
+                  },
+                  {
+                    name: 'ctaBlock',
+                    condition: 'has:cta',
+                    slots: ['cta']
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          name: 'default',
+          condition: 'default',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'statusHeader',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: '{dimension.gap.base}',
+                  flexWrap: 'wrap'
+                },
+                groups: [
+                  {
+                    name: 'statusTypeBlock',
+                    slots: ['status_type'],
+                    type: 'template',
+                    style: {
+                      flexShrink: '0'
+                    }
+                  },
+                  {
+                    name: 'messageBlock',
+                    slots: ['message'],
+                    type: 'template',
+                    style: {
+                      flex: '1'
+                    }
+                  }
+                ]
+              },
+              {
+                name: 'footerRow',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '{dimension.gap.base}',
+                  flexWrap: 'wrap',
+                  marginTop: '{dimension.margin.tight}'
+                },
+                groups: [
+                  {
+                    name: 'timestampBlock',
+                    condition: 'has:timestamp',
+                    slots: ['timestamp']
+                  },
+                  {
+                    name: 'ctaBlock',
+                    condition: 'has:cta',
+                    slots: ['cta']
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '{dimension.gap.base}',
+        borderRadius: '{dimension.borderradius.xl}',
+        padding: '{dimension.padding.loose}',
+        background: '{color.surfacecontainer.white100}',
+        boxShadow: '{material.hierarchy.1f}',
+        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+      },
+      slotConfigs: {
+        status_type: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.small}',
+            fontWeight: '{font.fontweight.semibold}',
+            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
+            borderRadius: '{dimension.borderradius.large}',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '{dimension.gap.supertight}',
+            // 默认样式（成功）
+            background: '{color.success.green1}',
+            color: '{color.success.green6}'
+          }
+        },
+        message: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.medium}',
+            color: '{color.onsurface.black88}',
+            lineHeight: '1.5'
+          }
+        },
+        progress: {
+          type: 'template',
+          style: {
+            width: '100%',
+            height: '8px',
+            background: '{color.surfacecontainer.black7}',
+            borderRadius: '{dimension.borderradius.large}',
+            overflow: 'hidden',
+            position: 'relative'
+          },
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.tiny}',
+            color: '{color.onsurface.black64}',
+            // 进度条会通过 CSS 变量和伪元素实现
+            display: 'block',
+            height: '100%',
+            background: 'linear-gradient(90deg, {color.primary.brand6} 0%, {color.primary.brand5} 100%)',
+            borderRadius: 'inherit',
+            transition: 'width 0.3s ease'
+          }
+        },
+        timestamp: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.tiny}',
+            color: '{color.onsurface.black48}',
+            letterSpacing: '0.04em'
+          }
+        },
+        cta: {
+          metaType: 'button',
+          variant: 'secondary',
+          variantStyle: {
+            minWidth: '100px',
+            padding: '{dimension.padding.supertight} {dimension.padding.base}',
+            borderRadius: '{dimension.borderradius.large}',
+            fontSize: '{font.size.small}',
+            fontWeight: '{font.fontweight.semibold}'
+          },
+          supportedAttributes: ['href', 'target']
+        }
+      },
+      slots: {
+        status_type: { required: true, optional: false },
+        message: { required: true, optional: false },
+        progress: { required: false, optional: true },
+        timestamp: { required: false, optional: true },
+        cta: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
+      }
+    },
+
+    // 📊 表格卡片（Table Card）
+    tableCard: {
+      type: 'template',
+      layoutModes: [
+        {
+          name: 'full',
+          condition: 'has:title || has:subtitle || has:description || has:icon || has:badge',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'headerSection',
+                condition: 'has:title || has:subtitle || has:icon || has:badge',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '{dimension.gap.tight}',
+                  marginBottom: '{dimension.margin.base}'
+                },
+                groups: [
+                  {
+                    name: 'headerRow',
+                    type: 'template',
+                    style: {
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                      gap: '{dimension.gap.base}',
+                      flexWrap: 'wrap'
+                    },
+                    groups: [
+                      {
+                        name: 'iconBlock',
+                        condition: 'has:icon',
+                        slots: ['icon'],
+                        type: 'template',
+                        style: {
+                          flexShrink: '0'
+                        }
+                      },
+                      {
+                        name: 'titleBlock',
+                        type: 'template',
+                        style: {
+                          flex: '1',
+                          minWidth: '0'
+                        },
+                        groups: [
+                          {
+                            name: 'badgeRow',
+                            condition: 'has:badge',
+                            slots: ['badge'],
+                            type: 'template',
+                            style: {
+                              marginBottom: '{dimension.margin.supertight}'
+                            }
+                          },
+                          {
+                            name: 'titleRow',
+                            condition: 'has:title',
+                            slots: ['title'],
+                            type: 'template'
+                          },
+                          {
+                            name: 'subtitleRow',
+                            condition: 'has:subtitle',
+                            slots: ['subtitle'],
+                            type: 'template'
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    name: 'descriptionBlock',
+                    condition: 'has:description',
+                    slots: ['description'],
+                    type: 'template',
+                    style: {
+                      marginTop: '{dimension.margin.supertight}'
+                    }
+                  }
+                ]
+              },
+              {
+                name: 'tableBlock',
+                slots: ['table'],
+                type: 'template',
+                style: {
+                  width: '100%',
+                  overflowX: 'auto',
+                  marginTop: '{dimension.margin.tight}'
+                }
+              },
+              {
+                name: 'footerSection',
+                condition: 'has:footer',
+                slots: ['footer'],
+                type: 'template',
+                style: {
+                  marginTop: '{dimension.margin.base}',
+                  paddingTop: '{dimension.padding.base}',
+                  borderTop: '1px solid {color.surfacecontainer.black8}'
+                }
+              }
+            ]
+          }
+        },
+        {
+          name: 'default',
+          condition: 'default',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'tableBlock',
+                slots: ['table'],
+                type: 'template',
+                style: {
+                  width: '100%',
+                  overflowX: 'auto'
+                }
+              }
+            ]
+          }
+        }
+      ],
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '{dimension.gap.base}',
+        borderRadius: '{dimension.borderradius.xl}',
+        padding: '{dimension.padding.loose}',
+        background: '{color.surfacecontainer.white100}',
+        boxShadow: '{material.hierarchy.1f}',
+        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+      },
+      slotConfigs: {
+        icon: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.xxl}',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '48px',
+            height: '48px',
+            borderRadius: '{dimension.borderradius.large}',
+            background: '{color.primary.brand1}',
+            color: '{color.primary.brand6}',
+            flexShrink: '0'
+          }
+        },
+        badge: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.tiny}',
+            fontWeight: '{font.fontweight.semibold}',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
+            borderRadius: '{dimension.borderradius.large}',
+            background: '{color.primary.brand1}',
+            color: '{color.primary.brand6}',
+            display: 'inline-block'
+          }
+        },
+        title: {
+          metaType: 'text',
+          variant: 'h4',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.large}',
+            fontWeight: '{font.fontweight.semibold}',
+            color: '{color.onsurface.black88}',
+            lineHeight: '1.3'
+          }
+        },
+        subtitle: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.medium}',
+            color: '{color.onsurface.black64}',
+            lineHeight: '1.5',
+            marginTop: '{dimension.margin.supertight}'
+          }
+        },
+        description: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.small}',
+            color: '{color.onsurface.black64}',
+            lineHeight: '1.6'
+          }
+        },
+        table: {
+          type: 'template',
+          metaType: 'table',
+          variant: 'container',
+          style: {
+            width: '100%',
+            margin: '0'
+          }
+        },
+        footer: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.small}',
+            color: '{color.onsurface.black48}',
+            lineHeight: '1.5'
+          }
+        }
+      },
+      slots: {
+        icon: { required: false, optional: true },
+        badge: { required: false, optional: true },
+        title: { required: false, optional: true },
+        subtitle: { required: false, optional: true },
+        description: { required: false, optional: true },
+        table: { required: true, optional: false },
+        footer: { required: false, optional: true }
+      }
+    },
+
+    // 🗞️ 信息列表卡（Feed / List）
+    feedListCard: {
+      type: 'template',
+      layoutModes: [
+        {
+          name: 'default',
+          condition: 'default',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            padding: '{dimension.padding.loose}',
+            borderRadius: '{dimension.borderradius.xl}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'header',
+                condition: 'has:title || has:subtitle',
+                slots: ['title', 'subtitle'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '{dimension.gap.supertight}'
+                }
+              },
+              {
+                name: 'listGroup',
+                condition: 'has:items',
+                slots: ['items*'],
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '{dimension.gap.tight}'
+                }
+              }
+            ]
+          }
+        }
+      ],
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '{dimension.gap.base}',
+        padding: '{dimension.padding.loose}',
+        borderRadius: '{dimension.borderradius.xl}',
+        background: '{color.surfacecontainer.white100}',
+        boxShadow: '{material.hierarchy.1f}',
+        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+      },
+      slotConfigs: {
+        title: {
+          metaType: 'text',
+          variant: 'h4',
+          variantStyle: {
+            margin: '0',
+            color: '{color.onsurface.black88}'
+          }
+        },
+        subtitle: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            color: '{color.onsurface.black64}',
+            fontSize: '{font.size.small}'
+          }
+        },
+        items: {
+          type: 'template',
+          metaType: 'feedItem',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '{dimension.gap.tight}',
+            padding: '{dimension.padding.tight} 0',
+            borderBottom: '1px solid {color.surfacecontainer.black7}'
+          },
+          itemStyles: {
+            row: {
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '{dimension.gap.base}',
+              alignItems: 'flex-start'
+            },
+            leading: {
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: '{dimension.gap.supertight}'
+            },
+            avatar: {
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              background: '{color.surfacecontainer.black4}',
+              flexShrink: '0'
+            },
+            content: {
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '{dimension.gap.supertight}',
+              flex: '1'
+            },
+            textRow: {
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              gap: '{dimension.gap.supertight}'
+            },
+            icon: {
+              margin: '0',
+              fontSize: '{font.size.medium}',
+              color: '{color.primary.brand5}'
+            },
+            text: {
+              margin: '0',
+              fontSize: '{font.size.medium}',
+              color: '{color.onsurface.black88}',
+              lineHeight: '1.5'
+            },
+            timestamp: {
+              margin: '0',
+              fontSize: '{font.size.tiny}',
+              color: '{color.onsurface.black64}',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase'
+            },
+            meta: {
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: '{dimension.gap.supertight}',
+              marginLeft: '{dimension.margin.tight}'
+            },
+            ctaVariant: 'link'
+          },
+          subSlots: {
+            avatar: {
+              metaType: 'image',
+              variant: 'avatar',
+              variantStyle: {
+                width: '44px',
+                height: '44px',
+                borderRadius: '50%',
+                objectFit: 'cover'
+              }
+            },
+            icon: {
+              metaType: 'text',
+              variant: 'p',
+              variantStyle: {
+                margin: '0',
+                fontSize: '{font.size.medium}',
+                color: '{color.primary.brand5}'
+              }
+            },
+            text: {
+              metaType: 'text',
+              variant: 'p',
+              variantStyle: {
+                margin: '0',
+                fontSize: '{font.size.medium}',
+                color: '{color.onsurface.black88}',
+                lineHeight: '1.5'
+              }
+            },
+            timestamp: {
+              metaType: 'text',
+              variant: 'p',
+              variantStyle: {
+                margin: '0',
+                fontSize: '{font.size.tiny}',
+                color: '{color.onsurface.black64}',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase'
+              }
+            },
+            cta_inline: {
+              metaType: 'button',
+              variant: 'link',
+              variantStyle: {
+                fontSize: '{font.size.small}',
+                fontWeight: '{font.fontweight.semibold}',
+                textDecoration: 'none'
+              }
+            }
+          },
+          itemLayout: [
+            {
+              name: 'leading',
+              condition: 'has:avatar',
+              style: {
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '{dimension.gap.supertight}',
+                width: '44px',
+                height: '44px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                background: '{color.surfacecontainer.black4}',
+                flexShrink: '0'
+              },
+              slots: ['avatar']
+            },
+            {
+              name: 'content',
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '{dimension.gap.supertight}',
+                flex: '1'
+              },
+              slotGroups: [
+                {
+                  name: 'textRow',
+                  style: {
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'flex-start',
+                    gap: '{dimension.gap.supertight}'
+                  },
+                  slots: ['icon', 'text']
+                }
+              ]
+            },
+            {
+              name: 'meta',
+              condition: 'has:timestamp || has:cta_inline',
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                gap: '{dimension.gap.supertight}',
+                marginLeft: '{dimension.margin.tight}'
+              },
+              slots: ['timestamp', 'cta_inline']
+            }
+          ]
+        }
+      },
+      slots: {
+        title: { required: false, optional: true },
+        subtitle: { required: false, optional: true },
+        items: {
+          required: true,
+          optional: false,
+          supportedAttributes: ['avatar', 'icon', 'timestamp', 'cta_label', 'cta_href', 'cta_variant']
+        }
       }
     }
   }

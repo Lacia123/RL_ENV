@@ -1012,7 +1012,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
                 dataKeys: [],
                 name: "layout",
                 "name-zh": `模板标签容器-${tagName}`,
-                "file-type": "template",
+                "file-type": "template",      
                 theme: "default",
                 _metadata: {
                     actualType: 'templateTag',

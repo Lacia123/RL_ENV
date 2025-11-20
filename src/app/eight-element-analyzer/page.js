@@ -1814,6 +1814,210 @@ wrapper: {
 💡 **提示**: 插槽标签系统完全生成标准八要素结构，可以被标准的 \`renderEightElementHtml.js\` 正常渲染。`
   },
 
+  metricCardDemo: {
+    name: '📈 卡片分类',
+    description: '提供所有卡片分类的示例',
+    markdown: `
+<layout:gallery>
+<metricCard>
+  <status_tag>高优先级</status_tag>
+  <time_range>过去7天</time_range>
+  <metric_label>准点率</metric_label>
+  <metric_value>92%</metric_value>
+  <trend_icon>↑</trend_icon>
+  <trend_value>+12%</trend_value>
+  <chart_mini chart="pie" title="笔记本市场占比">
+| 类型 | 占比 |
+|------|------|
+| 游戏本 | 40% |
+| 轻薄本 | 35% |
+| 工作站 | 25% |
+  </chart_mini>
+</metricCard>
+
+<metricCard>
+  <status_tag>正常</status_tag>
+  <time_range>本月</time_range>
+  <metric_label>客服满意度</metric_label>
+  <metric_value>4.8 / 5</metric_value>
+  <trend_icon>→</trend_icon>
+  <trend_value>+0.1</trend_value>
+</metricCard>
+
+<heroCard>
+  <cover_image src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900"></cover_image>
+  <badge>热门目的地</badge>
+  <title>发现你的下一站旅行</title>
+  <subtitle>个性化行程推荐，AI 智能规划，帮你找到更合适的旅程节奏。</subtitle>
+  <metrics>⭐ 4.9 · 128K 用户</metrics>
+  <metrics>🗺️ 320+ 城市灵感</metrics>
+  <cta_primary href="https://example.com/plan">开始计划</cta_primary>
+  <cta_secondary href="https://example.com/destinations">查看目的地</cta_secondary>
+</heroCard>
+
+<heroCard>
+  <badge>最新活动</badge>
+  <title>AI 峰会 2024</title>
+  <subtitle>探索人工智能的未来，与行业领袖共同探讨前沿技术与应用。</subtitle>
+  <metrics>📅 2024年10月26日</metrics>
+  <metrics>📍 线上/线下同步</metrics>
+  <cta_primary href="https://example.com/register">立即注册</cta_primary>
+  <cta_secondary href="https://example.com/agenda">查看议程</cta_secondary>
+</heroCard>
+
+<contentDisplayCard>
+  <image src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&h=900"></image>
+  <title>东京塔夜景体验</title>
+  <subtitle>专属夜间登塔通道，包含城市观景与调酒课程</subtitle>
+  <tags>人气</tags>
+  <tags>必去</tags>
+  <rating>⭐ 4.7 · 2.1k 评价</rating>
+  <location>东京 · 港区</location>
+  <price>￥980 起</price>
+  <cta href="https://example.com/tokyo-night">查看详情</cta>
+</contentDisplayCard>
+
+<contentDisplayCard>
+  <title>京都庭院茶屋</title>
+  <subtitle>私享茶道体验 · 传统和菓子 · 三小时沉浸式旅程</subtitle>
+  <tags>精选</tags>
+  <tags>文化体验</tags>
+  <rating>⭐ 4.9</rating>
+  <location>京都 · 祇园</location>
+  <price>￥560</price>
+  <cta href="https://example.com/kyoto-tea">预约体验</cta>
+</contentDisplayCard>
+<feedListCard>
+  <title>项目动态</title>
+  <subtitle>最新 3 条更新 · 自动排列列表项</subtitle>
+
+  <items>
+    <avatar src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200"></avatar>
+    <icon>🆕</icon>
+    <text>产品团队发布了新的 <strong>AI 摘要</strong> 模块，正在灰度测试。</text>
+    <timestamp>1 小时前</timestamp>
+    <cta_inline href="https://example.com/feedback">回复</cta_inline>
+  </items>
+
+  <items>
+    <avatar src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200"></avatar>
+    <icon>✅</icon>
+    <text>数据组完成了日志清洗，指标可视化延迟降至 <strong>320ms</strong>。</text>
+    <timestamp>2 小时前</timestamp>
+    <cta_inline href="https://example.com/thanks">点赞</cta_inline>
+  </items>
+
+  <items>
+    <icon>📝</icon>
+    <text>市场同学提交了 4 条客户反馈，需要设计 review。</text>
+    <timestamp>昨天</timestamp>
+    <cta_inline href="https://example.com/tasks">查看任务</cta_inline>
+  </items>
+</feedListCard>
+
+<actionCard>
+  <icon>🚀</icon>
+  <badge>限时优惠</badge>
+  <title>升级到专业版</title>
+  <description>解锁所有高级功能，享受专业级体验。现在升级可享受 30% 折扣优惠。</description>
+  <cta_primary href="https://example.com/upgrade">立即升级</cta_primary>
+  <cta_secondary href="https://example.com/features">了解功能</cta_secondary>
+</actionCard>
+
+<actionCard>
+  <badge>新功能</badge>
+  <title>开始使用 AI 助手</title>
+  <description>让 AI 帮助您更高效地完成任务，提升工作效率。</description>
+  <cta_primary href="https://example.com/ai-assistant">立即体验</cta_primary>
+</actionCard>
+
+<actionCard>
+  <icon>📧</icon>
+  <title>订阅我们的新闻通讯</title>
+  <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>
+  <cta_primary href="https://example.com/subscribe">订阅</cta_primary>
+  <cta_secondary href="https://example.com/unsubscribe">稍后再说</cta_secondary>
+</actionCard>
+
+<eventCard>
+  <image src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=800"></image>
+  <tag>限时</tag>
+  <event_title>AI 技术峰会 2024</event_title>
+  <event_time>📅 2024年10月26日 14:00-18:00</event_time>
+  <cta href="https://example.com/ai-summit">查看活动</cta>
+</eventCard>
+
+<eventCard>
+  <image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800"></image>
+  <tag>官方</tag>
+  <event_title>产品发布会：新一代智能平台</event_title>
+  <event_time>📅 2024年11月15日 10:00-12:00 · 线上直播</event_time>
+  <cta href="https://example.com/product-launch">立即报名</cta>
+</eventCard>
+
+<eventCard>
+  <tag>限时</tag>
+  <event_title>年终大促活动</event_title>
+  <event_time>📅 2024年12月1日 - 12月31日</event_time>
+  <cta href="https://example.com/promo">参与活动</cta>
+</eventCard>
+
+<statusCard>
+  <status_type>✅ 成功</status_type>
+  <message>系统更新已完成，所有服务正常运行</message>
+  <timestamp>2 分钟前</timestamp>
+  <cta href="https://example.com/details">查看详情</cta>
+</statusCard>
+
+<statusCard>
+  <status_type>🔄 进行中</status_type>
+  <message>正在部署新版本，预计 5 分钟后完成</message>
+  <progress>65%</progress>
+  <timestamp>刚刚</timestamp>
+  <cta href="https://example.com/monitor">监控进度</cta>
+</statusCard>
+
+<statusCard>
+  <status_type>⚠️ 警告</status_type>
+  <message>检测到异常流量，已启动防护机制</message>
+  <timestamp>10 分钟前</timestamp>
+  <cta href="https://example.com/security">安全中心</cta>
+</statusCard>
+
+<tableCard>
+  <icon>📊</icon>
+  <badge>年度报告</badge>
+  <title>2024 年度销售数据</title>
+  <subtitle>季度业绩对比分析</subtitle>
+  <description>本报告展示了全年四个季度的销售表现，包括销售额、增长率和目标完成情况。</description>
+  <table>
+| 季度 | 销售额(万) | 增长率 | 目标完成度 |
+|------|-----------|--------|-----------|
+| Q1 | 1250 | +12% | 104% |
+| Q2 | 1680 | +18% | 112% |
+| Q3 | 1920 | +15% | 108% |
+| Q4 | 2150 | +20% | 115% |
+  </table>
+  <footer>数据更新时间：2024-12-31 | 数据来源：财务系统</footer>
+</tableCard>
+
+<tableCard>
+  <icon>📦</icon>
+  <title>产品销量统计</title>
+  <subtitle>本月各产品线表现</subtitle>
+  <table>
+| 产品 | 销量 | 收入(万) | 占比 |
+|------|------|---------|------|
+| 产品A | 1250 | 320 | 35% |
+| 产品B | 980 | 280 | 30% |
+| 产品C | 750 | 220 | 24% |
+| 产品D | 420 | 100 | 11% |
+  </table>
+</tableCard>
+</layout:gallery>
+`
+  },
+
   smartCardDemo: {
     name: '🤖 智能自适应卡片',
     description: '展示根据插槽存在性自动调整布局的智能产品卡片',
@@ -1840,7 +2044,10 @@ wrapper: {
   <tags>健康监测 · 运动追踪</tags>
   <description>全天候健康监测，支持50+运动模式，7天超长续航，50米防水设计。</description>
   <price>$399</price>
-  <actions href="https://example.com/buy">立即购买</actions>
+  <actions>
+    <button variant="secondary" href="https://example.com/cart">添加至购物车</button>
+    <button href="https://example.com/buy">立即购买</button>
+  </actions>
 </smartProductCard>
 </layout:row>
 
@@ -1941,7 +2148,32 @@ wrapper: {
 
 ---
 
-### 场景 5：评分优先（突出口碑）
+### 场景 5：自定义页脚容器（footer 标签）
+
+<layout:row>
+<smartProductCard>
+  <badge>🛒 优选</badge>
+  <image src="https://images.unsplash.com/photo-1470246973918-29a93221c455?w=600&h=400"></image>
+  <title>云端智能音箱</title>
+  <rating>⭐⭐⭐⭐ 4.5</rating>
+  <tags>AI助手 · 多房间联动</tags>
+  <description>支持语音助手、蓝牙Mesh联动以及多房间立体声，适合智能家居场景。</description>
+  <price>$149</price>
+  <footer>
+    <button variant="secondary" href="https://example.com/cart">添加至购物车</button>
+    <button href="https://example.com/buy">立刻购买</button>
+  </footer>
+</smartProductCard>
+</layout:row>
+
+**特点**：
+- ✅ footer 标签可作为自定义容器
+- ✅ 容器内部可嵌套任意数量的 button 标签
+- ✅ 每个按钮仍可使用 variant / href 等属性
+
+---
+
+### 场景 6：评分优先（突出口碑）
 
 <layout:row>
 <smartProductCard>
@@ -1969,7 +2201,7 @@ wrapper: {
 智能卡片使用 \`autoDataAttributes\` 自动生成 data 属性：
 
 \`\`\`javascript
-autoDataAttributes: ['badge', 'image', 'rating', 'tags', 'description', 'price', 'actions']
+autoDataAttributes: ['badge', 'image', 'rating', 'tags', 'description', 'price', 'actions', 'footer']
 \`\`\`
 
 当提供某个插槽时，会自动添加对应的 \`data-{slotName}="true"\` 属性到容器元素上。

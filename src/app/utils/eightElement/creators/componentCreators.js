@@ -9,6 +9,7 @@ import resolveToken from '../../tokens/resolveToken.js';
 import { createTextElement } from './textCreators.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createBackgroundElement } from './backgroundCreators.js';
+import { createChartElement, createTableElement, extractTableOrChartData, sortTableData, generateChartSvg } from './tableCreators.js';
 import { stripMarkdownFormatting, processExpression, extractMarkdownValue, extractSubTagValue } from './markdownUtils.js';
 
 // 🔧 直接导入以避免动态 import（ES6 模块系统会处理循环依赖）
@@ -137,7 +138,7 @@ function buildStructureFromMode(mode, slotElementsMap, componentElement, compone
     
     // 🆕 如果没有传入 actualSlots，从 slotElementsMap 获取
     if (!actualSlots) {
-        actualSlots = new Set(slotElementsMap.keys());
+        actualSlots = getActualSlotsFromMap(slotElementsMap);
     }
     
     return buildGroups(mode.structure.groups, slotElementsMap, actualSlots, mode.name, depth);
@@ -218,13 +219,13 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, depth = 0) 
         else if (group.slots && Array.isArray(group.slots)) {
             // 收集该分组中实际存在的插槽元素
             const groupElements = [];
-            for (const slotName of group.slots) {
-                if (slotElementsMap.has(slotName)) {
-                    const element = slotElementsMap.get(slotName);
-                    groupElements.push(element);
-                    console.log(`${indent}    ✅ 添加插槽: ${slotName}`);
+            for (const slotPattern of group.slots) {
+                const matched = collectSlotElements(slotPattern, slotElementsMap);
+                if (matched.length > 0) {
+                    matched.forEach(() => console.log(`${indent}    ✅ 添加插槽: ${slotPattern}`));
+                    groupElements.push(...matched);
                 } else {
-                    console.log(`${indent}    ⏭️ 跳过不存在的插槽: ${slotName}`);
+                    console.log(`${indent}    ⏭️ 跳过不存在的插槽: ${slotPattern}`);
                 }
             }
             
@@ -270,6 +271,66 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, depth = 0) 
     
     console.log(`${indent}  🎉 [深度 ${depth}] 结构构建完成，共 ${children.length} 个元素`);
     return children;
+}
+
+function collectSlotElements(slotPattern, slotElementsMap) {
+    const results = [];
+    if (!slotPattern) return results;
+    
+    if (slotPattern.endsWith('*')) {
+        const base = slotPattern.slice(0, -1);
+        for (const [key, element] of slotElementsMap.entries()) {
+            if (matchesSlotPattern(key, element, base, true)) {
+                results.push(element);
+            }
+        }
+    } else {
+        for (const [key, element] of slotElementsMap.entries()) {
+            if (matchesSlotPattern(key, element, slotPattern, false)) {
+                results.push(element);
+                break;
+            }
+        }
+    }
+    
+    return results;
+}
+
+function matchesSlotPattern(key, element, pattern, isWildcard) {
+    const base = element?._metadata?.slotBaseName || element?._metadata?.slotName || key;
+    if (isWildcard) {
+        return key.startsWith(pattern) || base === pattern;
+    }
+    return key === pattern || base === pattern;
+}
+
+function getActualSlotsFromMap(slotElementsMap) {
+    const actualSlots = new Set();
+    slotElementsMap.forEach((element, key) => {
+        actualSlots.add(key);
+        const base = element?._metadata?.slotBaseName || element?._metadata?.slotName;
+        if (base) {
+            actualSlots.add(base);
+        }
+    });
+    return actualSlots;
+}
+
+function resolveSlotConfig(slotName, slotConfigs = {}) {
+    if (slotConfigs[slotName]) {
+        return slotConfigs[slotName];
+    }
+    
+    for (const [key, config] of Object.entries(slotConfigs)) {
+        if (key.endsWith('*')) {
+            const base = key.slice(0, -1);
+            if (slotName.startsWith(base)) {
+                return config;
+            }
+        }
+    }
+    
+    return null;
 }
 
 // ==================== 插槽标签解析 ====================
@@ -438,6 +499,7 @@ function parseSingleLineSlot(line) {
 export function parseSlotTags(content) {
     const lines = content.split('\n');
     const slots = [];
+    const slotNameCounts = {};
     let i = 0;
     
     console.log(`\n🔍 开始解析插槽标签...`);
@@ -453,6 +515,7 @@ export function parseSlotTags(content) {
             console.log(`  ✅ 发现单行插槽: ${singleLineSlot.slotName}`);
             console.log(`     内容: "${singleLineSlot.slotContent}"`);
             console.log(`     属性:`, singleLineSlot.attributes);
+            enrichSlotName(singleLineSlot, slotNameCounts);
             slots.push(singleLineSlot);
             i++;
             continue;
@@ -465,6 +528,7 @@ export function parseSlotTags(content) {
             const slotData = extractSlotContent(lines, i);
             console.log(`    内容: "${slotData.slotContent}"`);
             console.log(`    属性:`, slotData.attributes);
+            enrichSlotName(slotData, slotNameCounts);
             slots.push(slotData);
             i = slotData.endIndex + 1;
         } else {
@@ -474,6 +538,18 @@ export function parseSlotTags(content) {
     
     console.log(`  ✅ 共解析到 ${slots.length} 个插槽`);
     return slots;
+}
+
+function enrichSlotName(slotData, slotNameCounts) {
+    const baseName = slotData.slotName;
+    slotNameCounts[baseName] = (slotNameCounts[baseName] || 0) + 1;
+    const count = slotNameCounts[baseName];
+    if (count === 1) {
+        slotData.baseSlotName = baseName;
+        return;
+    }
+    slotData.baseSlotName = baseName;
+    slotData.slotName = `${baseName}#${count}`;
 }
 
 /**
@@ -491,8 +567,12 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
     }
     
     const { slotContent, attributes } = slotData;
+    const baseSlotName = slotData?.baseSlotName || slotName;
     
     console.log(`\n🎰 创建插槽元素: ${slotName}`);
+    if (baseSlotName !== slotName) {
+        console.log(`  基础插槽名: ${baseSlotName}`);
+    }
     console.log('  配置:', slotConfig);
     console.log('  内容:', slotContent);
     console.log('  属性:', attributes);
@@ -508,8 +588,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             "file-type": "template",
             theme: "default",
             _metadata: {
-                actualType: 'slotContainer',
-                slotName: slotName
+                actualType: 'slotContainer'
             },
             layout: {
                 style: slotConfig.style || {},
@@ -521,6 +600,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             id: generateUUID(),
             events: [{}]
         };
+        annotateElementSlotMetadata(containerElement, slotName, baseSlotName);
         
         // 如果有内容，创建文本元素作为子元素
         if (slotContent) {
@@ -536,44 +616,95 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
     if (slotConfig.type === 'template' && slotConfig.metaType) {
         console.log('  模式: 元素+容器');
         
-        // 先创建内部元素
-        let innerElement = null;
+        // 先创建内部元素（可能是多个，比如 actions 里的多个按钮）
+        const innerElements = [];
         
         if (slotConfig.metaType === 'text') {
             console.log(`    创建文本元素: variant=${slotConfig.variant}`);
-            innerElement = createTextElement(
+            const textElement = createTextElement(
                 slotContent || '',
                 slotConfig.variant || 'p',
                 {},  // richTextOptions
                 slotConfig.variantStyle || null  // customStyles
             );
+            if (textElement) {
+                innerElements.push(textElement);
+            }
         } else if (slotConfig.metaType === 'button') {
-            const buttonUrl = attributes.href || '#';
-            const buttonText = slotContent || '';
-            console.log(`    创建按钮元素: text="${buttonText}", url=${buttonUrl}, variant=${slotConfig.variant}`);
-            innerElement = createButtonElement(
-                buttonText,
-                buttonUrl,
-                slotConfig.variant || 'primary',
-                currentMarkdown,
-                buttonText  // displayText - 显式指定显示文本
-            );
+            const nestedButtons = extractInlineButtons(slotContent);
             
-            // 如果有 variantStyle，应用到按钮的 classStyle
-            if (slotConfig.variantStyle && innerElement) {
-                Object.assign(innerElement.layout.classStyle, slotConfig.variantStyle);
+            if (nestedButtons.length > 0) {
+                console.log(`    在插槽 "${slotName}" 中解析到 ${nestedButtons.length} 个 button 标签`);
+                nestedButtons.forEach((buttonDef, index) => {
+                    const buttonElement = buildButtonElementFromDefinition(
+                        slotConfig,
+                        buttonDef.content,
+                        buttonDef.attributes,
+                        attributes,
+                        currentMarkdown,
+                        `${slotName}-${index}`
+                    );
+                    
+                    if (buttonElement) {
+                        innerElements.push(buttonElement);
+                    }
+                });
+            } else {
+                const buttonElement = buildButtonElementFromDefinition(
+                    slotConfig,
+                    slotContent,
+                    {}, // 没有内部属性
+                    attributes,
+                    currentMarkdown,
+                    slotName
+                );
+                
+                if (buttonElement) {
+                    innerElements.push(buttonElement);
+                }
             }
         } else if (slotConfig.metaType === 'image') {
             const imageUrl = attributes.src || '';
             console.log(`    创建图片元素: src=${imageUrl}, variant=${slotConfig.variant}`);
-            innerElement = createBackgroundElement(
+            const imageElement = createBackgroundElement(
                 imageUrl,
                 slotConfig.variant || 'normal',
                 slotConfig.variantStyle || null
             );
+            
+            if (imageElement) {
+                innerElements.push(imageElement);
+            }
+        } else if (slotConfig.metaType === 'chart') {
+            const chartElement = buildChartElementFromContent(
+                slotName,
+                slotConfig,
+                slotContent,
+                attributes
+            );
+            if (chartElement) {
+                innerElements.push(chartElement);
+            }
+        } else if (slotConfig.metaType === 'feedItem') {
+            const feedItemElement = buildFeedItemLayout(
+                slotName,
+                slotConfig,
+                slotContent,
+                attributes,
+                currentMarkdown
+            );
+            if (feedItemElement) {
+                innerElements.push(feedItemElement);
+            }
+        } else if (slotConfig.metaType === 'table') {
+            console.log(`    创建表格元素: content length=${slotContent?.length || 0}`);
+            const tableElement = createTableElement(slotContent || '');
+            if (tableElement) {
+                innerElements.push(tableElement);
+            }
         }
         
-        if (!innerElement) {
+        if (innerElements.length === 0) {
             console.warn(`  ❌ 无法创建插槽 "${slotName}" 的内部元素`);
             return null;
         }
@@ -587,19 +718,19 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             theme: "default",
             _metadata: {
                 actualType: 'slotContainer',
-                slotName: slotName,
                 containedElementType: slotConfig.metaType
             },
             layout: {
                 style: slotConfig.style || {},
                 classStyle: {},
                 className: `slot-${slotName}`,
-                children: [innerElement]
+                children: innerElements
             },
             description: `插槽容器 - ${slotName}`,
             id: generateUUID(),
             events: [{}]
         };
+        annotateElementSlotMetadata(containerElement, slotName, baseSlotName);
         
         console.log(`  ✅ 创建元素+容器成功`);
         return containerElement;
@@ -643,14 +774,22 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                 slotConfig.variant || 'normal',
                 slotConfig.variantStyle || null
             );
+        } else if (slotConfig.metaType === 'chart') {
+            element = buildChartElementFromContent(
+                slotName,
+                slotConfig,
+                slotContent,
+                attributes
+            );
+        } else if (slotConfig.metaType === 'table') {
+            console.log(`    创建表格元素: content length=${slotContent?.length || 0}`);
+            // 使用 createTableElement 创建表格元素
+            element = createTableElement(slotContent || '');
         }
         
         if (element) {
             // 为直接元素添加 slotName 元数据
-            if (!element._metadata) {
-                element._metadata = {};
-            }
-            element._metadata.slotName = slotName;
+            annotateElementSlotMetadata(element, slotName, baseSlotName);
             console.log(`  ✅ 创建直接元素成功`);
         } else {
             console.warn(`  ❌ 创建元素失败`);
@@ -659,6 +798,473 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
     }
     
     console.warn(`插槽 "${slotName}" 的配置格式不正确`);
+    return null;
+}
+
+function annotateElementSlotMetadata(element, slotName, baseSlotName) {
+    if (!element) return;
+    if (!element._metadata) {
+        element._metadata = {};
+    }
+    element._metadata.slotName = baseSlotName;
+    element._metadata.slotBaseName = baseSlotName;
+    element._metadata.slotUniqueName = slotName;
+}
+
+/**
+ * 解析插槽内容中的 button 标签
+ * @param {string} slotContent - 插槽内容
+ * @returns {Array<{content: string, attributes: Object}>}
+ */
+function extractInlineButtons(slotContent) {
+    if (!slotContent || !slotContent.includes('<button')) {
+        return [];
+    }
+    
+    const buttons = [];
+    const buttonRegex = /<button\b([^>]*)>([\s\S]*?)<\/button>/gi;
+    let match;
+    
+    while ((match = buttonRegex.exec(slotContent)) !== null) {
+        const attributesStr = (match[1] || '').trim();
+        const content = (match[2] || '').trim();
+        const attributes = parseAttributes(attributesStr);
+        
+        if (content) {
+            buttons.push({ content, attributes });
+        }
+    }
+    
+    return buttons;
+}
+
+/**
+ * 根据按钮定义创建按钮元素
+ */
+function buildButtonElementFromDefinition(slotConfig, buttonText, buttonAttributes = {}, outerAttributes = {}, currentMarkdown = '', debugLabel = '') {
+    const finalText = (buttonText || '').trim();
+    
+    if (!finalText) {
+        console.warn(`  ⚠️ 按钮${debugLabel ? ` (${debugLabel})` : ''} 内容为空，跳过`);
+        return null;
+    }
+    
+    const buttonUrl = buttonAttributes.href || buttonAttributes.url || outerAttributes.href || outerAttributes.url || '#';
+    const buttonVariant = buttonAttributes.variant || slotConfig.variant || 'primary';
+    
+    console.log(`    创建按钮元素${debugLabel ? ` [${debugLabel}]` : ''}: text="${finalText}", url=${buttonUrl}, variant=${buttonVariant}`);
+    
+    const buttonElement = createButtonElement(
+        finalText,
+        buttonUrl,
+        buttonVariant,
+        currentMarkdown,
+        finalText
+    );
+    
+    applyVariantStyleToButton(buttonElement, slotConfig.variantStyle);
+    
+    return buttonElement;
+}
+
+/**
+ * 将插槽级别的 variantStyle 应用到按钮元素
+ */
+function applyVariantStyleToButton(buttonElement, variantStyle) {
+    if (!buttonElement || !variantStyle) {
+        return;
+    }
+    
+    if (!buttonElement.layout) {
+        buttonElement.layout = {};
+    }
+    
+    buttonElement.layout.classStyle = {
+        ...(buttonElement.layout.classStyle || {}),
+        ...variantStyle
+    };
+}
+
+/**
+ * 创建图表插槽元素
+ */
+function buildChartElementFromContent(slotName, slotConfig, slotContent, attributes = {}) {
+    const trimmedContent = (slotContent || '').trim();
+    if (!trimmedContent) {
+        console.warn(`  ⚠️ 插槽 "${slotName}" 的图表内容为空，跳过`);
+        return null;
+    }
+
+    const chartType = attributes.chart || 'line';
+    const chartTitle = attributes.title || null;
+    const sortOrder = attributes.sort || null;
+    const tableLines = trimmedContent
+        .split('\n')
+        .map(line => line.trimEnd())
+        .filter(line => line.trim().length > 0);
+
+    if (tableLines.length === 0) {
+        console.warn(`  ⚠️ 插槽 "${slotName}" 的图表缺少表格数据，跳过`);
+        return null;
+    }
+
+    const headerParts = [chartType];
+    if (chartTitle) {
+        headerParts.push(chartTitle);
+    }
+    if (sortOrder) {
+        headerParts.push(sortOrder);
+    }
+    const syntheticHeader = `[chart:${headerParts.join('|')}]`;
+    const syntheticLines = [syntheticHeader, ...tableLines];
+
+    try {
+        const chartData = extractTableOrChartData(syntheticLines, 0);
+        const finalChartType = chartData.chartType || chartType;
+        const finalChartTitle = chartData.chartTitle || chartTitle;
+        const finalSortOrder = sortOrder || chartData.sortOrder;
+        const sortedTableData = sortTableData(chartData.tableData, finalSortOrder);
+
+        const chartElement = createChartElement(
+            finalChartType,
+            '',
+            sortedTableData,
+            chartData.tableContent,
+            slotConfig.variant || 'mini',
+            finalChartTitle,
+            []
+        );
+
+        const chartStyleConfig = {
+            variant: slotConfig.variant || 'mini',
+            title: chartElement.layout?.title,
+            legend: chartElement.layout?.legend,
+            axis: chartElement.layout?.axis
+        };
+
+        const svgContent = generateChartSvg(finalChartType, sortedTableData, chartStyleConfig, finalChartTitle);
+        chartElement.svgContent = svgContent;
+
+        const svgElement = {
+            id: generateUUID(),
+            name: "svg",
+            "name-zh": "SVG图表",
+            "file-type": "cell-element",
+            type: "svg",
+            _metadata: {
+                actualType: 'svg',
+                isChartSvg: true
+            },
+            layout: {
+                style: {
+                    width: "100%",
+                    height: "auto",
+                    display: "block"
+                }
+            },
+            svgContent
+        };
+
+        chartElement.layout = chartElement.layout || {};
+        chartElement.layout.children = chartElement.layout.children || [];
+        chartElement.layout.children.push(svgElement);
+
+        chartElement._metadata = chartElement._metadata || {};
+        chartElement._metadata.slotName = slotName;
+
+        console.log(`  ✅ 创建图表元素成功: type=${finalChartType}, slots=${slotName}`);
+        return chartElement;
+    } catch (error) {
+        console.error(`  ❌ 创建图表元素失败 (${slotName}):`, error);
+        return null;
+    }
+}
+
+function buildFeedItemLayout(slotName, slotConfig, slotContent = '', attributes = {}, currentMarkdown = '') {
+    const itemStyles = slotConfig.itemStyles || {};
+    const subSlots = slotConfig.subSlots || {};
+    const parsed = parseFeedItemSlotContent(slotContent || '', subSlots);
+
+    const subSlotElements = new Map();
+    const subSlotPresence = new Set();
+
+    Object.keys(subSlots).forEach(subSlotName => {
+        const element = createElementForSubSlot(
+            subSlotName,
+            parsed[subSlotName],
+            subSlots[subSlotName],
+            parsed.fallbackText,
+            attributes,
+            currentMarkdown
+        );
+
+        if (element) {
+            subSlotElements.set(subSlotName, element);
+            subSlotPresence.add(subSlotName);
+        }
+    });
+
+    if (!subSlotElements.has('text') && parsed.fallbackText && subSlots.text) {
+        const fallbackElement = createElementForSubSlot(
+            'text',
+            { content: parsed.fallbackText, attributes: {} },
+            subSlots.text,
+            parsed.fallbackText,
+            attributes,
+            currentMarkdown
+        );
+
+        if (fallbackElement) {
+            subSlotElements.set('text', fallbackElement);
+            subSlotPresence.add('text');
+        }
+    }
+
+    const rowElement = createFeedLayoutNode(itemStyles.row || {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: '12px'
+    }, `信息列表行-${slotName}`);
+
+    const layoutDefinition = getFeedItemLayoutDefinition(slotConfig);
+    buildFeedItemSections(layoutDefinition, rowElement, subSlotElements, subSlotPresence);
+
+    if (subSlotElements.size > 0) {
+        const residualContainer = createFeedLayoutNode({}, '信息列表补充区域');
+        subSlotElements.forEach(element => {
+            residualContainer.layout.children.push(element);
+        });
+
+        if (residualContainer.layout.children.length > 0) {
+            rowElement.layout.children.push(residualContainer);
+        }
+    }
+
+    return rowElement;
+}
+
+function createFeedLayoutNode(style = {}, label = '信息列表布局', children = []) {
+    const id = generateUUID();
+    const computedStyle = { ...(style || {}) };
+    return {
+        dataKeys: [],
+        name: "layout",
+        "name-zh": label,
+        "file-type": "template",
+        theme: "default",
+        layout: {
+            style: computedStyle,
+            classStyle: {},
+            className: `feed-${id}`,
+            children: children ? [...children] : []
+        },
+        description: label,
+        id,
+        events: [{}]
+    };
+}
+
+function parseFeedItemSlotContent(rawContent = '', subSlotConfigs = {}) {
+    const tagNames = Object.keys(subSlotConfigs);
+    const result = {};
+
+    if (tagNames.length === 0) {
+        return { fallbackText: rawContent.trim() };
+    }
+
+    tagNames.forEach(tag => {
+        result[tag] = extractFeedSubTag(rawContent, tag);
+    });
+
+    let cleaned = rawContent;
+    tagNames.forEach(tag => {
+        const openCloseRegex = new RegExp(`<${tag}(\\s[^>]*)?>[\\s\\S]*?<\\/${tag}>`, 'gi');
+        const selfClosingRegex = new RegExp(`<${tag}(\\s[^>]*)?\\/>`, 'gi');
+        cleaned = cleaned.replace(openCloseRegex, ' ');
+        cleaned = cleaned.replace(selfClosingRegex, ' ');
+    });
+
+    cleaned = cleaned.replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    result.fallbackText = cleaned;
+    return result;
+}
+
+function extractFeedSubTag(rawContent = '', tagName = '') {
+    if (!rawContent || !tagName) return null;
+
+    const openCloseRegex = new RegExp(`<${tagName}(\\s[^>]*)?>([\\s\\S]*?)<\/${tagName}>`, 'i');
+    const openCloseMatch = rawContent.match(openCloseRegex);
+    if (openCloseMatch) {
+        return {
+            content: (openCloseMatch[2] || '').trim(),
+            attributes: parseAttributes(openCloseMatch[1] || '')
+        };
+    }
+
+    const selfClosingRegex = new RegExp(`<${tagName}(\\s[^>]*)?\\/>`, 'i');
+    const selfClosingMatch = rawContent.match(selfClosingRegex);
+    if (selfClosingMatch) {
+        return {
+            content: '',
+            attributes: parseAttributes(selfClosingMatch[1] || '')
+        };
+    }
+
+    return null;
+}
+
+function buildFeedItemSections(layoutDefinition = [], rowElement, slotElementsMap, slotPresenceSet) {
+    if (!Array.isArray(layoutDefinition) || layoutDefinition.length === 0) {
+        slotElementsMap.forEach(element => rowElement.layout.children.push(element));
+        slotElementsMap.clear();
+        return;
+    }
+
+    layoutDefinition.forEach(section => {
+        if (section.condition && !evaluateLayoutCondition(section.condition, slotPresenceSet)) {
+            return;
+        }
+
+        const sectionNode = createFeedLayoutNode(section.style || {}, `信息列表-${section.name || 'section'}`);
+        let added = false;
+
+        if (Array.isArray(section.slotGroups)) {
+            section.slotGroups.forEach(group => {
+                if (group.condition && !evaluateLayoutCondition(group.condition, slotPresenceSet)) {
+                    return;
+                }
+
+                const groupNode = createFeedLayoutNode(group.style || {}, `信息列表-${section.name || 'section'}-${group.name || 'group'}`);
+                const groupAdded = appendSlotsToContainer(group.slots, groupNode, slotElementsMap);
+                if (groupAdded) {
+                    sectionNode.layout.children.push(groupNode);
+                    added = true;
+                }
+            });
+        }
+
+        if (appendSlotsToContainer(section.slots, sectionNode, slotElementsMap)) {
+            added = true;
+        }
+
+        if (added && sectionNode.layout.children.length > 0) {
+            rowElement.layout.children.push(sectionNode);
+        }
+    });
+}
+
+function appendSlotsToContainer(slotNames = [], containerNode, slotElementsMap) {
+    if (!Array.isArray(slotNames) || slotNames.length === 0) {
+        return false;
+    }
+
+    let added = false;
+    slotNames.forEach(slotName => {
+        const element = slotElementsMap.get(slotName);
+        if (element) {
+            containerNode.layout.children.push(element);
+            slotElementsMap.delete(slotName);
+            added = true;
+        }
+    });
+
+    return added;
+}
+
+function getFeedItemLayoutDefinition(slotConfig = {}) {
+    if (Array.isArray(slotConfig.itemLayout) && slotConfig.itemLayout.length > 0) {
+        return slotConfig.itemLayout;
+    }
+
+    return [
+        {
+            name: 'leading',
+            condition: 'has:avatar',
+            slots: ['avatar']
+        },
+        {
+            name: 'content',
+            slotGroups: [
+                {
+                    name: 'textRow',
+                    slots: ['icon', 'text']
+                }
+            ]
+        },
+        {
+            name: 'meta',
+            condition: 'has:timestamp || has:cta_inline',
+            slots: ['timestamp', 'cta_inline']
+        }
+    ];
+}
+
+function createElementForSubSlot(subSlotName, slotData, subSlotConfig, fallbackText = '', parentAttributes = {}, currentMarkdown = '') {
+    if (!subSlotConfig) {
+        return null;
+    }
+
+    const metaType = subSlotConfig.metaType || 'text';
+    let content = (slotData?.content || '').trim();
+    const slotAttributes = { ...(slotData?.attributes || {}) };
+
+    if (!content && subSlotName === 'text' && fallbackText) {
+        content = fallbackText;
+    }
+
+    if (metaType === 'text') {
+        if (!content) return null;
+        return createTextElement(
+            content,
+            subSlotConfig.variant || 'p',
+            {},
+            subSlotConfig.variantStyle || null
+        );
+    }
+
+    if (metaType === 'image') {
+        const src = slotAttributes.src || content || parentAttributes[`${subSlotName}`] || parentAttributes[`${subSlotName}_src`] || '';
+        if (!src) return null;
+
+        const imageElement = createBackgroundElement(src, subSlotConfig.variant || 'normal');
+        if (subSlotConfig.variantStyle) {
+            imageElement.layout = imageElement.layout || {};
+            imageElement.layout.classStyle = {
+                ...(imageElement.layout.classStyle || {}),
+                ...subSlotConfig.variantStyle
+            };
+        }
+        return imageElement;
+    }
+
+    if (metaType === 'button') {
+        const label = content || subSlotConfig.defaultText || '';
+        if (!label) return null;
+
+        const href = slotAttributes.href || slotAttributes.url || parentAttributes[`${subSlotName}_href`] || parentAttributes.href || '#';
+        const variant = slotAttributes.variant || subSlotConfig.variant || parentAttributes[`${subSlotName}_variant`] || 'link';
+
+        const buttonElement = createButtonElement(label, href, variant, currentMarkdown, label);
+        if (subSlotConfig.variantStyle) {
+            applyVariantStyleToButton(buttonElement, subSlotConfig.variantStyle);
+        }
+        return buttonElement;
+    }
+
+    if (metaType === 'icon') {
+        if (!content) return null;
+        return createTextElement(
+            content,
+            subSlotConfig.variant || 'p',
+            {},
+            subSlotConfig.variantStyle || null
+        );
+    }
+
     return null;
 }
 
@@ -1175,10 +1781,11 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         // 为每个插槽创建对应的元素
         slots.forEach(slotData => {
             const { slotName } = slotData;
-            const slotConfig = componentConfig.slotConfigs[slotName];
+            const baseSlotName = slotData.baseSlotName || slotName;
+            const slotConfig = resolveSlotConfig(baseSlotName, componentConfig.slotConfigs);
             
             if (!slotConfig) {
-                console.warn(`  ⚠️ 未找到插槽 "${slotName}" 的配置`);
+                console.warn(`  ⚠️ 未找到插槽 "${baseSlotName}" 的配置`);
                 return;
             }
             
@@ -1202,7 +1809,7 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
             console.log(`\n🎛️ 组件 "${variant}" 使用布局模式系统`);
             
             // 获取实际存在的插槽名称集合
-            const actualSlots = new Set(slotElementsMap.keys());
+            const actualSlots = getActualSlotsFromMap(slotElementsMap);
             
             // 选择合适的布局模式
             const selectedMode = selectLayoutMode(componentConfig.layoutModes, actualSlots);

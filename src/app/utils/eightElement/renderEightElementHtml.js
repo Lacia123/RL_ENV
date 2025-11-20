@@ -1308,6 +1308,10 @@ function processStyleReferences(processedElement, originalElement, styleConfig) 
  * @param {any} value - 样式属性值
  */
 function applyStylesToElement(computedStyle, key, value) {
+    if (typeof value === 'string' && value.includes('{')) {
+        value = resolveInlineTokens(value);
+    }
+
     // 特殊属性名映射
     const specialPropertyMap = {
         // 布局相关
@@ -1322,7 +1326,6 @@ function applyStylesToElement(computedStyle, key, value) {
 
         // 背景相关
         'fill': 'backgroundColor',
-        'background': 'backgroundColor',
 
         // 边框相关
         'strokeColor': 'borderColor',
@@ -1360,6 +1363,15 @@ function applyStylesToElement(computedStyle, key, value) {
         const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
         computedStyle[cssKey] = value;
     }
+}
+
+function resolveInlineTokens(value) {
+    if (typeof value !== 'string') return value;
+    return value.replace(/\{([^}]+)\}/g, (match, tokenPath) => {
+        const token = `{${tokenPath}}`;
+        const resolved = resolveToken(token);
+        return resolved !== token ? resolved : match;
+    });
 }
 
 /**
