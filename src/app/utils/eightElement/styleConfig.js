@@ -8,6 +8,7 @@ import { text } from 'd3';
 import { fontSize } from '../icons/Edit/index.js';
 import resolveToken from '../tokens/resolveToken.js';
 import border from '../tokens/color/border.js';
+import margin from '../tokens/dimension/margin.js';
 
 // CSS变量系统
 export const CSS_VARIABLE_SYSTEM = {
@@ -930,7 +931,7 @@ export const DEFAULT_STYLE_CONFIG = {
       margin: "0"
     },
     heroTitle: {
-      fontSize: "{font.size.xxxl}",
+      fontSize: "{font.size.xxl}",
       fontWeight: "{font.fontweight.bold}",
       letterSpacing: "-0.02em",
       color: "{color.onprimary.white100}",
@@ -938,7 +939,7 @@ export const DEFAULT_STYLE_CONFIG = {
       lineHeight: "1.1"
     },
     heroSubtitle: {
-      fontSize: "{font.size.large}",
+      fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.medium}",
       color: "{color.onprimary.white88}",
       margin: "0",
@@ -950,9 +951,10 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.semibold}",
       color: "{color.onprimary.white100}",
       margin: "0",
-      padding: "{dimension.padding.supertight} {dimension.padding.tight}",
+      padding: "{dimension.padding.base} {dimension.padding.tight}",
       borderRadius: "{dimension.borderradius.large}",
-      background: "rgba(255,255,255,0.16)",
+      backdropFilter: 'blur(10px)',
+      background: 'rgba(255,255,255,0.15)',
       border: "1px solid rgba(255,255,255,0.24)",
       letterSpacing: "0.02em"
     },
@@ -4787,7 +4789,8 @@ export const DEFAULT_STYLE_CONFIG = {
                   inset: '0',
                   zIndex: '0',
                   overflow: 'hidden',
-                  borderRadius: '{dimension.borderradius.xxxl}'
+                  borderRadius: '{dimension.borderradius.xxxl}',
+                  padding: '0'
                 }
               },
               {
@@ -4829,7 +4832,7 @@ export const DEFAULT_STYLE_CONFIG = {
                     type: 'template',
                     style: {
                       display: 'flex',
-                      flexWrap: 'wrap',
+                      flexDirection: 'column',
                       gap: '{dimension.gap.tight}'
                     }
                   },
@@ -4841,6 +4844,7 @@ export const DEFAULT_STYLE_CONFIG = {
                     style: {
                       display: 'flex',
                       flexDirection: 'row',
+                      justifyContent: 'flex-end',
                       gap: '{dimension.gap.tight}',
                       flexWrap: 'wrap'
                     }
@@ -4895,7 +4899,7 @@ export const DEFAULT_STYLE_CONFIG = {
                 type: 'template',
                 style: {
                   display: 'flex',
-                  flexWrap: 'wrap',
+                  flexDirection: 'column',
                   gap: '{dimension.gap.tight}'
                 }
               },
@@ -4907,6 +4911,7 @@ export const DEFAULT_STYLE_CONFIG = {
                 style: {
                   display: 'flex',
                   flexDirection: 'row',
+                  justifyContent: 'flex-end',
                   gap: '{dimension.gap.tight}',
                   flexWrap: 'wrap'
                 }
@@ -4935,22 +4940,33 @@ export const DEFAULT_STYLE_CONFIG = {
             position: 'absolute',
             inset: '0',
             zIndex: '0',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            padding: '0',
+            margin: '0'
           },
           metaType: 'image',
           variant: 'background',
+          variantStyle: {
+            padding: '0',
+            margin: '0'
+          }
         },
         badge: {
           metaType: 'text',
           variant: 'p',
           variantStyle: {
+            display: 'inline-block',
             fontSize: '{font.size.tiny}',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
+            color: '{color.onprimary.white100}',
+            padding: '{dimension.padding.tight}',
             borderRadius: '{dimension.borderradius.large}',
+            borderColor: '{color.onprimary.white100}',
+            borderWidth: '{dimension.borderwidth.narrow}',
+            backdropFilter: 'blur(10px)',
             background: 'rgba(255,255,255,0.15)',
-            border: '1px solid rgba(255,255,255,0.35)',
+            borderStyle: 'solid',
             margin: '0'
           }
         },
@@ -5580,7 +5596,7 @@ export const DEFAULT_STYLE_CONFIG = {
                     type: 'template',
                     style: {
                       display: 'flex',
-                      justifyContent: 'flex-start',
+                      justifyContent: 'flex-end',
                       marginTop: '{dimension.margin.tight}'
                     }
                   }
@@ -5632,7 +5648,7 @@ export const DEFAULT_STYLE_CONFIG = {
                 type: 'template',
                 style: {
                   display: 'flex',
-                  justifyContent: 'flex-start',
+                  justifyContent: 'flex-end',
                   marginTop: '{dimension.margin.tight}'
                 }
               }
@@ -5658,7 +5674,9 @@ export const DEFAULT_STYLE_CONFIG = {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            display: 'block'
+            display: 'block',
+            padding: '0',
+            margin: '0'
           },
           supportedAttributes: ['src', 'alt']
         },

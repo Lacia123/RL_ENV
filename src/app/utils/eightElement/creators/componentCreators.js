@@ -668,9 +668,17 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             console.log(`    创建图片元素: src=${imageUrl}, variant=${slotConfig.variant}`);
             const imageElement = createBackgroundElement(
                 imageUrl,
-                slotConfig.variant || 'normal',
-                slotConfig.variantStyle || null
+                slotConfig.variant || 'normal'
             );
+            
+            // 🆕 应用 variantStyle 来覆盖默认样式（特别是 padding 和 margin）
+            if (slotConfig.variantStyle && imageElement) {
+                imageElement.layout = imageElement.layout || {};
+                imageElement.layout.style = {
+                    ...(imageElement.layout.style || {}),
+                    ...slotConfig.variantStyle
+                };
+            }
             
             if (imageElement) {
                 innerElements.push(imageElement);
@@ -771,9 +779,17 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             console.log(`    创建图片元素: src=${imageUrl}, variant=${slotConfig.variant}`);
             element = createBackgroundElement(
                 imageUrl,
-                slotConfig.variant || 'normal',
-                slotConfig.variantStyle || null
+                slotConfig.variant || 'normal'
             );
+            
+            // 🆕 应用 variantStyle 来覆盖默认样式（特别是 padding 和 margin）
+            if (slotConfig.variantStyle && element) {
+                element.layout = element.layout || {};
+                element.layout.style = {
+                    ...(element.layout.style || {}),
+                    ...slotConfig.variantStyle
+                };
+            }
         } else if (slotConfig.metaType === 'chart') {
             element = buildChartElementFromContent(
                 slotName,
@@ -1233,8 +1249,14 @@ function createElementForSubSlot(subSlotName, slotData, subSlotConfig, fallbackT
         const imageElement = createBackgroundElement(src, subSlotConfig.variant || 'normal');
         if (subSlotConfig.variantStyle) {
             imageElement.layout = imageElement.layout || {};
+            // 🆕 应用 variantStyle 到 classStyle（用于样式属性）
             imageElement.layout.classStyle = {
                 ...(imageElement.layout.classStyle || {}),
+                ...subSlotConfig.variantStyle
+            };
+            // 🆕 也应用到 style 中以覆盖 layout column 的默认 padding/margin
+            imageElement.layout.style = {
+                ...(imageElement.layout.style || {}),
                 ...subSlotConfig.variantStyle
             };
         }
