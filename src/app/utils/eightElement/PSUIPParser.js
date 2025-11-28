@@ -1812,13 +1812,13 @@ function parseMarkdown(markdown, options = {}) {
         // 从 styleConfig 获取 hyperlink 样式并解析 tokens
         const hyperlinkStyle = DEFAULT_STYLE_CONFIG.text?.hyperlink || {};
         
-        const fontSize = hyperlinkStyle.fontSize ? (resolveToken(hyperlinkStyle.fontSize) || hyperlinkStyle.fontSize) : 'inherit';
-        const fontWeight = hyperlinkStyle.fontWeight ? (resolveToken(hyperlinkStyle.fontWeight) || hyperlinkStyle.fontWeight) : '500';
-        const color = hyperlinkStyle.color ? (resolveToken(hyperlinkStyle.color) || hyperlinkStyle.color) : '#615eec';
-        const textDecoration = hyperlinkStyle.textDecoration || 'none';
+        const fontSize = 'inherit';
+        const fontWeight = '500';
+        const color = '#615eec';
+        const textDecoration = 'none';
         // 🔧 borderBottom 也需要解析 token（可能包含颜色 token）
-        const borderBottom = hyperlinkStyle.borderBottom ? (resolveToken(hyperlinkStyle.borderBottom) || hyperlinkStyle.borderBottom) : '2px solid #bcbef7';
-        const transition = hyperlinkStyle.transition ? (resolveToken(hyperlinkStyle.transition) || hyperlinkStyle.transition) : 'all 0.3s ease';
+        const borderBottom = '2px solid #bcbef7';
+        const transition = 'all 0.3s ease';
         
         // 同时使用 CSS 类（支持 hover）和内联样式（作为备用）
         const inlineStyle = `font-size: ${fontSize}; font-weight: ${fontWeight}; color: ${color}; text-decoration: ${textDecoration}; border-bottom: ${borderBottom}; transition: ${transition};`;
