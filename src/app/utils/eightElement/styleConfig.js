@@ -5040,6 +5040,8 @@ export const DEFAULT_STYLE_CONFIG = {
                   borderRadius: '{dimension.borderradius.large}',
                   overflow: 'hidden',
                   aspectRatio: '4 / 3',
+                  margin: 0,
+                  padding: 0,
                   background: '{color.surfacecontainer.black7}'
                 }
               },
@@ -5075,15 +5077,39 @@ export const DEFAULT_STYLE_CONFIG = {
                   {
                     name: 'infoRow',
                     condition: 'has:rating || has:location || has:price',
-                    slots: ['rating', 'location', 'price'],
                     type: 'template',
                     style: {
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '{dimension.gap.base}',
-                      flexWrap: 'wrap'
-                    }
+                      flexDirection: 'column',
+                      borderRadius: '{dimension.borderradius.large}',
+                      background: '{color.primarycontainer.brand0}',
+                      padding: '{dimension.padding.base}',
+                      gap: '{dimension.gap.base}'
+                    },
+                    groups: [
+                      {
+                        name: 'priceRow',
+                        condition: 'has:price',
+                        slots: ['price'],
+                        type: 'template',
+                        style: {
+                          display: 'flex',
+                          justifyContent: 'flex-start'
+                        }
+                      },
+                      {
+                        name: 'ratingLocationRow',
+                        condition: 'has:rating || has:location',
+                        slots: ['rating', 'location'],
+                        type: 'template',
+                        style: {
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '{dimension.gap.base}',
+                          flexWrap: 'wrap'
+                        }
+                      }
+                    ]
                   },
                   {
                     name: 'ctaRow',
@@ -5147,15 +5173,39 @@ export const DEFAULT_STYLE_CONFIG = {
                   {
                     name: 'infoRow',
                     condition: 'has:rating || has:location || has:price',
-                    slots: ['rating', 'location', 'price'],
                     type: 'template',
                     style: {
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '{dimension.gap.base}',
-                      flexWrap: 'wrap'
-                    }
+                      flexDirection: 'column',
+                      borderRadius: '{dimension.borderradius.large}',
+                      background: '{color.primarycontainer.brand0}',
+                      padding: '{dimension.padding.base}',
+                      gap: '{dimension.gap.base}'
+                    },
+                    groups: [
+                      {
+                        name: 'priceRow',
+                        condition: 'has:price',
+                        slots: ['price'],
+                        type: 'template',
+                        style: {
+                          display: 'flex',
+                          justifyContent: 'flex-start'
+                        }
+                      },
+                      {
+                        name: 'ratingLocationRow',
+                        condition: 'has:rating || has:location',
+                        slots: ['rating', 'location'],
+                        type: 'template',
+                        style: {
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '{dimension.gap.base}',
+                          flexWrap: 'wrap'
+                        }
+                      }
+                    ],
                   },
                   {
                     name: 'ctaRow',
@@ -5190,6 +5240,8 @@ export const DEFAULT_STYLE_CONFIG = {
           variantStyle: {
             width: '100%',
             height: '100%',
+            margin: 0,
+            padding: 0,
             objectFit: 'cover',
             display: 'block'
           },
@@ -5223,8 +5275,8 @@ export const DEFAULT_STYLE_CONFIG = {
             fontWeight: '{font.fontweight.semibold}',
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            color: '{color.onsurface.black76}',
-            background: '{color.surfacecontainer.black4}',
+            color: '{color.primary.brand4}',
+            background: '{color.primarycontainer.brand0}',
             padding: '{dimension.padding.supertight} {dimension.padding.tight}',
             borderRadius: '{dimension.borderradius.large}'
           }
