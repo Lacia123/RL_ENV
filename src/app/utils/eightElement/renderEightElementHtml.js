@@ -210,7 +210,6 @@ export function renderEightElementToHtml(eightElement, options = {}) {
     // 创建HTML文档尾部
     const htmlFooter = `
       </div>
-      
       <!-- 🆕 Markdown 编辑器覆盖层 -->
       <div class="editor-overlay" id="editor-overlay">
         <div class="editor-container">

@@ -1820,11 +1820,18 @@ wrapper: {
     markdown: `
 <layout:gallery>
 <metricCard>
-  <status_tag>高优先级</status_tag>
+  <status>正常</status>
+  <time_range>本月</time_range>
+  <metric_label>客服满意度</metric_label>
+  <metric_value>4.8 / 5</metric_value>
+  <trend_value>+0.1</trend_value>
+</metricCard>
+
+<metricCard>
+  <status>高优先级</status>
   <time_range>过去7天</time_range>
   <metric_label>准点率</metric_label>
   <metric_value>92%</metric_value>
-  <trend_icon>↑</trend_icon>
   <trend_value>+12%</trend_value>
   <chart_mini chart="pie" title="笔记本市场占比">
 | 类型 | 占比 |
@@ -1833,15 +1840,6 @@ wrapper: {
 | 轻薄本 | 35% |
 | 工作站 | 25% |
   </chart_mini>
-</metricCard>
-
-<metricCard>
-  <status_tag>正常</status_tag>
-  <time_range>本月</time_range>
-  <metric_label>客服满意度</metric_label>
-  <metric_value>4.8 / 5</metric_value>
-  <trend_icon>→</trend_icon>
-  <trend_value>+0.1</trend_value>
 </metricCard>
 
 <heroCard>

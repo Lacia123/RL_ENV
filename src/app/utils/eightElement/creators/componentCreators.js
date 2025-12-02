@@ -21,6 +21,32 @@ import { generateSlotDataAttributes, separateConditionalStyles, validateSlotsCon
 // ==================== 🆕 Layout Modes 系统 ====================
 
 /**
+ * 生成简单的 hash 值用于确保 class 名称唯一性
+ * @param {string} str - 要生成 hash 的字符串
+ * @returns {number} hash 值
+ */
+function generateHash(str) {
+    if (!str) return 0;
+    return str.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
+}
+
+/**
+ * 生成唯一的 group className，包含 hash 以避免不同组件 / 模式间的样式冲突
+ * @param {string} componentName - 组件名称（如 heroCard, contentDisplayCard）
+ * @param {string} modeName - 模式名称（如 default, withImage）
+ * @param {string} groupName - group 名称（如 ctaRow）
+ * @returns {string} 唯一的 className
+ */
+function generateGroupClassName(componentName, modeName, groupName) {
+    const safeComponentName = componentName || 'component';
+    const safeModeName = modeName || 'mode';
+    const safeGroupName = groupName || 'group';
+    const hashInput = `${safeComponentName}-${safeModeName}-${safeGroupName}`;
+    const hash = Math.abs(generateHash(hashInput));
+    return `group-${safeComponentName}-${safeGroupName}-hash${hash}`;
+}
+
+/**
  * 评估布局条件
  * @param {string} condition - 条件表达式 (如 'has:image', 'no:title', 'default')
  * @param {Set} actualSlots - 实际存在的插槽名称集合
@@ -140,8 +166,22 @@ function buildStructureFromMode(mode, slotElementsMap, componentElement, compone
     if (!actualSlots) {
         actualSlots = getActualSlotsFromMap(slotElementsMap);
     }
+
+    // 提取组件名称用于生成唯一的 group className
+    const componentName =
+        (componentElement && componentElement._metadata && componentElement._metadata.componentName) ||
+        componentConfig?.name ||
+        'component';
     
-    return buildGroups(mode.structure.groups, slotElementsMap, actualSlots, mode.name, depth);
+    return buildGroups(
+        mode.structure.groups,
+        slotElementsMap,
+        actualSlots,
+        mode.name,
+        componentName,
+        componentConfig,
+        depth
+    );
 }
 
 /**
@@ -150,10 +190,12 @@ function buildStructureFromMode(mode, slotElementsMap, componentElement, compone
  * @param {Map} slotElementsMap - 插槽元素映射
  * @param {Set} actualSlots - 实际存在的插槽名称集合
  * @param {string} modeName - 模式名称
+ * @param {string} componentName - 组件名称（用于生成唯一的 group className）
+ * @param {Object} componentConfig - 组件配置（用于访问 slotConfigs 等）
  * @param {number} depth - 当前嵌套深度
  * @returns {Array} 构建后的子元素数组
  */
-function buildGroups(groups, slotElementsMap, actualSlots, modeName, depth = 0) {
+function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentName, componentConfig, depth = 0) {
     const indent = '  '.repeat(depth);
     const children = [];
     
@@ -179,7 +221,15 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, depth = 0) 
             console.log(`${indent}  🔄 分组 "${group.name}" 包含嵌套分组，递归处理...`);
             
             // 递归构建嵌套分组
-            const nestedChildren = buildGroups(group.groups, slotElementsMap, actualSlots, modeName, depth + 1);
+            const nestedChildren = buildGroups(
+                group.groups,
+                slotElementsMap,
+                actualSlots,
+                modeName,
+                componentName,
+                componentConfig,
+                depth + 1
+            );
             
             if (nestedChildren.length === 0) {
                 console.log(`${indent}  ⚠️ 嵌套分组 "${group.name}" 没有任何元素，跳过`);
@@ -204,7 +254,7 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, depth = 0) 
                     layout: {
                         style: { ...groupStyle },
                         classStyle: groupStyle,
-                        className: `group-${group.name}`,
+                        className: generateGroupClassName(componentName, modeName, group.name),
                         children: nestedChildren
                     }
                 };
@@ -233,6 +283,34 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, depth = 0) 
                 console.log(`${indent}  ⚠️ 分组 "${group.name}" 没有任何元素，跳过`);
                 continue;
             }
+
+            // 🆕 如果配置了 styleReference，则使用引用的 slot 样式对当前分组内的元素做样式覆盖
+            if (group.styleReference && componentConfig && componentConfig.slotConfigs) {
+                const refSlotConfig = componentConfig.slotConfigs[group.styleReference];
+                if (refSlotConfig) {
+                    const refStyles = refSlotConfig.variantStyle || {};
+                    if (Object.keys(refStyles).length > 0) {
+                        console.log(`${indent}  🎨 分组 "${group.name}" 使用 styleReference="${group.styleReference}" 覆盖样式`);
+                        groupElements.forEach(el => {
+                            if (!el || !el.layout) return;
+                            // 只对有 slot 元数据的元素应用（避免误伤其他容器）
+                            if (!el._metadata || !el._metadata.slotName) return;
+                            
+                            // 将引用样式合并到 classStyle 和 style，保证覆盖生效
+                            el.layout.classStyle = {
+                                ...(el.layout.classStyle || {}),
+                                ...refStyles
+                            };
+                            el.layout.style = {
+                                ...(el.layout.style || {}),
+                                ...refStyles
+                            };
+                        });
+                    }
+                } else {
+                    console.warn(`${indent}  ⚠️ styleReference "${group.styleReference}" 未在 slotConfigs 中找到`);
+                }
+            }
             
             // 如果指定了 type: 'template'，创建容器
             if (group.type === 'template') {
@@ -252,7 +330,7 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, depth = 0) 
                     layout: {
                         style: { ...groupStyle },
                         classStyle: groupStyle,
-                        className: `group-${group.name}`,
+                        className: generateGroupClassName(componentName, modeName, group.name),
                         children: groupElements
                     }
                 };

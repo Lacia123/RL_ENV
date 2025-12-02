@@ -4480,12 +4480,13 @@ export const DEFAULT_STYLE_CONFIG = {
             boxShadow: '{material.hierarchy.1f}',
             border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
           },
+
           structure: {
             groups: [
               {
                 name: 'metaRow',
-                condition: 'has:status_tag || has:time_range',
-                slots: ['status_tag', 'time_range'],
+                condition: 'has:metric_label || has:time_range',
+                slots: ['metric_label', 'time_range'],
                 type: 'template',
                 style: {
                   display: 'flex',
@@ -4516,30 +4517,45 @@ export const DEFAULT_STYLE_CONFIG = {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '{dimension.gap.tight}',
-                      flex: '1'
+                      justifyContent: 'space-between',
+                      flex: '1',
+                      padding: '{dimension.padding.base} 0'
                     },
                     groups: [
                       {
-                        name: 'labelRow',
-                        slots: ['metric_label']
-                      },
-                      {
-                        name: 'valueRow',
-                        slots: ['metric_value']
-                      },
-                      {
-                        name: 'trendRow',
-                        condition: 'has:trend_icon || has:trend_value',
-                        slots: ['trend_icon', 'trend_value'],
+                        name: 'metricContainer',
                         type: 'template',
+                        condition: 'has:metric_label || has:metric_value || has:trend_value',
                         style: {
                           display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          gap: '{dimension.gap.supertight}'
-                        }
+                          flexDirection: 'column',
+                          gap: '{dimension.gap.tight}',
+                        },
+                        groups: [
+                          {
+                            name: 'valueRow',
+                            slots: ['metric_value']
+                          },
+                          {
+                            name: 'trendRow',
+                            condition: 'has:trend_value',
+                            slots: ['trend_value'],
+                            type: 'template',
+                            style: {
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: '{dimension.gap.supertight}'
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        name: 'status',
+                        slots: ['status']
                       }
                     ]
+
                   },
                   {
                     name: 'chartMini',
@@ -4579,8 +4595,8 @@ export const DEFAULT_STYLE_CONFIG = {
             groups: [
               {
                 name: 'metaRow',
-                condition: 'has:status_tag || has:time_range',
-                slots: ['status_tag', 'time_range'],
+                condition: 'has:metric_label || has:time_range',
+                slots: ['metric_label', 'time_range'],
                 type: 'template',
                 style: {
                   display: 'flex',
@@ -4595,52 +4611,51 @@ export const DEFAULT_STYLE_CONFIG = {
                 }
               },
               {
-                name: 'metricColumn',
+                name: 'contentRow',
                 type: 'template',
                 style: {
                   display: 'flex',
-                  flexDirection: 'column',
-                  gap: '{dimension.gap.tight}'
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                 },
                 groups: [
                   {
-                    name: 'labelRow',
-                    slots: ['metric_label']
-                  },
-                  {
-                    name: 'valueRow',
-                    slots: ['metric_value']
-                  },
-                  {
-                    name: 'trendRow',
-                    condition: 'has:trend_icon || has:trend_value',
-                    slots: ['trend_icon', 'trend_value'],
+                    name: 'metricColumn',
                     type: 'template',
                     style: {
                       display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: '{dimension.gap.supertight}'
-                    }
+                      flexDirection: 'column',
+                      gap: '{dimension.gap.tight}',
+                    },
+                    groups: [
+                      {
+                        name: 'valueRow',
+                        slots: ['metric_value']
+                      },
+                      {
+                        name: 'trendRow',
+                        condition: 'has:trend_icon || has:trend_value',
+                        slots: ['trend_icon', 'trend_value'],
+                        type: 'template',
+                        style: {
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: '{dimension.gap.supertight}'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    name: 'status',
+                    slots: ['status'],
+                    styleReference: 'status_large'
                   }
                 ]
               },
               {
-                name: 'chartMiniDefault',
-                condition: 'has:chart_mini',
-                slots: ['chart_mini'],
-                type: 'template',
-                style: {
-                  width: '100%',
-                  minHeight: '120px',
-                  padding: '{dimension.padding.base}',
-                  background: '{color.surfacecontainer.white96}',
-                  borderRadius: '{dimension.borderradius.large}',
-                  border: '1px solid {color.surfacecontainer.black8}',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }
+
               }
             ]
           }
@@ -4674,28 +4689,13 @@ export const DEFAULT_STYLE_CONFIG = {
             opacity: '0.85'
           }
         },
-        trend_icon: {
-          metaType: 'text',
-          variant: 'p',
-          variantStyle: {
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minWidth: '32px',
-            height: '32px',
-            fontSize: '{font.size.medium}',
-            fontWeight: '{font.fontweight.semibold}',
-            margin: '0',
-            padding: '0',
-            borderRadius: '50%',
-            background: '{color.surface.green1}',
-            color: '{color.success.green6}'
-          }
-        },
         trend_value: {
           metaType: 'text',
           variant: 'p',
           variantStyle: {
+            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
+            background: '{color.success.green1}',
+            borderRadius: '{dimension.borderradius.medium}',
             fontSize: '{font.size.small}',
             fontWeight: '{font.fontweight.semibold}',
             color: '{color.success.green6}',
@@ -4730,20 +4730,26 @@ export const DEFAULT_STYLE_CONFIG = {
             margin: '0'
           }
         },
-        status_tag: {
+        status: {
           metaType: 'text',
           variant: 'p',
           variantStyle: {
-            fontSize: '{font.size.tiny}',
+            fontSize: '{font.size.xl}',
             fontWeight: '{font.fontweight.bold}',
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
-            borderRadius: '{dimension.borderradius.medium}',
-            background: '{color.surface.blue1}',
             color: '{color.primary.brand5}',
-            margin: '0',
-            boxShadow: '{material.hierarchy.B1}'
+          }
+        },
+        status_large: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            fontSize: '{font.size.xxxl}',
+            fontWeight: '{font.fontweight.bold}',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: '{color.primary.brand5}',
           }
         }
       },
@@ -4754,7 +4760,7 @@ export const DEFAULT_STYLE_CONFIG = {
         trend_value: { required: false, optional: true },
         chart_mini: { required: false, optional: true, supportedAttributes: ['chart', 'title', 'sort'] },
         time_range: { required: false, optional: true },
-        status_tag: { required: false, optional: true }
+        status: { required: false, optional: true }
       }
     },
 
@@ -5118,7 +5124,7 @@ export const DEFAULT_STYLE_CONFIG = {
                     type: 'template',
                     style: {
                       display: 'flex',
-                      justifyContent: 'flex-end'
+                      justifyContent: 'flex-start'
                     }
                   }
                 ]
@@ -5214,7 +5220,7 @@ export const DEFAULT_STYLE_CONFIG = {
                     type: 'template',
                     style: {
                       display: 'flex',
-                      justifyContent: 'flex-end'
+                      justifyContent: 'flex-start'
                     }
                   }
                 ]
@@ -5648,7 +5654,6 @@ export const DEFAULT_STYLE_CONFIG = {
                     type: 'template',
                     style: {
                       display: 'flex',
-                      justifyContent: 'flex-end',
                       marginTop: '{dimension.margin.tight}'
                     }
                   }
@@ -5700,7 +5705,6 @@ export const DEFAULT_STYLE_CONFIG = {
                 type: 'template',
                 style: {
                   display: 'flex',
-                  justifyContent: 'flex-end',
                   marginTop: '{dimension.margin.tight}'
                 }
               }
