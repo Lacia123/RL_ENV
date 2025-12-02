@@ -1604,10 +1604,17 @@ export function extractComponentParameters(parameterDefinitions, markdownData, c
 function extractParameterFromContent(paramName, paramConfig, content) {
     if (!content || !paramConfig.source) return null;
     
-    // 尝试从子标签提取: <paramName>value</paramName>
-    let value = extractSubTagValue(content, paramName);
+    let value = null;
     
-    // 如果没有找到子标签，尝试从 markdown 格式提取
+    // 优先根据 source 从子标签提取: <source>value</source>
+    value = extractSubTagValue(content, paramConfig.source);
+    
+    // 如果根据 source 没找到，再尝试使用参数名作为标签名: <paramName>value</paramName>
+    if (!value) {
+        value = extractSubTagValue(content, paramName);
+    }
+    
+    // 如果仍然没有找到子标签，尝试从 markdown 格式提取
     if (!value) {
         value = extractMarkdownValue(content, paramConfig.source, paramConfig.expression);
     }
@@ -1915,6 +1922,15 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
             const selectedMode = selectLayoutMode(componentConfig.layoutModes, actualSlots);
             
             if (selectedMode) {
+                // 🆕 先应用组件基础样式（包括通过 parameters 注入的变量），再叠加模式样式
+                if (processedStyle && Object.keys(processedStyle).length > 0) {
+                    componentElement.layout.classStyle = {
+                        ...processedStyle,
+                        ...componentElement.layout.classStyle
+                    };
+                    console.log(`  🎨 应用组件基础样式（含参数）:`, Object.keys(processedStyle));
+                }
+
                 // 🔧 应用选中模式的容器样式（合并到 classStyle，确保优先级）
                 if (selectedMode.style) {
                     // 合并模式样式到 classStyle（覆盖原有样式）

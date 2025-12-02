@@ -4669,7 +4669,8 @@ export const DEFAULT_STYLE_CONFIG = {
         padding: '{dimension.padding.loose}',
         background: '{color.surfacecontainer.white100}',
         boxShadow: '{material.hierarchy.1f}',
-        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}',
+        
       },
       slotConfigs: {
         metric_value: {
@@ -5237,7 +5238,7 @@ export const DEFAULT_STYLE_CONFIG = {
         padding: '{dimension.padding.loose}',
         background: '{color.surfacecontainer.white100}',
         boxShadow: '{material.hierarchy.1f}',
-        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+        border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}',
       },
       slotConfigs: {
         image: {
@@ -5798,6 +5799,13 @@ export const DEFAULT_STYLE_CONFIG = {
     // 🔔 系统状态卡（System Status / Update Card）
     statusCard: {
       type: 'template',
+      // 使用 progress 插槽内容作为参数，驱动进度条宽度
+      parameters: {
+        progressValue: {
+          source: 'progress',              // 从 <progress>65%</progress> 中取值
+          expression: 'replace(\"%\", \"\")' // 去掉百分号，只保留数字
+        }
+      },
       layoutModes: [
         {
           name: 'withProgress',
@@ -5953,6 +5961,7 @@ export const DEFAULT_STYLE_CONFIG = {
         }
       ],
       style: {
+        '--status-progress': '$progressValue',
         display: 'flex',
         flexDirection: 'column',
         gap: '{dimension.gap.base}',
@@ -6006,12 +6015,14 @@ export const DEFAULT_STYLE_CONFIG = {
             margin: '0',
             fontSize: '{font.size.tiny}',
             color: '{color.onsurface.black64}',
-            // 进度条会通过 CSS 变量和伪元素实现
+            // 进度条填充部分，通过 CSS 变量控制宽度
             display: 'block',
             height: '100%',
             background: 'linear-gradient(90deg, {color.primary.brand6} 0%, {color.primary.brand5} 100%)',
             borderRadius: 'inherit',
-            transition: 'width 0.3s ease'
+            transition: 'width 0.3s ease',
+            // 使用 statusCard 根上的 --status-progress（0-100），映射到宽度百分比
+            width: 'calc(var(--status-progress, 0) * 1%)'
           }
         },
         timestamp: {
