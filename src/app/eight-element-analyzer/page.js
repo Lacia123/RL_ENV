@@ -1474,6 +1474,36 @@ const userRoles = {
     | 工作站 | 25% |
 
     </card:minimalistChartCard>
+
+    ## 组件标签测试
+
+    ### 方式一：使用 markdown 自动映射
+
+    <layout:row>
+    <simpleCard>
+    ### AI芯片
+    #### 搭载最新AI处理器
+    </simpleCard>
+
+    <simpleCard>
+    ### 智能助手
+    #### 24小时在线服务
+    </simpleCard>
+    </layout:row>
+
+    ### 方式二：使用嵌套标签（去掉markdown符号）
+
+    <layout:row>
+    <simpleCard>
+    <itemTitle>## 云存储</itemTitle>
+    <itemDescription>### 1TB免费空间</itemDescription>
+    </simpleCard>
+
+    <simpleCard>
+    <itemTitle>安全加密</itemTitle>
+    <itemDescription>企业级数据保护</itemDescription>
+    </simpleCard>
+    </layout:row>
     `
   }
 };

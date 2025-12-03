@@ -6,8 +6,10 @@ import resolveToken from '../tokens/resolveToken.js';
 import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './creators/tableCreators.js';
 import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './creators/codeCreators.js';
 import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot } from './creators/layoutCreators.js';
-import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch, processTemplatePathWithWildcard } from './creators/cardCreators.js';
+
+import { extractCardBlock, createCardElement, isCardTag, isComponentTag, extractComponentBlock, findWildcardMatch, processTemplatePathWithWildcard } from './creators/cardCreators.js';
 import { isListItem, processListItemAndRichText, createTextElement, createHeadingBlockContainer, createHyperlinkElement } from './creators/textCreators.js';
+
 import { parseButtonVariant, createButtonElement, createVerticalButtonLayout } from './creators/buttonCreators.js';
 import { createBackgroundElement } from './creators/backgroundCreators.js';
 import { createIconElement } from './creators/iconCreators.js';
@@ -184,6 +186,12 @@ function parseCustomStyleTag(line) {
     const attributesStr = match[2] || '';
     const content = match[3].trim();
 
+    // 🔧 修复：只处理带属性的标签，纯模板标签（无属性）不在这里处理
+    // 这样可以避免模板标签被错误地当作自定义样式标签处理
+    if (!attributesStr.trim()) {
+        return null; // 没有属性，不是自定义样式标签
+    }
+
     // 解析属性
     const customStyles = {};
     if (attributesStr.trim()) {
@@ -216,8 +224,6 @@ function parseCustomStyleTag(line) {
             customStyles[cssProperty] = attrValue;
         }
     }
-
-    console.log(`🎨 解析到自定义样式标签: ${tagName}, 内容: "${content}", 样式:`, customStyles);
 
     return {
         variant: tagName,
@@ -1135,6 +1141,58 @@ function parseMarkdown(markdown, options = {}) {
             stack[stack.length - 1].elements.push(cardElement);
 
             // 跳过已处理的卡片标签行
+            i = endIndex;
+            continue;
+        }
+
+        // 处理组件标签（如 <simpleCard>）
+        const componentTagInfo = isComponentTag(trimmedLine);
+        if (componentTagInfo.isComponentTag && !componentTagInfo.isClosing) {
+
+            // 处理之前累积的内容
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            // 如果正在处理列表，先结束列表
+            if (inList && listItems.length > 0) {
+                const listLayout = createLayoutElement(
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                    listItems,
+                    {
+                        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                    }
+                );
+                stack[stack.length - 1].elements.push(listLayout);
+                inList = false;
+                listItems = [];
+            }
+
+            // 提取组件标签内容
+            const { componentContent, componentName, attributes, endIndex } = extractComponentBlock(
+                markedLines.map(item => item.line),
+                i
+            );
+
+            // 🔧 修复：组件需要特殊处理，因为它们在 component 配置下，不是 card 配置
+            // 创建一个模拟的 card 元素结构来包装组件
+            const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[componentName];
+            if (componentConfig) {
+                // 使用 createCardElement，但传入完整的配置作为样式
+                const componentElement = createCardElement(componentContent, componentName, attributes, currentMarkdown);
+                
+                // 修正元素的配置来源为 component
+                if (componentElement && componentElement._metadata) {
+                    componentElement._metadata.isComponent = true;
+                    componentElement._metadata.configSource = 'component';
+                }
+                
+                stack[stack.length - 1].elements.push(componentElement);
+            } else {
+                console.warn(`组件 ${componentName} 的配置未找到`);
+            }
+
+            // 跳过已处理的组件标签行
             i = endIndex;
             continue;
         }

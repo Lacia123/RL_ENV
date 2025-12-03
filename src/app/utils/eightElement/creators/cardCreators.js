@@ -65,6 +65,105 @@ function isCardTag(line) {
     return { isCardTag: false };
 }
 
+// 检测是否为组件标签（如 <simpleCard>）
+function isComponentTag(line) {
+    // 匹配开始标签: <componentName attr1="value1" attr2="value2"> 或 <componentName>
+    // 注意：不匹配 card:, layout:, tab: 等已有的命名空间标签
+    const componentTagMatch = line.trim().match(/^<(?!card:|layout:|tab:|\/)([\w]+)([^>]*)>$/);
+    if (componentTagMatch) {
+        const componentName = componentTagMatch[1];
+        const attributesStr = componentTagMatch[2].trim();
+
+        // 🔧 修复：检查 component 配置，不是 card 配置
+        const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[componentName];
+        if (!componentConfig) {
+            return { isComponentTag: false };
+        }
+
+        // 解析属性
+        const attributes = {};
+        if (attributesStr) {
+            // 匹配 key="value" 或 key={token.value} 格式的属性
+            const attrRegex = /(\w+)=(?:["']([^"']*?)["']|\{([^}]*?)\})/g;
+            let attrMatch;
+            while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
+                const key = attrMatch[1];
+                const value = attrMatch[2] || attrMatch[3]; // 支持引号和大括号格式
+                attributes[key] = value;
+            }
+        }
+
+        return {
+            isComponentTag: true,
+            componentName: componentName,
+            attributes: attributes,
+            isClosing: false
+        };
+    }
+
+    // 匹配结束标签 </componentName>
+    const closingTagMatch = line.trim().match(/^<\/([\w]+)>$/);
+    if (closingTagMatch) {
+        const componentName = closingTagMatch[1];
+        
+        // 🔧 修复：检查 component 配置，不是 card 配置
+        const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[componentName];
+        if (componentConfig) {
+            return {
+                isComponentTag: true,
+                componentName: componentName,
+                attributes: {},
+                isClosing: true
+            };
+        }
+    }
+
+    return { isComponentTag: false };
+}
+
+// 提取组件标签块
+function extractComponentBlock(lines, startIndex) {
+    const startLine = lines[startIndex];
+    const startTagInfo = isComponentTag(startLine);
+
+    if (!startTagInfo.isComponentTag || startTagInfo.isClosing) {
+        console.error('无效的组件标签起始行');
+        return { componentContent: '', componentName: '', attributes: {}, endIndex: startIndex };
+    }
+
+    const componentName = startTagInfo.componentName;
+    const attributes = startTagInfo.attributes || {};
+    const contentLines = [];
+    let i = startIndex + 1;
+    let foundEnd = false;
+
+    // 查找对应的结束标签
+    while (i < lines.length) {
+        const line = lines[i];
+        const tagInfo = isComponentTag(line);
+
+        if (tagInfo.isComponentTag && tagInfo.isClosing && tagInfo.componentName === componentName) {
+            foundEnd = true;
+            i++;
+            break;
+        }
+
+        contentLines.push(line);
+        i++;
+    }
+
+    if (!foundEnd) {
+        console.warn(`警告: 未找到组件标签 ${componentName} 的结束标签`);
+    }
+
+    return {
+        componentContent: contentLines.join('\n').trim(),
+        componentName: componentName,
+        attributes: attributes,
+        endIndex: i - 1
+    };
+}
+
 // 解析分组模式，支持 h3+h4+p:group 这种语法
 function parseGroupPattern(pattern) {
     const groupMatch = pattern.match(/^(.+):group$/);
@@ -534,10 +633,16 @@ function createCardUpdateEvent(cardId, variant, sanitizedContent, options = {}) 
 // 创建卡片元素
 function createCardElement(content, variant = 'standard', attributes = {}, currentMarkdown = '', options = {}) {
     const id = generateUUID();
-    const sanitizedCardContent = sanitizeCardContent(content || '');
-    const { rawTag = '', attributeMeta = {} } = options || {};
-    // 获取卡片元素的样式配置
-    let cardStyleConfig = getElementStyleConfig('card', variant);
+    // 🔧 修复：首先尝试从 component 配置获取，如果不存在再从 card 配置获取
+    let cardStyleConfig = null;
+    
+    // 优先检查 component 配置
+    if (DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[variant]) {
+        cardStyleConfig = DEFAULT_STYLE_CONFIG.component[variant];
+    } else {
+        // 回退到 card 配置
+        cardStyleConfig = getElementStyleConfig('card', variant);
+    }
 
     // 🆕 处理 classList 和 defaultClass
     // 深拷贝以避免修改原配置
@@ -719,6 +824,32 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
 }
 
 
+// 清理 markdown 格式符号，保留纯文本内容
+function stripMarkdownFormatting(text) {
+    if (!text) return text;
+    
+    let cleaned = text.trim();
+    
+    // 去掉标题符号 (# ## ### 等)
+    cleaned = cleaned.replace(/^#{1,6}\s+/, '');
+    
+    // 去掉粗体 ** 或 __
+    cleaned = cleaned.replace(/\*\*(.+?)\*\*/g, '$1');
+    cleaned = cleaned.replace(/__(.+?)__/g, '$1');
+    
+    // 去掉斜体 * 或 _
+    cleaned = cleaned.replace(/\*(.+?)\*/g, '$1');
+    cleaned = cleaned.replace(/_(.+?)_/g, '$1');
+    
+    // 去掉删除线 ~~
+    cleaned = cleaned.replace(/~~(.+?)~~/g, '$1');
+    
+    // 去掉行内代码 `
+    cleaned = cleaned.replace(/`(.+?)`/g, '$1');
+    
+    return cleaned;
+}
+
 // 创建模板标签元素, TODO: 需要重构
 function createTemplateTagElement(tagName, content, cardStyleConfig, markdownData = null, currentMarkdown = '') {
 
@@ -877,7 +1008,6 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
 
     // 检查是否为元件引用（回退到原有逻辑）
     if (tagConfig.metaType && tagConfig.variant) {
-
         // 🆕 处理自定义样式覆盖
         let finalVariant = tagConfig.variant;
         let styleOverride = null;
@@ -993,8 +1123,10 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             // 递归解析嵌套的模板标签
             children = parseTemplateCardContent(content, tagConfig, false, currentMarkdown);
         } else {
+            // 🆕 如果是文本类型且没有被前面的逻辑处理，清理 markdown 符号
+            const cleanedContent = tagConfig.metaType === 'text' ? stripMarkdownFormatting(content) : content;
             // 解析为普通内容
-            const parsedContent = parseMarkdown(content, { currentMarkdown });
+            const parsedContent = parseMarkdown(cleanedContent, { currentMarkdown });
             children = parsedContent;
         }
     }
@@ -1860,7 +1992,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
             const tagContent = inlineTemplateTagMatch[2];
 
             // 创建模板标签元素
-            const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig);
+            const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig, null, currentMarkdown);
             if (templateElement) {
                 children.push(templateElement);
             }
@@ -1876,7 +2008,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                 const { tagContent, endIndex } = extractTemplateTag(lines, i, tagName);
 
                 // 创建模板标签元素
-                const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig);
+                const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig, null, currentMarkdown);
                 if (templateElement) {
                     children.push(templateElement);
                 }
@@ -2135,8 +2267,10 @@ function createComponentElement(content, variant, markdownData = null, styleOver
 
 export {
     isCardTag,
+    isComponentTag,
     extractWildcardMatch,
     extractCardBlock,
+    extractComponentBlock,
     findWildcardMatch,
     createCardElement,
     processTemplatePathWithWildcard,
