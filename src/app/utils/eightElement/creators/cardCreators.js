@@ -552,6 +552,10 @@ function createCardUpdateEvent(cardId, variant, sanitizedContent, options = {}) 
 // 创建卡片元素
 function createCardElement(content, variant = 'standard', attributes = {}, currentMarkdown = '', options = {}) {
     const id = generateUUID();
+    // 从 options 中提取 rawTag 和 attributeMeta（如果存在）
+    const rawTag = options.rawTag || '';
+    const attributeMeta = options.attributeMeta || {};
+    
     // 🔧 修复：首先尝试从 component 配置获取，如果不存在再从 card 配置获取
     let cardStyleConfig = null;
     
@@ -673,6 +677,9 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
         console.log(`  处理 required 容器:`, cardStyleConfig.required);
         processRequiredContainers(cardStyleConfig, cardChildren, cardStyleConfig, paramValues);
     }
+
+    // 清理并规范化卡片内容（用于事件和元数据）
+    const sanitizedCardContent = sanitizeCardContent(content);
 
     const cardUpdateEvent = createCardUpdateEvent(
         id,
