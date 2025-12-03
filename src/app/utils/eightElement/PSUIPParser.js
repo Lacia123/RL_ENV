@@ -1179,9 +1179,11 @@ function parseMarkdown(markdown, options = {}) {
             continue;
         }
 
-        // 处理组件标签（如 <simpleCard>）
+        // 处理组件标签（如 <simpleCard> 或 <halfCirclePrecent fillColor={...}>）
         const componentTagInfo = isComponentTag(trimmedLine);
         if (componentTagInfo.isComponentTag && !componentTagInfo.isClosing) {
+            console.log(`\n🎯 发现组件标签: <${componentTagInfo.componentName}>`);
+            console.log('  属性:', componentTagInfo.attributes);
 
             // 处理之前累积的内容
             flushTextBlock();
@@ -1207,23 +1209,43 @@ function parseMarkdown(markdown, options = {}) {
                 markedLines.map(item => item.line),
                 i
             );
+            
+            console.log('  内容:', componentContent);
 
             // 🔧 修复：组件需要特殊处理，因为它们在 component 配置下，不是 card 配置
-            // 创建一个模拟的 card 元素结构来包装组件
             const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[componentName];
             if (componentConfig) {
-                // 使用 createCardElement，但传入完整的配置作为样式
-                const componentElement = createCardElement(componentContent, componentName, attributes, currentMarkdown);
-                
-                // 修正元素的配置来源为 component
-                if (componentElement && componentElement._metadata) {
-                    componentElement._metadata.isComponent = true;
-                    componentElement._metadata.configSource = 'component';
+                // 🆕 检查组件是否有参数定义
+                if (componentConfig.parameters) {
+                    // 这是一个带参数的组件，需要特殊处理
+                    console.log(`  这是带参数的组件，参数定义:`, componentConfig.parameters);
+                    
+                    // 直接使用 createCardElement，它会调用 createComponentElement 或处理模板
+                    const componentElement = createCardElement(componentContent, componentName, attributes, currentMarkdown);
+                    
+                    // 修正元素的配置来源为 component
+                    if (componentElement && componentElement._metadata) {
+                        componentElement._metadata.isComponent = true;
+                        componentElement._metadata.configSource = 'component';
+                    }
+                    
+                    stack[stack.length - 1].elements.push(componentElement);
+                } else {
+                    // 普通组件，使用原有逻辑
+                    const componentElement = createCardElement(componentContent, componentName, attributes, currentMarkdown);
+                    
+                    // 修正元素的配置来源为 component
+                    if (componentElement && componentElement._metadata) {
+                        componentElement._metadata.isComponent = true;
+                        componentElement._metadata.configSource = 'component';
+                    }
+                    
+                    stack[stack.length - 1].elements.push(componentElement);
                 }
                 
-                stack[stack.length - 1].elements.push(componentElement);
+                console.log(`✅ 组件元素已创建并添加到栈中\n`);
             } else {
-                console.warn(`组件 ${componentName} 的配置未找到`);
+                console.warn(`⚠️ 组件 ${componentName} 的配置未找到`);
             }
 
             // 跳过已处理的组件标签行

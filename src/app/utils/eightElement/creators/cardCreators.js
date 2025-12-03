@@ -65,7 +65,7 @@ function isCardTag(line) {
     return { isCardTag: false };
 }
 
-// 检测是否为组件标签（如 <simpleCard>）
+// 检测是否为组件标签（如 <simpleCard> 或 <halfCirclePrecent fillColor={...}>）
 function isComponentTag(line) {
     // 匹配开始标签: <componentName attr1="value1" attr2="value2"> 或 <componentName>
     // 注意：不匹配 card:, layout:, tab: 等已有的命名空间标签
@@ -80,10 +80,11 @@ function isComponentTag(line) {
             return { isComponentTag: false };
         }
 
-        // 解析属性
+        // 解析属性（支持多种格式）
         const attributes = {};
         if (attributesStr) {
-            // 匹配 key="value" 或 key={token.value} 格式的属性
+            // 🆕 匹配 key="value", key='value', key={token.value} 格式的属性
+            // 使用更强大的正则来处理带点的 token（如 {color.basic.red.0}）
             const attrRegex = /(\w+)=(?:["']([^"']*?)["']|\{([^}]*?)\})/g;
             let attrMatch;
             while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
@@ -248,6 +249,40 @@ function findWildcardMatch(input, markdownMapping) {
 }
 
 
+// 🆕 检测是否为带属性的模板标签（如 <halfCirclePrecent fillColor={...}>）
+function isTemplateTagWithAttributes(line) {
+    // 匹配带属性的开始标签: <tagName attr1="value1" attr2={token.value}> 
+    // 注意：不匹配 card:, layout:, tab: 等已有的命名空间标签
+    const templateTagMatch = line.trim().match(/^<([\w\.]+)\s+([^>]+)>$/);
+    if (templateTagMatch && !line.includes(':')) {
+        const tagName = templateTagMatch[1];
+        const attributesStr = templateTagMatch[2].trim();
+
+        // 解析属性
+        const attributes = {};
+        if (attributesStr) {
+            // 匹配多种格式的属性：key="value", key='value', key={value}
+            const attrRegex = /(\w+)=(?:["']([^"']*?)["']|\{([^}]*?)\})/g;
+            let attrMatch;
+            while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
+                const attrName = attrMatch[1];
+                // attrMatch[2] 是引号格式的值，attrMatch[3] 是大括号格式的值
+                const attrValue = attrMatch[2] !== undefined ? attrMatch[2] : attrMatch[3];
+                attributes[attrName] = attrValue;
+            }
+        }
+
+        return {
+            isTemplateTag: true,
+            tagName: tagName,
+            attributes: attributes,
+            isClosing: false
+        };
+    }
+
+    return { isTemplateTag: false };
+}
+
 // 提取模板标签内容
 function extractTemplateTag(lines, startIndex, tagName) {
 
@@ -255,9 +290,12 @@ function extractTemplateTag(lines, startIndex, tagName) {
     let i = startIndex + 1;
     let foundEnd = false;
 
+    // 🆕 转义标签名中的特殊字符（如点号）以用于正则表达式
+    const escapedTagName = tagName.replace(/\./g, '\\.');
+
     while (i < lines.length) {
         const line = lines[i];
-        const closingTagMatch = line.trim().match(new RegExp(`^</${tagName}>$`));
+        const closingTagMatch = line.trim().match(new RegExp(`^</${escapedTagName}>$`));
 
         if (closingTagMatch) {
             foundEnd = true;
@@ -662,8 +700,11 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
         }
     }
 
-    // 应用属性到样式配置
-    if (Object.keys(attributes).length > 0) {
+    // 🆕 检查是否为带参数的组件（需要提前检查）
+    const hasParameters = cardStyleConfig && cardStyleConfig.parameters;
+
+    // 应用属性到样式配置（仅对非带参数组件）
+    if (Object.keys(attributes).length > 0 && !hasParameters) {
         // 处理各种可能的属性
         Object.keys(attributes).forEach(attrKey => {
             const attrValue = attributes[attrKey];
@@ -703,20 +744,53 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
 
     // 生成唯一的className
     const uniqueClassName = `card-${id}`;
-
+    
     // 检查是否为模板类型的卡片
     const isTemplateCard = cardStyleConfig && cardStyleConfig.type === 'template';
 
     let cardChildren = [];
+    let paramValues = {};
+    let processedStyle = cardStyleConfig.style || {};
+    
+    // 🆕 如果是带参数的组件，先提取参数
+    if (hasParameters) {
+        console.log(`\n📦 处理带参数的组件: ${variant}`);
+        console.log('  组件配置:', cardStyleConfig);
+        console.log('  标签属性:', attributes);
+        console.log('  内容:', content);
+        
+        // 提取参数值
+        paramValues = extractComponentParameters(
+            cardStyleConfig.parameters,
+            null, // markdownData
+            content, // content（包含子标签）
+            attributes // externalParameters（来自标签属性）
+        );
+        
+        // 应用参数到样式（深拷贝，避免修改原配置）
+        if (Object.keys(paramValues).length > 0) {
+            console.log('  原始样式:', cardStyleConfig.style);
+            // 🆕 深拷贝样式对象，避免修改原配置（特别是嵌套对象如 &::before）
+            processedStyle = applyParametersToStyle(JSON.parse(JSON.stringify(cardStyleConfig.style || {})), paramValues);
+            console.log('  应用参数后的样式:', processedStyle);
+        }
+    }
+    
     if (content && content.trim()) {
-        if (isTemplateCard) {
-            // 对于模板类型的卡片，解析嵌套的模板标签
+        if (isTemplateCard || hasParameters) {
+            // 对于模板类型的卡片或带参数的组件，解析嵌套的模板标签
             cardChildren = parseTemplateCardContent(content, cardStyleConfig, false, currentMarkdown);
         } else {
             // 对于普通卡片，递归解析内容
             const parsedContent = parseMarkdown(content, { currentMarkdown });
             cardChildren = parsedContent;
         }
+    }
+    
+    // 🆕 如果是带参数的组件，处理 required 容器
+    if (hasParameters && cardStyleConfig.required) {
+        console.log(`  处理 required 容器:`, cardStyleConfig.required);
+        processRequiredContainers(cardStyleConfig, cardChildren, cardStyleConfig, paramValues);
     }
 
     const cardUpdateEvent = createCardUpdateEvent(
@@ -731,20 +805,23 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
     );
     const cardEvents = cardUpdateEvent ? [cardUpdateEvent] : [{}];
 
-    if (isTemplateCard) {
+    if (isTemplateCard || hasParameters) {
         // 模板类型卡片的结构
         const cardElement = {
             dataKeys: [],
             name: "layout",
-            "name-zh": "卡片",
+            "name-zh": hasParameters ? `带参数组件-${variant}` : "卡片",
             "file-type": "template",
             theme: "default",
             _metadata: {
-                actualType: 'card',
+                actualType: hasParameters ? 'component' : 'card',
                 variant: variant,
-                isCard: true,
+                isCard: !hasParameters,
+                isComponent: hasParameters,
                 isLayout: true,
-                isTemplateCard: true,
+                isTemplateCard: isTemplateCard,
+                hasParameters: hasParameters,
+                parameters: paramValues,
                 cardContent: sanitizedCardContent
             },
             layout: {
@@ -767,12 +844,12 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
                     // ...cardStyleConfig.style // 应用模板样式
                 },
                 classStyle: {
-                    ...cardStyleConfig.style
+                    ...processedStyle
                 },
                 className: uniqueClassName,
                 children: cardChildren
             },
-            description: `模板卡片元素 - ${variant}`,
+            description: hasParameters ? `带参数组件 - ${variant}` : `模板卡片元素 - ${variant}`,
             id,
             events: cardEvents
         };
@@ -854,10 +931,21 @@ function stripMarkdownFormatting(text) {
 function createTemplateTagElement(tagName, content, cardStyleConfig, markdownData = null, currentMarkdown = '') {
 
     const id = generateUUID();
-    const uniqueClassName = `template-${tagName}-${id}`;
+    const uniqueClassName = `template-${tagName.replace(/\./g, '-')}-${id}`;
 
-    // 获取标签配置
-    const tagConfig = cardStyleConfig[tagName];
+    // 🆕 处理嵌套路径（如 header.title）
+    let tagConfig = cardStyleConfig;
+    const pathParts = tagName.split('.');
+    
+    for (const part of pathParts) {
+        if (tagConfig && tagConfig[part]) {
+            tagConfig = tagConfig[part];
+        } else {
+            console.warn(`警告: 未找到模板标签 ${tagName} 的配置（在路径 ${part} 处失败）`);
+            return null;
+        }
+    }
+    
     if (!tagConfig) {
         console.warn(`警告: 未找到模板标签 ${tagName} 的配置`);
         return null;
@@ -1463,7 +1551,7 @@ function processExpression(content, expression) {
  * @param {Object} parameterDefinitions - 参数定义对象（来自组件配置的 parameters）
  * @param {Object} markdownData - Markdown数据（包含 type 和 content）
  * @param {string} content - 内容
- * @param {Object} externalParameters - 外部传递的参数值（来自使用方的 parameters）
+ * @param {Object} externalParameters - 外部传递的参数值（来自使用方的 parameters 或标签属性）
  * @returns {Object} 参数值对象 { paramName: value }
  */
 function extractComponentParameters(parameterDefinitions, markdownData, content, externalParameters = {}) {
@@ -1473,40 +1561,131 @@ function extractComponentParameters(parameterDefinitions, markdownData, content,
         return paramValues;
     }
     
+    console.log('🔍 开始提取组件参数...');
+    console.log('  参数定义:', parameterDefinitions);
+    console.log('  外部参数:', externalParameters);
+    console.log('  内容:', content);
+    
     // 遍历所有参数定义
     for (const [paramName, paramConfig] of Object.entries(parameterDefinitions)) {
         let value = null;
+        let valueSource = '';
         
         // 处理不同的参数来源
         if (paramConfig.source === 'outer') {
             // 🆕 从外部参数中获取值
             if (externalParameters && externalParameters.hasOwnProperty(paramName)) {
                 value = externalParameters[paramName];
+                valueSource = '外部属性';
+                
+                // 🆕 处理 token 格式
+                if (typeof value === 'string') {
+                    if (value.startsWith('{') && value.endsWith('}')) {
+                        // 已经是 token 格式，保持不变
+                        console.log(`  📦 参数 ${paramName} 是 token 格式: ${value}`);
+                    } else if (value.includes('.') && !value.startsWith('$')) {
+                        // 看起来像 token 路径（如 color.basic.red.0），添加大括号
+                        value = `{${value}}`;
+                        console.log(`  📦 参数 ${paramName} 转换为 token 格式: ${value}`);
+                        valueSource += ' (转换为 token)';
+                    }
+                }
             } else if (paramConfig.default !== undefined) {
                 // 使用默认值
                 value = paramConfig.default;
+                valueSource = '默认值';
             } else {
-                console.warn(`外部参数 "${paramName}" 未提供，且没有默认值`);
+                console.warn(`⚠️ 外部参数 "${paramName}" 未提供，且没有默认值`);
                 continue;
             }
         } else if (markdownData && paramConfig.source === markdownData.type) {
             // 从 markdown 内容中提取
             value = content;
+            valueSource = 'markdown 数据';
             
             // 如果有 expression，应用表达式处理
             if (paramConfig.expression) {
                 value = processExpression(value, paramConfig.expression);
+                valueSource += ' (经过表达式处理)';
             }
         } else {
-            // 参数来源不匹配，跳过
-            continue;
+            // 🆕 尝试从 content 中的子标签提取参数值（如 <progressValue>15%</progressValue>）
+            if (content && paramConfig.source) {
+                // 匹配子标签格式: <paramName>value</paramName>
+                const tagPattern = new RegExp(`<${paramName}>(.+?)<\/${paramName}>`, 'is');
+                const tagMatch = content.match(tagPattern);
+                if (tagMatch) {
+                    value = tagMatch[1].trim();
+                    valueSource = '子标签';
+                    
+                    // 如果有 expression，应用表达式处理
+                    if (paramConfig.expression) {
+                        const beforeExpression = value;
+                        value = processExpression(value, paramConfig.expression);
+                        valueSource += ` (${beforeExpression} -> ${value})`;
+                    }
+                } else {
+                    // 🆕 尝试从 markdown 格式中提取（h2, h3, h4, p 等）
+                    if (paramConfig.source === 'h4') {
+                        const h4Match = content.match(/####\s+(.+)/);
+                        if (h4Match) {
+                            value = h4Match[1].trim();
+                            valueSource = 'h4 标题';
+                            if (paramConfig.expression) {
+                                value = processExpression(value, paramConfig.expression);
+                                valueSource += ' (经过表达式处理)';
+                            }
+                        }
+                    } else if (paramConfig.source === 'h3') {
+                        const h3Match = content.match(/###\s+(.+)/);
+                        if (h3Match) {
+                            value = h3Match[1].trim();
+                            valueSource = 'h3 标题';
+                            if (paramConfig.expression) {
+                                value = processExpression(value, paramConfig.expression);
+                                valueSource += ' (经过表达式处理)';
+                            }
+                        }
+                    } else if (paramConfig.source === 'h2') {
+                        const h2Match = content.match(/##\s+(.+)/);
+                        if (h2Match) {
+                            value = h2Match[1].trim();
+                            valueSource = 'h2 标题';
+                            if (paramConfig.expression) {
+                                value = processExpression(value, paramConfig.expression);
+                                valueSource += ' (经过表达式处理)';
+                            }
+                        }
+                    } else if (paramConfig.source === 'p') {
+                        const pMatch = content.match(/^(?!#|<)(.+)/m);
+                        if (pMatch) {
+                            value = pMatch[1].trim();
+                            valueSource = '段落';
+                            if (paramConfig.expression) {
+                                value = processExpression(value, paramConfig.expression);
+                                valueSource += ' (经过表达式处理)';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 如果还没有值，使用默认值
+        if (value === null && paramConfig.default !== undefined) {
+            value = paramConfig.default;
+            valueSource = '默认值（回退）';
         }
         
         if (value !== null) {
             paramValues[paramName] = value;
+            console.log(`  ✅ 参数 ${paramName} = "${value}" (来源: ${valueSource})`);
+        } else {
+            console.warn(`  ❌ 参数 ${paramName} 提取失败`);
         }
     }
     
+    console.log('📦 最终提取的参数:', paramValues);
     return paramValues;
 }
 
@@ -1524,15 +1703,31 @@ function applyParametersToStyle(style, paramValues) {
     const processedStyle = {};
     
     for (const [key, value] of Object.entries(style)) {
-        if (typeof value === 'string' && value.startsWith('$')) {
-            // 替换参数引用
-            const paramName = value.substring(1); // 去掉 $ 符号
-            if (paramValues.hasOwnProperty(paramName)) {
-                processedStyle[key] = paramValues[paramName];
-            } else {
-                console.warn(`未找到参数: ${paramName}`);
-                processedStyle[key] = value;
-            }
+        if (typeof value === 'string') {
+            // 🆕 处理字符串中的所有 $paramName 占位符（支持字符串中间的占位符）
+            let processedValue = value;
+            
+            // 替换所有 $paramName 格式的占位符
+            processedValue = processedValue.replace(/\$(\w+)/g, (match, paramName) => {
+                if (paramValues.hasOwnProperty(paramName)) {
+                    let paramValue = paramValues[paramName];
+                    
+                    // 🆕 如果参数值是 token 格式（如 {color.basic.red.0}），解析它
+                    if (typeof paramValue === 'string' && paramValue.startsWith('{') && paramValue.endsWith('}')) {
+                        const resolvedValue = resolveToken(paramValue);
+                        console.log(`✅ 应用参数 ${paramName}: ${paramValue} -> ${resolvedValue}`);
+                        return resolvedValue;
+                    } else {
+                        console.log(`✅ 应用参数 ${paramName}: ${paramValue}`);
+                        return paramValue;
+                    }
+                } else {
+                    console.warn(`⚠️ 未找到参数: ${paramName}，可用参数:`, Object.keys(paramValues));
+                    return match; // 保持原样
+                }
+            });
+            
+            processedStyle[key] = processedValue;
         } else if (typeof value === 'object' && value !== null) {
             // 递归处理嵌套对象
             processedStyle[key] = applyParametersToStyle(value, paramValues);
@@ -1549,14 +1744,25 @@ function applyParametersToStyle(style, paramValues) {
  * @param {Object} config - 配置对象（可能包含 required 数组）
  * @param {Array} children - 子元素数组，required 容器将被添加到此数组
  * @param {Object} styleConfig - 样式配置对象，用于查找 required 容器的配置
+ * @param {Object} paramValues - 参数值对象（可选），用于应用到 required 容器的样式
  */
-function processRequiredContainers(config, children, styleConfig) {
+function processRequiredContainers(config, children, styleConfig, paramValues = {}) {
     if (config.required && Array.isArray(config.required)) {
         config.required.forEach(requiredContainerName => {
             const requiredConfig = config[requiredContainerName];
             if (requiredConfig) {
+                // 🆕 如果有参数值，应用到 required 容器的样式
+                let processedConfig = { ...requiredConfig };
+                if (requiredConfig.style && Object.keys(paramValues).length > 0) {
+                    processedConfig.style = applyParametersToStyle(requiredConfig.style, paramValues);
+                }
+                
+                // 创建临时配置对象
+                const tempConfig = { ...config };
+                tempConfig[requiredContainerName] = processedConfig;
+                
                 // 创建必需的容器元素
-                const requiredElement = createTemplateTagElement(requiredContainerName, '', config);
+                const requiredElement = createTemplateTagElement(requiredContainerName, '', tempConfig);
                 if (requiredElement) {
                     children.push(requiredElement);
                 }
@@ -1601,6 +1807,182 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
 
         if (!line) {
             i++;
+            continue;
+        }
+
+        // 🆕 最高优先级：检查是否为内联模板标签（如 <header.title>内容</header.title>）
+        const inlineTemplateTagMatch = line.match(/^<([\w\.]+)>(.*?)<\/\1>$/);
+        if (inlineTemplateTagMatch) {
+            const tagName = inlineTemplateTagMatch[1];
+            const tagContent = inlineTemplateTagMatch[2];
+
+            // 创建模板标签元素
+            const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig, null, currentMarkdown);
+            if (templateElement) {
+                children.push(templateElement);
+            }
+
+            i++;
+            continue;
+        }
+
+        // 🆕 检查是否为带属性的模板标签（如 <halfCirclePrecent fillColor={...}>）
+        const templateTagWithAttrsInfo = isTemplateTagWithAttributes(line);
+        if (templateTagWithAttrsInfo.isTemplateTag) {
+            const tagName = templateTagWithAttrsInfo.tagName;
+            const attributes = templateTagWithAttrsInfo.attributes || {};
+
+            // 检查这是否是一个组件（在 component 配置中）
+            const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[tagName];
+            
+            if (componentConfig) {
+                console.log(`\n🎨 发现带参数的组件标签: <${tagName}>`);
+                console.log('  标签属性:', attributes);
+                
+                // 这是一个带参数的组件，直接使用
+                // 提取标签内容
+                const { tagContent, endIndex } = extractTemplateTag(lines, i, tagName);
+                console.log('  标签内容:', tagContent);
+
+                // 🆕 提取参数值（从属性和内容中）
+                const paramValues = extractComponentParameters(
+                    componentConfig.parameters,
+                    null, // markdownData
+                    tagContent, // content（包含子标签）
+                    attributes // externalParameters（来自标签属性）
+                );
+
+                // 🆕 应用参数到样式
+                console.log('  原始样式:', componentConfig.style);
+                let processedStyle = componentConfig.style || {};
+                if (Object.keys(paramValues).length > 0) {
+                    processedStyle = applyParametersToStyle(processedStyle, paramValues);
+                    console.log('  应用参数后的样式:', processedStyle);
+                }
+
+                // 创建组件容器元素
+                const componentElement = {
+                    dataKeys: [],
+                    name: "layout",
+                    "name-zh": `组件容器-${tagName}`,
+                    "file-type": "template",
+                    theme: "default",
+                    id: generateUUID(),
+                    className: `component-${tagName}`,
+                    _metadata: {
+                        actualType: 'component',
+                        variant: tagName,
+                        isComponent: true,
+                        componentName: tagName,
+                        parameters: paramValues
+                    },
+                    layout: {
+                        children: [],
+                        style: processedStyle,
+                        className: `component-${tagName}`,
+                        classStyle: processedStyle
+                    }
+                };
+
+                // 🆕 处理 required 容器
+                if (componentConfig.required) {
+                    console.log(`  处理 required 容器:`, componentConfig.required);
+                    processRequiredContainers(componentConfig, componentElement.layout.children, componentConfig, paramValues);
+                }
+
+                console.log(`✅ 组件元素创建完成，包含 ${componentElement.layout.children.length} 个子元素\n`);
+                children.push(componentElement);
+
+                i = endIndex + 1;
+                continue;
+            } else {
+                // 不是组件，按普通模板标签处理
+                // 提取标签内容
+                const { tagContent, endIndex } = extractTemplateTag(lines, i, tagName);
+
+                // 创建模板标签元素
+                const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig, null, currentMarkdown);
+                if (templateElement) {
+                    children.push(templateElement);
+                }
+
+                i = endIndex + 1;
+                continue;
+            }
+        }
+
+        // 🆕 检查是否为块级模板标签（如 <header.title>...</header.title>）
+        const templateTagMatch = line.match(/^<([\w\.]+)>$/);
+        if (templateTagMatch) {
+            const tagName = templateTagMatch[1];
+
+            // 提取标签内容
+            const { tagContent, endIndex } = extractTemplateTag(lines, i, tagName);
+
+            // 创建模板标签元素
+            const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig, null, currentMarkdown);
+            if (templateElement) {
+                children.push(templateElement);
+            }
+
+            i = endIndex + 1;
+            continue;
+        }
+
+        // 🆕 检查是否为 layout 标签（如 <layout:row>）
+        const layoutTagInfo = isLayoutTag(line);
+        if (layoutTagInfo.isLayoutTag && !layoutTagInfo.isClosing) {
+            // 提取 layout 标签内容
+            const { layoutContent, variant, attributes, endIndex } = extractLayoutBlock(lines, i);
+
+            // 递归解析 layout 内部的内容
+            const layoutChildren = parseTemplateCardContent(layoutContent, cardStyleConfig, true, currentMarkdown);
+
+            // 创建 layout 元素
+            const direction = variant.startsWith('row') ? LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL : LAYOUT_CONSTANTS.DIRECTION.VERTICAL;
+            
+            // 处理 justify 和 align 属性
+            const layoutOptions = {
+                variant: variant,
+                attributes: attributes
+            };
+
+            // 映射 justify 属性到 justifyContent
+            if (attributes.justify) {
+                const justifyMap = {
+                    'start': 'flex-start',
+                    'end': 'flex-end',
+                    'center': 'center',
+                    'between': 'space-between',
+                    'around': 'space-around',
+                    'evenly': 'space-evenly'
+                };
+                layoutOptions.justifyContent = justifyMap[attributes.justify] || attributes.justify;
+            }
+
+            // 映射 align 属性到 alignItems
+            if (attributes.align) {
+                const alignMap = {
+                    'start': 'flex-start',
+                    'end': 'flex-end',
+                    'center': 'center',
+                    'stretch': 'stretch',
+                    'baseline': 'baseline'
+                };
+                layoutOptions.alignItems = alignMap[attributes.align] || attributes.align;
+            }
+
+            // 支持 gap 属性
+            if (attributes.gap) {
+                layoutOptions.gap = attributes.gap;
+            }
+
+            const layoutElement = createLayoutElement(direction, layoutChildren, layoutOptions);
+
+            children.push(layoutElement);
+
+            // 跳过已处理的 layout 标签行
+            i = endIndex + 1;
             continue;
         }
 
@@ -1985,130 +2367,40 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
             }
         }
 
-        // 🆕 检查是否为 layout 标签（如 <layout:row>）
-        const layoutTagInfo = isLayoutTag(line);
-        if (layoutTagInfo.isLayoutTag && !layoutTagInfo.isClosing) {
-            // 提取 layout 标签内容
-            const { layoutContent, variant, attributes, endIndex } = extractLayoutBlock(lines, i);
-
-            // 递归解析 layout 内部的内容
-            const layoutChildren = parseTemplateCardContent(layoutContent, cardStyleConfig, true, currentMarkdown);
-
-            // 创建 layout 元素
-            // 🔧 修复：检查 variant 是否以 'row' 开头，支持 row-center 等变体
-            const direction = variant.startsWith('row') ? LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL : LAYOUT_CONSTANTS.DIRECTION.VERTICAL;
-            
-            // 🆕 处理 justify 和 align 属性，类似 Tailwind 的灵活组合
-            const layoutOptions = {
-                variant: variant,
-                attributes: attributes
-            };
-
-            // 映射 justify 属性到 justifyContent
-            if (attributes.justify) {
-                const justifyMap = {
-                    'start': 'flex-start',
-                    'end': 'flex-end',
-                    'center': 'center',
-                    'between': 'space-between',
-                    'around': 'space-around',
-                    'evenly': 'space-evenly'
-                };
-                layoutOptions.justifyContent = justifyMap[attributes.justify] || attributes.justify;
+        // 🆕 如果有 markdownMapping 且是普通文本，尝试作为段落处理
+        if (hasMarkdownMapping && cardStyleConfig.markdownMapping.p) {
+            // 🔧 修复：清理段落符号
+            const cleanedLine = line.replace(/§PARAGRAPH§/g, '');
+            if (cleanedLine.trim()) {
+                // 🆕 使用合并逻辑处理段落
+                createOrMergeTemplateElement(
+                    cardStyleConfig.markdownMapping.p,
+                    cleanedLine,
+                    cardStyleConfig,
+                    containerMap,
+                    children,
+                    null, // existingElement
+                    { type: 'p', content: cleanedLine } // markdownData for paragraph
+                );
             }
-
-            // 映射 align 属性到 alignItems
-            if (attributes.align) {
-                const alignMap = {
-                    'start': 'flex-start',
-                    'end': 'flex-end',
-                    'center': 'center',
-                    'stretch': 'stretch',
-                    'baseline': 'baseline'
-                };
-                layoutOptions.alignItems = alignMap[attributes.align] || attributes.align;
-            }
-
-            // 支持 gap 属性
-            if (attributes.gap) {
-                layoutOptions.gap = attributes.gap;
-            }
-
-            const layoutElement = createLayoutElement(direction, layoutChildren, layoutOptions);
-
-            children.push(layoutElement);
-
-            // 跳过已处理的 layout 标签行
-            i = endIndex + 1;
-            continue;
-        }
-
-        // 检查是否为内联模板标签（如 <title>内容</title>）
-        const inlineTemplateTagMatch = line.match(/^<(\w+)>(.*?)<\/\1>$/);
-        if (inlineTemplateTagMatch) {
-            const tagName = inlineTemplateTagMatch[1];
-            const tagContent = inlineTemplateTagMatch[2];
-
-            // 创建模板标签元素
-            const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig, null, currentMarkdown);
-            if (templateElement) {
-                children.push(templateElement);
-            }
-
-            i++;
-        } else {
-            // 检查是否为块级模板标签（如 <content>...多行内容...</content>）
-            const templateTagMatch = line.match(/^<(\w+)>$/);
-            if (templateTagMatch) {
-                const tagName = templateTagMatch[1];
-
-                // 提取标签内容
-                const { tagContent, endIndex } = extractTemplateTag(lines, i, tagName);
-
-                // 创建模板标签元素
-                const templateElement = createTemplateTagElement(tagName, tagContent, cardStyleConfig, null, currentMarkdown);
-                if (templateElement) {
-                    children.push(templateElement);
+        } else if (!hasMarkdownMapping) {
+            // 如果没有 markdownMapping，按普通卡片处理
+            // 🔧 修复：清理段落符号并使用 parseMarkdown 处理（支持超链接等）
+            const cleanedLine = line.replace(/§PARAGRAPH§/g, '');
+            if (cleanedLine.trim()) {
+                // 🆕 使用 parseMarkdown 处理，这样可以正确解析超链接等内容
+                const parsedElements = parseMarkdown(cleanedLine, { currentMarkdown });
+                if (parsedElements && parsedElements.length > 0) {
+                    children.push(...parsedElements);
+                } else {
+                    // 如果解析失败，回退到创建普通文本元素
+                    const textElement = createTextElement(cleanedLine);
+                    children.push(textElement);
                 }
-
-                i = endIndex + 1;
-            } else {
-                // 🆕 如果有 markdownMapping 且是普通文本，尝试作为段落处理
-                if (hasMarkdownMapping && cardStyleConfig.markdownMapping.p) {
-                    // 🔧 修复：清理段落符号
-                    const cleanedLine = line.replace(/§PARAGRAPH§/g, '');
-                    if (cleanedLine.trim()) {
-                        // 🆕 使用合并逻辑处理段落
-                        createOrMergeTemplateElement(
-                            cardStyleConfig.markdownMapping.p,
-                            cleanedLine,
-                            cardStyleConfig,
-                            containerMap,
-                            children,
-                            null, // existingElement
-                            { type: 'p', content: cleanedLine } // markdownData for paragraph
-                        );
-                    }
-                } else if (!hasMarkdownMapping) {
-                    // 如果没有 markdownMapping，按普通卡片处理
-                    // 🔧 修复：清理段落符号并使用 parseMarkdown 处理（支持超链接等）
-                    const cleanedLine = line.replace(/§PARAGRAPH§/g, '');
-                    if (cleanedLine.trim()) {
-                        // 🆕 使用 parseMarkdown 处理，这样可以正确解析超链接等内容
-                        const parsedElements = parseMarkdown(cleanedLine, { currentMarkdown });
-                        if (parsedElements && parsedElements.length > 0) {
-                            children.push(...parsedElements);
-                        } else {
-                            // 如果解析失败，回退到创建普通文本元素
-                            const textElement = createTextElement(cleanedLine);
-                            children.push(textElement);
-                        }
-                    }
-                }
-                // 🆕 如果有 markdownMapping 但没有 p 映射，且没有 others 映射，则跳过不处理
-                i++;
             }
         }
+        // 🆕 如果有 markdownMapping 但没有 p 映射，且没有 others 映射，则跳过不处理
+        i++;
     }
 
     // 🆕 处理required容器：确保必需的样式承载容器被渲染

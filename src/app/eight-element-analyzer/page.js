@@ -1562,10 +1562,82 @@ const userRoles = {
     <itemDescription>随放随充</itemDescription>
     </layout:column-center-center>
     </simpleCard>
+    `
+  },
+
+  // 🆕 带参数组件直接使用示例
+  parametricComponents: {
+    name: '带参数组件直接使用',
+    markdown: `
+    # 带参数组件使用示例
+
+    ## 直接使用带参数的组件
+
+    ### 示例一：使用子标签指定参数
+
+    <halfCirclePrecent fillColor={color.basic.red.0}>
+    <progressValue>15%</progressValue>
+    </halfCirclePrecent>
+
+    <halfCirclePrecent fillColor={color.basic.opacity.white.100}>
+    <progressValue>45%</progressValue>
+    </halfCirclePrecent>
+
+    <halfCirclePrecent fillColor={color.basic.opacity.white.100}>
+    <progressValue>78%</progressValue>
+    </halfCirclePrecent>
+
+    ### 示例二：多个组件并排展示
+
+    <layout:row gap="24px">
+    <halfCirclePrecent fillColor={color.basic.opacity.white.100}>
+    <progressValue>25%</progressValue>
+    </halfCirclePrecent>
+
+    <halfCirclePrecent fillColor={color.basic.opacity.white.100}>
+    <progressValue>50%</progressValue>
+    </halfCirclePrecent>
+
+    <halfCirclePrecent fillColor={color.basic.opacity.white.100}>
+    <progressValue>75%</progressValue>
+    </halfCirclePrecent>
+    </layout:row>
+
+    ## 对比：在 Card 中引用组件（现有方式）
+
+    下面是使用现有方式（通过 card 的 markdownMapping 引用组件）：
+
+    <card:newPrecentItem>
+    ### 中国市场
+    AI-PC 出货量
+    #### 15%
+    </card:newPrecentItem>
+
+    <card:newPrecentItem>
+    ### 全球市场
+    AI-PC 渗透率
+    #### 25%
+    </card:newPrecentItem>
+
+    ## 两种方式的区别
+
+    ### 直接使用组件（新方式）
+    - ✅ 更灵活，可以直接设置组件参数
+    - ✅ 参数通过标签属性（如 \`fillColor\`）或子标签（如 \`<progressValue>\`）指定
+    - ✅ Required 容器自动添加，无需手动指定
+    - ✅ 适合简单、直接的组件使用
+
+    ### 在 Card 中引用组件（现有方式）
+    - ✅ 适合有复杂布局的场景
+    - ✅ 可以通过 markdownMapping 自动映射 markdown 元素
+    - ✅ 支持多层嵌套和组合
+    - ✅ 更适合复杂的卡片设计
 
     `
   }
 };
+
+
 
 const EightElementAnalyzer = () => {
   // 🆕 新增模板相关状态

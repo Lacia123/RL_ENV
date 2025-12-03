@@ -1903,7 +1903,6 @@ export const DEFAULT_STYLE_CONFIG = {
       },
     },
 
-
     bannerPanel: {
       type: 'template',
       markdownMapping: {
@@ -3944,7 +3943,7 @@ export const DEFAULT_STYLE_CONFIG = {
         metaType: 'text',
         variant: 'minimalistListCardItemDescription',
       }
-    }
+    },
   }
 };
 
