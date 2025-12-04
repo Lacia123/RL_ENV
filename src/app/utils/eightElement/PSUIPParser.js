@@ -1036,93 +1036,95 @@ function parseMarkdown(markdown, options = {}) {
                 }
                 Object.assign(options.rootAttributes, attributes);
             } else {
-                // 递归解析布局标签内的内容
+                // 递归解析布局标签内的内容（即使内容为空，也要创建布局元素，以支持纯属性型 layout）
+                let layoutChildren = [];
+
                 if (layoutContent.trim()) {
-                    const layoutChildren = parseMarkdown(layoutContent, {
+                    layoutChildren = parseMarkdown(layoutContent, {
                         disableButtonGrouping: true,
                         disableSiblingGrouping: variant.startsWith('row'),  // 🔧 只在 row 布局中禁用同级标题分组
                         currentMarkdown
                     });
-
-                    // 根据变体确定布局方向
-                    let direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL; // 默认垂直
-                    let alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
-                    let counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
-
-                    // 🔧 修复：检查 variant 是否以 'row' 或 'column' 开头，支持 row-center、column-center 等变体
-                    if (variant.startsWith('row')) {
-                        direction = LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL;
-                        // changed center to stretch
-                        // alignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
-                        alignItems = 'stretch';
-                        // alignItems = 'flex-start';
-                        counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER;
-                    } else if (variant.startsWith('column')) {
-                        direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL;
-                        alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
-                        counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
-                    }
-
-                    // 🔧 创建稳定的内容种子用于生成稳定ID
-                    const contentSeed = `${variant}-${layoutContent}`;
-                    const position = `line-${i}`;
-
-                    // 🆕 处理 justify 和 align 属性，类似 Tailwind 的灵活组合
-                    const layoutOptions = {
-                        variant: variant,
-                        alignItems: alignItems,
-                        counterAxisAlign: counterAxisAlign,
-                        contentSeed: contentSeed,
-                        position: position,
-                        attributes: attributes // 🆕 传递属性
-                    };
-
-                    // 映射 justify 属性到 justifyContent
-                    if (attributes.justify) {
-                        const justifyMap = {
-                            'start': 'flex-start',
-                            'end': 'flex-end',
-                            'center': 'center',
-                            'between': 'space-between',
-                            'around': 'space-around',
-                            'evenly': 'space-evenly'
-                        };
-                        layoutOptions.justifyContent = justifyMap[attributes.justify] || attributes.justify;
-                    }
-
-                    // 映射 align 属性到 alignItems
-                    if (attributes.align) {
-                        const alignMap = {
-                            'start': 'flex-start',
-                            'end': 'flex-end',
-                            'center': 'center',
-                            'stretch': 'stretch',
-                            'baseline': 'baseline'
-                        };
-                        layoutOptions.alignItems = alignMap[attributes.align] || attributes.align;
-                    }
-
-                    // 支持 gap 属性
-                    if (attributes.gap) {
-                        layoutOptions.gap = attributes.gap;
-                    }
-
-                    // 创建布局容器，传递属性
-                    const layoutContainer = createLayoutElement(
-                        direction,
-                        layoutChildren,
-                        layoutOptions
-                    );
-
-                    // 🔧 确保元数据正确保存了variant信息
-                    if (layoutContainer._metadata) {
-                        layoutContainer._metadata.variant = variant;
-                        layoutContainer._metadata.originalVariant = variant; // 保存原始variant
-                        layoutContainer._metadata.isLayoutTag = true; // 标记这是来自layout标签的
-                    }
-
-                    stack[stack.length - 1].elements.push(layoutContainer);
                 }
+
+                // 根据变体确定布局方向
+                let direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL; // 默认垂直
+                let alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
+                let counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
+
+                // 🔧 修复：检查 variant 是否以 'row' 或 'column' 开头，支持 row-center、column-center 等变体
+                if (variant.startsWith('row')) {
+                    direction = LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL;
+                    // changed center to stretch
+                    // alignItems = LAYOUT_CONSTANTS.ALIGN.X.CENTER;
+                    alignItems = 'stretch';
+                    // alignItems = 'flex-start';
+                    counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.CENTER;
+                } else if (variant.startsWith('column')) {
+                    direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL;
+                    alignItems = LAYOUT_CONSTANTS.ALIGN.X.MIN;
+                    counterAxisAlign = LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN;
+                }
+
+                // 🔧 创建稳定的内容种子用于生成稳定ID
+                const contentSeed = `${variant}-${layoutContent}`;
+                const position = `line-${i}`;
+
+                // 🆕 处理 justify 和 align 属性，类似 Tailwind 的灵活组合
+                const layoutOptions = {
+                    variant: variant,
+                    alignItems: alignItems,
+                    counterAxisAlign: counterAxisAlign,
+                    contentSeed: contentSeed,
+                    position: position,
+                    attributes: attributes // 🆕 传递属性
+                };
+
+                // 映射 justify 属性到 justifyContent
+                if (attributes.justify) {
+                    const justifyMap = {
+                        'start': 'flex-start',
+                        'end': 'flex-end',
+                        'center': 'center',
+                        'between': 'space-between',
+                        'around': 'space-around',
+                        'evenly': 'space-evenly'
+                    };
+                    layoutOptions.justifyContent = justifyMap[attributes.justify] || attributes.justify;
+                }
+
+                // 映射 align 属性到 alignItems
+                if (attributes.align) {
+                    const alignMap = {
+                        'start': 'flex-start',
+                        'end': 'flex-end',
+                        'center': 'center',
+                        'stretch': 'stretch',
+                        'baseline': 'baseline'
+                    };
+                    layoutOptions.alignItems = alignMap[attributes.align] || attributes.align;
+                }
+
+                // 支持 gap 属性
+                if (attributes.gap) {
+                    layoutOptions.gap = attributes.gap;
+                }
+
+                // 创建布局容器，传递属性
+                const layoutContainer = createLayoutElement(
+                    direction,
+                    layoutChildren,
+                    layoutOptions
+                );
+
+                // 🔧 确保元数据正确保存了variant信息
+                if (layoutContainer._metadata) {
+                    layoutContainer._metadata.variant = variant;
+                    layoutContainer._metadata.originalVariant = variant; // 保存原始variant
+                    layoutContainer._metadata.isLayoutTag = true; // 标记这是来自layout标签的
+                }
+
+                stack[stack.length - 1].elements.push(layoutContainer);
             }
 
             // 跳过已处理的布局标签行

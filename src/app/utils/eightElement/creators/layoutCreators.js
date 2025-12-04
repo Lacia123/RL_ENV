@@ -4,29 +4,65 @@ import {
 } from '../styleConfig.js';
 import { generateUUID } from '../util.js';
 import { createTextElement } from './textCreators.js';
+import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';
 
 // 检测是否为布局标签（支持属性）
 function isLayoutTag(line) {
+    const trimmed = line.trim();
+
+    // 通用属性解析函数
+    const parseAttributes = (attributesStr) => {
+        const attributes = {};
+        if (!attributesStr) return attributes;
+
+        // 匹配多种格式的属性：key="value", key='value', key={value}
+        const attrRegex = /(\w+)=(["']([^"']*?)["']|\{([^}]*?)\})/g;
+        let attrMatch;
+        while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
+            const attrName = attrMatch[1];
+            // attrMatch[3] 是引号格式的值，attrMatch[4] 是大括号格式的值
+            const attrValue = attrMatch[3] !== undefined ? attrMatch[3] : attrMatch[4];
+            attributes[attrName] = attrValue;
+        }
+        return attributes;
+    };
+
+    // 🆕 支持单行形式：<layout ...></layout>
+    const simpleSelfClosingMatch = trimmed.match(/^<layout([^>]*)>\s*<\/layout>$/);
+    if (simpleSelfClosingMatch) {
+        const attributesStr = simpleSelfClosingMatch[1].trim();
+        const attributes = parseAttributes(attributesStr);
+
+        return {
+            isLayoutTag: true,
+            variant: 'column',
+            attributes,
+            isClosing: false
+        };
+    }
+
+    // 🆕 支持单行形式：<layout:variant ...></layout:variant>
+    const variantSelfClosingMatch = trimmed.match(/^<layout:([\w-]+)([^>]*)>\s*<\/layout:\1>$/);
+    if (variantSelfClosingMatch) {
+        const variant = variantSelfClosingMatch[1];
+        const attributesStr = variantSelfClosingMatch[2].trim();
+        const attributes = parseAttributes(attributesStr);
+
+        return {
+            isLayoutTag: true,
+            variant,
+            attributes,
+            isClosing: false
+        };
+    }
+
     // 匹配带属性的开始标签: <layout:variant attr1="value1" attr2="value2">
     // 🔧 修复：使用 [\w-]+ 来支持包含连字符的变体名（如 row-center）
-    const layoutTagWithAttrsMatch = line.trim().match(/^<layout:([\w-]+)([^>]*)>$/);
+    const layoutTagWithAttrsMatch = trimmed.match(/^<layout:([\w-]+)([^>]*)>$/);
     if (layoutTagWithAttrsMatch) {
         const variant = layoutTagWithAttrsMatch[1];
         const attributesStr = layoutTagWithAttrsMatch[2].trim();
-
-        // 解析属性
-        const attributes = {};
-        if (attributesStr) {
-            // 匹配多种格式的属性：key="value", key='value', key={value}
-            const attrRegex = /(\w+)=(["']([^"']*?)["']|\{([^}]*?)\})/g;
-            let attrMatch;
-            while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
-                const attrName = attrMatch[1];
-                // attrMatch[3] 是引号格式的值，attrMatch[4] 是大括号格式的值
-                const attrValue = attrMatch[3] !== undefined ? attrMatch[3] : attrMatch[4];
-                attributes[attrName] = attrValue;
-            }
-        }
+        const attributes = parseAttributes(attributesStr);
 
         return {
             isLayoutTag: true,
@@ -36,9 +72,24 @@ function isLayoutTag(line) {
         };
     }
 
+    // 🆕 支持简写形式: <layout attr1="..." attr2="...">
+    const simpleLayoutWithAttrsMatch = trimmed.match(/^<layout([^>]*)>$/);
+    if (simpleLayoutWithAttrsMatch) {
+        const attributesStr = simpleLayoutWithAttrsMatch[1].trim();
+        const attributes = parseAttributes(attributesStr);
+
+        // 简写形式默认使用 column 变体
+        return {
+            isLayoutTag: true,
+            variant: 'column',
+            attributes: attributes,
+            isClosing: false
+        };
+    }
+
     // 匹配简单的开始标签: <layout:variant>
     // 🔧 修复：使用 [\w-]+ 来支持包含连字符的变体名
-    const layoutTagMatch = line.trim().match(/^<layout:([\w-]+)>$/);
+    const layoutTagMatch = trimmed.match(/^<layout:([\w-]+)>$/);
     if (layoutTagMatch) {
         return {
             isLayoutTag: true,
@@ -49,11 +100,22 @@ function isLayoutTag(line) {
     }
 
     // 🔧 修复：使用 [\w-]+ 来支持包含连字符的变体名
-    const closingTagMatch = line.trim().match(/^<\/layout:([\w-]+)>$/);
+    const closingTagMatch = trimmed.match(/^<\/layout:([\w-]+)>$/);
     if (closingTagMatch) {
         return {
             isLayoutTag: true,
             variant: closingTagMatch[1],
+            attributes: {},
+            isClosing: true
+        };
+    }
+
+    // 🆕 支持简写形式的结束标签: </layout>
+    const simpleClosingTagMatch = trimmed.match(/^<\/layout>$/);
+    if (simpleClosingTagMatch) {
+        return {
+            isLayoutTag: true,
+            variant: 'column',
             attributes: {},
             isClosing: true
         };
@@ -110,7 +172,7 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
 
     return {
         style: {
-            display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+            // display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
             layoutMode: direction,
             layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
             // primaryAxisSizingMode: "fixed",
@@ -191,6 +253,12 @@ function createLayoutElement(direction, children = [], options = {}) {
     // 使用随机UUID生成ID
     const layoutId = generateUUID();
 
+    // 🆕 处理绑定数据和事件相关属性（仅针对布局，目前支持 bindingData + dataListener）
+    const bindingDataKey = attributes.bindingData || null;
+    const eventType = attributes.event || null;
+    const actionType = attributes.action || 'append';
+    const statusKey = attributes.status || '';
+
     // 根据方向自动计算交叉轴对齐方式
     // 对于水平布局，默认交叉轴居中对齐；对于垂直布局，使用传入的选项或默认左对齐
     const counterAxisAlign = options.counterAxisAlign ||
@@ -245,7 +313,11 @@ function createLayoutElement(direction, children = [], options = {}) {
             isLayout: true,
             isRoot: isRoot,
             // 🆕 保存应用的属性信息
-            appliedAttributes: attributes
+            appliedAttributes: attributes,
+            // 🆕 绑定的数据键（用于 dataVariables 和 dataListener）
+            bindingData: bindingDataKey || undefined,
+            dataAction: actionType,
+            statusKey: statusKey,
         },
         layout: {
             ...baseLayout,
@@ -259,6 +331,27 @@ function createLayoutElement(direction, children = [], options = {}) {
         events: [{}]
     };
 
+    // 🆕 如果配置了 dataListener 事件，为该布局元素创建 DATA_LISTENER 事件
+    if (bindingDataKey && eventType && (eventType === EVENT_NAME.DATA_LISTENER || eventType === 'dataListener')) {
+        const baseConfig = EVENT_CONFIG?.[EVENT_NAME.DATA_LISTENER];
+        if (baseConfig) {
+            const dataListenerEvent = JSON.parse(JSON.stringify(baseConfig));
+            dataListenerEvent.EventTargetId = layoutId;
+
+            if (!dataListenerEvent.parameters) {
+                dataListenerEvent.parameters = {};
+            }
+
+            dataListenerEvent.parameters.eleId = layoutId;
+            dataListenerEvent.parameters.dataKey = bindingDataKey;
+            dataListenerEvent.parameters.action = actionType || 'append';
+            dataListenerEvent.parameters.statusKey = statusKey || '';
+
+            layout.events = [dataListenerEvent];
+            console.log(`📡 为布局元素 ${layoutId} 创建 DATA_LISTENER 事件:`, dataListenerEvent);
+        }
+    }
+
     // 添加子元素
     layout.layout.children = children;
 
@@ -267,8 +360,58 @@ function createLayoutElement(direction, children = [], options = {}) {
 
 // 提取完整的布局标签块
 function extractLayoutBlock(lines, startIndex) {
-
     const startLine = lines[startIndex];
+    const trimmed = startLine.trim();
+
+    // 🆕 支持单行形式的 layout：<layout ...></layout> 或 <layout:row ...></layout:row>
+    // 1) 简写形式：<layout attr...></layout>
+    let selfClosingMatch = trimmed.match(/^<layout([^>]*)>\s*<\/layout>$/);
+    if (selfClosingMatch) {
+        const attributesStr = selfClosingMatch[1].trim();
+        const attributes = {};
+        if (attributesStr) {
+            const attrRegex = /(\w+)=(["']([^"']*?)["']|\{([^}]*?)\})/g;
+            let attrMatch;
+            while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
+                const attrName = attrMatch[1];
+                const attrValue = attrMatch[3] !== undefined ? attrMatch[3] : attrMatch[4];
+                attributes[attrName] = attrValue;
+            }
+        }
+
+        return {
+            layoutContent: '',
+            variant: 'column',
+            attributes,
+            endIndex: startIndex
+        };
+    }
+
+    // 2) 带变体形式：<layout:row attr...></layout:row>
+    selfClosingMatch = trimmed.match(/^<layout:([\w-]+)([^>]*)>\s*<\/layout:\1>$/);
+    if (selfClosingMatch) {
+        const variant = selfClosingMatch[1];
+        const attributesStr = selfClosingMatch[2].trim();
+        const attributes = {};
+        if (attributesStr) {
+            const attrRegex = /(\w+)=(["']([^"']*?)["']|\{([^}]*?)\})/g;
+            let attrMatch;
+            while ((attrMatch = attrRegex.exec(attributesStr)) !== null) {
+                const attrName = attrMatch[1];
+                const attrValue = attrMatch[3] !== undefined ? attrMatch[3] : attrMatch[4];
+                attributes[attrName] = attrValue;
+            }
+        }
+
+        return {
+            layoutContent: '',
+            variant,
+            attributes,
+            endIndex: startIndex
+        };
+    }
+
+    // 常规多行形式：起始行和结束行分别存在
     const startTagInfo = isLayoutTag(startLine);
 
     if (!startTagInfo.isLayoutTag || startTagInfo.isClosing) {
@@ -354,10 +497,29 @@ function collectDataVariables(elements) {
     const collectFromElement = (element) => {
         if (!element) return;
 
-        // 检查选项卡元素的绑定数据
+        // 检查选项卡元素的绑定数据（优先使用默认选中 tab 值）
         if (element._metadata && element._metadata.isTab && element._metadata.bindingData && element._metadata.defaultTabKey) {
             dataVariables[element._metadata.bindingData] = element._metadata.defaultTabKey;
-            console.log(`🔗 收集到数据变量: ${element._metadata.bindingData} = ${element._metadata.defaultTabKey}`);
+            console.log(`🔗 收集到数据变量(选项卡): ${element._metadata.bindingData} = ${element._metadata.defaultTabKey}`);
+        }
+
+        // 🆕 检查普通布局元素的绑定数据（bindingData），默认值为空字符串
+        if (element._metadata && element._metadata.bindingData && !element._metadata.isTab) {
+            const key = element._metadata.bindingData;
+            // 如果之前没有被其他元素（如 Tab）设置过，才初始化
+            if (!Object.prototype.hasOwnProperty.call(dataVariables, key)) {
+                dataVariables[key] = '';
+                console.log(`🔗 收集到数据变量(布局): ${key} = ''`);
+            }
+        }
+
+        // 🆕 如果有 statusKey，也在根 data 中初始化一个空值
+        if (element._metadata && element._metadata.statusKey) {
+            const statusKey = element._metadata.statusKey;
+            if (!Object.prototype.hasOwnProperty.call(dataVariables, statusKey)) {
+                dataVariables[statusKey] = '';
+                console.log(`🔗 收集到状态数据变量: ${statusKey} = ''`);
+            }
         }
 
         // 递归检查子元素

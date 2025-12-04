@@ -244,7 +244,7 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                 const containerElement = {
                     id: generateUUID(),
                     name: 'layout',
-                    type: 'template',
+                    'file-type': 'template',
                     _metadata: {
                         isGroup: true,
                         groupName: group.name,
@@ -320,7 +320,7 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                 const containerElement = {
                     id: generateUUID(),
                     name: 'layout',
-                    type: 'template',
+                    'file-type': 'template',
                     _metadata: {
                         isGroup: true,
                         groupName: group.name,
@@ -1796,9 +1796,6 @@ function createMetaTypeComponent(content, variant, componentConfig, markdownData
             },
             layout: {
                 style: {
-                    display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
-                    layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
-                    layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
                     boxSizing: "border-box",
                     height: "auto",
                     position: "relative"

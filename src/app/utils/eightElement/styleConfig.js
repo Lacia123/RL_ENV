@@ -845,7 +845,7 @@ export const DEFAULT_STYLE_CONFIG = {
       padding: "{dimension.padding.loose} {dimension.padding.extraloose}",
       margin: "{dimension.margin.loose} 0",
       backgroundColor: "{color.surface.grey1}",
-      borderLeft: `6px solid {color.primary.brand4}`,
+      borderLeft: `6px solid {color.primary.brand4}`, 
       borderRadius: "{dimension.borderradius.medium}",
       boxShadow: "{material.hierarchy.1f}",
       position: 'relative',
@@ -927,7 +927,7 @@ export const DEFAULT_STYLE_CONFIG = {
       fontWeight: "{font.fontweight.bold}",
       color: "{color.primary.brand6}",
       letterSpacing: "-0.02em",
-      lineHeight: "1",
+      lineHeight: "1em",
       margin: "0"
     },
     heroTitle: {

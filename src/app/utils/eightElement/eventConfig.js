@@ -5,6 +5,7 @@ export const EVENT_NAME = {
     TAB_CHANGED: 'tab_changed',
     THEME_CHANGED: 'theme_changed',
     UPDATE: 'update',
+    DATA_LISTENER: 'data_listener',
 }
 
 export const EVENT_CONFIG = {
@@ -54,6 +55,16 @@ export const EVENT_CONFIG = {
         "parameters": {
             "markdown": "",
             "cardId": ""
+        }
+    },
+    [EVENT_NAME.DATA_LISTENER]: {
+        "runtimeEventKey": EVENT_NAME.DATA_LISTENER,
+        "dataEventKey": [],
+        "parameters": {
+            "eleId": "",
+            "dataKey": "",
+            "action": "",
+            "statusKey": "",
         }
     }
 }
