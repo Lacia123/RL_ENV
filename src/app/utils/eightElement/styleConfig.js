@@ -3539,6 +3539,8 @@ export const DEFAULT_STYLE_CONFIG = {
       clipPath: "none",
       maxWidth: "100%",
       height: "auto",
+      padding: '0',
+      margin: '0',
       transition: CSS_VARIABLE_SYSTEM.ANIMATION.SMOOTH,
       '&:hover': {
         borderColor: "{color.primarycontainer.brand2}",
@@ -4466,6 +4468,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 📊 指标 / KPI 卡片
     metricCard: {
       type: 'template',
+      hasUpdateEvent: true,
       layoutModes: [
         {
           name: 'withChart',
@@ -4768,6 +4771,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 🌄 主视觉说明卡
     heroCard: {
       type: 'template',
+      hasUpdateEvent: true,
       layoutModes: [
         {
           name: 'withCover',
@@ -5022,6 +5026,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 🖼️ 内容展示卡（可视媒体信息卡片）
     contentDisplayCard: {
       type: 'template',
+      hasUpdateEvent: true,
       layoutModes: [
         {
           name: 'withImage',
@@ -5350,6 +5355,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 🎯 操作与引导卡（Action / CTA Card）
     actionCard: {
       type: 'template',
+      hasUpdateEvent: true,
       layoutModes: [
         {
           name: 'withIcon',
@@ -5587,6 +5593,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 📅 事件/活动卡（Event / Announcement Card）
     eventCard: {
       type: 'template',
+      hasUpdateEvent: true,
       layoutModes: [
         {
           name: 'withImage',
@@ -5799,6 +5806,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 🔔 系统状态卡（System Status / Update Card）
     statusCard: {
       type: 'template',
+      hasUpdateEvent: true,
       // 使用 progress 插槽内容作为参数，驱动进度条宽度
       parameters: {
         progressValue: {
@@ -6060,6 +6068,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 📊 表格卡片（Table Card）
     tableCard: {
       type: 'template',
+      hasUpdateEvent: true,
       layoutModes: [
         {
           name: 'full',
@@ -6313,6 +6322,7 @@ export const DEFAULT_STYLE_CONFIG = {
     // 🗞️ 信息列表卡（Feed / List）
     feedListCard: {
       type: 'template',
+      hasUpdateEvent: true,
       layoutModes: [
         {
           name: 'default',

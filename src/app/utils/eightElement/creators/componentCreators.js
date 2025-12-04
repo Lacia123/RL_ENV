@@ -5,6 +5,7 @@
 
 import { generateUUID } from '../util.js';
 import { DEFAULT_STYLE_CONFIG, LAYOUT_CONSTANTS } from '../styleConfig.js';
+import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';
 import resolveToken from '../../tokens/resolveToken.js';
 import { createTextElement } from './textCreators.js';
 import { createButtonElement } from './buttonCreators.js';
@@ -44,6 +45,67 @@ function generateGroupClassName(componentName, modeName, groupName) {
     const hashInput = `${safeComponentName}-${safeModeName}-${safeGroupName}`;
     const hash = Math.abs(generateHash(hashInput));
     return `group-${safeComponentName}-${safeGroupName}-hash${hash}`;
+}
+
+/**
+ * 构建组件的起始标签字符串，如 <heroCard attr="value">
+ * @param {string} variant - 组件名称 / 变体
+ * @param {Object} attributes - 组件标签上的属性
+ * @returns {string} 起始标签
+ */
+function buildComponentStartTag(variant, attributes = {}) {
+    const parts = [];
+
+    Object.entries(attributes || {}).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        const strValue = value.toString().trim();
+        // 简化版：统一使用引号包裹属性值
+        parts.push(`${key}="${strValue}"`);
+    });
+
+    const attrString = parts.join(' ');
+    if (attrString) {
+        return `<${variant} ${attrString}>`;
+    }
+    return `<${variant}>`;
+}
+
+/**
+ * 构建组件的完整 markdown 片段：<Hero>...\ncontent\n...</Hero>
+ */
+function buildComponentMarkdownPayload(variant, content, attributes = {}) {
+    const startTag = buildComponentStartTag(variant, attributes);
+    const closingTag = `</${variant}>`;
+    const body = content ? `\n${content}\n` : '\n';
+    return `${startTag}${body}${closingTag}`;
+}
+
+/**
+ * 为组件创建 UPDATE 事件（与卡片的 update 事件类似）
+ * @param {string} componentId - 组件 ID
+ * @param {string} variant - 组件变体名称
+ * @param {string} content - 组件内部内容（不含组件标签）
+ * @param {Object} attributes - 组件标签上的属性
+ * @returns {Object|null} 事件配置
+ */
+function createComponentUpdateEvent(componentId, variant, content, attributes = {}) {
+    if (!componentId) return null;
+
+    const baseUpdateConfig = EVENT_CONFIG?.[EVENT_NAME.UPDATE];
+    if (!baseUpdateConfig) return null;
+
+    const eventConfig = JSON.parse(JSON.stringify(baseUpdateConfig));
+    eventConfig.EventTargetId = componentId;
+
+    if (!eventConfig.parameters) {
+        eventConfig.parameters = {};
+    }
+
+    // 使用组件标签 + 内容构造完整的 markdown 片段
+    eventConfig.parameters.markdown = buildComponentMarkdownPayload(variant, content, attributes);
+    eventConfig.parameters.cardId = componentId;
+
+    return eventConfig;
 }
 
 /**
@@ -1843,6 +1905,8 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
     }
     
     // 创建组件容器元素
+    const componentId = generateUUID();
+
     const componentElement = {
         dataKeys: [],
         name: "layout",
@@ -1863,7 +1927,9 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
             // 🔧 如果有 layoutModes，不预先应用 componentConfig.style（等模式选择后再应用）
             // 如果没有 layoutModes，使用 componentConfig.style 作为默认样式
             classStyle: hasLayoutModes ? {} : { ...processedStyle }
-        }
+        },
+        id: componentId,
+        events: [{}]
     };
     
     // 应用样式覆盖（只有在没有 layoutModes 时才应用）
@@ -2013,6 +2079,14 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
     if (componentConfig.required) {
         console.log(`  处理组件 "${variant}" 的 required 容器:`, componentConfig.required);
         processRequiredContainers(componentConfig, componentElement.layout.children, componentConfig, paramValues);
+    }
+
+    // 🆕 如果样式配置中声明了 hasUpdateEvent，则为组件创建 UPDATE 事件
+    if (componentConfig.hasUpdateEvent) {
+        const updateEvent = createComponentUpdateEvent(componentId, variant, content, externalParameters || {});
+        if (updateEvent) {
+            componentElement.events = [updateEvent];
+        }
     }
     
     // 🆕 插槽系统：生成数据属性并处理条件样式
