@@ -6075,6 +6075,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:title || has:subtitle || has:description || has:icon || has:badge',
           style: {
             display: 'flex',
+            width: '100%',
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -6189,6 +6190,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
+            width: '100%',
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
