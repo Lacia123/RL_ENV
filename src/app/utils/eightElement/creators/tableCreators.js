@@ -79,23 +79,46 @@ function sortTableData(tableData, sortOrder) {
 }
 
 // 检测是否为表格或图表数据（统一检测）
-function isTableOrChartData(line) {
-    // 首先检查是否是图表数据标记
-    const isChart = line.trim().match(/^\[chart:(.+?)\]/);
+function isTableOrChartData(lineOrLines) {
+    // 兼容数组或字符串
+    const lines = Array.isArray(lineOrLines) ? lineOrLines : [lineOrLines];
+    // 过滤出有效的非空字符串行
+    const validLines = lines.filter(l => typeof l === 'string' && l.trim().length > 0);
 
-    if (isChart) {
-        return { isData: true, isChart: true, chartType: isChart[1] };
+    if (validLines.length === 0) {
+        return { isData: false, isChart: false, chartType: null };
     }
 
-    // 然后检查是否是普通表格
-    if (line.includes('|')) {
-        const nextLine = line.trim();
-        // 表格至少需要一个分隔符
-        const hasSeparator = nextLine.includes('|');
+    const firstLine = validLines[0].trim();
 
-        if (hasSeparator) {
-            return { isData: true, isChart: false, chartType: null };
+    // 首先检查是否是图表数据标记
+    const chartMatch = firstLine.match(/^\[chart:(.+?)\]/);
+    if (chartMatch) {
+        // 图表必须至少有一行表格数据（包含 | 且至少两列）
+        const hasTableLine = validLines.slice(1).some(l => {
+            const trimmed = l.trim();
+            if (!trimmed.includes('|')) return false;
+            const cols = trimmed.split('|').filter(c => c.trim().length > 0);
+            return cols.length >= 2;
+        });
+
+        if (!hasTableLine) {
+            return { isData: false, isChart: true, chartType: chartMatch[1] };
         }
+
+        return { isData: true, isChart: true, chartType: chartMatch[1] };
+    }
+
+    // 检查是否是普通表格：任意一行包含 | 且至少两列
+    const hasTable = validLines.some(l => {
+        const trimmed = l.trim();
+        if (!trimmed.includes('|')) return false;
+        const cols = trimmed.split('|').filter(c => c.trim().length > 0);
+        return cols.length >= 2;
+    });
+
+    if (hasTable) {
+        return { isData: true, isChart: false, chartType: null };
     }
 
     return { isData: false, isChart: false, chartType: null };

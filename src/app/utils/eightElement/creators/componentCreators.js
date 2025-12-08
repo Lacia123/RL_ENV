@@ -10,7 +10,7 @@ import resolveToken from '../../tokens/resolveToken.js';
 import { createTextElement } from './textCreators.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createBackgroundElement } from './backgroundCreators.js';
-import { createChartElement, createTableElement, extractTableOrChartData, sortTableData, generateChartSvg } from './tableCreators.js';
+import { createChartElement, createTableElement, extractTableOrChartData, sortTableData, generateChartSvg, isTableOrChartData } from './tableCreators.js';
 import { stripMarkdownFormatting, processExpression, extractMarkdownValue, extractSubTagValue } from './markdownUtils.js';
 
 // 🔧 直接导入以避免动态 import（ES6 模块系统会处理循环依赖）
@@ -1074,12 +1074,32 @@ function buildChartElementFromContent(slotName, slotConfig, slotContent, attribu
     const syntheticHeader = `[chart:${headerParts.join('|')}]`;
     const syntheticLines = [syntheticHeader, ...tableLines];
 
+    // 🆕 先检查是否符合表格/图表数据的基本格式
+    const { isData } = isTableOrChartData(syntheticLines);
+
+    if (!isData) {
+        console.warn(`  ⚠️ 插槽 "${slotName}" 的内容不符合图表数据格式，跳过`);
+        return null;
+    }
+
     try {
         const chartData = extractTableOrChartData(syntheticLines, 0);
         const finalChartType = chartData.chartType || chartType;
         const finalChartTitle = chartData.chartTitle || chartTitle;
         const finalSortOrder = sortOrder || chartData.sortOrder;
         const sortedTableData = sortTableData(chartData.tableData, finalSortOrder);
+
+        // 🆕 校验解析结果是否有有效表格数据
+        const hasValidTable =
+            Array.isArray(chartData.tableData) &&
+            chartData.tableData.length > 0 &&
+            Array.isArray(chartData.tableData[0]) &&
+            chartData.tableData[0].length > 0;
+
+        if (!hasValidTable) {
+            console.warn(`  ⚠️ 插槽 "${slotName}" 的图表数据解析为空，跳过`);
+            return null;
+        }
 
         const chartElement = createChartElement(
             finalChartType,
@@ -1949,6 +1969,7 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         const slotElementsMap = new Map();
         
         // 为每个插槽创建对应的元素
+        let abortForInvalidChart = false;
         slots.forEach(slotData => {
             const { slotName } = slotData;
             const baseSlotName = slotData.baseSlotName || slotName;
@@ -1971,8 +1992,18 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                 slotElementsMap.set(slotName, element);
             } else {
                 console.warn(`  ❌ 创建插槽元素失败: ${slotName}`);
+                
+                // 🆕 如果是图表插槽且内容不合法，终止整个组件生成
+                if (slotConfig.metaType === 'chart') {
+                    abortForInvalidChart = true;
+                }
             }
         });
+
+        if (abortForInvalidChart) {
+            console.warn(`  ❌ 图表内容无效，终止组件 "${variant}" 的生成`);
+            return null;
+        }
         
         // 🆕 检查是否有 layoutModes 配置
         if (componentConfig.layoutModes && componentConfig.layoutModes.length > 0) {

@@ -300,6 +300,7 @@ function analyzeElementsInEightElement(eightElement) {
 
         // 遍历子元素，提取内容信息和类型信息
         children.forEach((child, index) => {
+            if (!child) return; // 🆕 防御：跳过空子元素
             let itemContent = '';
             let itemType = child.name;
             let itemVariant = 'p';
