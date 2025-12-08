@@ -3178,7 +3178,7 @@ export const DEFAULT_STYLE_CONFIG = {
         metaType: 'component',
         variant: 'labelTitle',
         parameters: {
-          labelBgColor: "{color.primary.brand5}"
+          labelBgColor: "{color.primary.brand4}"
         }
       }
     },
