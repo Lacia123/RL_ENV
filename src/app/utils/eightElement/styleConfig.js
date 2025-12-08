@@ -4778,6 +4778,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:cover_image',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xxxl}',
@@ -4786,7 +4787,7 @@ export const DEFAULT_STYLE_CONFIG = {
             position: 'relative',
             overflow: 'hidden',
             minHeight: '320px',
-            height: '100%',
+            height: 'auto',
             boxShadow: '{material.hierarchy.2f}'
           },
           structure: {
@@ -4870,6 +4871,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
+            flex: '1',
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xxxl}',
@@ -4878,6 +4880,7 @@ export const DEFAULT_STYLE_CONFIG = {
             color: '{color.onprimary.white100}',
             position: 'relative',
             minHeight: '280px',
+            height: 'auto',
             boxShadow: '{material.hierarchy.2f}'
           },
           structure: {
