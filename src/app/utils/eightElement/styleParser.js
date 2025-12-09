@@ -92,12 +92,19 @@ export function removeInlineStyles(content) {
 
 /**
  * 解析表格内容，提取表头样式并清理内容
+ * 支持格式：
+ * - [background:{color.primarycontainer.brand0};headerAlign:center;cellAlign:center]
+ * - 多个样式用 ; 分隔
+ * - headerAlign: center/left/right - 表头对齐
+ * - cellAlign: center/left/right - 单元格对齐
  * @param {string} tableContent - 表格内容
- * @returns {Object} { headerStyles: Object, cleanContent: string }
+ * @returns {Object} { headerStyles: Object, headerAlign: string, cellAlign: string, cleanContent: string }
  */
 export function parseTableHeaderStyles(tableContent) {
     const lines = tableContent.trim().split('\n');
     let headerStyles = {};
+    let headerAlign = null;
+    let cellAlign = null;
     const cleanLines = [];
 
     for (let i = 0; i < lines.length; i++) {
@@ -105,9 +112,55 @@ export function parseTableHeaderStyles(tableContent) {
         
         // 第一行（表头行）：解析样式
         if (i === 0) {
-            const { styles, cleanContent } = parseInlineStyles(line);
-            headerStyles = styles;
-            cleanLines.push(cleanContent);
+            // 🆕 匹配完整的样式块：[...]
+            const styleBlockMatch = line.match(/\[([^\]]+)\]/);
+            
+            if (styleBlockMatch) {
+                const styleBlockContent = styleBlockMatch[1];
+                
+                // 🆕 用 ; 分割多个样式设置
+                const styleParts = styleBlockContent.split(';').map(s => s.trim()).filter(s => s);
+                
+                styleParts.forEach(part => {
+                    // 🆕 处理特殊对齐属性：headerAlign:center 或 cellAlign:center
+                    const headerAlignMatch = part.match(/^headerAlign:\s*(center|left|right)$/i);
+                    if (headerAlignMatch) {
+                        headerAlign = headerAlignMatch[1].toLowerCase();
+                        return;
+                    }
+                    
+                    const cellAlignMatch = part.match(/^cellAlign:\s*(center|left|right)$/i);
+                    if (cellAlignMatch) {
+                        cellAlign = cellAlignMatch[1].toLowerCase();
+                        return;
+                    }
+                    
+                    // 🆕 处理普通样式：property:{token} 或 property:value
+                    const tokenStyleMatch = part.match(/^(\w+):\s*\{([^}]+)\}$/);
+                    if (tokenStyleMatch) {
+                        const [, propertyName, tokenPath] = tokenStyleMatch;
+                        const camelCaseProperty = propertyName.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+                        headerStyles[camelCaseProperty] = `{${tokenPath}}`;
+                        return;
+                    }
+                    
+                    // 🆕 处理普通值样式：property:value（非 token）
+                    const valueStyleMatch = part.match(/^(\w+):\s*(.+)$/);
+                    if (valueStyleMatch) {
+                        const [, propertyName, value] = valueStyleMatch;
+                        const camelCaseProperty = propertyName.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+                        headerStyles[camelCaseProperty] = value.trim();
+                        return;
+                    }
+                });
+                
+                // 🆕 移除样式块，保留其他内容
+                const cleanContent = line.replace(/\[([^\]]+)\]/, '').trim();
+                cleanLines.push(cleanContent);
+            } else {
+                // 没有样式块，直接使用原内容
+                cleanLines.push(line);
+            }
         } else {
             // 其他行：直接清理样式语法
             cleanLines.push(removeInlineStyles(line));
@@ -116,6 +169,8 @@ export function parseTableHeaderStyles(tableContent) {
 
     return {
         headerStyles,
+        headerAlign,
+        cellAlign,
         cleanContent: cleanLines.join('\n')
     };
 }

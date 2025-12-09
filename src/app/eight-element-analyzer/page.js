@@ -234,7 +234,7 @@ const MARKDOWN_TEMPLATES = {
 ![优雅设计](https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_1280.jpg)
 
 这种设计风格特别适合商务场景、品牌展示和高端产品介绍。
-[了解更多](https://example.com/elegant)
+[了解更多]()
 [secondary][了解更多](https://example.com/elegant)
 </card:elegantStandard>
 
@@ -271,7 +271,7 @@ const MARKDOWN_TEMPLATES = {
 ### 数据展示
 专业的表格数据展示布局，保持优雅青蓝风格的同时确保数据的清晰可读。
 
-| 功能模块 | 完成度 | 优先级 |[background:{color.primarycontainer.brand0}]
+| 功能模块 | 完成度 | 优先级 |[background:{color.primarycontainer.brand0};headerAlign:center;cellAlign:center]
 |---------|--------|--------|
 | 卡片系统 | 100% | 高 |
 | 布局引擎 | 95% | 高 |

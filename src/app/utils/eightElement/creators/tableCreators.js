@@ -200,7 +200,7 @@ function createTableElement(markdownTableContent) {
     const tableCellStyleConfig = getElementStyleConfig('table', 'td');
 
     // 🆕 使用通用工具解析表头样式
-    const { headerStyles, cleanContent } = parseTableHeaderStyles(markdownTableContent);
+    const { headerStyles, headerAlign, cellAlign, cleanContent } = parseTableHeaderStyles(markdownTableContent);
     const cleanedTableContent = cleanContent;
     
     // 🆕 扩展样式应用：不仅支持 background，还支持其他样式属性
@@ -230,6 +230,19 @@ function createTableElement(markdownTableContent) {
             }
         });
         console.log('🎨 应用表头自定义样式 (保持 token 格式):', headerStyles);
+    }
+    
+    // 🆕 应用表头对齐设置
+    if (headerAlign) {
+        finalThStyleConfig.textAlign = headerAlign;
+        console.log('🎨 应用表头对齐:', headerAlign);
+    }
+    
+    // 🆕 构建td样式配置，应用单元格对齐设置
+    let finalTdStyleConfig = { ...tableCellStyleConfig };
+    if (cellAlign) {
+        finalTdStyleConfig.textAlign = cellAlign;
+        console.log('🎨 应用单元格对齐:', cellAlign);
     }
 
     // 创建符合要求的表格元素结构
@@ -290,9 +303,7 @@ function createTableElement(markdownTableContent) {
                 // borderBottomStyle: "solid"
             },
             td: {
-                style: {
-                    ...tableCellStyleConfig
-                }
+                style: finalTdStyleConfig
             }
         },
         events: [{}]
