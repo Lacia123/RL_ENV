@@ -5036,6 +5036,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:image',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5146,6 +5147,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5603,6 +5605,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:image',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5678,6 +5681,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
