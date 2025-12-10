@@ -1,5 +1,5 @@
 import { EVENT_NAME, EVENT_CONFIG } from './eventConfig.js';
-import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG } from './styleConfig.js';
+import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig } from './styleConfig.js';
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance } from './util.js';
 import resolveToken from '../tokens/resolveToken.js';
@@ -2137,10 +2137,7 @@ function markdownToEightElement(markdown, styleConfig) {
     // 如果提供了样式配置，设置当前配置
     if (styleConfig) {
         try {
-            // 动态导入避免循环依赖
-            import('./styleConfig.js').then(({ setStyleConfig }) => {
-                setStyleConfig(styleConfig);
-            });
+            setStyleConfig(styleConfig);
         } catch (error) {
             console.warn('设置样式配置失败:', error);
         }
@@ -2182,10 +2179,7 @@ function markdownToEightElement(markdown, styleConfig) {
 
     // 重置为默认配置
     try {
-        // 动态导入避免循环依赖
-        import('./styleConfig.js').then(({ resetStyleConfig }) => {
-            resetStyleConfig();
-        });
+        resetStyleConfig();
     } catch (error) {
         console.warn('重置样式配置失败:', error);
     }

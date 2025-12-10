@@ -9,8 +9,6 @@
 import * as d3 from 'd3';
 import { COLOR_CONSTANTS, DEFAULT_STYLE_CONFIG,  } from './styleConfig.js';
 import resolveToken from '../tokens/resolveToken.js';
-import { JSDOM } from 'jsdom';
-
 
 const legendConfig = {
   fontSize: "14px",
@@ -43,42 +41,106 @@ const titleConfig = {
   fill: "{color.onsurface.black88}",
 }
 
+const hasBrowserDom = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+let cachedJsdomClass;
+
+function tryLoadJsdom() {
+  if (cachedJsdomClass !== undefined) {
+    return cachedJsdomClass;
+  }
+
+  if (hasBrowserDom) {
+    cachedJsdomClass = null;
+    return cachedJsdomClass;
+  }
+
+  const globalJsdom =
+    (typeof globalThis !== 'undefined' && (globalThis.JSDOM || globalThis.jsdom || globalThis.__JSDOM__)) ||
+    null;
+
+  if (globalJsdom) {
+    cachedJsdomClass = globalJsdom;
+    return cachedJsdomClass;
+  }
+
+  if (typeof require === 'function') {
+    try {
+      const jsdomModule = require('jsdom');
+      cachedJsdomClass = jsdomModule?.JSDOM || jsdomModule?.default?.JSDOM || jsdomModule?.default || null;
+      return cachedJsdomClass;
+    } catch (error) {
+      console.warn('[psuip] 加载 jsdom 失败，将在无 DOM 环境禁用图表渲染：', error);
+    }
+  }
+
+  cachedJsdomClass = null;
+  return cachedJsdomClass;
+}
+
+function createDocumentContext(width = 800, height = 500) {
+  if (hasBrowserDom) {
+    const doc =
+      window.document?.implementation?.createHTMLDocument('psuip-chart') ||
+      window.document.cloneNode(false) ||
+      window.document;
+    if (!doc.body) {
+      doc.appendChild(doc.createElement('body'));
+    }
+    return { document: doc, cleanup: () => {} };
+  }
+
+  const JsdomClass = tryLoadJsdom();
+  if (!JsdomClass) {
+    throw new Error(
+      'PSUIP chartGenerator 需要 DOM 环境。请在 Node 端安装 jsdom，或手动注入 window/document。'
+    );
+  }
+
+  const dom = new JsdomClass(`<!DOCTYPE html><html><body></body></html>`, {
+    pretendToBeVisual: true,
+    url: 'http://localhost/',
+    width,
+    height
+  });
+
+  return {
+    document: dom.window.document,
+    cleanup: () => {
+      if (typeof dom.window.close === 'function') {
+        dom.window.close();
+      }
+    }
+  };
+}
+
 /**
- * 创建JSDOM环境
+ * 创建渲染所需的 DOM/SVG 环境
  * @param {number} width - SVG宽度
  * @param {number} height - SVG高度
- * @returns {Object} - 包含document和d3对象的环境
+ * @returns {Object} - 包含document和svg引用的环境
  */
 function createJsdomEnv(width = 800, height = 500) {
-  // 创建虚拟DOM
-  const dom = new JSDOM(`<!DOCTYPE html><html><body></body></html>`);
-  const document = dom.window.document;
-  
-  // 🆕 创建响应式SVG元素 - 适应容器宽度
-  const svg = d3.select(document.body)
+  const { document, cleanup } = createDocumentContext(width, height);
+  const host = document.createElement('div');
+  document.body?.appendChild(host);
+
+  const svg = d3
+    .select(host)
     .append('svg')
-    .attr('width', '100%')        // 🆕 使用100%宽度，适应容器
-    .attr('height', '100%')       // 🆕 使用100%高度，完全填充
-    .attr('viewBox', `0 0 ${width} ${height}`)  // 保持原始比例
-    .attr('preserveAspectRatio', 'none')  // 🆕 不保持宽高比，完全拉伸填充
+    .attr('width', '100%')
+    .attr('height', '100%')
+    .attr('viewBox', `0 0 ${width} ${height}`)
+    .attr('preserveAspectRatio', 'none')
     .attr('xmlns', 'http://www.w3.org/2000/svg')
-    .style('width', '100%')       // 🆕 CSS确保宽度100%
-    .style('height', '100%')      // 🆕 CSS确保高度100%
-    .style('display', 'block')    // 🆕 块级元素，避免内联空隙
-    .style('min-height', '200px'); // 🆕 最小高度，避免太小
-  
-  // 解析颜色tokens
+    .style('width', '100%')
+    .style('height', '100%')
+    .style('display', 'block')
+    .style('min-height', '200px');
+
   const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
   const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
   const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
 
-
-  // .axis text {
-    //   fill: #666;
-    //   font-size: 12px;
-    // }
-  
-  // 添加样式
   const defs = svg.append('defs');
   defs.append('style').text(`
     .axis line, .axis path {
@@ -169,11 +231,17 @@ function createJsdomEnv(width = 800, height = 500) {
       fill: ${colorBrand4}; 
     }
   `);
-  
+
   return {
     document,
     svg,
-    body: document.body
+    body: document.body,
+    cleanup: () => {
+      if (host.parentNode) {
+        host.parentNode.removeChild(host);
+      }
+      cleanup?.();
+    }
   };
 }
 
@@ -313,9 +381,7 @@ function generateLegend(g, innerHeight, items, displayConfig, chartStyleConfig, 
  * @returns {string} - SVG图表的HTML字符串
  */
 export function generateChartFromTableData(tableData, chartType, chartStyleConfig = null, chartTitle = null) {
-  try {
-    console.log('生成图表，类型:', chartType, '数据行数:', tableData.length);
-    
+  try {    
     // 确保至少有标题行和一行数据
     if (!tableData || tableData.length < 2) {
       throw new Error('图表数据不足，至少需要标题行和一行数据');
@@ -636,7 +702,6 @@ function generateTreeMindChart(tableData, chartTitle = null) {
  */
 function generateGroupedLineChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
   try {
-    console.log('生成分组折线图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
     const { svg, document } = createJsdomEnv(width, height);
     
@@ -1044,7 +1109,6 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
  */
 function generateBarChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
   try {
-    console.log('生成垂直柱状图, 数据点数:', data.length, '数据系列数:', valueFields.length);
     
     // 创建JSDOM环境
     const { svg, document } = createJsdomEnv(width, height);
@@ -1241,9 +1305,7 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
  * @returns {string} - SVG图表的HTML字符串
  */
 function generateBarHChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
-  try {
-    console.log('生成水平柱状图, 数据点数:', data.length, '数据系列数:', valueFields.length);
-    
+  try {    
     // 创建JSDOM环境
     const { svg, document } = createJsdomEnv(width, height);
     
@@ -1475,9 +1537,7 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
  * @returns {string} - SVG图表的HTML字符串
  */
 function generateAreaChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
-  try {
-    console.log('生成面积图, 数据点数:', data.length, '数据系列数:', valueFields.length);
-    
+  try {    
     const { svg, document } = createJsdomEnv(width, height);
     
     const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
@@ -1742,7 +1802,6 @@ function generateAreaChart(data, dateField, valueFields, width, height, margin, 
  */
 function generateDonutChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
   try {
-    console.log('生成环状图, 数据点数:', data.length, '值字段:', valueFields);
     
     // 创建JSDOM环境
     const { svg, document } = createJsdomEnv(width, height);
@@ -1888,9 +1947,7 @@ function generateDonutChart(data, dateField, valueFields, width, height, margin,
  * @returns {string} - SVG图表的HTML字符串
  */
 function generatePieChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
-  try {
-    console.log('生成饼图, 数据点数:', data.length, '值字段:', valueFields);
-    
+  try {    
     // 创建JSDOM环境
     const { svg, document } = createJsdomEnv(width, height);
     
