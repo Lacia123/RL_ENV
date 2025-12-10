@@ -6338,6 +6338,8 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
+            flex: 1,
+            width: '100%',
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             padding: '{dimension.padding.loose}',
@@ -6376,6 +6378,8 @@ export const DEFAULT_STYLE_CONFIG = {
       ],
       style: {
         display: 'flex',
+        flex: 1,
+        width: '100%',
         flexDirection: 'column',
         gap: '{dimension.gap.base}',
         padding: '{dimension.padding.loose}',
