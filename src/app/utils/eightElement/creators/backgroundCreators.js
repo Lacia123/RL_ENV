@@ -63,6 +63,7 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
                     layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
                     layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
                     layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+                    width: '100%',
                     // borderColor: {
                     //   element: "color",
                     //   value: "border",
