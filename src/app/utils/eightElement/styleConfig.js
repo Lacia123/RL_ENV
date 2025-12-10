@@ -6083,6 +6083,7 @@ export const DEFAULT_STYLE_CONFIG = {
           style: {
             display: 'flex',
             width: '100%',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -6198,6 +6199,7 @@ export const DEFAULT_STYLE_CONFIG = {
           style: {
             display: 'flex',
             width: '100%',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
