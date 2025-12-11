@@ -949,13 +949,12 @@ export const DEFAULT_STYLE_CONFIG = {
     heroMetric: {
       fontSize: "{font.size.medium}",
       fontWeight: "{font.fontweight.semibold}",
-      color: "{color.onprimary.white100}",
+      color: "{color.basic.opacity.white.88}",
       margin: "0",
-      padding: "{dimension.padding.base} {dimension.padding.tight}",
-      borderRadius: "{dimension.borderradius.large}",
+      padding: "{dimension.padding.base} {dimension.padding.extraloose}",
+      borderRadius: "{dimension.borderradius.full}",
       backdropFilter: 'blur(10px)',
-      background: 'rgba(255,255,255,0.15)',
-      border: "1px solid rgba(255,255,255,0.24)",
+      background: '{color.basic.opacity.white.12}',
       letterSpacing: "0.02em"
     },
     cardSegment: {
@@ -4782,8 +4781,7 @@ export const DEFAULT_STYLE_CONFIG = {
             display: 'flex',
             flex: 1,
             flexDirection: 'column',
-            gap: '{dimension.gap.base}',
-            borderRadius: '{dimension.borderradius.xxxl}',
+            borderRadius: '{dimension.borderradius.xxxxl}',
             padding: '{dimension.padding.extraloose}',
             color: '{color.onprimary.white100}',
             position: 'relative',
@@ -4815,7 +4813,7 @@ export const DEFAULT_STYLE_CONFIG = {
                   zIndex: '1',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '{dimension.gap.base}'
+                  gap: '{dimension.gap.superloose}'
                 },
                 groups: [
                   {
@@ -4874,11 +4872,11 @@ export const DEFAULT_STYLE_CONFIG = {
           style: {
             display: 'flex',
             flex: '1',
+            gap: '{dimension.gap.superloose}',
             flexDirection: 'column',
-            gap: '{dimension.gap.base}',
-            borderRadius: '{dimension.borderradius.xxxl}',
+            borderRadius: '{dimension.borderradius.xxxxl}',
             padding: '{dimension.padding.extraloose}',
-            background: `linear-gradient(135deg, {color.primary.brand6} 0%, {color.secondary.violet5} 60%, {color.surfacecontainer.black12} 100%)`,
+            background: '{color.gradient.gradient.primary180secondary}',
             color: '{color.onprimary.white100}',
             position: 'relative',
             minHeight: '280px',
@@ -4939,10 +4937,9 @@ export const DEFAULT_STYLE_CONFIG = {
       style: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '{dimension.gap.base}',
-        borderRadius: '{dimension.borderradius.xxxl}',
+        borderRadius: '{dimension.borderradius.xxxxl}',
         padding: '{dimension.padding.extraloose}',
-        background: `linear-gradient(135deg, {color.primary.brand6} 0%, {color.secondary.violet5} 60%, {color.surfacecontainer.black12} 100%)`,
+        background: '{color.gradient.gradient.primary180secondary}',
         color: '{color.onprimary.white100}',
         position: 'relative',
         overflow: 'hidden',
@@ -4975,14 +4972,11 @@ export const DEFAULT_STYLE_CONFIG = {
             fontSize: '{font.size.tiny}',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: '{color.onprimary.white100}',
-            padding: '{dimension.padding.tight}',
-            borderRadius: '{dimension.borderradius.large}',
-            borderColor: '{color.onprimary.white100}',
-            borderWidth: '{dimension.borderwidth.narrow}',
+            color: '{color.basic.opacity.white.88}',
+            padding: '{dimension.padding.semitight} {dimension.padding.base}',
+            borderRadius: '{dimension.borderradius.full}',
             backdropFilter: 'blur(10px)',
-            background: 'rgba(255,255,255,0.15)',
-            borderStyle: 'solid',
+            background: '{color.basic.opacity.white.16}',
             margin: '0'
           }
         },
@@ -5040,7 +5034,7 @@ export const DEFAULT_STYLE_CONFIG = {
             display: 'flex',
             flex: 1,
             flexDirection: 'column',
-            gap: '{dimension.gap.base}',
+            gap: '{dimension.gap.superloose}',
             borderRadius: '{dimension.borderradius.xl}',
             padding: '{dimension.padding.loose}',
             background: '{color.surfacecontainer.white100}',
@@ -5069,7 +5063,7 @@ export const DEFAULT_STYLE_CONFIG = {
                 style: {
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '{dimension.gap.base}'
+                  gap: '{dimension.gap.semiloose}'
                 },
                 groups: [
                   {
@@ -5101,6 +5095,7 @@ export const DEFAULT_STYLE_CONFIG = {
                       flexDirection: 'column',
                       borderRadius: '{dimension.borderradius.large}',
                       background: '{color.primarycontainer.brand0}',
+                      margin: '{dimension.margin.semitight} 0',
                       padding: '{dimension.padding.base}',
                       gap: '{dimension.gap.base}'
                     },
@@ -5151,7 +5146,7 @@ export const DEFAULT_STYLE_CONFIG = {
             display: 'flex',
             flex: 1,
             flexDirection: 'column',
-            gap: '{dimension.gap.base}',
+            gap: '{dimension.gap.superloose}',
             borderRadius: '{dimension.borderradius.xl}',
             padding: '{dimension.padding.loose}',
             background: '{color.surfacecontainer.white100}',
@@ -5166,7 +5161,7 @@ export const DEFAULT_STYLE_CONFIG = {
                 style: {
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '{dimension.gap.base}'
+                  gap: '{dimension.gap.semiloose}'
                 },
                 groups: [
                   {
@@ -5198,6 +5193,7 @@ export const DEFAULT_STYLE_CONFIG = {
                       flexDirection: 'column',
                       borderRadius: '{dimension.borderradius.large}',
                       background: '{color.primarycontainer.brand0}',
+                      margin: '{dimension.margin.semitight} 0',
                       padding: '{dimension.padding.base}',
                       gap: '{dimension.gap.base}'
                     },
@@ -5245,7 +5241,7 @@ export const DEFAULT_STYLE_CONFIG = {
       style: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '{dimension.gap.base}',
+        gap: '{dimension.gap.superloose}',
         borderRadius: '{dimension.borderradius.xl}',
         padding: '{dimension.padding.loose}',
         background: '{color.surfacecontainer.white100}',
@@ -5271,9 +5267,9 @@ export const DEFAULT_STYLE_CONFIG = {
           variant: 'h3',
           variantStyle: {
             margin: '0',
-            fontSize: '{font.size.xl}',
+            fontSize: '{font.size.xxl}',
             fontWeight: '{font.fontweight.bold}',
-            color: '{color.onsurface.black88}'
+            color: '{color.basic.opacity.black.100}'
           }
         },
         subtitle: {
@@ -5281,7 +5277,8 @@ export const DEFAULT_STYLE_CONFIG = {
           variant: 'p',
           variantStyle: {
             margin: '0',
-            color: '{color.onsurface.black64}',
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.black.48}',
             lineHeight: '1.5'
           }
         },
@@ -5318,9 +5315,9 @@ export const DEFAULT_STYLE_CONFIG = {
           variant: 'p',
           variantStyle: {
             margin: '0',
-            fontSize: '{font.size.large}',
+            fontSize: '{font.size.xl}',
             fontWeight: '{font.fontweight.bold}',
-            color: '{color.primary.brand6}'
+            color: '{color.basic.brand.7}'
           }
         },
         location: {
