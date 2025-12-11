@@ -845,7 +845,7 @@ export const DEFAULT_STYLE_CONFIG = {
       padding: "{dimension.padding.loose} {dimension.padding.extraloose}",
       margin: "{dimension.margin.loose} 0",
       backgroundColor: "{color.surface.grey1}",
-      borderLeft: `6px solid {color.primary.brand4}`, 
+      borderLeft: `6px solid {color.primary.brand4}`,
       borderRadius: "{dimension.borderradius.medium}",
       boxShadow: "{material.hierarchy.1f}",
       position: 'relative',
@@ -4674,7 +4674,7 @@ export const DEFAULT_STYLE_CONFIG = {
         background: '{color.surfacecontainer.white100}',
         boxShadow: '{material.hierarchy.1f}',
         border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}',
-        
+
       },
       slotConfigs: {
         metric_value: {
@@ -5845,26 +5845,39 @@ export const DEFAULT_STYLE_CONFIG = {
                 style: {
                   display: 'flex',
                   flexDirection: 'row',
-                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  alignItems: 'top',
                   gap: '{dimension.gap.base}',
                   flexWrap: 'wrap'
                 },
                 groups: [
                   {
-                    name: 'statusTypeBlock',
-                    slots: ['status_type'],
+                    name: 'statusMessage',
                     type: 'template',
                     style: {
-                      flexShrink: '0'
-                    }
+                      display: 'flex',
+                      flexDirection: 'column',
+                    },
+                    groups: [{
+                      name: 'statusTypeBlock',
+                      slots: ['status_type'],
+                      type: 'template',
+                      style: {
+                        flexShrink: '0'
+                      }
+                    }, {
+                      name: 'messageBlock',
+                      slots: ['message'],
+                      type: 'template',
+                      style: {
+                        flex: '1'
+                      }
+                    }]
                   },
                   {
-                    name: 'messageBlock',
-                    slots: ['message'],
-                    type: 'template',
-                    style: {
-                      flex: '1'
-                    }
+                    name: 'timestampBlock',
+                    condition: 'has:timestamp',
+                    slots: ['timestamp']
                   }
                 ]
               },
@@ -5889,11 +5902,6 @@ export const DEFAULT_STYLE_CONFIG = {
                   marginTop: '{dimension.margin.tight}'
                 },
                 groups: [
-                  {
-                    name: 'timestampBlock',
-                    condition: 'has:timestamp',
-                    slots: ['timestamp']
-                  },
                   {
                     name: 'ctaBlock',
                     condition: 'has:cta',
@@ -5926,28 +5934,49 @@ export const DEFAULT_STYLE_CONFIG = {
                 style: {
                   display: 'flex',
                   flexDirection: 'row',
-                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  alignItems: 'top',
                   gap: '{dimension.gap.base}',
                   flexWrap: 'wrap'
                 },
                 groups: [
                   {
-                    name: 'statusTypeBlock',
-                    slots: ['status_type'],
+                    name: 'statusMessage',
                     type: 'template',
                     style: {
-                      flexShrink: '0'
-                    }
+                      display: 'flex',
+                      flexDirection: 'column',
+                    },
+                    groups: [{
+                      name: 'statusTypeBlock',
+                      slots: ['status_type'],
+                      type: 'template',
+                      style: {
+                        flexShrink: '0'
+                      }
+                    }, {
+                      name: 'messageBlock',
+                      slots: ['message'],
+                      type: 'template',
+                      style: {
+                        flex: '1'
+                      }
+                    }]
                   },
                   {
-                    name: 'messageBlock',
-                    slots: ['message'],
-                    type: 'template',
-                    style: {
-                      flex: '1'
-                    }
+                    name: 'timestampBlock',
+                    condition: 'has:timestamp',
+                    slots: ['timestamp']
                   }
                 ]
+              },
+              {
+                name: 'progressBlock',
+                slots: ['progress'],
+                type: 'template',
+                style: {
+                  marginTop: '{dimension.margin.tight}'
+                }
               },
               {
                 name: 'footerRow',
@@ -5962,11 +5991,6 @@ export const DEFAULT_STYLE_CONFIG = {
                   marginTop: '{dimension.margin.tight}'
                 },
                 groups: [
-                  {
-                    name: 'timestampBlock',
-                    condition: 'has:timestamp',
-                    slots: ['timestamp']
-                  },
                   {
                     name: 'ctaBlock',
                     condition: 'has:cta',
@@ -5996,15 +6020,9 @@ export const DEFAULT_STYLE_CONFIG = {
           variantStyle: {
             margin: '0',
             fontSize: '{font.size.small}',
-            fontWeight: '{font.fontweight.semibold}',
-            padding: '{dimension.padding.supertight} {dimension.padding.tight}',
-            borderRadius: '{dimension.borderradius.large}',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '{dimension.gap.supertight}',
+            fontWeight: '{font.fontweight.bold}',
             // 默认样式（成功）
-            background: '{color.success.green1}',
-            color: '{color.success.green6}'
+            color: '{color.basic.brand.6}'
           }
         },
         message: {
@@ -6036,7 +6054,7 @@ export const DEFAULT_STYLE_CONFIG = {
             // 进度条填充部分，通过 CSS 变量控制宽度
             display: 'block',
             height: '100%',
-            background: 'linear-gradient(90deg, {color.primary.brand6} 0%, {color.primary.brand5} 100%)',
+            background: 'linear-gradient({dimension.basic.deg.135}, {color.basic.violet.5} {dimension.basic.percent.0}, {color.basic.blue.5} {dimension.basic.percent.100})',
             borderRadius: 'inherit',
             transition: 'width 0.3s ease',
             // 使用 statusCard 根上的 --status-progress（0-100），映射到宽度百分比
