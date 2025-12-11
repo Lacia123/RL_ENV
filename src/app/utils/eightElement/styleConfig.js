@@ -4475,6 +4475,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:chart_mini',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -4586,6 +4587,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5367,6 +5369,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:icon',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5451,6 +5454,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5827,6 +5831,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:progress',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5907,6 +5912,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
+            flex: 1,
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
