@@ -1223,7 +1223,7 @@ export const DEFAULT_STYLE_CONFIG = {
       // borderRight: `{dimension.borderwidth.narrow} solid {color.surfacecontainer.black20}`,
       borderBottom: `{dimension.borderwidth.base} solid {color.surfacecontainer.black20}`,
       backgroundImage: 'none',
-      textTransform: 'uppercase',
+      // textTransform: 'uppercase',
       letterSpacing: '0.5px'
     },
     td: {
