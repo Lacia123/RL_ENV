@@ -43,7 +43,9 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
                 boxSizing: "border-box",
                 // primaryAxisSizingMode: "fixed",
                 position: "relative",
-                ...layoutStyleConfig
+                ...layoutStyleConfig,
+                padding: '0',
+                margin: '0'
             },
             background: {
                 type: "container",
@@ -64,6 +66,7 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
                     layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
                     layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
                     width: '100%',
+                    height: '100%',
                     // borderColor: {
                     //   element: "color",
                     //   value: "border",

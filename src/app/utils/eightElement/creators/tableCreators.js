@@ -94,15 +94,24 @@ function isTableOrChartData(lineOrLines) {
     // 首先检查是否是图表数据标记
     const chartMatch = firstLine.match(/^\[chart:(.+?)\]/);
     if (chartMatch) {
-        // 图表必须至少有一行表格数据（包含 | 且至少两列）
-        const hasTableLine = validLines.slice(1).some(l => {
+        // 🔧 修复：检查图表标记后面是否紧跟表格数据（在同一行）
+        const chartType = chartMatch[1].split('|')[0].trim(); // 提取图表类型（可能包含标题和排序参数）
+        const afterChartTag = firstLine.replace(/^\[chart:[^\]]+\]/, '').trim();
+        
+        // 检查图表标记后是否在同一行有表格数据
+        const hasTableInSameLine = afterChartTag.includes('|') && 
+            afterChartTag.split('|').filter(c => c.trim().length > 0).length >= 2;
+        
+        // 检查后续行是否有表格数据
+        const hasTableInNextLines = validLines.slice(1).some(l => {
             const trimmed = l.trim();
             if (!trimmed.includes('|')) return false;
             const cols = trimmed.split('|').filter(c => c.trim().length > 0);
             return cols.length >= 2;
         });
 
-        if (!hasTableLine) {
+        // 🔧 修复：只要同一行或后续行有表格数据，就认为是有效的图表数据
+        if (!hasTableInSameLine && !hasTableInNextLines) {
             return { isData: false, isChart: true, chartType: chartMatch[1] };
         }
 
@@ -199,9 +208,13 @@ function createTableElement(markdownTableContent) {
     const tableRowStyleConfig = getElementStyleConfig('table', 'tr');
     const tableCellStyleConfig = getElementStyleConfig('table', 'td');
 
+    // 🔧 修复：移除可能残留的图表标记（防御性编程）
+    let cleanedContent = markdownTableContent || '';
+    cleanedContent = cleanedContent.replace(/^\[chart:[^\]]+\]\s*/gm, '');
+    
     // 🆕 使用通用工具解析表头样式
-    const { headerStyles, headerAlign, cellAlign, cleanContent } = parseTableHeaderStyles(markdownTableContent);
-    const cleanedTableContent = cleanContent;
+    const { headerStyles, headerAlign, cellAlign, cleanContent: furtherCleanedContent } = parseTableHeaderStyles(cleanedContent);
+    const cleanedTableContent = furtherCleanedContent;
     
     // 🆕 扩展样式应用：不仅支持 background，还支持其他样式属性
     const headerBackgroundColor = headerStyles.background || null;

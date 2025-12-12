@@ -4474,7 +4474,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:chart_mini',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -4586,7 +4586,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -4779,7 +4779,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:cover_image',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             borderRadius: '{dimension.borderradius.xxxxl}',
             padding: '{dimension.padding.extraloose}',
@@ -5032,7 +5032,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:image',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.superloose}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5144,7 +5144,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.superloose}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5366,7 +5366,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:icon',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5451,7 +5451,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5606,7 +5606,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:image',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5682,7 +5682,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5828,7 +5828,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'has:progress',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -5917,7 +5917,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -6104,7 +6104,7 @@ export const DEFAULT_STYLE_CONFIG = {
           style: {
             display: 'flex',
             width: '100%',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -6220,7 +6220,7 @@ export const DEFAULT_STYLE_CONFIG = {
           style: {
             display: 'flex',
             width: '100%',
-            flex: 1,
+            flex: "1",
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
             borderRadius: '{dimension.borderradius.xl}',
@@ -6361,7 +6361,7 @@ export const DEFAULT_STYLE_CONFIG = {
           condition: 'default',
           style: {
             display: 'flex',
-            flex: 1,
+            flex: "1",
             width: '100%',
             flexDirection: 'column',
             gap: '{dimension.gap.base}',
@@ -6401,7 +6401,7 @@ export const DEFAULT_STYLE_CONFIG = {
       ],
       style: {
         display: 'flex',
-        flex: 1,
+        flex: "1",
         width: '100%',
         flexDirection: 'column',
         gap: '{dimension.gap.base}',
