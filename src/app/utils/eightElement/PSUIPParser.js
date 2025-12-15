@@ -815,6 +815,46 @@ function processMarkdownWithMathProtection(markdown) {
 }
 
 
+/**
+ * 预处理组件标签：将单行的组件标签拆分为多行
+ * 例如：<heroCard><title>标题</title></heroCard> 
+ * 转换为：
+ * <heroCard>
+ * <title>标题</title>
+ * </heroCard>
+ */
+function preprocessComponentTags(markdown) {
+    // 获取所有已注册的组件名称
+    const componentNames = DEFAULT_STYLE_CONFIG.component ? Object.keys(DEFAULT_STYLE_CONFIG.component) : [];
+    
+    if (componentNames.length === 0) {
+        return markdown;
+    }
+    
+    // 构建组件名称的正则模式
+    const componentPattern = componentNames.join('|');
+    
+    // 匹配单行组件标签：<componentName>...</componentName> 或 <componentName attr="value">...</componentName>
+    const regex = new RegExp(`<(${componentPattern})([^>]*)>([\\s\\S]*?)<\\/\\1>`, 'g');
+    
+    return markdown.replace(regex, (match, componentName, attributes, content) => {
+        // 检查是否已经是多行格式（包含换行符）
+        if (match.includes('\n')) {
+            return match; // 已经是多行，不需要处理
+        }
+        
+        // 🆕 在插槽标签之间添加换行符（处理内容中的连续标签）
+        // 匹配所有的单行标签：<tagName ...>content</tagName>
+        let processedContent = content.replace(/(<\/[\w]+>)(<[\w]+)/g, '$1\n$2');
+        
+        // 拆分为多行
+        const openTag = `<${componentName}${attributes}>`;
+        const closeTag = `</${componentName}>`;
+        
+        return `${openTag}\n${processedContent}\n${closeTag}`;
+    });
+}
+
 // 改进Markdown解析功能，支持列表和富文本，TODO: 需要重构
 function parseMarkdown(markdown, options = {}) {
     const { disableButtonGrouping = false, disableSiblingGrouping = false, currentMarkdown: passedMarkdown } = options;
@@ -823,7 +863,10 @@ function parseMarkdown(markdown, options = {}) {
     // 把所有的\r\n转换为\n
     const normalizedMarkdown = markdown.replace(/\r\n/g, '\n');
 
-    const processedMarkdown = processMarkdownWithMathProtection(normalizedMarkdown);
+    // 🆕 预处理：将单行组件标签拆分为多行
+    const preprocessedMarkdown = preprocessComponentTags(normalizedMarkdown);
+
+    const processedMarkdown = processMarkdownWithMathProtection(preprocessedMarkdown);
 
     // 分割Markdown文本为行（保留空行标记）
     const lines = processedMarkdown.split('\n');
