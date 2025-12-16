@@ -894,13 +894,40 @@ function parseMarkdown(markdown, options = {}) {
     let listItems = [];
 
 
-    // 创建一个函数来查找完整表格的起始行
+    // 创建一个函数来查找完整表格/图表块的起始行
     function findTableStartLines(lines) {
         const tableStarts = [];
+        let inCodeBlock = false;
 
         for (let i = 0; i < lines.length - 1; i++) {
-            // 使用新的检测逻辑检查是否为表格
-            const { isData, isChart } = isTableOrChartData(lines[i]);
+            const currentLine = (lines[i] || '').trim();
+
+            // 🔧 跟踪代码块状态：进入/退出代码块
+            if (currentLine.startsWith('```')) {
+                inCodeBlock = !inCodeBlock;
+                continue;
+            }
+
+            // 🔧 在代码块内时，跳过所有检测
+            if (inCodeBlock) {
+                continue;
+            }
+
+            // 跳过纯布局/卡片/组件等结构标签行，由专门逻辑处理
+            if (
+                !currentLine ||
+                currentLine.match(/^<(layout|card|tab|component)[:\w>]/i) ||
+                currentLine.match(/^<\/(layout|card|tab|component)/i)
+            ) {
+                continue;
+            }
+
+            // 使用窗口检测：当前行 + 后续若干行，支持
+            // 1) [chart:..] 和表格在同一行
+            // 2) [chart:..] 单独一行、表格在后面多行
+            const windowLines = lines.slice(i, Math.min(i + 8, lines.length));
+            const { isData } = isTableOrChartData(windowLines);
+
             if (isData) {
                 tableStarts.push(i);
             }
@@ -983,29 +1010,9 @@ function parseMarkdown(markdown, options = {}) {
             continue;
         }
 
-        // 检查是否为表格或图表数据
-        const { isData, isChart, chartType } = isTableOrChartData(trimmedLine);
+        
 
-        if (isData) {
-            // 处理之前累积的内容
-            flushTextBlock();
-            flushConsecutiveButtons();
-
-            // 提取表格/图表数据
-            const result = extractTableOrChartData(
-                markedLines.map(item => item.line),
-                i
-            );
-
-            // 处理表格/图表数据
-            const endIndex = processTableOrChartData(result, stack);
-
-            // 跳过已处理的行
-            i = endIndex;
-            continue;
-        }
-
-        // 处理代码块
+        // 🔧 优先处理代码块（避免误把代码块内的表格当作真实表格）
         if (isMarkdownCodeBlock(trimmedLine)) {
             // 处理之前累积的内容
             flushTextBlock();
@@ -1025,6 +1032,46 @@ function parseMarkdown(markdown, options = {}) {
             i = endIndex;
             continue;
         }
+
+        // 检查是否为表格或图表数据
+        // 情况1：chart 和 table 在同一行
+        // 情况2：chart 单独一行，后续多行是 table
+        let handledTableOrChart = false;
+
+        // 对纯结构标签行不做表格/图表检测，由各自逻辑处理
+        const isStructureTagLine =
+            /^<(layout|card|tab|component)[:\w>]/i.test(trimmedLine) ||
+            /^<\/(layout|card|tab|component)/i.test(trimmedLine);
+
+        if (!isStructureTagLine) {
+            // 使用窗口：当前行 + 后面若干行，一起判断是否构成 chart/table 数据块
+            const windowLines = markedLines
+                .slice(i, Math.min(i + 8, markedLines.length))
+                .map(item => item.line);
+
+            const { isData } = isTableOrChartData(windowLines);
+
+            if (isData) {
+                // 处理之前累积的内容
+                flushTextBlock();
+                flushConsecutiveButtons();
+
+                // 从当前行开始，提取完整的表格/图表数据
+                const result = extractTableOrChartData(
+                    markedLines.map(item => item.line),
+                    i
+                );
+
+                // 处理表格/图表数据（内部区分 chart/table）
+                const endIndex = processTableOrChartData(result, stack);
+
+                // 跳过已处理的行
+                i = endIndex;
+                handledTableOrChart = true;
+                continue;
+            }
+        }
+
 
         // 处理布局标签
         const layoutTagInfo = isLayoutTag(trimmedLine);

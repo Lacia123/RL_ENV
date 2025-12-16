@@ -80,16 +80,66 @@ function sortTableData(tableData, sortOrder) {
 
 // 检测是否为表格或图表数据（统一检测）
 function isTableOrChartData(lineOrLines) {
+
     // 兼容数组或字符串
     const lines = Array.isArray(lineOrLines) ? lineOrLines : [lineOrLines];
-    // 过滤出有效的非空字符串行
-    const validLines = lines.filter(l => typeof l === 'string' && l.trim().length > 0);
+    
+    // 先检查第一个非空行
+    let firstNonEmptyLine = null;
+    let firstLineIndex = -1;
+    for (let i = 0; i < lines.length; i++) {
+        const trimmed = (lines[i] || '').trim();
+        if (trimmed.length > 0) {
+            firstNonEmptyLine = trimmed;
+            firstLineIndex = i;
+            break;
+        }
+    }
+    
+    if (!firstNonEmptyLine) {
+        return { isData: false, isChart: false, chartType: null };
+    }
+    
+    // 检查第一行是否是图表标记
+    const isChartLine = firstNonEmptyLine.match(/^\[chart:(.+?)\]/);
+    
+    // 🔧 收集有效行：遇到代码块标记或空行时停止（图表标记例外）
+    const validLines = [];
+    let hasEmptyLine = false;
+    
+    for (let i = firstLineIndex; i < lines.length; i++) {
+        const trimmed = (lines[i] || '').trim();
+        
+        // 遇到代码块标记，停止收集
+        if (trimmed.startsWith('```')) {
+            break;
+        }
+        
+        // 遇到空行
+        if (trimmed.length === 0) {
+            // 如果是图表标记，允许跳过一个空行继续找表格
+            if (isChartLine && validLines.length === 1 && !hasEmptyLine) {
+                hasEmptyLine = true;
+                continue;
+            }
+            // 否则停止收集（表格必须是连续的）
+            break;
+        }
+        
+        validLines.push(lines[i]);
+    }
 
     if (validLines.length === 0) {
         return { isData: false, isChart: false, chartType: null };
     }
 
     const firstLine = validLines[0].trim();
+    
+    // 🔧 核心优化：收集后的第一行必须是表格格式（含 |）或图表标记
+    // 这样可以过滤掉前面有空行、但实际第一个有效行不是表格的情况
+    if (!firstLine.match(/^\[chart:/) && !firstLine.includes('|')) {
+        return { isData: false, isChart: false, chartType: null };
+    }
 
     // 首先检查是否是图表数据标记
     const chartMatch = firstLine.match(/^\[chart:(.+?)\]/);
