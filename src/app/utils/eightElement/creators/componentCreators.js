@@ -1616,6 +1616,7 @@ export function extractComponentParameters(parameterDefinitions, markdownData, c
     console.log('  参数定义:', parameterDefinitions);
     console.log('  外部参数:', externalParameters);
     console.log('  内容:', content);
+    console.log('  markdownData:', markdownData);
     
     // 遍历所有参数定义
     for (const [paramName, paramConfig] of Object.entries(parameterDefinitions)) {
@@ -1746,9 +1747,11 @@ export function applyParametersToStyle(style, paramValues) {
         return style;
     }
     
+    // 🔧 重要修复：深拷贝输入的 style，确保不修改原始对象
+    const inputStyle = JSON.parse(JSON.stringify(style));
     const processedStyle = {};
     
-    for (const [key, value] of Object.entries(style)) {
+    for (const [key, value] of Object.entries(inputStyle)) {
         if (typeof value === 'string') {
             // 处理字符串中的所有 $paramName 占位符（支持字符串中间的占位符）
             let processedValue = value;
@@ -1775,7 +1778,7 @@ export function applyParametersToStyle(style, paramValues) {
             
             processedStyle[key] = processedValue;
         } else if (typeof value === 'object' && value !== null) {
-            // 递归处理嵌套对象
+            // 递归处理嵌套对象（已经是深拷贝的对象了）
             processedStyle[key] = applyParametersToStyle(value, paramValues);
         } else {
             processedStyle[key] = value;
@@ -1797,13 +1800,17 @@ export function applyParametersToStyle(style, paramValues) {
  */
 export function createComponentElement(content, variant, markdownData = null, styleOverride = null, externalParameters = null, currentMarkdown = '') {
     // 获取组件配置
-    const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[variant];
+    const originalConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[variant];
     
-    if (!componentConfig) {
+    if (!originalConfig) {
         console.warn(`未找到组件变体 "${variant}" 的配置`);
         // 返回一个基础的文本元素作为回退
         return createTextElement(content);
     }
+    
+    // 🔧 关键修复：深拷贝配置对象，确保每个组件实例都有独立的配置
+    // 这样参数应用到样式时不会影响其他实例
+    const componentConfig = JSON.parse(JSON.stringify(originalConfig));
     
     // 如果组件配置有 metaType（如 text, button 等），说明这是一个元件引用，而不是模板组件
     // 应该直接创建对应的元件，如果有 style 则用容器包装
@@ -1831,14 +1838,16 @@ function createMetaTypeComponent(content, variant, componentConfig, markdownData
     }
     
     // 合并样式：componentConfig.style + styleOverride
-    let finalStyle = {
-        ...(componentConfig.style || {}),
-        ...(styleOverride || {})
-    };
-    
+    // 🔧 重要：深拷贝避免共享对象
+    let finalStyle = componentConfig.style ? JSON.parse(JSON.stringify(componentConfig.style)) : {};
+    if (styleOverride) {
+        finalStyle = { ...finalStyle, ...styleOverride };
+    }
+
     // 应用参数到样式
     if (Object.keys(paramValues).length > 0) {
         finalStyle = applyParametersToStyle(finalStyle, paramValues);
+        console.log(`🎨 应用参数后的样式 (metaType):`, finalStyle);
     }
     
     let elementInstance = null;
@@ -1919,13 +1928,17 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
     const hasLayoutModes = componentConfig.layoutModes && componentConfig.layoutModes.length > 0;
     
     // 应用参数到样式
-    let processedStyle = componentConfig.style || {};
+    // 🔧 重要：必须深拷贝 style，避免多个实例共享同一个对象
+    let processedStyle = componentConfig.style ? JSON.parse(JSON.stringify(componentConfig.style)) : {};
     if (Object.keys(paramValues).length > 0) {
         processedStyle = applyParametersToStyle(processedStyle, paramValues);
+        console.log(`🎨 应用参数后的样式:`, processedStyle);
     }
     
     // 创建组件容器元素
     const componentId = generateUUID();
+    // 🔧 关键修复：生成唯一的 className，避免样式冲突
+    const uniqueClassName = `component-${variant}-${componentId}`;
 
     const componentElement = {
         dataKeys: [],
@@ -1943,7 +1956,7 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         layout: {
             children: [],
             style: {},  // style 用于内联样式
-            className: `component-${variant}`,
+            className: uniqueClassName,  // 🔧 使用唯一的 className
             // 🔧 如果有 layoutModes，不预先应用 componentConfig.style（等模式选择后再应用）
             // 如果没有 layoutModes，使用 componentConfig.style 作为默认样式
             classStyle: hasLayoutModes ? {} : { ...processedStyle }

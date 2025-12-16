@@ -3844,8 +3844,8 @@ export const DEFAULT_STYLE_CONFIG = {
 
       markdownMapping: {
         h3: 'header.title',
+        h4: 'precentContainer',  // 🔧 修复：h4 移到 p 之前，匹配实际 markdown 顺序
         p: 'header.description',
-        h4: 'precentContainer',
       },
       header: {
         type: 'template',

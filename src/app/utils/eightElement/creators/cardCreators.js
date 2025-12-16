@@ -1001,6 +1001,13 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             // 🆕 处理component类型，引用通用组件配置
             // 从 tagConfig 中获取外部参数（如果有的话）
             const externalParameters = tagConfig.parameters || null;
+            // 🔍 调试日志：检查传递给组件的参数
+            console.log(`🔍 创建组件 ${tagConfig.variant}:`, {
+                tagName,
+                content,
+                markdownData,
+                externalParameters
+            });
             elementInstance = createComponentElement(content, tagConfig.variant, markdownData, styleOverride, externalParameters, currentMarkdown);
         }
         // 可以在这里添加其他元件类型的支持
