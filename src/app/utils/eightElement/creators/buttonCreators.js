@@ -13,7 +13,8 @@ import { parseEventSyntax, removeEventSyntax } from '../PSUIPParser.js';
 // 解析按钮类型标记
 function parseButtonVariant(text) {
     // 匹配按钮类型标记格式：[variant] [文本](链接) 或 [variant][文本](链接)
-    const variantPattern = /^\[(\w+)\]\s*\[([^\]]+)\]\(([^)]+)\)$/;
+    // 🔧 修复：允许空 URL，如 [primary][免费试用]()，将 ([^)]+) 改为 ([^)]*)
+    const variantPattern = /^\[(\w+)\]\s*\[([^\]]+)\]\(([^)]*)\)$/;
     const match = text.match(variantPattern);
 
     if (match) {
@@ -26,13 +27,14 @@ function parseButtonVariant(text) {
                 hasVariant: true,
                 variant: variant,
                 text: buttonText,
-                url: url
+                url: url || '#'  // 🔧 空 URL 时默认使用 #
             };
         }
     }
 
     // 🆕 检查事件语法格式：[event:eventName][文本](链接)
-    const eventPattern = /^\[event:\w+\]\s*\[([^\]]+)\]\(([^)]+)\)$/;
+    // 🔧 修复：允许空 URL
+    const eventPattern = /^\[event:\w+\]\s*\[([^\]]+)\]\(([^)]*)\)$/;
     const eventMatch = text.match(eventPattern);
 
     if (eventMatch) {
@@ -42,7 +44,7 @@ function parseButtonVariant(text) {
             hasVariant: true,
             variant: 'primary', // 事件按钮默认使用primary样式
             text: buttonText,
-            url: url,
+            url: url || '#',  // 🔧 空 URL 时默认使用 #
             isEventButton: true // 标记为事件按钮
         };
     }

@@ -515,7 +515,8 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     }
 
     // 检查带变体的按钮格式 [variant][text](url)
-    const buttonVariantMatch = line.match(/^\[(\w+)\]\s*\[([^\]]+)\]\(([^)]+)\)$/);
+    // 🔧 允许 url 为空：() 也视为按钮（和 [立即试用]() 一致）
+    const buttonVariantMatch = line.match(/^\[(\w+)\]\s*\[([^\]]+)\]\(([^)]*)\)$/);
     if (buttonVariantMatch) {
         const variant = buttonVariantMatch[1];
         const buttonMappingKey = `button:${variant}`; // 构造按钮映射键，如 'button:primary'
@@ -1193,6 +1194,7 @@ function parseMarkdown(markdown, options = {}) {
                     attributes: attributes // 🆕 传递属性
                 };
 
+
                 // 映射 justify 属性到 justifyContent
                 if (attributes.justify) {
                     const justifyMap = {
@@ -1674,8 +1676,10 @@ function parseMarkdown(markdown, options = {}) {
             }
 
             // 如果该行不仅仅只有一个链接（即前后有其他文本），视为混合内容行
-            const multiLinkMatch = trimmedLine.match(/\[([^\]]+)\]\(([^)]+)\)/g);
-            const linkPattern = /^\[([^\]]+)\]\(([^)]+)\)$/;
+            // 🔧 修复：允许空 URL，如 [首页]()，将 ([^)]+) 改为 ([^)]*)
+            const multiLinkMatch = trimmedLine.match(/\[([^\]]+)\]\(([^)]*)\)/g);
+            // 🔧 修复：允许空 URL，如 [首页]()，将 ([^)]+) 改为 ([^)]*)
+            const linkPattern = /^\[([^\]]+)\]\(([^)]*)\)$/;
             const isLinkLine = linkPattern.test(trimmedLine);
 
             // 如果不是纯链接行，则当作混合内容处理
@@ -1710,7 +1714,8 @@ function parseMarkdown(markdown, options = {}) {
                     // 🆕 有事件 OR 没有 URL -> 创建按钮
                     if (hasEvent || !hasUrl) {
                         console.log(`  → 创建按钮（${hasEvent ? '有事件' : '无 URL'}）`);
-                        const buttonElement = createButtonElement(trimmedLine, linkUrl || '#', 'primary', currentMarkdown);
+                        // 🔧 修复：传入 linkText 而不是 trimmedLine，确保 buttonText 是纯文本
+                        const buttonElement = createButtonElement(linkText, linkUrl || '#', 'primary', currentMarkdown);
                         consecutiveButtons.push(buttonElement);
                     } 
                     // 🆕 有 URL 且无事件 -> 创建超链接

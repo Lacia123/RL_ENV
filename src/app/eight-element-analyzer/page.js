@@ -316,7 +316,7 @@ const a = 1;
 适用于重要通知、促销活动、核心功能介绍等需要强调的内容
 </card:highlight>
 
-[查看源码](https://github.com/example/elegant-cards)
+[查看源码]()
 
 ## 使用指南
 
@@ -421,14 +421,14 @@ interface TechStack {
 
 > "技术的发展永不停歇，我们的创新也永不止步。"
 
-[开始体验](https://example.com/demo)
-[secondary][技术文档](https://docs.example.com)
+[开始体验]()
+[secondary][技术文档]()
 </card:techGradientStandard>
 
 <card:techGradientHeaderActions>
 ## AI智能平台
-[立即试用](https://example.com/try)
-[secondary][了解更多](https://example.com/learn)
+[立即试用]()
+[secondary][了解更多]()
 
 ### 人工智能解决方案
 我们的AI智能平台集成了最新的机器学习算法和深度学习技术，为企业提供智能化的数据分析和决策支持。
@@ -483,8 +483,8 @@ contract DeFiProtocol {
 
 > "区块链技术正在重新定义价值交换的方式。"
 
-[连接钱包](https://example.com/wallet)
-[secondary][白皮书](https://example.com/whitepaper)
+[连接钱包]()
+[secondary][白皮书]()
 </card:techGradientStandard>
 
 <card:techGradientHeaderActions>
@@ -552,7 +552,7 @@ contract DeFiProtocol {
 - 💎 细节完美：精雕细琢每一个视觉细节
 - 🌊 自然流动：布局如水流般自然顺畅
 
-[了解更多](https://example.com/philosophy)
+[了解更多]()
 </card:elegantStandard>
 
 <card:elegantList>
@@ -586,8 +586,8 @@ contract DeFiProtocol {
 
 > "大自然是最好的艺术家，她的作品永远值得我们学习和模仿。"
 
-[设计案例](https://example.com/cases)
-[secondary][设计指南](https://example.com/guide)
+[设计案例]()
+[secondary][设计指南]()
 </card:elegantStandard>
 
 <card:elegantTable>
@@ -617,7 +617,7 @@ contract DeFiProtocol {
 
 我们通过用户调研、A/B测试和数据分析，不断优化产品的每一个细节。
 
-[用户反馈](https://example.com/feedback)
+[用户反馈]()
 </card:elegantStandard>
 
 <card:elegantList>
@@ -660,8 +660,8 @@ contract DeFiProtocol {
 - 响应式列数调整
 - 流畅的重排动画
 
-[技术文档](https://example.com/docs)
-[secondary][开源代码](https://github.com/example/gallery)
+[技术文档]()
+[secondary][开源代码]()
 </card:elegantStandard>
 
 <card:elegantTable>
@@ -693,7 +693,7 @@ contract DeFiProtocol {
 
 > "设计不是装饰，而是沟通。好的设计能够跨越语言和文化的障碍，直达人心。"
 
-[趋势报告](https://example.com/trends)
+[趋势报告]()
 </card:elegantStandard>
 
 <card:elegantList>
@@ -724,8 +724,8 @@ Pinterest作为瀑布流布局的典型代表，通过这种布局方式重新�
 
 通过深入分析成功案例，我们可以提取出可复用的设计模式和最佳实践。
 
-[案例详情](https://example.com/case-study)
-[secondary][设计分析](https://example.com/analysis)
+[案例详情]()
+[secondary][设计分析]()
 </card:elegantStandard>
 
 </layout:gallery>
@@ -754,11 +754,11 @@ Pinterest作为瀑布流布局的典型代表，通过这种布局方式重新�
     name: '🏢 企业官网',
     description: '企业着陆页，包含导航、特性介绍、联系方式',
     markdown: `<layout:row>
-[首页](/)
-[产品](/products)
-[解决方案](/solutions)
-[关于我们](/about)
-[联系我们](/contact)
+[首页]()
+[产品]()
+[解决方案]()
+[关于我们]()
+[联系我们]()
 </layout:row>
 
 ![企业Logo](https://images.unsplash.com/photo-1560472354-b33ff0c44a43)
@@ -769,9 +769,9 @@ Pinterest作为瀑布流布局的典型代表，通过这种布局方式重新�
 我们致力于为企业提供最先进的数字化解决方案，助力业务增长和数字化转型。访问 [产品介绍页](https://example.com/products) 了解更多详情。
 </layout:row>
 <layout:row>
-[primary][免费试用](https://example.com/trial)
-[了解更多](https://example.com/learn)
-[观看演示](https://example.com/demo)
+[primary][免费试用]()
+[了解更多]()
+[观看演示]()
 [联系顾问]()
 </layout:row>
 
@@ -785,7 +785,7 @@ Pinterest作为瀑布流布局的典型代表，通过这种布局方式重新�
 - ✅ 智能化推荐算法
 - ✅ 多端同步支持
 
-[查看功能详情](https://example.com/features)
+[查看功能详情]()
 </card>
 <card>
 
@@ -797,7 +797,7 @@ Pinterest作为瀑布流布局的典型代表，通过这种布局方式重新�
 - 🔧 分布式缓存
 - 🔧 负载均衡
 
-[技术白皮书](https://example.com/tech)
+[技术白皮书]()
 </card>
 
 </layout:row>
@@ -838,8 +838,8 @@ RESTful API，快速集成现有系统
 - 🎓 **培训服务**: 产品使用培训
 
 <layout:row>
-[联系客服](https://example.com/support)
-[提交工单](https://example.com/ticket)
+[联系客服]()
+[提交工单]()
 </layout:row>
 
 ### 质量保证
@@ -852,7 +852,7 @@ RESTful API，快速集成现有系统
 3. **性能监控**: 实时系统性能监控
 4. **安全扫描**: 定期安全漏洞扫描
 
-[质量报告](https://example.com/quality)
+[质量报告]()
 </layout:row>
 
 ### 客户案例
@@ -870,8 +870,8 @@ RESTful API，快速集成现有系统
 - 🏥 医疗健康: 67+ 客户
 
 <layout:row>
-[查看案例](https://example.com/cases)
-[客户推荐](https://example.com/testimonials)
+[查看案例]()
+[客户推荐]()
 </layout:row>
 
 ### 团队实力
@@ -886,7 +886,7 @@ RESTful API，快速集成现有系统
 | 测试工程师 | 12人 | 4+ 年 |
 | 产品经理 | 6人 | 6+ 年 |
 
-[团队介绍](https://example.com/team)
+[团队介绍]()
 </layout:row>
 
 ### 服务覆盖
@@ -911,7 +911,7 @@ RESTful API，快速集成现有系统
 
 > **性能保障**: 全球延迟 < 100ms
 
-[部署指南](https://example.com/deploy)
+[部署指南]()
 
 ### 合规认证
 通过ISO27001、SOC2等多项安全认证
@@ -924,8 +924,8 @@ RESTful API，快速集成现有系统
 4. ✓ **PCI DSS**: 支付卡行业标准
 
 <layout:row>
-[查看证书](https://example.com/certificates)
-[合规文档](https://example.com/compliance)
+[查看证书]()
+[合规文档]()
 </layout:row>
 </layout:row>
 
@@ -938,9 +938,9 @@ RESTful API，快速集成现有系统
 | 企业版 | 联系销售 | 全部功能 | 无限制 |
 
 <layout:row>
-[立即注册](https://example.com/signup)
-[联系销售](https://example.com/sales)
-[技术支持](https://example.com/support)
+[立即注册]()
+[联系销售]()
+[技术支持]()
 </layout:row>
 
 <layout:row>
@@ -959,7 +959,7 @@ RESTful API，快速集成现有系统
 - 系统架构设计
 - 业务流程优化
 
-[预约咨询](https://example.com/consult)
+[预约咨询]()
 
 ### 实施服务
 完整的项目实施流程，确保顺利上线
@@ -976,8 +976,8 @@ RESTful API，快速集成现有系统
 > **服务承诺**: 7×24小时项目支持，确保按期交付
 
 <layout:row>
-[实施流程](https://example.com/implementation)
-[项目管理](https://example.com/pm)
+[实施流程]()
+[项目管理]()
 </layout:row>
 </layout:row>
 
@@ -1157,8 +1157,8 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
     markdown: `
     <card:techGradientHeaderActions>
 ## 算法工程师招聘JD
-[secondary][联系我们](https://example.com/elegant)
-[在线申请](https://example.com/elegant)
+[secondary][联系我们]()
+[在线申请]()
 </card:techGradientHeaderActions>
 <layout:row>
 <card:elegantTable>
@@ -1194,9 +1194,9 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
 ### 加入我们
 成为我们团队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长，共同打造行业领先的解决方案。如果你对算法充满热情，渴望挑战，欢迎加入我们！
 ### 应聘方式
-[官网在线申请](https://example.com/apply)
-[公众号后台申请](https://example.com/about)
-[发送邮件申请](https://example.com/contact)
+[官网在线申请]()
+[公众号后台申请]()
+[发送邮件申请]()
 </card:neomorphismStandard>
     `
   },
@@ -1229,12 +1229,12 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
             <card:elegantStandard>
 ## 关键指标
 ### 核心业务数据
-- 📈 月活用户增长: **25%**
-- 💰 营收同比增长: **32%**
-- 🎯 客户满意度: **4.8/5**
-- ⚡ 系统响应时间: **<100ms**
+📈 月活用户增长: **25%**
+💰 营收同比增长: **32%**
+🎯 客户满意度: **4.8/5**
+⚡ 系统响应时间: **<100ms**
 
-[查看详细报告](https://example.com/report)
+[查看详细报告]()
             </card:elegantStandard>
 
             <card:elegantList>
@@ -1280,8 +1280,8 @@ $$ L = \\frac{1}{2} \\rho v^2 S C_L $$
         3. **移动端优化**: 重点提升移动端用户体验
         4. **人才储备**: 招聘更多AI和云计算专业人才
 
-        [了解详细策略](https://example.com/strategy)
-        [secondary][下载报告](https://example.com/download)
+        [了解详细策略]()
+        [secondary][下载报告]()
     </tabPanel>
     
     <tabPanel tabKey="settings" tabTitle="系统设置">
@@ -1314,8 +1314,8 @@ const userRoles = {
 };
 \`\`\`
 
-[保存设置](https://example.com/save)
-[secondary][重置默认](https://example.com/reset)
+[保存设置]()
+[secondary][重置默认]()
         </card:techGradientStandard>
 
         <card:elegantList>
@@ -1366,8 +1366,8 @@ const userRoles = {
 - 条件样式和显示控制
 - 完整的事件系统支持
 
-[查看技术文档](https://example.com/docs)
-[secondary][源码示例](https://github.com/example/tab-component)`
+[查看技术文档]()
+[secondary][源码示例]()`
   },
   minimalistCardSeries: {
     name: "简约卡片系列",
@@ -1417,9 +1417,9 @@ const userRoles = {
     ## 加入我们
     成为我们图队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长，共同打造行业领先的解决方案。如果你对算法充满热情，渴望挑战，欢迎加入我们！
     ## 应聘方式
-    [官网在线申请](https://example.com/apply)
-    [公众号后台申请](https://example.com/about)
-    [发送邮件申请](https://example.com/contact)
+    [官网在线申请]()
+    [公众号后台申请]()
+    [发送邮件申请]()
     </card:minimalistButtonCard>
     </layout:minimalContainer>
     </layout:root>
