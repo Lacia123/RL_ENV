@@ -233,6 +233,22 @@ function collectGroupItems(lines, startIndex, groupConfig, cardStyleConfig) {
                 continue;
             }
 
+            // 🔧 跳过 HTML 注释
+            if (line.startsWith('<!--')) {
+                if (line.endsWith('-->')) {
+                    j++;
+                    continue;
+                } else {
+                    // 多行注释：跳过直到找到结束标记
+                    let k = j + 1;
+                    while (k < lines.length && !lines[k].trim().includes('-->')) {
+                        k++;
+                    }
+                    j = k + 1;
+                    continue;
+                }
+            }
+
             // 🆕 重置连续空行计数
             consecutiveEmptyLines = 0;
 
@@ -362,6 +378,22 @@ function collectUnmappedMarkdownContent(lines, startIndex, markdownMapping) {
         if (!line) {
             i++;
             continue;
+        }
+
+        // 🔧 跳过 HTML 注释
+        if (line.startsWith('<!--')) {
+            if (line.endsWith('-->')) {
+                i++;
+                continue;
+            } else {
+                // 多行注释：跳过直到找到结束标记
+                let j = i + 1;
+                while (j < lines.length && !lines[j].trim().includes('-->')) {
+                    j++;
+                }
+                i = j + 1;
+                continue;
+            }
         }
 
         // 检查是否为已映射的 markdown 格式
@@ -1438,6 +1470,31 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
         if (!line) {
             i++;
             continue;
+        }
+
+        // 🔧 跳过 HTML 注释（如 <!-- pagestart -->）
+        if (line.startsWith('<!--')) {
+            if (line.endsWith('-->')) {
+                // 单行注释
+                console.log(`⏭️ [卡片内容] 跳过 HTML 注释: ${line}`);
+                i++;
+                continue;
+            } else {
+                // 多行注释：跳过直到找到结束标记
+                console.log(`⏭️ [卡片内容] 跳过多行 HTML 注释开始: ${line}`);
+                let j = i + 1;
+                while (j < lines.length) {
+                    const commentLine = lines[j].trim();
+                    if (commentLine.includes('-->')) {
+                        console.log(`⏭️ [卡片内容] 跳过多行 HTML 注释结束: ${commentLine}`);
+                        i = j;
+                        break;
+                    }
+                    j++;
+                }
+                i++;
+                continue;
+            }
         }
 
         // 🆕 最高优先级：检查是否为内联模板标签（如 <header.title>内容</header.title>）

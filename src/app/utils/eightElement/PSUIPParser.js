@@ -982,6 +982,29 @@ function parseMarkdown(markdown, options = {}) {
             continue;
         }
 
+        // 🔧 跳过 HTML 注释（如 <!-- pagestart -->）
+        if (trimmedLine.startsWith('<!--')) {
+            if (trimmedLine.endsWith('-->')) {
+                // 单行注释
+                console.log(`⏭️ 跳过 HTML 注释: ${trimmedLine}`);
+                continue;
+            } else {
+                // 多行注释：跳过直到找到结束标记
+                console.log(`⏭️ 跳过多行 HTML 注释开始: ${trimmedLine}`);
+                let j = i + 1;
+                while (j < markedLines.length) {
+                    const commentLine = markedLines[j].line.trim();
+                    if (commentLine.includes('-->')) {
+                        console.log(`⏭️ 跳过多行 HTML 注释结束: ${commentLine}`);
+                        i = j;
+                        break;
+                    }
+                    j++;
+                }
+                continue;
+            }
+        }
+
         // 检查是否为段落分隔符
         if (trimmedLine === '§PARAGRAPH§') {
             // 处理之前累积的内容
