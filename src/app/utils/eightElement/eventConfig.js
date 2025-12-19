@@ -8,6 +8,22 @@ export const EVENT_NAME = {
     DATA_LISTENER: 'data_listener',
 }
 
+export const NATIVE_EVENT_KEY = {
+    CLICK: 'click',
+    DBCLICK: 'dbclick',
+    MOUSEDOWN: 'mousedown',
+    MOUSEUP: 'mouseup',
+    MOUSEMOVE: 'mousemove',
+    MOUSEOVER: 'mouseover',
+    MOUSEOUT: 'mouseout',
+    MOUSEENTER: 'mouseenter',
+    CONTEXTMENU: 'contextmenu',
+    WHEEL: 'wheel',
+    KEYDOWN: 'keydown',
+    KEYUP: 'keyup',
+    INPUT: 'input',
+}
+
 export const EVENT_CONFIG = {
     [EVENT_NAME.EDIT]: {
         // "EventTargetId": "",

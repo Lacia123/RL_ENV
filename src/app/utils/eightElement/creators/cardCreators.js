@@ -8,6 +8,7 @@ import { createTextElement } from './textCreators.js';
 import { createElementContainer, createBaseLayout, createLayoutElement, isLayoutTag, extractLayoutBlock } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';
+import { createNativeEventConfig } from '../eventUtils.js';
 import resolveToken from '../../tokens/resolveToken.js';
 import { getElementStyleConfig } from '../styleConfig.js';
 import { DEFAULT_STYLE_CONFIG } from '../styleConfig.js';
@@ -724,6 +725,19 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
         }
     );
     const cardEvents = cardUpdateEvent ? [cardUpdateEvent] : [{}];
+
+    // 🆕 处理 nativeEvent 和 data 属性
+    if (attributes.nativeEvent && attributes.data) {
+        const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+        if (nativeEventConfig) {
+            // 如果 cardEvents 第一个元素是空对象，则替换它，否则追加
+            if (Object.keys(cardEvents[0]).length === 0) {
+                cardEvents[0] = nativeEventConfig;
+            } else {
+                cardEvents.push(nativeEventConfig);
+            }
+        }
+    }
 
     if (isTemplateCard || hasParameters) {
         // 模板类型卡片的结构

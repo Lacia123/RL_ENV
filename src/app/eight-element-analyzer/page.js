@@ -292,8 +292,8 @@ const MARKDOWN_TEMPLATES = {
 const a = 1;
 \`\`\`
 
-
-[event:edit][编辑配置](https://github.com/example/edit)
+[nativeEvent:click;data:bindData][自定义事件]()
+[event:edit][编辑配置]()
 [提交问题]()
 </card:elegantStandard>
 

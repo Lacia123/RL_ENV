@@ -1,4 +1,4 @@
-import { EVENT_NAME, EVENT_CONFIG } from './eventConfig.js';
+import { EVENT_NAME, EVENT_CONFIG, NATIVE_EVENT_KEY } from './eventConfig.js';
 import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig } from './styleConfig.js';
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance } from './util.js';
@@ -36,10 +36,13 @@ function isIconTag(line) {
     return { isIconTag: false };
 }
 
-// 解析事件语法 [event:eventName] 并返回事件配置
+// 解析事件语法 [event:eventName] 或 [nativeEvent:nativeKey;data:dataKey] 并返回事件配置
 function parseEventSyntax(text, elementId, currentMarkdown = '') {
     // 🆕 更新事件模式以支持带参数的事件：[event:eventName(param1,param2)]
     const eventPattern = /\[event:(\w+)(?:\(([^)]*)\))?\]/g;
+    // 🆕 支持 nativeEvent 语法：[nativeEvent:key;data:key]
+    const nativeEventPattern = /\[nativeEvent:(\w+);data:(\w+)\]/g;
+
     const events = [];
     let match;
 
@@ -79,6 +82,22 @@ function parseEventSyntax(text, elementId, currentMarkdown = '') {
         }
     }
 
+    // 🆕 解析 nativeEvent
+    while ((match = nativeEventPattern.exec(text)) !== null) {
+        const nativeKey = match[1];
+        const dataKey = match[2];
+        const validNativeKeys = Object.values(NATIVE_EVENT_KEY);
+
+        if (validNativeKeys.includes(nativeKey)) {
+            events.push({
+                nativeEventKey: nativeKey,
+                dataEventKey: dataKey
+            });
+        } else {
+            console.warn(`⚠️ 无效的 nativeEventKey: ${nativeKey}`);
+        }
+    }
+
     return events;
 }
 
@@ -91,8 +110,19 @@ function removeEventSyntax(text) {
         return fullEventMatch[1].trim();
     }
 
+    // 🆕 检查完整的 nativeEvent 按钮语法
+    const fullNativeEventMatch = text.match(/^\[nativeEvent:\w+;data:\w+\]\s*\[([^\]]+)\]\(([^)]*)\)$/);
+    if (fullNativeEventMatch) {
+        return fullNativeEventMatch[1].trim();
+    }
+
     // 🆕 清理带参数的事件标记：[event:eventName(param1,param2)]
-    return text.replace(/\[event:\w+(?:\([^)]*\))?\]/g, '').trim();
+    let cleanedText = text.replace(/\[event:\w+(?:\([^)]*\))?\]/g, '').trim();
+    
+    // 🆕 清理 nativeEvent 标记
+    cleanedText = cleanedText.replace(/\[nativeEvent:\w+;data:\w+\]/g, '').trim();
+
+    return cleanedText;
 }
 
 // 🆕 辅助函数：处理内联图标文本，将图标语法转换为内联 SVG
@@ -462,6 +492,25 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
                     content: eventLinkMatch[1].trim(), // 按钮文本
                     url: eventLinkMatch[2].trim(),     // 按钮URL
                     originalText: line.trim()          // 🆕 保存原始完整文本，包含事件语法
+                },
+                newListItemCounter: currentListItemCounter
+            };
+        }
+    }
+
+    // 🆕 检查原生事件语法格式 [nativeEvent:nativeKey;data:dataKey][text](url)
+    const nativeEventLinkMatch = line.match(/^\[nativeEvent:\w+;data:\w+\]\s*\[([^\]]+)\]\(([^)]*)\)$/);
+    if (nativeEventLinkMatch) {
+        const primaryButtonMapping = markdownMapping['button:primary'];
+        if (primaryButtonMapping) {
+            return {
+                markdownResult: {
+                    type: 'button',
+                    variant: 'primary',
+                    templatePath: primaryButtonMapping,
+                    content: nativeEventLinkMatch[1].trim(), // 按钮文本
+                    url: nativeEventLinkMatch[2].trim(),     // 按钮URL (允许为空)
+                    originalText: line.trim()                // 保存原始完整文本
                 },
                 newListItemCounter: currentListItemCounter
             };

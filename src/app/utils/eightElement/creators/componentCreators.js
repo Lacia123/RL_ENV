@@ -6,6 +6,7 @@
 import { generateUUID } from '../util.js';
 import { DEFAULT_STYLE_CONFIG, LAYOUT_CONSTANTS } from '../styleConfig.js';
 import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';
+import { createNativeEventConfig } from '../eventUtils.js';
 import resolveToken from '../../tokens/resolveToken.js';
 import { createTextElement } from './textCreators.js';
 import { createButtonElement } from './buttonCreators.js';
@@ -767,6 +768,19 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                 {},  // richTextOptions
                 slotConfig.variantStyle || null  // customStyles
             );
+            
+            // 🆕 处理 nativeEvent 和 data 属性
+            if (attributes && attributes.nativeEvent && attributes.data) {
+                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                if (nativeEventConfig && textElement) {
+                    if (textElement.events.length === 1 && Object.keys(textElement.events[0]).length === 0) {
+                        textElement.events[0] = nativeEventConfig;
+                    } else {
+                        textElement.events.push(nativeEventConfig);
+                    }
+                }
+            }
+            
             if (textElement) {
                 innerElements.push(textElement);
             }
@@ -818,6 +832,18 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                     ...(imageElement.layout.style || {}),
                     ...slotConfig.variantStyle
                 };
+            }
+            
+            // 🆕 处理 nativeEvent 和 data 属性
+            if (attributes && attributes.nativeEvent && attributes.data) {
+                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                if (nativeEventConfig && imageElement) {
+                    if (imageElement.events.length === 1 && Object.keys(imageElement.events[0]).length === 0) {
+                        imageElement.events[0] = nativeEventConfig;
+                    } else {
+                        imageElement.events.push(nativeEventConfig);
+                    }
+                }
             }
             
             if (imageElement) {
@@ -898,6 +924,18 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                 {},  // richTextOptions
                 slotConfig.variantStyle || null  // customStyles
             );
+            
+            // 🆕 处理 nativeEvent 和 data 属性
+            if (attributes && attributes.nativeEvent && attributes.data) {
+                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                if (nativeEventConfig && element) {
+                    if (element.events.length === 1 && Object.keys(element.events[0]).length === 0) {
+                        element.events[0] = nativeEventConfig;
+                    } else {
+                        element.events.push(nativeEventConfig);
+                    }
+                }
+            }
         } else if (slotConfig.metaType === 'button') {
             const buttonUrl = attributes.href || '#';
             const buttonText = slotContent || '';
@@ -906,13 +944,25 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                 buttonText,
                 buttonUrl,
                 slotConfig.variant || 'primary',
-                currentMarkdown,
-                buttonText  // displayText - 显式指定显示文本
+                currentMarkdown
+                // displayText - 不传递第5个参数，让 createButtonElement 内部处理 removeEventSyntax
             );
             
             // 如果有 variantStyle，应用到按钮的 classStyle
             if (slotConfig.variantStyle && element) {
                 Object.assign(element.layout.classStyle, slotConfig.variantStyle);
+            }
+            
+            // 🆕 处理 nativeEvent 和 data 属性
+            if (attributes && attributes.nativeEvent && attributes.data) {
+                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                if (nativeEventConfig && element) {
+                    if (element.events.length === 1 && Object.keys(element.events[0]).length === 0) {
+                        element.events[0] = nativeEventConfig;
+                    } else {
+                        element.events.push(nativeEventConfig);
+                    }
+                }
             }
         } else if (slotConfig.metaType === 'image') {
             const imageUrl = attributes.src || '';
@@ -929,6 +979,18 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                     ...(element.layout.style || {}),
                     ...slotConfig.variantStyle
                 };
+            }
+            
+            // 🆕 处理 nativeEvent 和 data 属性
+            if (attributes && attributes.nativeEvent && attributes.data) {
+                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                if (nativeEventConfig && element) {
+                    if (element.events.length === 1 && Object.keys(element.events[0]).length === 0) {
+                        element.events[0] = nativeEventConfig;
+                    } else {
+                        element.events.push(nativeEventConfig);
+                    }
+                }
             }
         } else if (slotConfig.metaType === 'chart') {
             element = buildChartElementFromContent(
@@ -1014,9 +1076,24 @@ function buildButtonElementFromDefinition(slotConfig, buttonText, buttonAttribut
         finalText,
         buttonUrl,
         buttonVariant,
-        currentMarkdown,
-        finalText
+        currentMarkdown
+        // displayText - 不传递第5个参数，让 createButtonElement 内部处理 removeEventSyntax
     );
+    
+    // 🆕 处理 nativeEvent 和 data 属性 (优先使用内部属性，其次使用外部属性)
+    const nativeEvent = buttonAttributes.nativeEvent || outerAttributes.nativeEvent;
+    const data = buttonAttributes.data || outerAttributes.data;
+    
+    if (nativeEvent && data) {
+        const nativeEventConfig = createNativeEventConfig(nativeEvent, data);
+        if (nativeEventConfig && buttonElement) {
+            if (buttonElement.events.length === 1 && Object.keys(buttonElement.events[0]).length === 0) {
+                buttonElement.events[0] = nativeEventConfig;
+            } else {
+                buttonElement.events.push(nativeEventConfig);
+            }
+        }
+    }
     
     applyVariantStyleToButton(buttonElement, slotConfig.variantStyle);
     
@@ -1900,7 +1977,35 @@ function createMetaTypeComponent(content, variant, componentConfig, markdownData
             events: [{}]
         };
         
+        // 🆕 处理 nativeEvent 和 data 属性 (针对 containerElement)
+        if (externalParameters && externalParameters.nativeEvent && externalParameters.data) {
+            const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data);
+            if (nativeEventConfig) {
+                if (containerElement.events.length === 1 && Object.keys(containerElement.events[0]).length === 0) {
+                    containerElement.events[0] = nativeEventConfig;
+                } else {
+                    containerElement.events.push(nativeEventConfig);
+                }
+            }
+        }
+
         return containerElement;
+    }
+    
+    // 🆕 处理 nativeEvent 和 data 属性 (针对 elementInstance，当没有容器时)
+    if (elementInstance && externalParameters && externalParameters.nativeEvent && externalParameters.data) {
+        const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data);
+        if (nativeEventConfig) {
+            // elementInstance 应该也有 events 数组
+            if (!elementInstance.events) {
+                elementInstance.events = [{}];
+            }
+            if (elementInstance.events.length === 1 && Object.keys(elementInstance.events[0]).length === 0) {
+                elementInstance.events[0] = nativeEventConfig;
+            } else {
+                elementInstance.events.push(nativeEventConfig);
+            }
+        }
     }
     
     // 如果没有样式，直接返回元件
@@ -1964,6 +2069,18 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         id: componentId,
         events: [{}]
     };
+
+    // 🆕 处理 nativeEvent 和 data 属性
+    if (externalParameters && externalParameters.nativeEvent && externalParameters.data) {
+        const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data);
+        if (nativeEventConfig) {
+            if (componentElement.events.length === 1 && Object.keys(componentElement.events[0]).length === 0) {
+                componentElement.events[0] = nativeEventConfig;
+            } else {
+                componentElement.events.push(nativeEventConfig);
+            }
+        }
+    }
     
     // 应用样式覆盖（只有在没有 layoutModes 时才应用）
     if (styleOverride && !hasLayoutModes) {

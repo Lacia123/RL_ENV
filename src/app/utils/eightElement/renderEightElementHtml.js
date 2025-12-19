@@ -1666,6 +1666,21 @@ function processCodeElement(processedElement, originalElement) {
     processedElement.rawData = originalElement.rawData || '';
     processedElement.language = originalElement.language || 'plaintext';
 
+    // 🆕 使用 marked 和 highlight.js 生成高亮 HTML
+    if (processedElement.rawData) {
+        try {
+            const rawCode = processedElement.rawData;
+            const language = processedElement.language;
+            // 构造 markdown 代码块
+            const markdownCode = `\`\`\`${language}\n${rawCode}\n\`\`\``;
+            // 使用 marked 解析生成 HTML
+            processedElement.highlightedCode = markedInstance.parse(markdownCode);
+        } catch (error) {
+            console.error('代码高亮处理失败:', error);
+            // 失败时保持 highlightedCode 为空，renderCodeElement 会回退到普通显示
+        }
+    }
+
     // 处理样式引用
     if (originalElement.layout && originalElement.layout.style) {
         processStyleReferences(processedElement, originalElement, originalElement.layout.style);
