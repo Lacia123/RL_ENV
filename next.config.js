@@ -31,6 +31,20 @@ const nextConfig = {
   // 配置日志级别，帮助调试
   logging: {
     level: 'info',
+  },
+
+  // 配置 CORS 头，允许跨域请求
+  async headers() {
+    return [
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Access-Control-Allow-Methods", value: "GET, POST, PUT, DELETE, PATCH, OPTIONS" },
+          { key: "Access-Control-Allow-Headers", value: "X-Requested-With, Content-Type, Authorization" },
+        ]
+      }
+    ]
   }
 };
 
