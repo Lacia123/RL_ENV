@@ -2070,18 +2070,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         events: [{}]
     };
 
-    // 🆕 处理 nativeEvent 和 data 属性
-    if (externalParameters && externalParameters.nativeEvent && externalParameters.data) {
-        const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data);
-        if (nativeEventConfig) {
-            if (componentElement.events.length === 1 && Object.keys(componentElement.events[0]).length === 0) {
-                componentElement.events[0] = nativeEventConfig;
-            } else {
-                componentElement.events.push(nativeEventConfig);
-            }
-        }
-    }
-    
     // 应用样式覆盖（只有在没有 layoutModes 时才应用）
     if (styleOverride && !hasLayoutModes) {
         Object.assign(componentElement.layout.classStyle, styleOverride);
@@ -2336,6 +2324,22 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         }
     }
     
+    // 🆕 处理 nativeEvent 和 data 属性 (针对 createTemplateComponent)
+    if (externalParameters && externalParameters.nativeEvent && externalParameters.data) {
+        const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data);
+        if (nativeEventConfig) {
+            if (!componentElement.events) {
+                componentElement.events = [];
+            }
+            // 检查是否已有空事件对象，如果是则替换
+            if (componentElement.events.length === 1 && Object.keys(componentElement.events[0]).length === 0) {
+                componentElement.events[0] = nativeEventConfig;
+            } else {
+                componentElement.events.push(nativeEventConfig);
+            }
+        }
+    }
+
     return componentElement;
 }
 

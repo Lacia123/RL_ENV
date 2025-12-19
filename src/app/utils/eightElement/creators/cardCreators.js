@@ -1591,6 +1591,22 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                     processRequiredContainers(componentConfig, componentElement.layout.children, componentConfig, paramValues);
                 }
 
+                // 🆕 处理 nativeEvent 和 data 属性
+                if (attributes && attributes.nativeEvent && attributes.data) {
+                    const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                    if (nativeEventConfig) {
+                        if (!componentElement.events) {
+                            componentElement.events = [];
+                        }
+                        // 检查是否已有空事件对象，如果是则替换
+                        if (componentElement.events.length === 1 && Object.keys(componentElement.events[0]).length === 0) {
+                            componentElement.events[0] = nativeEventConfig;
+                        } else {
+                            componentElement.events.push(nativeEventConfig);
+                        }
+                    }
+                }
+
                 console.log(`✅ 组件元素创建完成，包含 ${componentElement.layout.children.length} 个子元素\n`);
                 children.push(componentElement);
 
