@@ -2010,6 +2010,8 @@ function renderElement(element) {
             return renderCodeElement(element);
         case 'chart':
             return renderChartElement(element);
+        case 'video':
+            return renderVideoElement(element);
         default:
             return renderGenericElement(element);
     }
@@ -2655,6 +2657,40 @@ function applyChartStyles(svgContent, element) {
  * @param {Object} element - 元素对象
  * @returns {string} - 渲染的HTML字符串
  */
+/**
+ * 渲染视频元素
+ * @param {Object} element - 视频元素
+ * @returns {string} - 渲染的HTML字符串
+ */
+function renderVideoElement(element) {
+    const styleAttr = generateStyleAttribute(element.computedStyle);
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
+    
+    // 获取视频资源链接
+    let src = '';
+    if (element.material && element.material.video && element.material.video.default) {
+        src = element.material.video.default.resource || '';
+        
+        // 也可以从 style 中获取 (根据创建器结构)
+        if (!src && element.material.video.default.style && element.material.video.default.style.video) {
+            src = element.material.video.default.style.video.value;
+        }
+    }
+    
+    if (!src) {
+        return `<div id="${element.id || ''}" ${classAttr} data-element-type="layout" ${styleAttr} style="background:#eee;display:flex;align-items:center;justify-content:center;">No Video Source</div>`;
+    }
+    
+    return `
+      <div id="${element.id || ''}" ${classAttr} data-element-type="layout" ${styleAttr}>
+        <video controls src="${src}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    `;
+}
+
 function renderGenericElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
 

@@ -1831,7 +1831,8 @@ export const DEFAULT_STYLE_CONFIG = {
         ul: 'content.list',
         table: 'content.table',
         blockquote: 'content.quote',
-        code: 'content.codeBlock'
+        code: 'content.codeBlock',
+        video: 'content.video'
       },
       style: {
         display: 'flex',
@@ -3507,6 +3508,12 @@ export const DEFAULT_STYLE_CONFIG = {
         }
       }
     },
+  },
+  video: {
+    normal: {
+      width: "100%",
+      height: "auto",
+    }
   },
   // ==================== 图像元件 ====================
   image: {

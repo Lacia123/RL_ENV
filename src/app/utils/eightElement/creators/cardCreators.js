@@ -4,6 +4,7 @@ import { createCodeElement } from './codeCreators.js';
 import { createTableElement, extractTableOrChartData, getChartVariantFromConfig, createChartElement, generateChartSvg, addChartEventButton } from './tableCreators.js';
 import { createBackgroundElement } from './backgroundCreators.js';
 import { createButtonElement } from './buttonCreators.js';
+import { createVideoElement } from './videoCreators.js';
 import { createTextElement } from './textCreators.js';
 import { createElementContainer, createBaseLayout, createLayoutElement, isLayoutTag, extractLayoutBlock } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
@@ -952,6 +953,11 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             // 🆕 如果有原始文本，使用原始文本来解析事件；否则使用按钮文本
             const textForEventParsing = markdownData.originalText || buttonText;
             elementInstance = createButtonElement(textForEventParsing, buttonUrl, buttonVariant, currentMarkdown);
+        } else if (markdownData.type === 'video') {
+            // 视频类型
+            const videoSrc = markdownData.src;
+            const videoAttributes = markdownData.attributes || {};
+            elementInstance = createVideoElement(videoSrc, videoAttributes);
         } else if (markdownData.type === 'p') {
             // 🆕 段落类型：检查是否包含链接，如果有则用 parseMarkdown 处理
             if (content && (content.includes('](') || content.includes('[') || content.includes('**'))) {
