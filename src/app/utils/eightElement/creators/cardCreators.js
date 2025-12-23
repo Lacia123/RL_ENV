@@ -5,6 +5,7 @@ import { createTableElement, extractTableOrChartData, getChartVariantFromConfig,
 import { createBackgroundElement } from './backgroundCreators.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createVideoElement } from './videoCreators.js';
+import { createAudioElement } from './audioCreators.js';
 import { createTextElement } from './textCreators.js';
 import { createElementContainer, createBaseLayout, createLayoutElement, isLayoutTag, extractLayoutBlock } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
@@ -958,6 +959,11 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             const videoSrc = markdownData.src;
             const videoAttributes = markdownData.attributes || {};
             elementInstance = createVideoElement(videoSrc, videoAttributes);
+        } else if (markdownData.type === 'audio') {
+            // 音频类型
+            const audioSrc = markdownData.src;
+            const audioAttributes = markdownData.attributes || {};
+            elementInstance = createAudioElement(audioSrc, audioAttributes);
         } else if (markdownData.type === 'p') {
             // 🆕 段落类型：检查是否包含链接，如果有则用 parseMarkdown 处理
             if (content && (content.includes('](') || content.includes('[') || content.includes('**'))) {

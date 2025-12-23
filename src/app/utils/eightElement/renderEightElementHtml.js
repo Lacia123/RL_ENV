@@ -2012,6 +2012,8 @@ function renderElement(element) {
             return renderChartElement(element);
         case 'video':
             return renderVideoElement(element);
+        case 'audio':
+            return renderAudioElement(element);
         default:
             return renderGenericElement(element);
     }
@@ -2683,10 +2685,44 @@ function renderVideoElement(element) {
     }
     
     return `
-      <div id="${element.id || ''}" ${classAttr} data-element-type="layout" ${styleAttr}>
+      <div id="${element.id || ''}" ${classAttr} data-element-type="video" ${styleAttr}>
         <video controls src="${src}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">
           Your browser does not support the video tag.
         </video>
+      </div>
+    `;
+}
+
+/**
+ * 渲染音频元素
+ * @param {Object} element - 音频元素
+ * @returns {string} - 渲染的HTML字符串
+ */
+function renderAudioElement(element) {
+    const styleAttr = generateStyleAttribute(element.computedStyle);
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
+    
+    // 获取音频资源链接
+    let src = '';
+    if (element.material && element.material.audio && element.material.audio.default) {
+        src = element.material.audio.default.resource || '';
+        
+        // 也可以从 style 中获取 (根据创建器结构)
+        if (!src && element.material.audio.default.style && element.material.audio.default.style.audio) {
+            src = element.material.audio.default.style.audio.value;
+        }
+    }
+    
+    if (!src) {
+        return `<div id="${element.id || ''}" ${classAttr} data-element-type="audio" ${styleAttr} style="background:#eee;display:flex;align-items:center;justify-content:center;padding:10px;">No Audio Source</div>`;
+    }
+    
+    return `
+      <div id="${element.id || ''}" ${classAttr} data-element-type="audio" ${styleAttr}>
+        <audio controls src="${src}" style="width: 100%; border-radius: inherit;">
+          Your browser does not support the audio tag.
+        </audio>
       </div>
     `;
 }

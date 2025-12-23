@@ -42,6 +42,8 @@ const MARKDOWN_TEMPLATES = {
 
 <video src="https://media.w3.org/2010/05/sintel/trailer.mp4"></video>
 
+<audio src="https://media.w3.org/2010/07/bunny/04-Death_Becomes_Fur.oga"></audio>
+
 [event:download][下载资源](https://github.com/example/download)
 [联系我们]()
 
@@ -579,6 +581,8 @@ contract DeFiProtocol {
 观察自然界中的美妙图案，从叶脉的纹理到水滴的形状，这些都为我们的设计提供了无尽的灵感源泉。
 
 <video src="https://media.w3.org/2010/05/bunny/trailer.mp4"></video>
+
+<audio src="https://media.w3.org/2010/07/bunny/04-Death_Becomes_Fur.oga"></audio>
 
 ![自然之美](https://images.unsplash.com/photo-1441974231531-c6227db76b6e)
 

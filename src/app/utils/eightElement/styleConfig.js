@@ -2230,6 +2230,10 @@ export const DEFAULT_STYLE_CONFIG = {
         codeBlock: {
           metaType: 'text',
           variant: 'codeBlock'
+        },
+        audio: {
+          metaType: 'audio',
+          variant: 'normal'
         }
       },
     },
@@ -2540,6 +2544,10 @@ export const DEFAULT_STYLE_CONFIG = {
         codeBlock: {
           metaType: 'text',
           variant: 'codeBlock'
+        },
+        audio: {
+          metaType: 'audio',
+          variant: 'normal'
         }
       },
     },
@@ -3513,6 +3521,12 @@ export const DEFAULT_STYLE_CONFIG = {
     normal: {
       width: "100%",
       height: "auto",
+    }
+  },
+  audio: {
+    normal: {
+      width: "auto",
+      height: "auto"
     }
   },
   // ==================== 图像元件 ====================

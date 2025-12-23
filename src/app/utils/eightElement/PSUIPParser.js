@@ -16,6 +16,7 @@ import { createBackgroundElement } from './creators/backgroundCreators.js';
 import { createIconElement } from './creators/iconCreators.js';
 import { isTabTag, extractTabBlock, createTabElement } from './creators/tabCreators.js';
 import { isVideoTag, createVideoElement } from './creators/videoCreators.js';
+import { isAudioTag, createAudioElement } from './creators/audioCreators.js';
 
 // 检测是否为引用文本
 function isQuoteText(line) {
@@ -622,6 +623,27 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
         }
     }
 
+    // 🆕 检查 Audio 标签
+    const audioTagInfo = isAudioTag(line);
+    if (audioTagInfo.isAudioTag) {
+        // 使用 audio 映射，如果不存在则使用 p 映射或 others 映射
+        const templatePath = markdownMapping.audio || markdownMapping.p || markdownMapping.others;
+        
+        // 只有找到有效的映射路径才返回结果
+        if (templatePath) {
+            return {
+                markdownResult: {
+                    type: 'audio',
+                    src: audioTagInfo.src,
+                    attributes: audioTagInfo.attributes,
+                    templatePath: templatePath,
+                    content: line.trim()
+                },
+                newListItemCounter: currentListItemCounter
+            };
+        }
+    }
+
     // 🆕 检查代码块格式 ```language
     const codeBlockMatch = line.match(/^```(\w+)?$/);
     if (codeBlockMatch) {
@@ -1198,6 +1220,36 @@ function parseMarkdown(markdown, options = {}) {
             continue;
         }
 
+        // 🆕 处理 Audio 标签
+        const audioTagInfo = isAudioTag(trimmedLine);
+        if (audioTagInfo.isAudioTag) {
+            console.log(`🔊 发现音频标签: ${audioTagInfo.src}`);
+
+            // 处理之前累积的内容
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            // 如果正在处理列表，先结束列表
+            if (inList && listItems.length > 0) {
+                const listLayout = createLayoutElement(
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                    listItems,
+                    {
+                        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                    }
+                );
+                stack[stack.length - 1].elements.push(listLayout);
+                inList = false;
+                listItems = [];
+            }
+
+            // 创建音频元素
+            const audioElement = createAudioElement(audioTagInfo.src, audioTagInfo.attributes);
+            stack[stack.length - 1].elements.push(audioElement);
+
+            continue;
+        }
         
         // 处理布局标签
         const layoutTagInfo = isLayoutTag(trimmedLine);
