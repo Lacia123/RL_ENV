@@ -11,6 +11,8 @@ import resolveToken from '../../tokens/resolveToken.js';
 import { createTextElement } from './textCreators.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createBackgroundElement } from './backgroundCreators.js';
+import { createAudioElement } from './audioCreators.js';
+import { createVideoElement } from './videoCreators.js';
 import { createChartElement, createTableElement, extractTableOrChartData, sortTableData, generateChartSvg, isTableOrChartData } from './tableCreators.js';
 import { stripMarkdownFormatting, processExpression, extractMarkdownValue, extractSubTagValue } from './markdownUtils.js';
 
@@ -992,6 +994,20 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                     }
                 }
             }
+        } else if (slotConfig.metaType === 'audio') {
+            const audioSrc = attributes.src || '';
+            console.log(`    创建音频元素: src=${audioSrc}, variant=${slotConfig.variant}`);
+            element = createAudioElement(
+                audioSrc,
+                attributes
+            );
+        } else if (slotConfig.metaType === 'video') {
+            const videoSrc = attributes.src || '';
+            console.log(`    创建视频元素: src=${videoSrc}, variant=${slotConfig.variant}`);
+            element = createVideoElement(
+                videoSrc,
+                attributes
+            );
         } else if (slotConfig.metaType === 'chart') {
             element = buildChartElementFromContent(
                 slotName,
@@ -1522,6 +1538,20 @@ function createElementForSubSlot(subSlotName, slotData, subSlotConfig, fallbackT
             {},
             subSlotConfig.variantStyle || null
         );
+    }
+
+    if (metaType === 'video') {
+        const src = slotAttributes.src || content || parentAttributes[`${subSlotName}_src`] || '';
+        if (!src) return null;
+        
+        return createVideoElement(src, slotAttributes);
+    }
+
+    if (metaType === 'audio') {
+        const src = slotAttributes.src || content || parentAttributes[`${subSlotName}_src`] || '';
+        if (!src) return null;
+
+        return createAudioElement(src, slotAttributes);
     }
 
     return null;

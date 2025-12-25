@@ -127,7 +127,8 @@ export const CSS_VARIABLE_SYSTEM = {
     SMOOTH: 'var(--animation-smooth, all 0.3s cubic-bezier(0.4, 0, 0.2, 1))',
     FAST: 'var(--animation-fast, all 0.2s cubic-bezier(0.4, 0, 0.2, 1))',
     SPRING: 'var(--animation-spring, all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275))'
-  }
+  },
+
 };
 
 /**
@@ -3812,6 +3813,79 @@ export const DEFAULT_STYLE_CONFIG = {
 
   // ==================== 封装组件 ====================（用于支持通用组件的样式配置）
   component: {
+    multimediaCard: {
+      type: 'template',
+      hasUpdateEvent: true,
+      layoutModes: [
+        {
+          name: 'default',
+          condition: 'true',
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: '{dimension.borderradius.xl}',
+            padding: '{dimension.padding.loose}',
+            background: '{color.surfacecontainer.white100}',
+            boxShadow: '{material.hierarchy.1f}',
+            gap: '{dimension.gap.base}'
+          },
+          structure: {
+            groups: [
+              {
+                name: 'mediaLayer',
+                slots: ['audio', 'video'],
+                type: 'template',
+                style: {
+                  position: 'relative',
+                  zIndex: '0',
+                  overflow: 'hidden',
+                  borderRadius: '{dimension.borderradius.large}'
+                }
+              },
+              {
+                name: 'contentLayer',
+                type: 'template',
+                style: {
+                  position: 'relative',
+                  zIndex: '1'
+                },
+                groups: [
+                  { name: 'titleBlock', slots: ['title'] },
+                  { name: 'descriptionBlock', slots: ['description'] }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      slotConfigs: {
+        audio: {
+          metaType: 'audio',
+          variant: 'standard'
+        },
+        video: {
+          metaType: 'video',
+          variant: 'standard'
+        },
+        title: {
+          metaType: 'text',
+          variant: 'multimediaCardTitle',
+          variantStyle: {
+            fontSize: '{font.size.title.medium}',
+            fontWeight: '{font.weight.bold}',
+            color: '{color.content.primary}'
+          }
+        },
+        description: {
+          metaType: 'text',
+          variant: 'multimediaCardDescription',
+          variantStyle: {
+            fontSize: '{font.size.body.medium}',
+            color: '{color.content.secondary}'
+          }
+        }
+      }
+    },
     // 半分比 item 组件
     precentItem: {
       type: 'template',
@@ -6742,33 +6816,9 @@ export function getElementStyleConfig(elementType, variant = 'normal', attribute
             // 如果看起来像token路径（包含点），自动添加大括号
             if (attrValue.includes('.')) {
               const tokenToResolve = `{${attrValue}}`;
-              const tokenResult = resolveToken(tokenToResolve);
-              if (tokenResult !== tokenToResolve) {
-                // console.log(`   🎯 Token解析: ${attrValue} -> ${tokenToResolve} -> ${tokenResult}`);
-                resolvedValue = tokenResult;
-              } else {
-                console.log(`   📝 Token未找到，使用原值: ${attrValue}`);
-                resolvedValue = attrValue;
-              }
-            } else {
-              console.log(`   📝 普通值: ${attrValue}`);
-              resolvedValue = attrValue;
+              resolvedValue = tokenToResolve
             }
-          } else if (attrValue.startsWith('{') && attrValue.endsWith('}')) {
-            // 显式的token格式
-            const tokenResult = resolveToken(attrValue);
-            if (tokenResult !== attrValue) {
-              // console.log(`   🎯 Token解析: ${attrValue} -> ${tokenResult}`);
-              resolvedValue = tokenResult;
-            } else {
-              console.log(`   📝 Token未找到，使用原值: ${attrValue}`);
-              resolvedValue = attrValue;
-            }
-          } else {
-            console.log(`   📝 特殊值: ${attrValue} (跳过token解析)`);
-            resolvedValue = attrValue;
           }
-
           finalStyle[attrName] = resolvedValue;
         } else {
           console.warn(`   ⚠️ 属性 "${attrName}" 不在支持列表中:`, variantConfig.supportedAttributes);
