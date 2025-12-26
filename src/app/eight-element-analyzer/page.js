@@ -2021,6 +2021,25 @@ wrapper: {
 | 产品D | 420 | 100 | 11% |
   </table>
 </tableCard>
+
+<hiringTitleCard>
+  <title>算法工程师</title>
+  <desc>负责核心算法模型的设计、优化与落地</desc>
+  <badge>岗位JD</badge>
+</hiringTitleCard>
+
+<hiringImageCard image="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&h=900">
+  <title>关于企业</title>
+  <desc>我们是一家专注于人工智能和大数据领域的创新科技公司</desc>
+</hiringImageCard>
+
+<hiringListCard>
+  <salaryTitle>薪资范围</salaryTitle>
+  <salaryValue>1.6K-1.8K</salaryValue>
+  <hrTitle>招聘人数</hrTitle>
+  <hrValue>5人</hrValue>
+</hiringListCard>
+
 </layout:gallery>
 `
   },

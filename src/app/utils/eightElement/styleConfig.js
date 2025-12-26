@@ -9,6 +9,8 @@ import { fontSize } from '../icons/Edit/index.js';
 import resolveToken from '../tokens/resolveToken.js';
 import border from '../tokens/color/border.js';
 import margin from '../tokens/dimension/margin.js';
+import lineheight from '../tokens/font/lineheight.js';
+import borderradius from '../tokens/dimension/borderradius.js';
 
 // CSS变量系统
 export const CSS_VARIABLE_SYSTEM = {
@@ -4862,6 +4864,246 @@ export const DEFAULT_STYLE_CONFIG = {
         time_range: { required: false, optional: true },
         status: { required: false, optional: true }
       }
+    },
+
+    // Hiring Title Card
+    hiringTitleCard: {
+      type: 'template',
+      hasUpdateEvent: true,
+      layoutModes: [{
+        name: 'default',
+        condition: 'default',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          borderRadius: '{dimension.borderradius.xxxxl}',
+          background: '{color.basic.brand.5}',
+          padding: '{dimension.padding.superloose}',
+        },
+        structure: {
+          groups: [{
+            name: 'titleBlock',
+            slots: ['title', 'desc'],
+            type: 'template',
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '{dimension.gap.tight}',
+            }
+          }, {
+            name: 'badgeBlock',
+            slots: ['badge'],
+          }]
+        }
+      }],
+      slotConfigs: {
+        title: {
+          metaType: 'text',
+          variantStyle: {
+            lineHeight: '1',
+            fontSize: '{font.size.xxxl}',
+            fontWeight: '{font.fontweight.bold}',
+            color: '{color.basic.opacity.white.100}',
+          }
+        },
+        desc: {
+          metaType: 'text',
+          variantStyle: {
+            width: '70%',
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.64}',
+          }
+        },
+        badge: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.100}',
+            padding: '{dimension.padding.base} {dimension.padding.extraloose}',
+            background: '{color.basic.opacity.white.12}',
+            borderRadius: '{dimension.borderradius.full}',
+          }
+        }
+      }
+    },
+
+    // Hiring List Card
+    hiringListCard: {
+      type: 'template',
+      hasUpdateEvent: true,
+      layoutModes: [{
+        name: 'default',
+        condition: 'default',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: '{dimension.borderradius.xxxxl}',
+          padding: '{dimension.padding.superloose}',
+          background: 'linear-gradient(135deg, {color.primary.brand3} 0%, {color.primary.brand5} 100%)',
+        },
+        structure: {
+          groups: [{
+            name: 'topBlock',
+            type: 'template',
+            style: {
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              width: '100%',
+              alignItems: 'flex-start',
+            },
+            groups: [{
+              name: 'shortListContainer',
+              type: 'template',
+              style: {
+                width: '60%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '{dimension.gap.base}',
+              },
+              groups: [{
+                name: 'shortListItem',
+                type: 'template',
+                style: {
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  borderRadius: '{dimension.borderradius.xxxxl}',
+                  padding: '{dimension.padding.base} {dimension.padding.superloose}',
+                  background: '{color.basic.brand.5}',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    left: '12px',
+                    width: '6px',
+                    height: '25%',
+                    borderRadius: '{dimension.borderradius.full}',
+                    background: '{color.basic.brand.3}',
+                  }
+                },
+                slots: ['salaryTitle', 'salaryValue'],
+              }, {
+                name: 'shortListItem1',
+                type: 'template',
+                style: {
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  borderRadius: '{dimension.borderradius.xxxxl}',
+                  padding: '{dimension.padding.base} {dimension.padding.superloose}',
+                  background: '{color.basic.blue.6}',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    left: '12px',
+                    width: '6px',
+                    height: '25%',
+                    borderRadius: '{dimension.borderradius.full}',
+                    background: '{color.basic.blue.3}',
+                  }
+                },
+                slots: ['hrTitle', 'hrValue'],
+              }]
+            }, {
+
+            }]
+          }]
+        }
+      }],
+      slotConfigs: {
+        salaryTitle: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.48}',
+            margin: 0,
+          }
+        },
+        hrTitle: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.48}',
+            margin: 0,
+          }
+        },
+        salaryValue: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.xl}',
+            color: '{color.basic.opacity.white.100}',
+            margin: 0,
+          }
+        },
+        hrValue: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.xl}',
+            color: '{color.basic.opacity.white.100}',
+            margin: 0,
+          }
+        },
+      }
+    },
+
+    // Hiring Image Card
+    hiringImageCard: {
+      type: 'template',
+      hasUpdateEvent: true,
+      parameters: {
+        image: {
+          source: 'outer',
+        }
+      },
+      layoutModes: [{
+        name: 'default',
+        condition: 'default',
+        style: {
+          backgroundImage: 'url({image})',
+          padding: '{dimension.padding.extraloose}',
+          borderRadius: '{dimension.borderradius.xxxxl}',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        },
+        structure: {
+          groups: [{
+            name: 'contentBlock',
+            slots: ['title', 'desc'],
+            type: 'template',
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '{dimension.gap.tight}',
+              minHeight: '320px',
+            }
+          }]
+        }
+      }],
+      slotConfigs: {
+        title: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.xxl}',
+            color: '{color.basic.opacity.white.100}',
+            lineHeight: '1',
+          }
+        },
+        desc: {
+          metaType: 'text',
+          variantStyle: {
+            width: '60%',
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.64}'
+          }
+        }
+      },
     },
 
     // 🌄 主视觉说明卡

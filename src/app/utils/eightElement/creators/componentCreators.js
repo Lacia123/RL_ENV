@@ -1834,7 +1834,8 @@ function normalizeTokenValue(value) {
     }
     
     // 如果看起来像 token 路径（如 color.basic.red.0），添加大括号
-    if (value.includes('.') && !value.startsWith('$')) {
+    // 🔧 修复：不处理 URL
+    if (value.includes('.') && !value.startsWith('$') && !value.startsWith('http')) {
         const tokenValue = `{${value}}`;
         console.log(`  📦 参数转换为 token 格式: ${tokenValue}`);
         return tokenValue;
@@ -1863,8 +1864,10 @@ export function applyParametersToStyle(style, paramValues) {
             // 处理字符串中的所有 $paramName 占位符（支持字符串中间的占位符）
             let processedValue = value;
             
-            // 替换所有 $paramName 格式的占位符
-            processedValue = processedValue.replace(/\$(\w+)/g, (match, paramName) => {
+            // 替换所有 $paramName 或 {paramName} 格式的占位符
+            // 🔧 修复：支持 {paramName} 格式
+            processedValue = processedValue.replace(/(?:\$(\w+)|\{(\w+)\})/g, (match, p1, p2) => {
+                const paramName = p1 || p2;
                 if (paramValues.hasOwnProperty(paramName)) {
                     let paramValue = paramValues[paramName];
                     
@@ -1878,6 +1881,10 @@ export function applyParametersToStyle(style, paramValues) {
                         return paramValue;
                     }
                 } else {
+                    // 🔧 如果是 {paramName} 格式且未找到参数，可能是普通 token，不报警告
+                    if (match.startsWith('{')) {
+                         return match;
+                    }
                     console.warn(`⚠️ 未找到参数: ${paramName}，可用参数:`, Object.keys(paramValues));
                     return match; // 保持原样
                 }
@@ -2175,12 +2182,19 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
 
                 // 🔧 应用选中模式的容器样式（合并到 classStyle，确保优先级）
                 if (selectedMode.style) {
+                    // 🔧 修复：应用参数到模式样式
+                    let modeStyle = selectedMode.style;
+                    if (Object.keys(paramValues).length > 0) {
+                        modeStyle = applyParametersToStyle(modeStyle, paramValues);
+                        console.log(`  🎨 模式样式应用参数完成`);
+                    }
+
                     // 合并模式样式到 classStyle（覆盖原有样式）
                     componentElement.layout.classStyle = {
                         ...componentElement.layout.classStyle,
-                        ...selectedMode.style
+                        ...modeStyle
                     };
-                    console.log(`  🎨 应用模式 "${selectedMode.name}" 的样式:`, Object.keys(selectedMode.style));
+                    console.log(`  🎨 应用模式 "${selectedMode.name}" 的样式:`, Object.keys(modeStyle));
                 }
                 
                 // 根据模式构建结构（传入 actualSlots 以支持嵌套分组中的条件评估）
