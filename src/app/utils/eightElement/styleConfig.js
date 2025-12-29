@@ -4958,7 +4958,7 @@ export const DEFAULT_STYLE_CONFIG = {
               name: 'shortListContainer',
               type: 'template',
               style: {
-                width: '60%',
+                width: '50%',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '{dimension.gap.base}',
@@ -5011,7 +5011,73 @@ export const DEFAULT_STYLE_CONFIG = {
                 slots: ['hrTitle', 'hrValue'],
               }]
             }, {
-
+              name: 'titleBlock',
+              type: 'template',
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                width: '35%',
+                gap: '{dimension.gap.base}',
+              },
+              slots: ['title', 'desc']
+            }]
+          }, {
+            name: 'listContainer',
+            type: 'template',
+            style: {
+              marginTop: '{dimension.margin.base}',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '{dimension.gap.base}',
+            },
+            groups: [{
+              name: 'listItem1',
+              type: 'template',
+              style: {
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                borderRadius: '{dimension.borderradius.xxxxl}',
+                padding: '{dimension.padding.base} {dimension.padding.superloose}',
+                background: '{color.basic.opacity.black.12}',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  left: '12px',
+                  width: '6px',
+                  height: '25%',
+                  borderRadius: '{dimension.borderradius.full}',
+                  background: '{color.basic.opacity.white.32}',
+                }
+              },
+              slots: ['areaTitle', 'areaValue']
+            }, {
+              name: 'listItem2',
+              type: 'template',
+              style: {
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                borderRadius: '{dimension.borderradius.xxxxl}',
+                padding: '{dimension.padding.base} {dimension.padding.superloose}',
+                background: '{color.basic.opacity.black.12}',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  left: '12px',
+                  width: '6px',
+                  height: '25%',
+                  borderRadius: '{dimension.borderradius.full}',
+                  background: '{color.basic.opacity.white.32}',
+                }
+              },
+              slots: ['jobTitle', 'jobValue']
             }]
           }]
         }
@@ -5033,6 +5099,38 @@ export const DEFAULT_STYLE_CONFIG = {
             margin: 0,
           }
         },
+        jobTitle: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.48}',
+            margin: 0,
+          }
+        },
+        areaTitle: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.48}',
+            margin: 0,
+          }
+        },
+        areaValue: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.xl}',
+            color: '{color.basic.opacity.white.100}',
+            margin: 0,
+          }
+        },
+        jobValue: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.xl}',
+            color: '{color.basic.opacity.white.100}',
+            margin: 0,
+          }
+        },
         salaryValue: {
           metaType: 'text',
           variantStyle: {
@@ -5049,6 +5147,21 @@ export const DEFAULT_STYLE_CONFIG = {
             margin: 0,
           }
         },
+        title: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.xl}',
+            color: '{color.basic.opacity.white.100}',
+            margin: 0,
+          }
+        },
+        desc: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: 'font.size.medium',
+            color: '{color.basic.opacity.white.64}'
+          }
+        }
       }
     },
 

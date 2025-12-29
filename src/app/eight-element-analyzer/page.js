@@ -2038,6 +2038,12 @@ wrapper: {
   <salaryValue>1.6K-1.8K</salaryValue>
   <hrTitle>招聘人数</hrTitle>
   <hrValue>5人</hrValue>
+  <title>岗位详情</title>
+  <desc>我们拥有一支充满活力和创新精神的技术团队。</desc>
+  <areaTitle>工作地点</areaTitle>
+  <areaValue>北京</areaValue>
+  <jobTitle>工作类型</jobTitle>
+  <jobValue>全职职位</jobValue>
 </hiringListCard>
 
 </layout:gallery>
