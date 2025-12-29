@@ -15,9 +15,9 @@ export function middleware(request) {
 
   // 处理 OPTIONS 请求 (CORS 预检)，直接返回 200
   // 实际的 CORS 头由 next.config.js 配置添加
-  if (request.method === 'OPTIONS') {
-    return new NextResponse(null, { status: 200 });
-  }
+  // if (request.method === 'OPTIONS') {
+  //   return new NextResponse(null, { status: 200 });
+  // }
   
   return response;
 }
