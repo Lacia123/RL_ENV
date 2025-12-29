@@ -4,10 +4,13 @@ import { createCodeElement } from './codeCreators.js';
 import { createTableElement, extractTableOrChartData, getChartVariantFromConfig, createChartElement, generateChartSvg, addChartEventButton } from './tableCreators.js';
 import { createBackgroundElement } from './backgroundCreators.js';
 import { createButtonElement } from './buttonCreators.js';
+import { createVideoElement } from './videoCreators.js';
+import { createAudioElement } from './audioCreators.js';
 import { createTextElement } from './textCreators.js';
 import { createElementContainer, createBaseLayout, createLayoutElement, isLayoutTag, extractLayoutBlock } from './layoutCreators.js';
 import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';
+import { createNativeEventConfig } from '../eventUtils.js';
 import resolveToken from '../../tokens/resolveToken.js';
 import { getElementStyleConfig } from '../styleConfig.js';
 import { DEFAULT_STYLE_CONFIG } from '../styleConfig.js';
@@ -725,6 +728,19 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
     );
     const cardEvents = cardUpdateEvent ? [cardUpdateEvent] : [{}];
 
+    // 🆕 处理 nativeEvent 和 data 属性
+    if (attributes.nativeEvent && attributes.data) {
+        const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+        if (nativeEventConfig) {
+            // 如果 cardEvents 第一个元素是空对象，则替换它，否则追加
+            if (Object.keys(cardEvents[0]).length === 0) {
+                cardEvents[0] = nativeEventConfig;
+            } else {
+                cardEvents.push(nativeEventConfig);
+            }
+        }
+    }
+
     if (isTemplateCard || hasParameters) {
         // 模板类型卡片的结构
         const cardElement = {
@@ -938,6 +954,16 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             // 🆕 如果有原始文本，使用原始文本来解析事件；否则使用按钮文本
             const textForEventParsing = markdownData.originalText || buttonText;
             elementInstance = createButtonElement(textForEventParsing, buttonUrl, buttonVariant, currentMarkdown);
+        } else if (markdownData.type === 'video') {
+            // 视频类型
+            const videoSrc = markdownData.src;
+            const videoAttributes = markdownData.attributes || {};
+            elementInstance = createVideoElement(videoSrc, videoAttributes);
+        } else if (markdownData.type === 'audio') {
+            // 音频类型
+            const audioSrc = markdownData.src;
+            const audioAttributes = markdownData.attributes || {};
+            elementInstance = createAudioElement(audioSrc, audioAttributes);
         } else if (markdownData.type === 'p') {
             // 🆕 段落类型：检查是否包含链接，如果有则用 parseMarkdown 处理
             if (content && (content.includes('](') || content.includes('[') || content.includes('**'))) {
@@ -1575,6 +1601,22 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                 if (componentConfig.required) {
                     console.log(`  处理 required 容器:`, componentConfig.required);
                     processRequiredContainers(componentConfig, componentElement.layout.children, componentConfig, paramValues);
+                }
+
+                // 🆕 处理 nativeEvent 和 data 属性
+                if (attributes && attributes.nativeEvent && attributes.data) {
+                    const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                    if (nativeEventConfig) {
+                        if (!componentElement.events) {
+                            componentElement.events = [];
+                        }
+                        // 检查是否已有空事件对象，如果是则替换
+                        if (componentElement.events.length === 1 && Object.keys(componentElement.events[0]).length === 0) {
+                            componentElement.events[0] = nativeEventConfig;
+                        } else {
+                            componentElement.events.push(nativeEventConfig);
+                        }
+                    }
                 }
 
                 console.log(`✅ 组件元素创建完成，包含 ${componentElement.layout.children.length} 个子元素\n`);

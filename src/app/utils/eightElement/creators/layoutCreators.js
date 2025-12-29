@@ -5,6 +5,7 @@ import {
 import { generateUUID } from '../util.js';
 import { createTextElement } from './textCreators.js';
 import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';
+import { createNativeEventConfig } from '../eventUtils.js';
 
 // 检测是否为布局标签（支持属性）
 function isLayoutTag(line) {
@@ -349,6 +350,19 @@ function createLayoutElement(direction, children = [], options = {}) {
 
             layout.events = [dataListenerEvent];
             console.log(`📡 为布局元素 ${layoutId} 创建 DATA_LISTENER 事件:`, dataListenerEvent);
+        }
+    }
+
+    // 🆕 处理 nativeEvent 和 data 属性
+    if (attributes.nativeEvent && attributes.data) {
+        const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+        if (nativeEventConfig) {
+            // 如果 events 第一个元素是空对象，则替换它，否则追加
+            if (layout.events.length === 1 && Object.keys(layout.events[0]).length === 0) {
+                layout.events[0] = nativeEventConfig;
+            } else {
+                layout.events.push(nativeEventConfig);
+            }
         }
     }
 

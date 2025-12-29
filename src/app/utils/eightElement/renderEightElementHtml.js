@@ -1666,6 +1666,21 @@ function processCodeElement(processedElement, originalElement) {
     processedElement.rawData = originalElement.rawData || '';
     processedElement.language = originalElement.language || 'plaintext';
 
+    // 🆕 使用 marked 和 highlight.js 生成高亮 HTML
+    if (processedElement.rawData) {
+        try {
+            const rawCode = processedElement.rawData;
+            const language = processedElement.language;
+            // 构造 markdown 代码块
+            const markdownCode = `\`\`\`${language}\n${rawCode}\n\`\`\``;
+            // 使用 marked 解析生成 HTML
+            processedElement.highlightedCode = markedInstance.parse(markdownCode);
+        } catch (error) {
+            console.error('代码高亮处理失败:', error);
+            // 失败时保持 highlightedCode 为空，renderCodeElement 会回退到普通显示
+        }
+    }
+
     // 处理样式引用
     if (originalElement.layout && originalElement.layout.style) {
         processStyleReferences(processedElement, originalElement, originalElement.layout.style);
@@ -1995,6 +2010,10 @@ function renderElement(element) {
             return renderCodeElement(element);
         case 'chart':
             return renderChartElement(element);
+        case 'video':
+            return renderVideoElement(element);
+        case 'audio':
+            return renderAudioElement(element);
         default:
             return renderGenericElement(element);
     }
@@ -2640,6 +2659,74 @@ function applyChartStyles(svgContent, element) {
  * @param {Object} element - 元素对象
  * @returns {string} - 渲染的HTML字符串
  */
+/**
+ * 渲染视频元素
+ * @param {Object} element - 视频元素
+ * @returns {string} - 渲染的HTML字符串
+ */
+function renderVideoElement(element) {
+    const styleAttr = generateStyleAttribute(element.computedStyle);
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
+    
+    // 获取视频资源链接
+    let src = '';
+    if (element.material && element.material.video && element.material.video.default) {
+        src = element.material.video.default.resource || '';
+        
+        // 也可以从 style 中获取 (根据创建器结构)
+        if (!src && element.material.video.default.style && element.material.video.default.style.video) {
+            src = element.material.video.default.style.video.value;
+        }
+    }
+    
+    if (!src) {
+        return `<div id="${element.id || ''}" ${classAttr} data-element-type="layout" ${styleAttr} style="background:#eee;display:flex;align-items:center;justify-content:center;">No Video Source</div>`;
+    }
+    
+    return `
+      <div id="${element.id || ''}" ${classAttr} data-element-type="video" ${styleAttr}>
+        <video controls src="${src}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    `;
+}
+
+/**
+ * 渲染音频元素
+ * @param {Object} element - 音频元素
+ * @returns {string} - 渲染的HTML字符串
+ */
+function renderAudioElement(element) {
+    const styleAttr = generateStyleAttribute(element.computedStyle);
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
+    
+    // 获取音频资源链接
+    let src = '';
+    if (element.material && element.material.audio && element.material.audio.default) {
+        src = element.material.audio.default.resource || '';
+        
+        // 也可以从 style 中获取 (根据创建器结构)
+        if (!src && element.material.audio.default.style && element.material.audio.default.style.audio) {
+            src = element.material.audio.default.style.audio.value;
+        }
+    }
+    
+    if (!src) {
+        return `<div id="${element.id || ''}" ${classAttr} data-element-type="audio" ${styleAttr} style="background:#eee;display:flex;align-items:center;justify-content:center;padding:10px;">No Audio Source</div>`;
+    }
+    
+    return `
+      <div id="${element.id || ''}" ${classAttr} data-element-type="audio" ${styleAttr}>
+        <audio controls src="${src}" style="width: 100%; border-radius: inherit;">
+          Your browser does not support the audio tag.
+        </audio>
+      </div>
+    `;
+}
+
 function renderGenericElement(element) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
 

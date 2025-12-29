@@ -1,4 +1,4 @@
-import { EVENT_NAME, EVENT_CONFIG } from './eventConfig.js';
+import { EVENT_NAME, EVENT_CONFIG, NATIVE_EVENT_KEY } from './eventConfig.js';
 import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig } from './styleConfig.js';
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance } from './util.js';
@@ -15,6 +15,8 @@ import { parseButtonVariant, createButtonElement, createVerticalButtonLayout } f
 import { createBackgroundElement } from './creators/backgroundCreators.js';
 import { createIconElement } from './creators/iconCreators.js';
 import { isTabTag, extractTabBlock, createTabElement } from './creators/tabCreators.js';
+import { isVideoTag, createVideoElement } from './creators/videoCreators.js';
+import { isAudioTag, createAudioElement } from './creators/audioCreators.js';
 
 // 检测是否为引用文本
 function isQuoteText(line) {
@@ -36,10 +38,13 @@ function isIconTag(line) {
     return { isIconTag: false };
 }
 
-// 解析事件语法 [event:eventName] 并返回事件配置
+// 解析事件语法 [event:eventName] 或 [nativeEvent:nativeKey;data:dataKey] 并返回事件配置
 function parseEventSyntax(text, elementId, currentMarkdown = '') {
     // 🆕 更新事件模式以支持带参数的事件：[event:eventName(param1,param2)]
     const eventPattern = /\[event:(\w+)(?:\(([^)]*)\))?\]/g;
+    // 🆕 支持 nativeEvent 语法：[nativeEvent:key;data:key]
+    const nativeEventPattern = /\[nativeEvent:(\w+);data:(\w+)\]/g;
+
     const events = [];
     let match;
 
@@ -79,6 +84,22 @@ function parseEventSyntax(text, elementId, currentMarkdown = '') {
         }
     }
 
+    // 🆕 解析 nativeEvent
+    while ((match = nativeEventPattern.exec(text)) !== null) {
+        const nativeKey = match[1];
+        const dataKey = match[2];
+        const validNativeKeys = Object.values(NATIVE_EVENT_KEY);
+
+        if (validNativeKeys.includes(nativeKey)) {
+            events.push({
+                nativeEventKey: nativeKey,
+                dataEventKey: dataKey
+            });
+        } else {
+            console.warn(`⚠️ 无效的 nativeEventKey: ${nativeKey}`);
+        }
+    }
+
     return events;
 }
 
@@ -91,8 +112,19 @@ function removeEventSyntax(text) {
         return fullEventMatch[1].trim();
     }
 
+    // 🆕 检查完整的 nativeEvent 按钮语法
+    const fullNativeEventMatch = text.match(/^\[nativeEvent:\w+;data:\w+\]\s*\[([^\]]+)\]\(([^)]*)\)$/);
+    if (fullNativeEventMatch) {
+        return fullNativeEventMatch[1].trim();
+    }
+
     // 🆕 清理带参数的事件标记：[event:eventName(param1,param2)]
-    return text.replace(/\[event:\w+(?:\([^)]*\))?\]/g, '').trim();
+    let cleanedText = text.replace(/\[event:\w+(?:\([^)]*\))?\]/g, '').trim();
+    
+    // 🆕 清理 nativeEvent 标记
+    cleanedText = cleanedText.replace(/\[nativeEvent:\w+;data:\w+\]/g, '').trim();
+
+    return cleanedText;
 }
 
 // 🆕 辅助函数：处理内联图标文本，将图标语法转换为内联 SVG
@@ -468,6 +500,25 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
         }
     }
 
+    // 🆕 检查原生事件语法格式 [nativeEvent:nativeKey;data:dataKey][text](url)
+    const nativeEventLinkMatch = line.match(/^\[nativeEvent:\w+;data:\w+\]\s*\[([^\]]+)\]\(([^)]*)\)$/);
+    if (nativeEventLinkMatch) {
+        const primaryButtonMapping = markdownMapping['button:primary'];
+        if (primaryButtonMapping) {
+            return {
+                markdownResult: {
+                    type: 'button',
+                    variant: 'primary',
+                    templatePath: primaryButtonMapping,
+                    content: nativeEventLinkMatch[1].trim(), // 按钮文本
+                    url: nativeEventLinkMatch[2].trim(),     // 按钮URL (允许为空)
+                    originalText: line.trim()                // 保存原始完整文本
+                },
+                newListItemCounter: currentListItemCounter
+            };
+        }
+    }
+
     // 🆕 检查链接格式 [text](url) - 根据情况决定是超链接还是按钮
     const linkMatch = line.match(/^\[([^\]]+)\]\(([^)]*)\)$/);
     if (linkMatch) {
@@ -549,6 +600,48 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
             },
             newListItemCounter: currentListItemCounter
         };
+    }
+
+    // 🆕 检查 Video 标签
+    const videoTagInfo = isVideoTag(line);
+    if (videoTagInfo.isVideoTag) {
+        // 使用 video 映射，如果不存在则使用 p 映射或 others 映射
+        const templatePath = markdownMapping.video || markdownMapping.p || markdownMapping.others;
+        
+        // 只有找到有效的映射路径才返回结果
+        if (templatePath) {
+            return {
+                markdownResult: {
+                    type: 'video',
+                    src: videoTagInfo.src,
+                    attributes: videoTagInfo.attributes,
+                    templatePath: templatePath,
+                    content: line.trim()
+                },
+                newListItemCounter: currentListItemCounter
+            };
+        }
+    }
+
+    // 🆕 检查 Audio 标签
+    const audioTagInfo = isAudioTag(line);
+    if (audioTagInfo.isAudioTag) {
+        // 使用 audio 映射，如果不存在则使用 p 映射或 others 映射
+        const templatePath = markdownMapping.audio || markdownMapping.p || markdownMapping.others;
+        
+        // 只有找到有效的映射路径才返回结果
+        if (templatePath) {
+            return {
+                markdownResult: {
+                    type: 'audio',
+                    src: audioTagInfo.src,
+                    attributes: audioTagInfo.attributes,
+                    templatePath: templatePath,
+                    content: line.trim()
+                },
+                newListItemCounter: currentListItemCounter
+            };
+        }
     }
 
     // 🆕 检查代码块格式 ```language
@@ -1096,7 +1189,68 @@ function parseMarkdown(markdown, options = {}) {
             }
         }
 
+        // 🆕 处理 Video 标签
+        const videoTagInfo = isVideoTag(trimmedLine);
+        if (videoTagInfo.isVideoTag) {
+            console.log(`🎥 发现视频标签: ${videoTagInfo.src}`);
 
+            // 处理之前累积的内容
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            // 如果正在处理列表，先结束列表
+            if (inList && listItems.length > 0) {
+                const listLayout = createLayoutElement(
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                    listItems,
+                    {
+                        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                    }
+                );
+                stack[stack.length - 1].elements.push(listLayout);
+                inList = false;
+                listItems = [];
+            }
+
+            // 创建视频元素
+            const videoElement = createVideoElement(videoTagInfo.src, videoTagInfo.attributes);
+            stack[stack.length - 1].elements.push(videoElement);
+
+            continue;
+        }
+
+        // 🆕 处理 Audio 标签
+        const audioTagInfo = isAudioTag(trimmedLine);
+        if (audioTagInfo.isAudioTag) {
+            console.log(`🔊 发现音频标签: ${audioTagInfo.src}`);
+
+            // 处理之前累积的内容
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            // 如果正在处理列表，先结束列表
+            if (inList && listItems.length > 0) {
+                const listLayout = createLayoutElement(
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                    listItems,
+                    {
+                        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                    }
+                );
+                stack[stack.length - 1].elements.push(listLayout);
+                inList = false;
+                listItems = [];
+            }
+
+            // 创建音频元素
+            const audioElement = createAudioElement(audioTagInfo.src, audioTagInfo.attributes);
+            stack[stack.length - 1].elements.push(audioElement);
+
+            continue;
+        }
+        
         // 处理布局标签
         const layoutTagInfo = isLayoutTag(trimmedLine);
         if (layoutTagInfo.isLayoutTag && !layoutTagInfo.isClosing) {

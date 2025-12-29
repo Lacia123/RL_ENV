@@ -44,8 +44,23 @@ function parseButtonVariant(text) {
             hasVariant: true,
             variant: 'primary', // 事件按钮默认使用primary样式
             text: buttonText,
-            url: url || '#',  // 🔧 空 URL 时默认使用 #
+            url: url || '#' , // 🔧 空 URL 时默认使用 #
             isEventButton: true // 标记为事件按钮
+        };
+    }
+
+    // 🆕 检查原生事件语法格式：[nativeEvent:nativeKey;data:dataKey][文本](链接)
+    const nativeEventPattern = /^\[nativeEvent:\w+;data:\w+\]\s*\[([^\]]+)\]\(([^)]*)\)$/;
+    const nativeEventMatch = text.match(nativeEventPattern);
+    
+    if (nativeEventMatch) {
+        const [, buttonText, url] = nativeEventMatch;
+        return {
+            hasVariant: true,
+            variant: 'primary', // 原生事件按钮默认使用primary样式
+            text: buttonText,
+            url: url || '#',
+            isEventButton: true
         };
     }
 

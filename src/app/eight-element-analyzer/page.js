@@ -40,6 +40,10 @@ const MARKDOWN_TEMPLATES = {
 ### 快速链接
 访问我们的 [官方文档](https://psuip-docs-alpha.dingdaoos.com/docs) 了解更多信息，或者 [加入社区](https://psuip-docs-alpha.dingdaoos.com/docs) 与其他用户交流。
 
+<video src="https://media.w3.org/2010/05/sintel/trailer.mp4"></video>
+
+<audio src="https://media.w3.org/2010/07/bunny/04-Death_Becomes_Fur.oga"></audio>
+
 [event:download][下载资源](https://github.com/example/download)
 [联系我们]()
 
@@ -292,8 +296,8 @@ const MARKDOWN_TEMPLATES = {
 const a = 1;
 \`\`\`
 
-
-[event:edit][编辑配置](https://github.com/example/edit)
+[nativeEvent:click;data:bindData][自定义事件]()
+[event:edit][编辑配置]()
 [提交问题]()
 </card:elegantStandard>
 
@@ -540,6 +544,8 @@ contract DeFiProtocol {
 ## 瀑布流布局美学
 优雅卡片画廊采用瀑布流（瀑布流）布局，通过不同高度的卡片内容自动形成美观的瀑布流效果，适合展示多样化的内容。
 
+<video src="https://media.w3.org/2010/05/sintel/trailer.mp4"></video>
+
 <layout:gallery>
 
 <card:elegantStandard>
@@ -573,6 +579,10 @@ contract DeFiProtocol {
 ## 创意灵感
 ### 来自自然的设计语言
 观察自然界中的美妙图案，从叶脉的纹理到水滴的形状，这些都为我们的设计提供了无尽的灵感源泉。
+
+<video src="https://media.w3.org/2010/05/bunny/trailer.mp4"></video>
+
+<audio src="https://media.w3.org/2010/07/bunny/04-Death_Becomes_Fur.oga"></audio>
 
 ![自然之美](https://images.unsplash.com/photo-1441974231531-c6227db76b6e)
 
@@ -749,7 +759,6 @@ Pinterest作为瀑布流布局的典型代表，通过这种布局方式重新�
 
 这种布局特别适合展示不同长度的内容卡片，如作品集、新闻列表、产品展示等场景。`
   },
-
   landing: {
     name: '🏢 企业官网',
     description: '企业着陆页，包含导航、特性介绍、联系方式',
