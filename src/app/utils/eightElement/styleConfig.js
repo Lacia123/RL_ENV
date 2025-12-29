@@ -7063,6 +7063,20 @@ export const DEFAULT_STYLE_CONFIG = {
           supportedAttributes: ['avatar', 'icon', 'timestamp', 'cta_label', 'cta_href', 'cta_variant']
         }
       }
+    },
+
+    // commentListCard 数据绑定示例
+    commentListCard: {
+      type: 'template',
+      example: {
+         loopData: [{
+          title: '用户评论1',
+          desc: '这是一条用户评论，展示了用户对产品的评价和反馈。'
+         }, {
+          title: '用户评论2',
+          desc: '这是另一条用户评论，展示了用户对产品的评价和反馈。'
+         }]
+      }
     }
   }
 };

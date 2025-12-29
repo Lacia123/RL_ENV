@@ -2046,6 +2046,13 @@ wrapper: {
   <jobValue>全职职位</jobValue>
 </hiringListCard>
 
+<commentListCard>
+<loop data="loopData">
+    <title key="title"></title>
+    <desc key="desc"></desc>
+</loop>
+</commentListCard>
+
 </layout:gallery>
 `
   },

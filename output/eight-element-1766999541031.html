@@ -1,0 +1,1122 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Eight Element Renderer</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css" crossorigin="anonymous"></link>
+       
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        p {
+           margin-block: 0;
+           margin-inline: 0;
+           padding-block: 0;
+           padding-inline: 0;
+        }
+        .eight-element-container {
+          position: relative;
+        }
+        * {
+          box-sizing: border-box;
+        }
+        
+        /* 🆕 超链接样式 */
+        .hyperlink-styled {
+          font-size: inherit;
+          font-weight: 500;
+          color: #615eec;
+          text-decoration: none;
+          border-bottom: 2px solid #bcbef7;
+          transition: all 0.3s ease;
+        }
+        .hyperlink-styled:hover {
+          color: #4f4ac8;
+          border-bottom-color: #bcbef7;
+        }
+        .hyperlink-styled:active {
+          color: #2f2a95;
+        }
+
+        pre code.hljs {
+            display: block;
+            overflow-x: auto;
+            padding: 1em;
+        }
+        code.hljs {
+            padding: 3px 5px;
+        }
+        
+        /* 🆕 编辑器相关样式 */
+        .editor-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          z-index: 9999;
+          display: none;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .editor-container {
+          width: 90%;
+          max-width: 1200px;
+          height: 80%;
+          background: white;
+          border-radius: 8px;
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .editor-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #eee;
+        }
+        
+        .editor-title {
+          font-size: 18px;
+          font-weight: bold;
+          color: #333;
+        }
+        
+        .editor-buttons {
+          display: flex;
+          gap: 10px;
+        }
+        
+        .editor-btn {
+          padding: 8px 16px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s;
+        }
+        
+        .editor-btn-primary {
+          background: #007bff;
+          color: white;
+        }
+        
+        .editor-btn-primary:hover {
+          background: #0056b3;
+        }
+        
+        .editor-btn-secondary {
+          background: #6c757d;
+          color: white;
+        }
+        
+        .editor-btn-secondary:hover {
+          background: #545b62;
+        }
+        
+        .editor-content {
+          flex: 1;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        
+        #markdown-editor {
+          width: 100%;
+          height: 100%;
+        }
+        
+        /* 动态生成的类样式 */
+        .layout-root-dd-6a8b663e-aaa7-4341-a54f-0866c2a72c74 {
+  padding: 12px;
+  margin: 12px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0px;
+  background-image: none;
+  background-repeat: no-repeat;
+  background-size: 100vw;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  justify-items: stretch;
+}
+
+.card-dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  border-radius: 20px;
+  padding: 24px 0;
+  box-shadow: 0px 1px 8px 0px #1f1f2a26;
+  border-width: 1px;
+  border-color: #0000001f;
+  border-style: solid;
+  background: #ffffff;
+}
+
+.card-dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc ul {
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.template-title-dd-b0aa4c98-fe21-4567-a6e2-f2034e0eb659 {
+  width: 100%;
+}
+
+.text-dd-5883784c-4ba0-4f96-90eb-29c76ea69c32 {
+  font-weight: 600;
+  color: #000000e0;
+  font-size: 20px;
+  padding: 0 12px;
+  border-left-width: 4px;
+  border-left-style: solid;
+  border-left-color: #615eec;
+}
+
+.template-text-dd-61d95442-7ea1-42d7-8ecc-747481b1e24d {
+  padding: 0 12px;
+  margin-top: 12px;
+}
+
+.text-dd-f2371d7b-1d97-4b68-a75d-c0e5e41bb90b {
+  font-weight: 400;
+  color: #000000c2;
+  font-size: 16px;
+}
+
+.template-percentItems-dd-9708c1e0-c6ba-4c51-8c59-db3d9f9ecc67 {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 12px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.template-percentItem1-dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0 {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 200px;
+  padding: 12px;
+  align-items: center;
+  text-align: center;
+}
+
+.template-itemTitle-dd-62c11259-56e9-4ac1-8bb9-cc6f7e0623fb {
+  margin-bottom: 6px;
+}
+
+.text-dd-0a8179d0-a4b8-426b-b3cf-25d19f980e5f {
+  font-size: 14px;
+  font-weight: bold;
+  color: #2e2e38;
+}
+
+.template-percentValue-dd-430b0bb4-3bbd-497e-8d6f-20bdf608285b {
+  margin-bottom: 6px;
+}
+
+.text-dd-b4c5e795-1601-4c23-b22c-150e3d5d9376 {
+  font-size: 36px;
+  font-weight: bold;
+  color: #94180a;
+  text-align: center;
+}
+
+.text-dd-850e0004-da39-43ec-a1b2-d7388962c88a {
+  line-height: 1.4;
+  font-size: 12px;
+  font-weight: 200;
+  color: #2e2e38;
+}
+
+.template-percentItem2-dd-0d9f36ef-a4d2-4256-8de3-b23691179d43 {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 200px;
+  padding: 12px;
+  align-items: center;
+  text-align: center;
+}
+
+.template-itemTitle-dd-d82c3493-e25f-42e2-8b71-3398ab799f3e {
+  margin-bottom: 6px;
+}
+
+.text-dd-eb27d2b4-dbcd-4888-adeb-51f479ed01a0 {
+  font-size: 14px;
+  font-weight: bold;
+  color: #2e2e38;
+}
+
+.template-percentValue-dd-a70e5780-8c6b-4b8e-b736-e85d3fdf6caa {
+  margin-bottom: 6px;
+}
+
+.text-dd-6137b6de-158b-43ab-a0b7-b45aba6d194c {
+  font-size: 36px;
+  font-weight: bold;
+  color: #ff5329;
+  text-align: center;
+}
+
+.text-dd-7753b2be-c5ac-46f3-8449-46b3f6b02cf4 {
+  line-height: 1.4;
+  font-size: 12px;
+  font-weight: 200;
+  color: #2e2e38;
+}
+
+.template-percentItem3-dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 200px;
+  padding: 12px;
+  align-items: center;
+  text-align: center;
+}
+
+.template-itemTitle-dd-8e593aaa-f1d2-4425-be83-7919ee0952fd {
+  margin-bottom: 6px;
+}
+
+.text-dd-c28c9f25-ceaf-4e9d-bc66-493a5c7b6322 {
+  font-size: 14px;
+  font-weight: bold;
+  color: #2e2e38;
+}
+
+.template-percentValue-dd-ae25fe9d-f8b0-41bd-9f42-d4f7ca0b8cf8 {
+  margin-bottom: 6px;
+}
+
+.text-dd-84edd515-0dc6-469a-84b1-a84d2a4cd7b0 {
+  font-size: 36px;
+  font-weight: bold;
+  color: #ff5329;
+  text-align: center;
+}
+
+.text-dd-7aabb9ec-cfba-4763-97db-85e639ca5c80 {
+  line-height: 1.4;
+  font-size: 12px;
+  font-weight: 200;
+  color: #2e2e38;
+}
+
+
+      </style>
+    </head>
+    <body>
+      <div class="eight-element-container" id="root">
+  <div id="dd-6a8b663e-aaa7-4341-a54f-0866c2a72c74" class="layout-root-dd-6a8b663e-aaa7-4341-a54f-0866c2a72c74" data-element-type="layout" style="align-self: inherit; flex-grow: 0; height: 100%; position: relative; box-sizing: border-box"><div id="dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc" class="card-dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc" data-element-type="layout" style="flex-wrap: nowrap; box-sizing: border-box; height: auto; width: 100%; position: relative"><div id="dd-b0aa4c98-fe21-4567-a6e2-f2034e0eb659" class="template-title-dd-b0aa4c98-fe21-4567-a6e2-f2034e0eb659" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; box-sizing: border-box; height: auto; position: relative">
+      <div id="dd-5883784c-4ba0-4f96-90eb-29c76ea69c32" class="text-dd-5883784c-4ba0-4f96-90eb-29c76ea69c32" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>二、市场概述</p>
+
+      </div>
+    </div><div id="dd-61d95442-7ea1-42d7-8ecc-747481b1e24d" class="template-text-dd-61d95442-7ea1-42d7-8ecc-747481b1e24d" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; box-sizing: border-box; height: auto; position: relative">
+      <div id="dd-f2371d7b-1d97-4b68-a75d-c0e5e41bb90b" class="text-dd-f2371d7b-1d97-4b68-a75d-c0e5e41bb90b" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注</p>
+
+      </div>
+    </div><div id="dd-9708c1e0-c6ba-4c51-8c59-db3d9f9ecc67" class="template-percentItems-dd-9708c1e0-c6ba-4c51-8c59-db3d9f9ecc67" data-element-type="layout" style="box-sizing: border-box; height: auto; width: 100%; position: relative"><div id="dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0" class="template-percentItem1-dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0" data-element-type="layout" ><div id="dd-62c11259-56e9-4ac1-8bb9-cc6f7e0623fb" class="template-itemTitle-dd-62c11259-56e9-4ac1-8bb9-cc6f7e0623fb" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; box-sizing: border-box; height: auto; position: relative">
+      <div id="dd-0a8179d0-a4b8-426b-b3cf-25d19f980e5f" class="text-dd-0a8179d0-a4b8-426b-b3cf-25d19f980e5f" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>中国市场</p>
+
+      </div>
+    </div><div id="dd-430b0bb4-3bbd-497e-8d6f-20bdf608285b" class="template-percentValue-dd-430b0bb4-3bbd-497e-8d6f-20bdf608285b" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; box-sizing: border-box; height: auto; position: relative">
+      <div id="dd-b4c5e795-1601-4c23-b22c-150e3d5d9376" class="text-dd-b4c5e795-1601-4c23-b22c-150e3d5d9376" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>15%</p>
+
+      </div>
+    </div>
+      <div id="dd-850e0004-da39-43ec-a1b2-d7388962c88a" class="text-dd-850e0004-da39-43ec-a1b2-d7388962c88a" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>AI-PC 出货量</p>
+
+      </div>
+    </div><div id="dd-0d9f36ef-a4d2-4256-8de3-b23691179d43" class="template-percentItem2-dd-0d9f36ef-a4d2-4256-8de3-b23691179d43" data-element-type="layout" ><div id="dd-d82c3493-e25f-42e2-8b71-3398ab799f3e" class="template-itemTitle-dd-d82c3493-e25f-42e2-8b71-3398ab799f3e" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; box-sizing: border-box; height: auto; position: relative">
+      <div id="dd-eb27d2b4-dbcd-4888-adeb-51f479ed01a0" class="text-dd-eb27d2b4-dbcd-4888-adeb-51f479ed01a0" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>全球市场</p>
+
+      </div>
+    </div><div id="dd-a70e5780-8c6b-4b8e-b736-e85d3fdf6caa" class="template-percentValue-dd-a70e5780-8c6b-4b8e-b736-e85d3fdf6caa" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; box-sizing: border-box; height: auto; position: relative">
+      <div id="dd-6137b6de-158b-43ab-a0b7-b45aba6d194c" class="text-dd-6137b6de-158b-43ab-a0b7-b45aba6d194c" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>25%</p>
+
+      </div>
+    </div>
+      <div id="dd-7753b2be-c5ac-46f3-8449-46b3f6b02cf4" class="text-dd-7753b2be-c5ac-46f3-8449-46b3f6b02cf4" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>AI-PC 渗透率</p>
+
+      </div>
+    </div><div id="dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd" class="template-percentItem3-dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd" data-element-type="layout" ><div id="dd-8e593aaa-f1d2-4425-be83-7919ee0952fd" class="template-itemTitle-dd-8e593aaa-f1d2-4425-be83-7919ee0952fd" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; box-sizing: border-box; height: auto; position: relative">
+      <div id="dd-c28c9f25-ceaf-4e9d-bc66-493a5c7b6322" class="text-dd-c28c9f25-ceaf-4e9d-bc66-493a5c7b6322" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>未来预测</p>
+
+      </div>
+    </div><div id="dd-ae25fe9d-f8b0-41bd-9f42-d4f7ca0b8cf8" class="template-percentValue-dd-ae25fe9d-f8b0-41bd-9f42-d4f7ca0b8cf8" data-element-type="layout" style="display: flex; flex-direction: column; flex-wrap: nowrap; box-sizing: border-box; height: auto; position: relative">
+      <div id="dd-84edd515-0dc6-469a-84b1-a84d2a4cd7b0" class="text-dd-84edd515-0dc6-469a-84b1-a84d2a4cd7b0" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>40%</p>
+
+      </div>
+    </div>
+      <div id="dd-7aabb9ec-cfba-4763-97db-85e639ca5c80" class="text-dd-7aabb9ec-cfba-4763-97db-85e639ca5c80" data-element-type="text" style="box-sizing: border-box; position: relative; width: ; flex-grow: 0; background-color: none">
+        <p>预计增长率</p>
+
+      </div>
+    </div></div></div></div>
+      </div>
+      <!-- 🆕 Markdown 编辑器覆盖层 -->
+      <div class="editor-overlay" id="editor-overlay">
+        <div class="editor-container">
+          <div class="editor-header">
+            <div class="editor-title">编辑 Markdown 内容</div>
+            <div class="editor-buttons">
+              <button class="editor-btn editor-btn-primary" id="save-btn">保存</button>
+              <button class="editor-btn editor-btn-secondary" id="cancel-btn">返回</button>
+            </div>
+          </div>
+          <div class="editor-content">
+            <div id="markdown-editor"></div>
+          </div>
+        </div>
+      </div>
+      
+      <script type="module">
+        // 🆕 编辑器功能实现
+        let crepeEditor = null;
+        let currentMarkdown = '';
+        let currentEventTargetId = '';
+        
+        // 初始化编辑器（延迟加载）
+        async function initEditor() {
+          if (crepeEditor) return crepeEditor;
+          
+          try {
+            // 等待所有依赖加载完成
+            await waitForDependencies();
+            
+            // 尝试多种全局变量名称
+            const CrepeClass = window.Crepe || 
+                              window.MilkdownCrepe?.Crepe || 
+                              window['@milkdown/crepe']?.Crepe ||
+                              window.milkdownCrepe?.Crepe;
+            
+            if (!CrepeClass) {
+              throw new Error('Crepe类未找到，可能依赖加载失败');
+            }
+            
+            console.log('🔍 找到Crepe类:', typeof CrepeClass);
+            
+            crepeEditor = new CrepeClass({
+              root: '#markdown-editor',
+              defaultValue: '',
+            });
+            
+            await crepeEditor.create();
+            console.log('✅ Crepe 编辑器初始化成功');
+            return crepeEditor;
+          } catch (error) {
+            console.error('❌ Crepe 编辑器初始化失败:', error);
+            console.log('🔄 回退到简单编辑器...');
+            
+            // 回退到功能丰富的 textarea 编辑器
+            createFallbackEditor();
+            return null;
+          }
+        }
+        
+        // 等待依赖加载
+        function waitForDependencies() {
+          return new Promise((resolve) => {
+            let attempts = 0;
+            const maxAttempts = 50; // 5秒超时
+            
+            const checkDependencies = () => {
+              attempts++;
+              
+              // 检查关键依赖是否已加载
+              const hasLodash = window._ !== undefined;
+              const hasProseMirror = window.ProseMirror !== undefined || window['prosemirror-state'] !== undefined;
+              const hasCrepe = window.Crepe !== undefined || 
+                              window.MilkdownCrepe !== undefined || 
+                              window['@milkdown/crepe'] !== undefined;
+              
+              console.log('🔍 依赖检查:', { hasLodash, hasProseMirror, hasCrepe, attempt: attempts });
+              
+              if (attempts >= maxAttempts) {
+                console.warn('⚠️ 依赖加载超时，继续尝试初始化');
+                resolve();
+              } else if (hasLodash || hasCrepe) {
+                console.log('✅ 基础依赖已加载');
+                resolve();
+              } else {
+                setTimeout(checkDependencies, 100);
+              }
+            };
+            
+            checkDependencies();
+          });
+        }
+        
+        // 创建回退编辑器
+        function createFallbackEditor() {
+          const editorContainer = document.getElementById('markdown-editor');
+          editorContainer.innerHTML = `
+            <div style="height: 100%; display: flex; flex-direction: column;">
+              <div style="padding: 10px; background: #f5f5f5; border-bottom: 1px solid #ddd; font-size: 12px; color: #666;">
+                简化 Markdown 编辑器 (Crepe 加载失败时的备用方案)
+              </div>
+              <textarea id="fallback-editor" 
+                style="flex: 1; border: none; padding: 15px; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 14px; resize: none; outline: none; line-height: 1.5;"
+                placeholder="在此输入 Markdown 内容..."></textarea>
+            </div>
+          `;
+        }
+        
+        // 显示编辑器
+        async function showEditor(markdown, eventTargetId) {
+          currentMarkdown = markdown;
+          currentEventTargetId = eventTargetId;
+          
+          console.log('🔧 显示编辑器，EventTargetId:', eventTargetId);
+          console.log('📝 要编辑的markdown长度:', markdown.length);
+          
+          const overlay = document.getElementById('editor-overlay');
+          overlay.style.display = 'flex';
+          
+          // 初始化编辑器
+          const editor = await initEditor();
+          
+          if (editor) {
+            // 使用 Crepe 编辑器
+            try {
+              // 设置编辑器内容
+              await editor.action((ctx) => {
+                const view = ctx.get('editorView');
+                const schema = ctx.get('schema');
+                const parser = ctx.get('parser');
+                
+                // 解析 markdown 并设置到编辑器
+                const doc = parser(markdown);
+                view.dispatch(view.state.tr.replaceWith(0, view.state.doc.content.size, doc));
+              });
+            } catch (error) {
+              console.error('设置编辑器内容失败:', error);
+            }
+          } else {
+            // 使用回退的 textarea
+            const fallbackEditor = document.getElementById('fallback-editor');
+            if (fallbackEditor) {
+              fallbackEditor.value = markdown;
+            }
+          }
+        }
+        
+        // 获取编辑器内容
+        async function getEditorContent() {
+          if (crepeEditor) {
+            try {
+              return await crepeEditor.action((ctx) => {
+                const serializer = ctx.get('serializer');
+                const view = ctx.get('editorView');
+                return serializer(view.state.doc);
+              });
+            } catch (error) {
+              console.error('获取Crepe编辑器内容失败:', error);
+              // 如果Crepe获取失败，尝试回退编辑器
+              const fallbackEditor = document.getElementById('fallback-editor');
+              return fallbackEditor ? fallbackEditor.value : currentMarkdown;
+            }
+          } else {
+            // 使用回退的 textarea
+            const fallbackEditor = document.getElementById('fallback-editor');
+            if (fallbackEditor) {
+              console.log('📝 从回退编辑器获取内容，长度:', fallbackEditor.value.length);
+              return fallbackEditor.value;
+            } else {
+              console.warn('⚠️ 回退编辑器也未找到，返回原始内容');
+              return currentMarkdown;
+            }
+          }
+        }
+        
+        // 隐藏编辑器
+        function hideEditor() {
+          const overlay = document.getElementById('editor-overlay');
+          overlay.style.display = 'none';
+        }
+        
+        // 重新渲染页面
+        async function rerenderPage(newMarkdown) {
+          try {
+            console.log('🔄 开始重新渲染页面...');
+            console.log('📝 新的markdown长度:', newMarkdown.length);
+            
+            // 调用 markdown-to-html API 重新生成 HTML
+            const response = await fetch('/api/markdown-to-html', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                markdown: newMarkdown,
+                width: 800,
+                height: 500
+              })
+            });
+            
+            if (!response.ok) {
+              throw new Error('API调用失败: ' + response.status);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success && result.html) {
+              // 🆕 重新加载整个页面内容
+              document.open();
+              document.write(result.html);
+              document.close();
+              console.log('✅ 页面重新渲染成功');
+            } else {
+              throw new Error(result.error || '重新渲染失败');
+            }
+          } catch (error) {
+            console.error('❌ 重新渲染失败:', error);
+            alert('保存失败: ' + error.message);
+          }
+        }
+        
+        // 保存按钮事件
+        document.getElementById('save-btn').addEventListener('click', async () => {
+          try {
+            const newMarkdown = await getEditorContent();
+            console.log('💾 保存编辑内容，长度:', newMarkdown.length);
+            
+            hideEditor();
+            await rerenderPage(newMarkdown);
+          } catch (error) {
+            console.error('保存失败:', error);
+            alert('保存失败: ' + error.message);
+          }
+        });
+        
+        // 取消按钮事件
+        document.getElementById('cancel-btn').addEventListener('click', () => {
+          hideEditor();
+        });
+        
+        // 🆕 数据绑定系统
+        const dataBindingSystem = {
+          // 存储所有绑定数据的状态
+          dataState: {},
+          
+          // 初始化数据状态
+          initializeDataState(dataVariables) {
+            console.log('🔗 初始化数据绑定状态:', dataVariables);
+            this.dataState = { ...dataVariables };
+          },
+          
+          // 更新数据状态
+          updateDataState(key, value) {
+            console.log('🔄 更新数据状态: ' + key + ' = ' + value);
+            this.dataState[key] = value;
+            
+            // 触发条件样式和显示/隐藏的更新
+            this.updateConditionStyles();
+            this.updateConditionVisibility();
+          },
+          
+          // 获取数据状态
+          getDataState(key) {
+            return this.dataState[key];
+          },
+          
+          // 检查条件是否满足
+          evaluateCondition(condition) {
+            if (!condition || typeof condition !== 'string') return false;
+            
+            // 🔧 调试条件字符串
+            console.log('🔍 原始条件:', {
+              condition: condition,
+              length: condition.length,
+              charCodes: Array.from(condition).map(c => c.charCodeAt(0)),
+              trimmed: condition.trim()
+            });
+            
+            // 🔧 使用简单的字符串分割来避免正则表达式问题
+            const trimmedCondition = condition.trim();
+            const equalIndex = trimmedCondition.indexOf('=');
+            
+            if (equalIndex === -1) {
+              console.warn('🚫 条件格式错误 - 缺少等号:', {
+                original: condition,
+                trimmed: trimmedCondition
+              });
+              return false;
+            }
+            
+            const dataKey = trimmedCondition.substring(0, equalIndex).trim();
+            const expectedValue = trimmedCondition.substring(equalIndex + 1).trim();
+            
+            if (!dataKey || !expectedValue) {
+              console.warn('🚫 条件格式错误 - 键或值为空:', {
+                original: condition,
+                dataKey: dataKey,
+                expectedValue: expectedValue
+              });
+              return false;
+            }
+            const currentValue = this.getDataState(dataKey);
+            const isMatch = currentValue === expectedValue;
+            
+            console.log('🔍 条件评估:', {
+              condition: condition.trim(),
+              dataKey: dataKey,
+              expectedValue: expectedValue,
+              currentValue: currentValue,
+              dataState: this.dataState,
+              result: isMatch
+            });
+            
+            return isMatch;
+          },
+          
+          // 更新条件样式
+          updateConditionStyles() {
+            console.log('🎨 更新条件样式...当前数据状态:', this.dataState);
+            
+            // 查找所有具有条件样式的元素
+            const elementsWithConditionStyles = this.findElementsWithConditionStyles();
+            console.log('🔍 找到 ' + elementsWithConditionStyles.length + ' 个具有条件样式的元素');
+            
+            elementsWithConditionStyles.forEach(({ element, conditionStyle }) => {
+              const isConditionMet = this.evaluateCondition(conditionStyle.condition);
+              
+              if (isConditionMet) {
+                // 条件满足，应用条件样式
+                element.classList.add(conditionStyle.className);
+                console.log('✅ 应用条件样式: ' + element.id + ' -> ' + conditionStyle.className);
+              } else {
+                // 条件不满足，移除条件样式
+                element.classList.remove(conditionStyle.className);
+                console.log('❌ 移除条件样式: ' + element.id + ' -> ' + conditionStyle.className);
+              }
+              
+              console.log('🎯 元素 ' + element.id + ' 条件 "' + conditionStyle.condition + '" ' + (isConditionMet ? '满足' : '不满足'));
+            });
+          },
+          
+          // 更新条件显示/隐藏
+          updateConditionVisibility() {
+            console.log('👁️ 更新条件显示/隐藏...当前数据状态:', this.dataState);
+            
+            // 查找所有具有条件显示的元素
+            const elementsWithConditions = this.findElementsWithConditions();
+            console.log('🔍 找到 ' + elementsWithConditions.length + ' 个具有条件显示的元素');
+            
+            elementsWithConditions.forEach(({ element, condition }) => {
+              const isConditionMet = this.evaluateCondition(condition);
+              
+              if (isConditionMet) {
+                // 条件满足，显示元素
+                element.style.display = '';
+                console.log('✅ 显示元素: ' + element.id);
+              } else {
+                // 条件不满足，隐藏元素
+                element.style.display = 'none';
+                console.log('❌ 隐藏元素: ' + element.id);
+              }
+              
+              console.log('👁️ 元素 ' + element.id + ' 条件 "' + condition + '" ' + (isConditionMet ? '显示' : '隐藏'));
+            });
+          },
+          
+          // 查找所有具有条件样式的元素
+          findElementsWithConditionStyles() {
+            const elements = [];
+            const eightElementData = {"dataKeys":[],"id":"dd-6a8b663e-aaa7-4341-a54f-0866c2a72c74","name":"layout","name-zh":"布局","file-type":"template","theme":"default","data":{},"EventTargetIds":["dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc"],"_metadata":{"actualType":"layout","variant":"root","isLayout":true,"isRoot":true,"appliedAttributes":{}},"layout":{"classStyle":{"padding":"{dimension.padding.base}","margin":"{dimension.margin.base}","backgroundColor":"{color.basic.opacity.white.100}","borderRadius":"{dimension.borderradius.large}","display":"flex","flexDirection":"column","flexWrap":"nowrap","justifyContent":"flex-start","alignItems":"stretch","gap":"{dimension.padding.none}","backgroundImage":"none","backgroundRepeat":"no-repeat","backgroundSize":"100vw","gridTemplateColumns":"none","gridTemplateAreas":"none","justifyItems":"stretch"},"className":"layout-root-dd-6a8b663e-aaa7-4341-a54f-0866c2a72c74","style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","height":"100%","position":"relative","boxSizing":"border-box"},"children":[{"dataKeys":[],"name":"layout","name-zh":"卡片","file-type":"template","theme":"default","_metadata":{"actualType":"card","variant":"headerPrecentCard","isCard":true,"isLayout":true,"isTemplateCard":true,"parameters":{},"cardContent":"## 二、市场概述\n   AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注\n   ### 中国市场\n   <percentValue color={color.error.red8}>#### 15%</percentValue>\n   AI-PC 出货量\n   ### 全球市场  \n   #### 25%\n   AI-PC 渗透率\n   ### 未来预测\n   #### 40%\n   预计增长率"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","layoutGrow":"{layout.grow.0}","boxSizing":"border-box","height":"auto","width":"100%","position":"relative"},"classStyle":{"display":"flex","flexDirection":"column","flexGrow":"1","borderRadius":"{dimension.borderradius.xl}","padding":"{dimension.padding.extraloose} 0","boxShadow":"{material.hierarchy.main}","borderWidth":"{dimension.borderwidth.narrow}","borderColor":"{color.surfacecontainer.black12}","borderStyle":"solid","background":"{color.surfacecontainer.white100}","& ul":{"marginBlockStart":"0","marginBlockEnd":"0","marginTop":"0","marginBottom":"0"}},"className":"card-dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc","children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-title","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"title","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"headerCardTitle","tagContent":"二、市场概述"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"width":"100%"},"className":"template-title-dd-b0aa4c98-fe21-4567-a6e2-f2034e0eb659","children":[{"id":"dd-5883784c-4ba0-4f96-90eb-29c76ea69c32","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"headerCardTitle","originalVariant":"headerCardTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontWeight":"{font.fontweight.bold}","color":"{color.onprimary.black88}","fontSize":"{font.size.large}","padding":"0 {dimension.padding.base}","borderLeftWidth":"{dimension.borderwidth.wide}","borderLeftStyle":"solid","borderLeftColor":"{color.primary.brand5}"},"className":"text-dd-5883784c-4ba0-4f96-90eb-29c76ea69c32","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>二、市场概述</p>\n"}},"fontweight":"{font.fontweight.bold}"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - title","id":"dd-b0aa4c98-fe21-4567-a6e2-f2034e0eb659","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-text","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"text","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"headerCardText","tagContent":"AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"padding":"0 {dimension.padding.base}","marginTop":"{dimension.margin.base}"},"className":"template-text-dd-61d95442-7ea1-42d7-8ecc-747481b1e24d","children":[{"id":"dd-f2371d7b-1d97-4b68-a75d-c0e5e41bb90b","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"headerCardText","originalVariant":"headerCardText","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontWeight":"{font.fontweight.semibold}","color":"{color.onprimary.black76}","fontSize":"{font.size.medium}"},"className":"text-dd-f2371d7b-1d97-4b68-a75d-c0e5e41bb90b","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注</p>\n"}},"fontweight":"{font.fontweight.semibold}"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - text","id":"dd-61d95442-7ea1-42d7-8ecc-747481b1e24d","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签-percentItems","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentItems","isTemplateTag":true,"isLayout":true,"tagContent":""},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","width":"100%","position":"relative"},"classStyle":{"display":"flex","flexDirection":"row","gap":"{dimension.gap.loose}","padding":"{dimension.padding.base}","flexWrap":"wrap","justifyContent":"space-between"},"className":"template-percentItems-dd-9708c1e0-c6ba-4c51-8c59-db3d9f9ecc67","children":[{"dataKeys":[],"name":"layout","name-zh":"嵌套模板容器-percentItem1","file-type":"template","type":"layout","variant":"normal","id":"dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0","className":"template-percentItem1-dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0","layout":{"direction":"vertical","style":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-itemTitle","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"itemTitle","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentItemTitle","tagContent":"中国市场"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-itemTitle-dd-62c11259-56e9-4ac1-8bb9-cc6f7e0623fb","children":[{"id":"dd-0a8179d0-a4b8-426b-b3cf-25d19f980e5f","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemTitle","originalVariant":"percentItemTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.small}","fontWeight":"bold","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-0a8179d0-a4b8-426b-b3cf-25d19f980e5f","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>中国市场</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - itemTitle","id":"dd-62c11259-56e9-4ac1-8bb9-cc6f7e0623fb","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-percentValue","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentValue","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentValue","tagContent":"15%"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-percentValue-dd-430b0bb4-3bbd-497e-8d6f-20bdf608285b","children":[{"id":"dd-b4c5e795-1601-4c23-b22c-150e3d5d9376","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentValue","originalVariant":"percentValue","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.xxl}","fontWeight":"bold","color":"{color.error.red8}","textAlign":"center"},"className":"text-dd-b4c5e795-1601-4c23-b22c-150e3d5d9376","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>15%</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - percentValue","id":"dd-430b0bb4-3bbd-497e-8d6f-20bdf608285b","events":[{}]},{"id":"dd-850e0004-da39-43ec-a1b2-d7388962c88a","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemDescription","originalVariant":"percentItemDescription","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"lineHeight":"1.4","fontSize":"{font.size.tiny}","fontWeight":"{font.fontweight.medium}","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-850e0004-da39-43ec-a1b2-d7388962c88a","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>AI-PC 出货量</p>\n"}},"fontweight":"{font.fontweight.medium}"},"type":"text_body","state":"default","events":[{}]}],"classStyle":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"className":"template-percentItem1-dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0"}},{"dataKeys":[],"name":"layout","name-zh":"嵌套模板容器-percentItem2","file-type":"template","type":"layout","variant":"normal","id":"dd-0d9f36ef-a4d2-4256-8de3-b23691179d43","className":"template-percentItem2-dd-0d9f36ef-a4d2-4256-8de3-b23691179d43","layout":{"direction":"vertical","style":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-itemTitle","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"itemTitle","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentItemTitle","tagContent":"全球市场"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-itemTitle-dd-d82c3493-e25f-42e2-8b71-3398ab799f3e","children":[{"id":"dd-eb27d2b4-dbcd-4888-adeb-51f479ed01a0","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemTitle","originalVariant":"percentItemTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.small}","fontWeight":"bold","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-eb27d2b4-dbcd-4888-adeb-51f479ed01a0","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>全球市场</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - itemTitle","id":"dd-d82c3493-e25f-42e2-8b71-3398ab799f3e","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-percentValue","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentValue","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentValue","tagContent":"25%"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-percentValue-dd-a70e5780-8c6b-4b8e-b736-e85d3fdf6caa","children":[{"id":"dd-6137b6de-158b-43ab-a0b7-b45aba6d194c","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentValue","originalVariant":"percentValue","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.xxl}","fontWeight":"bold","color":"{color.error.red5}","textAlign":"center"},"className":"text-dd-6137b6de-158b-43ab-a0b7-b45aba6d194c","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>25%</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - percentValue","id":"dd-a70e5780-8c6b-4b8e-b736-e85d3fdf6caa","events":[{}]},{"id":"dd-7753b2be-c5ac-46f3-8449-46b3f6b02cf4","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemDescription","originalVariant":"percentItemDescription","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"lineHeight":"1.4","fontSize":"{font.size.tiny}","fontWeight":"{font.fontweight.medium}","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-7753b2be-c5ac-46f3-8449-46b3f6b02cf4","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>AI-PC 渗透率</p>\n"}},"fontweight":"{font.fontweight.medium}"},"type":"text_body","state":"default","events":[{}]}],"classStyle":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"className":"template-percentItem2-dd-0d9f36ef-a4d2-4256-8de3-b23691179d43"}},{"dataKeys":[],"name":"layout","name-zh":"嵌套模板容器-percentItem3","file-type":"template","type":"layout","variant":"normal","id":"dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd","className":"template-percentItem3-dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd","layout":{"direction":"vertical","style":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-itemTitle","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"itemTitle","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentItemTitle","tagContent":"未来预测"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-itemTitle-dd-8e593aaa-f1d2-4425-be83-7919ee0952fd","children":[{"id":"dd-c28c9f25-ceaf-4e9d-bc66-493a5c7b6322","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemTitle","originalVariant":"percentItemTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.small}","fontWeight":"bold","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-c28c9f25-ceaf-4e9d-bc66-493a5c7b6322","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>未来预测</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - itemTitle","id":"dd-8e593aaa-f1d2-4425-be83-7919ee0952fd","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-percentValue","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentValue","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentValue","tagContent":"40%"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-percentValue-dd-ae25fe9d-f8b0-41bd-9f42-d4f7ca0b8cf8","children":[{"id":"dd-84edd515-0dc6-469a-84b1-a84d2a4cd7b0","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentValue","originalVariant":"percentValue","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.xxl}","fontWeight":"bold","color":"{color.error.red5}","textAlign":"center"},"className":"text-dd-84edd515-0dc6-469a-84b1-a84d2a4cd7b0","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>40%</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - percentValue","id":"dd-ae25fe9d-f8b0-41bd-9f42-d4f7ca0b8cf8","events":[{}]},{"id":"dd-7aabb9ec-cfba-4763-97db-85e639ca5c80","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemDescription","originalVariant":"percentItemDescription","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"lineHeight":"1.4","fontSize":"{font.size.tiny}","fontWeight":"{font.fontweight.medium}","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-7aabb9ec-cfba-4763-97db-85e639ca5c80","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>预计增长率</p>\n"}},"fontweight":"{font.fontweight.medium}"},"type":"text_body","state":"default","events":[{}]}],"classStyle":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"className":"template-percentItem3-dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd"}}]},"description":"模板标签元素 - percentItems","id":"dd-9708c1e0-c6ba-4c51-8c59-db3d9f9ecc67","events":[{}]}]},"description":"模板卡片元素 - headerPrecentCard","id":"dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc","events":[{"runtimeEventKey":"update","nativeEventKey":"mouseenter","dataEventKey":[],"parameters":{"markdown":"<card:headerPrecentCard>\n## 二、市场概述\n   AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注\n   ### 中国市场\n   <percentValue color={color.error.red8}>#### 15%</percentValue>\n   AI-PC 出货量\n   ### 全球市场  \n   #### 25%\n   AI-PC 渗透率\n   ### 未来预测\n   #### 40%\n   预计增长率\n</card:headerPrecentCard>","cardId":"dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc"},"EventTargetId":"dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc"}]}]},"events":[{}]};
+            
+            const searchElement = (elementData) => {
+              if (!elementData) return;
+              
+              // 检查当前元素是否有条件样式
+              if (elementData.layout && elementData.layout.conditionStyle) {
+                const domElement = document.getElementById(elementData.id);
+                if (domElement) {
+                  elements.push({
+                    element: domElement,
+                    conditionStyle: elementData.layout.conditionStyle
+                  });
+                }
+              }
+              
+              // 递归检查子元素
+              if (elementData.layout && elementData.layout.children) {
+                elementData.layout.children.forEach(child => searchElement(child));
+              }
+            };
+            
+            searchElement(eightElementData);
+            return elements;
+          },
+          
+          // 查找所有具有条件显示的元素
+          findElementsWithConditions() {
+            const elements = [];
+            const eightElementData = {"dataKeys":[],"id":"dd-6a8b663e-aaa7-4341-a54f-0866c2a72c74","name":"layout","name-zh":"布局","file-type":"template","theme":"default","data":{},"EventTargetIds":["dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc"],"_metadata":{"actualType":"layout","variant":"root","isLayout":true,"isRoot":true,"appliedAttributes":{}},"layout":{"classStyle":{"padding":"{dimension.padding.base}","margin":"{dimension.margin.base}","backgroundColor":"{color.basic.opacity.white.100}","borderRadius":"{dimension.borderradius.large}","display":"flex","flexDirection":"column","flexWrap":"nowrap","justifyContent":"flex-start","alignItems":"stretch","gap":"{dimension.padding.none}","backgroundImage":"none","backgroundRepeat":"no-repeat","backgroundSize":"100vw","gridTemplateColumns":"none","gridTemplateAreas":"none","justifyItems":"stretch"},"className":"layout-root-dd-6a8b663e-aaa7-4341-a54f-0866c2a72c74","style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","height":"100%","position":"relative","boxSizing":"border-box"},"children":[{"dataKeys":[],"name":"layout","name-zh":"卡片","file-type":"template","theme":"default","_metadata":{"actualType":"card","variant":"headerPrecentCard","isCard":true,"isLayout":true,"isTemplateCard":true,"parameters":{},"cardContent":"## 二、市场概述\n   AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注\n   ### 中国市场\n   <percentValue color={color.error.red8}>#### 15%</percentValue>\n   AI-PC 出货量\n   ### 全球市场  \n   #### 25%\n   AI-PC 渗透率\n   ### 未来预测\n   #### 40%\n   预计增长率"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","layoutGrow":"{layout.grow.0}","boxSizing":"border-box","height":"auto","width":"100%","position":"relative"},"classStyle":{"display":"flex","flexDirection":"column","flexGrow":"1","borderRadius":"{dimension.borderradius.xl}","padding":"{dimension.padding.extraloose} 0","boxShadow":"{material.hierarchy.main}","borderWidth":"{dimension.borderwidth.narrow}","borderColor":"{color.surfacecontainer.black12}","borderStyle":"solid","background":"{color.surfacecontainer.white100}","& ul":{"marginBlockStart":"0","marginBlockEnd":"0","marginTop":"0","marginBottom":"0"}},"className":"card-dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc","children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-title","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"title","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"headerCardTitle","tagContent":"二、市场概述"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"width":"100%"},"className":"template-title-dd-b0aa4c98-fe21-4567-a6e2-f2034e0eb659","children":[{"id":"dd-5883784c-4ba0-4f96-90eb-29c76ea69c32","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"headerCardTitle","originalVariant":"headerCardTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontWeight":"{font.fontweight.bold}","color":"{color.onprimary.black88}","fontSize":"{font.size.large}","padding":"0 {dimension.padding.base}","borderLeftWidth":"{dimension.borderwidth.wide}","borderLeftStyle":"solid","borderLeftColor":"{color.primary.brand5}"},"className":"text-dd-5883784c-4ba0-4f96-90eb-29c76ea69c32","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>二、市场概述</p>\n"}},"fontweight":"{font.fontweight.bold}"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - title","id":"dd-b0aa4c98-fe21-4567-a6e2-f2034e0eb659","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-text","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"text","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"headerCardText","tagContent":"AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"padding":"0 {dimension.padding.base}","marginTop":"{dimension.margin.base}"},"className":"template-text-dd-61d95442-7ea1-42d7-8ecc-747481b1e24d","children":[{"id":"dd-f2371d7b-1d97-4b68-a75d-c0e5e41bb90b","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"headerCardText","originalVariant":"headerCardText","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontWeight":"{font.fontweight.semibold}","color":"{color.onprimary.black76}","fontSize":"{font.size.medium}"},"className":"text-dd-f2371d7b-1d97-4b68-a75d-c0e5e41bb90b","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注</p>\n"}},"fontweight":"{font.fontweight.semibold}"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - text","id":"dd-61d95442-7ea1-42d7-8ecc-747481b1e24d","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签-percentItems","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentItems","isTemplateTag":true,"isLayout":true,"tagContent":""},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","width":"100%","position":"relative"},"classStyle":{"display":"flex","flexDirection":"row","gap":"{dimension.gap.loose}","padding":"{dimension.padding.base}","flexWrap":"wrap","justifyContent":"space-between"},"className":"template-percentItems-dd-9708c1e0-c6ba-4c51-8c59-db3d9f9ecc67","children":[{"dataKeys":[],"name":"layout","name-zh":"嵌套模板容器-percentItem1","file-type":"template","type":"layout","variant":"normal","id":"dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0","className":"template-percentItem1-dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0","layout":{"direction":"vertical","style":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-itemTitle","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"itemTitle","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentItemTitle","tagContent":"中国市场"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-itemTitle-dd-62c11259-56e9-4ac1-8bb9-cc6f7e0623fb","children":[{"id":"dd-0a8179d0-a4b8-426b-b3cf-25d19f980e5f","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemTitle","originalVariant":"percentItemTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.small}","fontWeight":"bold","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-0a8179d0-a4b8-426b-b3cf-25d19f980e5f","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>中国市场</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - itemTitle","id":"dd-62c11259-56e9-4ac1-8bb9-cc6f7e0623fb","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-percentValue","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentValue","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentValue","tagContent":"15%"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-percentValue-dd-430b0bb4-3bbd-497e-8d6f-20bdf608285b","children":[{"id":"dd-b4c5e795-1601-4c23-b22c-150e3d5d9376","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentValue","originalVariant":"percentValue","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.xxl}","fontWeight":"bold","color":"{color.error.red8}","textAlign":"center"},"className":"text-dd-b4c5e795-1601-4c23-b22c-150e3d5d9376","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>15%</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - percentValue","id":"dd-430b0bb4-3bbd-497e-8d6f-20bdf608285b","events":[{}]},{"id":"dd-850e0004-da39-43ec-a1b2-d7388962c88a","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemDescription","originalVariant":"percentItemDescription","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"lineHeight":"1.4","fontSize":"{font.size.tiny}","fontWeight":"{font.fontweight.medium}","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-850e0004-da39-43ec-a1b2-d7388962c88a","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>AI-PC 出货量</p>\n"}},"fontweight":"{font.fontweight.medium}"},"type":"text_body","state":"default","events":[{}]}],"classStyle":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"className":"template-percentItem1-dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0"}},{"dataKeys":[],"name":"layout","name-zh":"嵌套模板容器-percentItem2","file-type":"template","type":"layout","variant":"normal","id":"dd-0d9f36ef-a4d2-4256-8de3-b23691179d43","className":"template-percentItem2-dd-0d9f36ef-a4d2-4256-8de3-b23691179d43","layout":{"direction":"vertical","style":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-itemTitle","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"itemTitle","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentItemTitle","tagContent":"全球市场"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-itemTitle-dd-d82c3493-e25f-42e2-8b71-3398ab799f3e","children":[{"id":"dd-eb27d2b4-dbcd-4888-adeb-51f479ed01a0","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemTitle","originalVariant":"percentItemTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.small}","fontWeight":"bold","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-eb27d2b4-dbcd-4888-adeb-51f479ed01a0","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>全球市场</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - itemTitle","id":"dd-d82c3493-e25f-42e2-8b71-3398ab799f3e","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-percentValue","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentValue","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentValue","tagContent":"25%"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-percentValue-dd-a70e5780-8c6b-4b8e-b736-e85d3fdf6caa","children":[{"id":"dd-6137b6de-158b-43ab-a0b7-b45aba6d194c","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentValue","originalVariant":"percentValue","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.xxl}","fontWeight":"bold","color":"{color.error.red5}","textAlign":"center"},"className":"text-dd-6137b6de-158b-43ab-a0b7-b45aba6d194c","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>25%</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - percentValue","id":"dd-a70e5780-8c6b-4b8e-b736-e85d3fdf6caa","events":[{}]},{"id":"dd-7753b2be-c5ac-46f3-8449-46b3f6b02cf4","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemDescription","originalVariant":"percentItemDescription","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"lineHeight":"1.4","fontSize":"{font.size.tiny}","fontWeight":"{font.fontweight.medium}","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-7753b2be-c5ac-46f3-8449-46b3f6b02cf4","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>AI-PC 渗透率</p>\n"}},"fontweight":"{font.fontweight.medium}"},"type":"text_body","state":"default","events":[{}]}],"classStyle":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"className":"template-percentItem2-dd-0d9f36ef-a4d2-4256-8de3-b23691179d43"}},{"dataKeys":[],"name":"layout","name-zh":"嵌套模板容器-percentItem3","file-type":"template","type":"layout","variant":"normal","id":"dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd","className":"template-percentItem3-dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd","layout":{"direction":"vertical","style":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-itemTitle","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"itemTitle","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentItemTitle","tagContent":"未来预测"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-itemTitle-dd-8e593aaa-f1d2-4425-be83-7919ee0952fd","children":[{"id":"dd-c28c9f25-ceaf-4e9d-bc66-493a5c7b6322","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemTitle","originalVariant":"percentItemTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.small}","fontWeight":"bold","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-c28c9f25-ceaf-4e9d-bc66-493a5c7b6322","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>未来预测</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - itemTitle","id":"dd-8e593aaa-f1d2-4425-be83-7919ee0952fd","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-percentValue","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentValue","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentValue","tagContent":"40%"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-percentValue-dd-ae25fe9d-f8b0-41bd-9f42-d4f7ca0b8cf8","children":[{"id":"dd-84edd515-0dc6-469a-84b1-a84d2a4cd7b0","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentValue","originalVariant":"percentValue","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.xxl}","fontWeight":"bold","color":"{color.error.red5}","textAlign":"center"},"className":"text-dd-84edd515-0dc6-469a-84b1-a84d2a4cd7b0","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>40%</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - percentValue","id":"dd-ae25fe9d-f8b0-41bd-9f42-d4f7ca0b8cf8","events":[{}]},{"id":"dd-7aabb9ec-cfba-4763-97db-85e639ca5c80","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemDescription","originalVariant":"percentItemDescription","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"lineHeight":"1.4","fontSize":"{font.size.tiny}","fontWeight":"{font.fontweight.medium}","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-7aabb9ec-cfba-4763-97db-85e639ca5c80","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>预计增长率</p>\n"}},"fontweight":"{font.fontweight.medium}"},"type":"text_body","state":"default","events":[{}]}],"classStyle":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"className":"template-percentItem3-dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd"}}]},"description":"模板标签元素 - percentItems","id":"dd-9708c1e0-c6ba-4c51-8c59-db3d9f9ecc67","events":[{}]}]},"description":"模板卡片元素 - headerPrecentCard","id":"dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc","events":[{"runtimeEventKey":"update","nativeEventKey":"mouseenter","dataEventKey":[],"parameters":{"markdown":"<card:headerPrecentCard>\n## 二、市场概述\n   AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注\n   ### 中国市场\n   <percentValue color={color.error.red8}>#### 15%</percentValue>\n   AI-PC 出货量\n   ### 全球市场  \n   #### 25%\n   AI-PC 渗透率\n   ### 未来预测\n   #### 40%\n   预计增长率\n</card:headerPrecentCard>","cardId":"dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc"},"EventTargetId":"dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc"}]}]},"events":[{}]};
+            
+            const searchElement = (elementData) => {
+              if (!elementData) return;
+              
+              // 检查当前元素是否有条件显示
+              if (elementData.layout && elementData.layout.condition) {
+                const domElement = document.getElementById(elementData.id);
+                if (domElement) {
+                  elements.push({
+                    element: domElement,
+                    condition: elementData.layout.condition
+                  });
+                }
+              }
+              
+              // 递归检查子元素
+              if (elementData.layout && elementData.layout.children) {
+                elementData.layout.children.forEach(child => searchElement(child));
+              }
+            };
+            
+            searchElement(eightElementData);
+            return elements;
+          }
+        };
+
+        // 🆕 为所有具有 edit 事件的元素添加点击监听器
+        document.addEventListener('DOMContentLoaded', () => {
+          console.log('🎯 页面加载完成，开始绑定编辑事件...');
+          
+          // 🆕 初始化数据绑定系统
+          const dataVariables = {};
+          dataBindingSystem.initializeDataState(dataVariables);
+          
+          // 🆕 初始化条件样式和显示状态
+          // 延迟执行以确保DOM完全加载
+          setTimeout(() => {
+            console.log('🔄 延迟初始化条件样式和显示状态...');
+            dataBindingSystem.updateConditionStyles();
+            dataBindingSystem.updateConditionVisibility();
+          }, 100);
+          
+          // 获取所有EventTargetIds
+          const eventTargetIds = ["dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc"];
+          console.log('📋 找到EventTargetIds:', eventTargetIds);
+          
+          // 检查是否在iframe中（React环境）
+          const isInIframe = window.parent !== window;
+          
+          // 为每个EventTargetId绑定点击事件
+          eventTargetIds.forEach(targetId => {
+            const element = document.getElementById(targetId);
+            if (element) {
+              console.log('🔗 为元素绑定编辑事件:', targetId);
+              
+              element.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // 🆕 从元素的事件配置中获取事件信息
+                const elementData = findElementDataById(targetId);
+                if (elementData && elementData.events) {
+                  // 🆕 处理选项卡切换事件
+                  const tabChangedEvent = elementData.events.find(event => 
+                    event.runtimeEventKey === 'tab_changed' && event.parameters && event.parameters.tabKey
+                  );
+                  
+                  if (tabChangedEvent) {
+                    console.log('🎯 触发选项卡切换事件，EventTargetId:', targetId);
+                    const tabKey = tabChangedEvent.parameters.tabKey;
+                    
+                    // 🆕 查找对应的数据绑定键
+                    const tabMetadata = elementData._metadata;
+                    if (tabMetadata && tabMetadata.bindingData) {
+                      const bindingKey = tabMetadata.bindingData;
+                      console.log('🔄 切换选项卡: ' + bindingKey + ' -> ' + tabKey);
+                      
+                      // 更新数据绑定状态
+                      dataBindingSystem.updateDataState(bindingKey, tabKey);
+                    }
+                    
+                    return; // 处理完选项卡事件后返回
+                  }
+                  
+                  // 🆕 处理编辑事件
+                  const editEvent = elementData.events.find(event => 
+                    event.runtimeEventKey === 'edit' && event.parameters && event.parameters.markdown
+                  );
+                  
+                  if (editEvent) {
+                    console.log('🎯 触发编辑事件，EventTargetId:', targetId);
+                    
+                    if (isInIframe) {
+                      // 🆕 在React环境中，发送消息给父窗口
+                      console.log('📤 发送编辑事件到React父窗口');
+                      window.parent.postMessage({
+                        type: 'EDIT_EVENT',
+                        eventTargetId: targetId,
+                        markdown: editEvent.parameters.markdown
+                      }, '*');
+                    } else {
+                      // 在独立HTML中，使用内置编辑器
+                      showEditor(editEvent.parameters.markdown, targetId);
+                    }
+                  } else {
+                    console.warn('⚠️ 未找到有效事件配置:', targetId);
+                  }
+                } else {
+                  console.warn('⚠️ 未找到元素数据:', targetId);
+                }
+              });
+            } else {
+              console.warn('⚠️ 未找到元素:', targetId);
+            }
+          });
+
+          // 🆕 为所有可点击的图表添加切换事件监听器
+          console.log('📊 开始绑定图表切换事件...');
+          const chartElements = document.querySelectorAll('[data-chart-clickable="true"]');
+          console.log('📊 找到可点击的图表数量:', chartElements.length);
+          
+                     chartElements.forEach(chartElement => {
+             const chartId = chartElement.id;
+             const currentChartType = chartElement.getAttribute('data-chart-type');
+             const chartTypesStr = chartElement.getAttribute('data-chart-types');
+             
+             if (chartTypesStr) {
+               try {
+                 const chartTypes = chartTypesStr.split(',').filter(type => type.trim());
+                 console.log('📊 为图表绑定切换事件:', chartId, '当前类型:', currentChartType, '可用类型:', chartTypes);
+                
+                chartElement.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  
+                  console.log('🎯 触发图表切换事件，图表ID:', chartId);
+                  
+                  // 找到当前类型在数组中的位置
+                  const currentIndex = chartTypes.indexOf(currentChartType);
+                  const nextIndex = (currentIndex + 1) % chartTypes.length;
+                  const nextChartType = chartTypes[nextIndex];
+                  
+                  console.log('🔄 切换图表类型:', currentChartType, '->', nextChartType);
+                  
+                  if (isInIframe) {
+                    // 🆕 在React环境中，发送消息给父窗口
+                    console.log('📤 发送图表切换事件到React父窗口');
+                    window.parent.postMessage({
+                      type: 'CHART_CHANGED_EVENT',
+                      eventTargetId: chartId,
+                      currentChartType: currentChartType,
+                      nextChartType: nextChartType,
+                      chartTypes: chartTypes
+                    }, '*');
+                  } else {
+                    // 🆕 在独立HTML中，调用API重新生成图表
+                    handleChartTypeChange(chartId, currentChartType, nextChartType, chartTypes);
+                  }
+                });
+              } catch (error) {
+                console.error('解析图表类型失败:', error);
+              }
+            }
+          });
+
+          // 🆕 为带有 chart_changed 事件的按钮绑定切换逻辑
+          console.log('🔘 开始绑定按钮 chart_changed 事件...');
+          const buttonElements = document.querySelectorAll('[data-element-type="button"]');
+          console.log('🔘 找到按钮数量:', buttonElements.length);
+
+          buttonElements.forEach(buttonEl => {
+            const buttonId = buttonEl.id;
+            const buttonData = findElementDataById(buttonId);
+
+            if (!buttonData || !buttonData.events) return;
+
+            const chartChangedEvent = buttonData.events.find(ev => 
+              ev && ev.runtimeEventKey === 'chart_changed' && ev.parameters && Array.isArray(ev.parameters.chartTypes)
+            );
+
+            if (!chartChangedEvent) return;
+
+            const targetChartId = chartChangedEvent.EventTargetId;
+            const chartTypes = chartChangedEvent.parameters.chartTypes || [];
+
+            if (!targetChartId || chartTypes.length === 0) return;
+
+            console.log('🔗 绑定按钮到图表切换:', { buttonId, targetChartId, chartTypes });
+
+            buttonEl.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              const chartEl = document.getElementById(targetChartId);
+              if (!chartEl) {
+                console.warn('⚠️ 未找到目标图表元素:', targetChartId);
+                return;
+              }
+
+              const currentChartType = chartEl.getAttribute('data-chart-type') || '';
+              const currentIndex = chartTypes.indexOf(currentChartType);
+              const nextIndex = (currentIndex + 1) % chartTypes.length;
+              const nextChartType = chartTypes[nextIndex];
+
+              console.log('🔄 按钮触发图表切换:', targetChartId, currentChartType, '->', nextChartType);
+
+              if (isInIframe) {
+                window.parent.postMessage({
+                  type: 'CHART_CHANGED_EVENT',
+                  eventTargetId: targetChartId,
+                  currentChartType,
+                  nextChartType,
+                  chartTypes
+                }, '*');
+              } else {
+                handleChartTypeChange(targetChartId, currentChartType, nextChartType, chartTypes);
+              }
+            });
+          });
+        });
+        
+        // 🆕 监听来自React父窗口的消息
+        window.addEventListener('message', (event) => {
+          if (event.data && event.data.type === 'SETUP_EDIT_LISTENER') {
+            console.log('📨 收到React父窗口的设置消息');
+            // React环境已经设置好了，不需要额外处理
+          }
+        });
+        
+        // 🆕 处理图表类型切换
+        async function handleChartTypeChange(chartId, currentChartType, nextChartType, chartTypes) {
+          try {
+            console.log('🔄 开始处理图表类型切换:', chartId, currentChartType, '->', nextChartType);
+            
+            // 获取图表元素数据
+            const elementData = findElementDataById(chartId);
+            if (!elementData) {
+              console.error('未找到图表元素数据:', chartId);
+              return;
+            }
+            
+            // 调用API重新生成图表
+            const response = await fetch('/api/markdown-to-eight-element', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                markdown: elementData.rawData || '',
+                chartType: nextChartType,
+                width: 800,
+                height: 500
+              })
+            });
+            
+            if (!response.ok) {
+              throw new Error('API调用失败: ' + response.status);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success && result.eightElement) {
+              // 找到新的图表元素
+              const newChartElement = findChartElementById(result.eightElement, chartId);
+              if (newChartElement && newChartElement.svgContent) {
+                // 更新图表内容
+                const chartElement = document.getElementById(chartId);
+                if (chartElement) {
+                  // 更新图表类型属性
+                  chartElement.setAttribute('data-chart-type', nextChartType);
+                  
+                  // 更新SVG内容
+                  chartElement.innerHTML = newChartElement.svgContent;
+                  
+                  console.log('✅ 图表切换成功:', currentChartType, '->', nextChartType);
+                }
+              } else {
+                console.error('未找到新的图表元素或SVG内容');
+              }
+            } else {
+              throw new Error(result.error || '图表切换失败');
+            }
+          } catch (error) {
+            console.error('❌ 图表切换失败:', error);
+            alert('图表切换失败: ' + error.message);
+          }
+        }
+        
+        // 🆕 辅助函数：在八要素结构中查找图表元素
+        function findChartElementById(element, targetId) {
+          if (!element) return null;
+          
+          if (element.id === targetId && element.name === 'chart') {
+            return element;
+          }
+          
+          if (element.layout && element.layout.children) {
+            for (const child of element.layout.children) {
+              const found = findChartElementById(child, targetId);
+              if (found) return found;
+            }
+          }
+          
+          return null;
+        }
+        
+        // 🆕 辅助函数：根据ID查找元素数据（从八要素结构中）
+        function findElementDataById(targetId) {
+          const eightElementData = {"dataKeys":[],"id":"dd-6a8b663e-aaa7-4341-a54f-0866c2a72c74","name":"layout","name-zh":"布局","file-type":"template","theme":"default","data":{},"EventTargetIds":["dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc"],"_metadata":{"actualType":"layout","variant":"root","isLayout":true,"isRoot":true,"appliedAttributes":{}},"layout":{"classStyle":{"padding":"{dimension.padding.base}","margin":"{dimension.margin.base}","backgroundColor":"{color.basic.opacity.white.100}","borderRadius":"{dimension.borderradius.large}","display":"flex","flexDirection":"column","flexWrap":"nowrap","justifyContent":"flex-start","alignItems":"stretch","gap":"{dimension.padding.none}","backgroundImage":"none","backgroundRepeat":"no-repeat","backgroundSize":"100vw","gridTemplateColumns":"none","gridTemplateAreas":"none","justifyItems":"stretch"},"className":"layout-root-dd-6a8b663e-aaa7-4341-a54f-0866c2a72c74","style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","height":"100%","position":"relative","boxSizing":"border-box"},"children":[{"dataKeys":[],"name":"layout","name-zh":"卡片","file-type":"template","theme":"default","_metadata":{"actualType":"card","variant":"headerPrecentCard","isCard":true,"isLayout":true,"isTemplateCard":true,"parameters":{},"cardContent":"## 二、市场概述\n   AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注\n   ### 中国市场\n   <percentValue color={color.error.red8}>#### 15%</percentValue>\n   AI-PC 出货量\n   ### 全球市场  \n   #### 25%\n   AI-PC 渗透率\n   ### 未来预测\n   #### 40%\n   预计增长率"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","layoutGrow":"{layout.grow.0}","boxSizing":"border-box","height":"auto","width":"100%","position":"relative"},"classStyle":{"display":"flex","flexDirection":"column","flexGrow":"1","borderRadius":"{dimension.borderradius.xl}","padding":"{dimension.padding.extraloose} 0","boxShadow":"{material.hierarchy.main}","borderWidth":"{dimension.borderwidth.narrow}","borderColor":"{color.surfacecontainer.black12}","borderStyle":"solid","background":"{color.surfacecontainer.white100}","& ul":{"marginBlockStart":"0","marginBlockEnd":"0","marginTop":"0","marginBottom":"0"}},"className":"card-dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc","children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-title","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"title","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"headerCardTitle","tagContent":"二、市场概述"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"width":"100%"},"className":"template-title-dd-b0aa4c98-fe21-4567-a6e2-f2034e0eb659","children":[{"id":"dd-5883784c-4ba0-4f96-90eb-29c76ea69c32","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"headerCardTitle","originalVariant":"headerCardTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontWeight":"{font.fontweight.bold}","color":"{color.onprimary.black88}","fontSize":"{font.size.large}","padding":"0 {dimension.padding.base}","borderLeftWidth":"{dimension.borderwidth.wide}","borderLeftStyle":"solid","borderLeftColor":"{color.primary.brand5}"},"className":"text-dd-5883784c-4ba0-4f96-90eb-29c76ea69c32","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>二、市场概述</p>\n"}},"fontweight":"{font.fontweight.bold}"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - title","id":"dd-b0aa4c98-fe21-4567-a6e2-f2034e0eb659","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-text","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"text","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"headerCardText","tagContent":"AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"padding":"0 {dimension.padding.base}","marginTop":"{dimension.margin.base}"},"className":"template-text-dd-61d95442-7ea1-42d7-8ecc-747481b1e24d","children":[{"id":"dd-f2371d7b-1d97-4b68-a75d-c0e5e41bb90b","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"headerCardText","originalVariant":"headerCardText","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontWeight":"{font.fontweight.semibold}","color":"{color.onprimary.black76}","fontSize":"{font.size.medium}"},"className":"text-dd-f2371d7b-1d97-4b68-a75d-c0e5e41bb90b","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注</p>\n"}},"fontweight":"{font.fontweight.semibold}"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - text","id":"dd-61d95442-7ea1-42d7-8ecc-747481b1e24d","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签-percentItems","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentItems","isTemplateTag":true,"isLayout":true,"tagContent":""},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","width":"100%","position":"relative"},"classStyle":{"display":"flex","flexDirection":"row","gap":"{dimension.gap.loose}","padding":"{dimension.padding.base}","flexWrap":"wrap","justifyContent":"space-between"},"className":"template-percentItems-dd-9708c1e0-c6ba-4c51-8c59-db3d9f9ecc67","children":[{"dataKeys":[],"name":"layout","name-zh":"嵌套模板容器-percentItem1","file-type":"template","type":"layout","variant":"normal","id":"dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0","className":"template-percentItem1-dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0","layout":{"direction":"vertical","style":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-itemTitle","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"itemTitle","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentItemTitle","tagContent":"中国市场"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-itemTitle-dd-62c11259-56e9-4ac1-8bb9-cc6f7e0623fb","children":[{"id":"dd-0a8179d0-a4b8-426b-b3cf-25d19f980e5f","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemTitle","originalVariant":"percentItemTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.small}","fontWeight":"bold","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-0a8179d0-a4b8-426b-b3cf-25d19f980e5f","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>中国市场</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - itemTitle","id":"dd-62c11259-56e9-4ac1-8bb9-cc6f7e0623fb","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-percentValue","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentValue","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentValue","tagContent":"15%"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-percentValue-dd-430b0bb4-3bbd-497e-8d6f-20bdf608285b","children":[{"id":"dd-b4c5e795-1601-4c23-b22c-150e3d5d9376","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentValue","originalVariant":"percentValue","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.xxl}","fontWeight":"bold","color":"{color.error.red8}","textAlign":"center"},"className":"text-dd-b4c5e795-1601-4c23-b22c-150e3d5d9376","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>15%</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - percentValue","id":"dd-430b0bb4-3bbd-497e-8d6f-20bdf608285b","events":[{}]},{"id":"dd-850e0004-da39-43ec-a1b2-d7388962c88a","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemDescription","originalVariant":"percentItemDescription","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"lineHeight":"1.4","fontSize":"{font.size.tiny}","fontWeight":"{font.fontweight.medium}","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-850e0004-da39-43ec-a1b2-d7388962c88a","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>AI-PC 出货量</p>\n"}},"fontweight":"{font.fontweight.medium}"},"type":"text_body","state":"default","events":[{}]}],"classStyle":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"className":"template-percentItem1-dd-a7d35347-7fa3-446e-8585-dfa7cb9d4ab0"}},{"dataKeys":[],"name":"layout","name-zh":"嵌套模板容器-percentItem2","file-type":"template","type":"layout","variant":"normal","id":"dd-0d9f36ef-a4d2-4256-8de3-b23691179d43","className":"template-percentItem2-dd-0d9f36ef-a4d2-4256-8de3-b23691179d43","layout":{"direction":"vertical","style":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-itemTitle","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"itemTitle","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentItemTitle","tagContent":"全球市场"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-itemTitle-dd-d82c3493-e25f-42e2-8b71-3398ab799f3e","children":[{"id":"dd-eb27d2b4-dbcd-4888-adeb-51f479ed01a0","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemTitle","originalVariant":"percentItemTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.small}","fontWeight":"bold","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-eb27d2b4-dbcd-4888-adeb-51f479ed01a0","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>全球市场</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - itemTitle","id":"dd-d82c3493-e25f-42e2-8b71-3398ab799f3e","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-percentValue","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentValue","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentValue","tagContent":"25%"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-percentValue-dd-a70e5780-8c6b-4b8e-b736-e85d3fdf6caa","children":[{"id":"dd-6137b6de-158b-43ab-a0b7-b45aba6d194c","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentValue","originalVariant":"percentValue","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.xxl}","fontWeight":"bold","color":"{color.error.red5}","textAlign":"center"},"className":"text-dd-6137b6de-158b-43ab-a0b7-b45aba6d194c","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>25%</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - percentValue","id":"dd-a70e5780-8c6b-4b8e-b736-e85d3fdf6caa","events":[{}]},{"id":"dd-7753b2be-c5ac-46f3-8449-46b3f6b02cf4","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemDescription","originalVariant":"percentItemDescription","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"lineHeight":"1.4","fontSize":"{font.size.tiny}","fontWeight":"{font.fontweight.medium}","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-7753b2be-c5ac-46f3-8449-46b3f6b02cf4","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>AI-PC 渗透率</p>\n"}},"fontweight":"{font.fontweight.medium}"},"type":"text_body","state":"default","events":[{}]}],"classStyle":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"className":"template-percentItem2-dd-0d9f36ef-a4d2-4256-8de3-b23691179d43"}},{"dataKeys":[],"name":"layout","name-zh":"嵌套模板容器-percentItem3","file-type":"template","type":"layout","variant":"normal","id":"dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd","className":"template-percentItem3-dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd","layout":{"direction":"vertical","style":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"children":[{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-itemTitle","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"itemTitle","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentItemTitle","tagContent":"未来预测"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-itemTitle-dd-8e593aaa-f1d2-4425-be83-7919ee0952fd","children":[{"id":"dd-c28c9f25-ceaf-4e9d-bc66-493a5c7b6322","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemTitle","originalVariant":"percentItemTitle","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.small}","fontWeight":"bold","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-c28c9f25-ceaf-4e9d-bc66-493a5c7b6322","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>未来预测</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - itemTitle","id":"dd-8e593aaa-f1d2-4425-be83-7919ee0952fd","events":[{}]},{"dataKeys":[],"name":"layout","name-zh":"模板标签容器-percentValue","file-type":"template","theme":"default","_metadata":{"actualType":"templateTag","tagName":"percentValue","isTemplateTag":true,"isLayout":true,"isElementContainer":true,"containedElementType":"text","containedElementVariant":"percentValue","tagContent":"40%"},"layout":{"style":{"display":"{layout.state.display.flex}","layoutMode":"{layout.direction.VERTICAL}","layoutWrap":"{layout.wrap.NO_WRAP}","boxSizing":"border-box","height":"auto","position":"relative"},"classStyle":{"marginBottom":"{dimension.margin.tight}"},"className":"template-percentValue-dd-ae25fe9d-f8b0-41bd-9f42-d4f7ca0b8cf8","children":[{"id":"dd-84edd515-0dc6-469a-84b1-a84d2a4cd7b0","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentValue","originalVariant":"percentValue","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"fontSize":"{font.size.xxl}","fontWeight":"bold","color":"{color.error.red5}","textAlign":"center"},"className":"text-dd-84edd515-0dc6-469a-84b1-a84d2a4cd7b0","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>40%</p>\n"}},"fontweight":"bold"},"type":"text_body","state":"default","events":[{}]}]},"description":"模板标签容器 - percentValue","id":"dd-ae25fe9d-f8b0-41bd-9f42-d4f7ca0b8cf8","events":[{}]},{"id":"dd-7aabb9ec-cfba-4763-97db-85e639ca5c80","name":"text","name-zh":"文本","file-type":"cell-element","_metadata":{"originalType":"text","actualType":"text","variant":"percentItemDescription","originalVariant":"percentItemDescription","containsMath":false,"mathType":null,"isList":false,"listType":null,"hasRichText":false},"layout":{"classStyle":{"lineHeight":"1.4","fontSize":"{font.size.tiny}","fontWeight":"{font.fontweight.medium}","color":"{color.onsurfacecontainer.grey9}"},"className":"text-dd-7aabb9ec-cfba-4763-97db-85e639ca5c80","style":{"boxSizing":"border-box","position":"relative","width":""},"text_body":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutGrow":"{layout.grow.0}","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"text"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]},"text_hyperlink":{"type":"container","content":[{"element":"font","value":"fontsize","prop":"default","token":"fontsize"}],"resource":"","data":[],"style":{"layoutAlign":"{layout.align.y.self.INHERIT}","layoutGrow":"{layout.grow.0}","textDecoration":"underline","width":"","textColor":{"element":"color","value":"text","prop":"default","token":"hyperlinktext"},"fill":{"element":"color","value":"bg","prop":"default","token":"bg"}},"children":[]}},"color":{"text":{"default":{"data-key":"","style":{}}},"bg":{"default":{"data-key":"","style":{"bg":{"value":"none","type":"color","key":"color-bg"}},"resource":"none"}}},"scale":{"min_height":{"default":{"data-key":"","style":{"min_height":{"value":"{dimension.basic.dimension.72}","type":"sizing","key":"scale-min_height"}},"resource":"{dimension.basic.dimension.72}"}},"max_width":{"default":{"data-key":"","style":{"max_width":{"value":"{dimension.basic.dimension.1200}","type":"sizing","key":"scale-max_width"}},"resource":"{dimension.basic.dimension.1200}"}}},"font":{"fontsize":{"default":{"data-key":"","content":"<p>预计增长率</p>\n"}},"fontweight":"{font.fontweight.medium}"},"type":"text_body","state":"default","events":[{}]}],"classStyle":{"display":"flex","flexDirection":"column","flex":"1","minWidth":"200px","padding":"{dimension.padding.base}","alignItems":"center","textAlign":"center"},"className":"template-percentItem3-dd-a043e4cd-a2c9-42e8-a233-e8f1776f22dd"}}]},"description":"模板标签元素 - percentItems","id":"dd-9708c1e0-c6ba-4c51-8c59-db3d9f9ecc67","events":[{}]}]},"description":"模板卡片元素 - headerPrecentCard","id":"dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc","events":[{"runtimeEventKey":"update","nativeEventKey":"mouseenter","dataEventKey":[],"parameters":{"markdown":"<card:headerPrecentCard>\n## 二、市场概述\n   AI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注\n   ### 中国市场\n   <percentValue color={color.error.red8}>#### 15%</percentValue>\n   AI-PC 出货量\n   ### 全球市场  \n   #### 25%\n   AI-PC 渗透率\n   ### 未来预测\n   #### 40%\n   预计增长率\n</card:headerPrecentCard>","cardId":"dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc"},"EventTargetId":"dd-f45f4054-7ecc-4c87-8126-2e0645f61dfc"}]}]},"events":[{}]};
+          
+          function searchElement(element) {
+            if (!element) return null;
+            
+            if (element.id === targetId) {
+              return element;
+            }
+            
+            if (element.layout && element.layout.children) {
+              for (const child of element.layout.children) {
+                const found = searchElement(child);
+                if (found) return found;
+              }
+            }
+            
+            return null;
+          }
+          
+          return searchElement(eightElementData);
+        }
+      </script>
+    </body>
+    </html>
+  

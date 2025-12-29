@@ -1,0 +1,381 @@
+            {
+                "dataKeys": [
+                    "username"
+                ],
+                "id": "dd-004d245c-83d3-40ee-a339-616abaeef161",
+                "name": "layout",
+                "name-zh": "服务列表",
+                "file-type": "template",
+                "layout": {
+                    "style": {
+                        "display": "{layout.state.display.flex}",
+                        "layoutMode": "{layout.direction.HORIZONTAL}",
+                        "layoutWrap": "{layout.wrap.WRAP}",
+                        "primaryAxisSizingMode": "fixed",
+                        "counterAxisSizingMode": "{layout.sizing.FIXED}",
+                        "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+                        "layoutAlign": "{layout.align.y.self.INHERIT}",
+                        "layoutGrow": "{layout.grow.0}",
+                        "width": "100%",
+                        "back-width": "100%",
+                        "back-height": "atuo",
+                        "position": "relative",
+                        "box-sizing": "border-box",
+                        "height": "atuo",
+                        "justify-content": "flex-start",
+                        "gap": "15px 12px",
+                        "padding-bottom": "{dimension.gap.16}",
+                        "padding-top": "{dimension.gap.16}",
+                        "flex": "1",
+                        "align-content": "flex-start"
+                    },
+                    "children": [
+                        {
+                            "dataKeys": [
+                                "username"
+                            ],
+                            "id": "dd-bbc2567a-987e-497c-9566-c16662989867",
+                            "name": "layout",
+                            "name-zh": "单个服务",
+                            "data-key": "list",
+                            "file-type": "template",
+                            "layout": {
+                                "style": {
+                                    "display": "{layout.state.display.flex}",
+                                    "layoutMode": "{layout.direction.VERTICAL}",
+                                    "layoutWrap": "{layout.wrap.NO_WRAP}",
+                                    "primaryAxisSizingMode": "fixed",
+                                    "counterAxisSizingMode": "{layout.sizing.FIXED}",
+                                    "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+                                    "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+                                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                                    "layoutGrow": "{layout.grow.0}",
+                                    "width": "auto",
+                                    "justify-content": "space-between",
+                                    "cursor": "pointer",
+                                    "back-width": "auto",
+                                    "position": "relative",
+                                    "box-sizing": "border-box",
+                                    "padding-right": "{dimension.gap.6}",
+                                    "padding-left": "{dimension.gap.6}"
+                                },
+                                "children": [
+                                    {
+                                        "file-type": "cell-element",
+                                        "thumbnail": "https://sop-cdn.dingcloud.com/thumbnail/r14l94mshtjvwjz7fpx7kz68epkzd1gb20240712213214007.jpeg",
+                                        "shape": {
+                                            "borderradius": {
+                                                "default": {
+                                                    "resource": "{dimension.borderradius.0}",
+                                                    "data-key": "",
+                                                    "style": {
+                                                        "0": {
+                                                            "type": "borderRadius",
+                                                            "value": "{dimension.borderradius.100}",
+                                                            "key": "shape-borderradius"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "layout": {
+                                            "img-loaded": {
+                                                "data": [],
+                                                "resource": "",
+                                                "type": "container",
+                                                "content": [
+                                                    {
+                                                        "value": "image",
+                                                        "element": "material"
+                                                    }
+                                                ],
+                                                "children": [],
+                                                "style": {
+                                                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                                                    "layoutGrow": "{layout.grow.0}",
+                                                    "borderRadius": {
+                                                        "value": "borderradius",
+                                                        "element": "shape",
+                                                        "prop": "default"
+                                                    },
+                                                    "asset": {
+                                                        "value": "image",
+                                                        "element": "material",
+                                                        "prop": "default"
+                                                    }
+                                                }
+                                            },
+                                            "style": {
+                                                "border": [],
+                                                "scale": [],
+                                                "background-color": [],
+                                                "font": [],
+                                                "primaryAxisSizingMode": "fixed",
+                                                "position": "relative",
+                                                "box-sizing": "border-box"
+                                            }
+                                        },
+                                        "name-zh": "背景",
+                                        "material": {
+                                            "image": {
+                                                "loading": {
+                                                    "resource": "https://i.pinimg.com/736x/35/6f/f1/356ff1848ba9affde2fbde8dacbf9891.jpg",
+                                                    "type": "img",
+                                                    "data-key": "",
+                                                    "style": {
+                                                        "gif": {
+                                                            "type": "asset",
+                                                            "value": "https://i.pinimg.com/736x/35/6f/f1/356ff1848ba9affde2fbde8dacbf9891.jpg",
+                                                            "key": "material-image"
+                                                        }
+                                                    }
+                                                },
+                                                "loaded": {
+                                                    "resource": "https://i.pinimg.com/736x/35/6f/f1/356ff1848ba9affde2fbde8dacbf9891.jpg",
+                                                    "type": "img",
+                                                    "data-key": "",
+                                                    "style": {
+                                                        "bg_loaded": {
+                                                            "type": "asset",
+                                                            "value": "https://i.pinimg.com/736x/35/6f/f1/356ff1848ba9affde2fbde8dacbf9891.jpg",
+                                                            "key": "material-image"
+                                                        }
+                                                    }
+                                                },
+                                                "default": {
+                                                    "resource": "https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png",
+                                                    "type": "img",
+                                                    "events": [
+                                                        {}
+                                                    ],
+                                                    "data-key": "icons",
+                                                    "style": {
+                                                        "bg": {
+                                                            "type": "asset",
+                                                            "value": "https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png",
+                                                            "key": "material-image"
+                                                        },
+                                                        "width": "72px",
+                                                        "height": "72px"
+                                                    }
+                                                },
+                                                "unload": {
+                                                    "resource": "https://i.pinimg.com/736x/35/6f/f1/356ff1848ba9affde2fbde8dacbf9891.jpg",
+                                                    "type": "img",
+                                                    "data-key": "",
+                                                    "style": {
+                                                        "bg_unload": {
+                                                            "type": "asset",
+                                                            "value": "https://i.pinimg.com/736x/35/6f/f1/356ff1848ba9affde2fbde8dacbf9891.jpg",
+                                                            "key": "material-image"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "name": "background-718",
+                                        "id": "dd-a30d2310-e944-45ee-9fd2-bdcbdca6dee6",
+                                        "type": "img-loaded",
+                                        "state": "default",
+                                        "events": [
+                                            {
+                                                "nativeEventKey": null,
+                                                "busEventKey": "Change",
+                                                "dataEventKey": null
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "dataKeys": [
+                                            "username"
+                                        ],
+                                        "id": "dd-4f799e7d-6058-4799-8e74-51523e60f551",
+                                        "name": "layout",
+                                        "name-zh": "服务文字",
+                                        "file-type": "template",
+                                        "layout": {
+                                            "style": {
+                                                "display": "{layout.state.display.flex}",
+                                                "layoutMode": "{layout.direction.HORIZONTAL}",
+                                                "layoutWrap": "{layout.wrap.WRAP}",
+                                                "primaryAxisSizingMode": "fixed",
+                                                "counterAxisSizingMode": "{layout.sizing.FIXED}",
+                                                "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+                                                "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+                                                "layoutAlign": "{layout.align.y.self.INHERIT}",
+                                                "layoutGrow": "{layout.grow.0}",
+                                                "max-width": "125px",
+                                                "width": "125px",
+                                                "line-height": "24px",
+                                                "fontSize": "14px",
+                                                "fontWeight": "400",
+                                                "text-align": "center",
+                                                "white-space": "wrap",
+                                                "back-width": "125px",
+                                                "position": "relative",
+                                                "box-sizing": "border-box"
+                                            },
+                                            "children": [
+                                                {
+                                                    "file-type": "cell-element",
+                                                    "thumbnail": "https://sop-cdn.dingcloud.com/thumbnail/text20240712213649663.jpeg",
+                                                    "color": {
+                                                        "border": {
+                                                            "default": {
+                                                                "resource": "{color.basic.opacity.white.32}",
+                                                                "data-key": "",
+                                                                "style": {
+                                                                    "white32": {
+                                                                        "type": "color",
+                                                                        "value": "{color.basic.opacity.white.32}",
+                                                                        "key": "color-border"
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        "text": {
+                                                            "loading": {
+                                                                "resource": "{color.basic.opacity.white.100}",
+                                                                "data-key": "",
+                                                                "style": {
+                                                                    "white100": {
+                                                                        "type": "color",
+                                                                        "value": "{color.basic.opacity.white.100}",
+                                                                        "key": "color-text"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "default": {
+                                                                "resource": "{color.basic.opacity.black.100}",
+                                                                "data-key": "",
+                                                                "style": {
+                                                                    "black100": {
+                                                                        "type": "color",
+                                                                        "value": "{color.basic.opacity.black.100}",
+                                                                        "key": "color-text"
+                                                                    },
+                                                                    "white-space": "wrap"
+                                                                }
+                                                            },
+                                                            "unload": {
+                                                                "resource": "{color.basic.opacity.black.32}",
+                                                                "data-key": "",
+                                                                "style": {
+                                                                    "black32": {
+                                                                        "type": "color",
+                                                                        "value": "{color.basic.opacity.black.32}",
+                                                                        "key": "color-text"
+                                                                    },
+                                                                    "white-space": "wrap"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "layout": {
+                                                        "style": {
+                                                            "border": [],
+                                                            "scale": [],
+                                                            "background-color": [],
+                                                            "font": [],
+                                                            "width": "100%",
+                                                            "fontSize": "14px",
+                                                            "fontWeight": "400",
+                                                            "text-align": "center",
+                                                            "white-space": "wrap",
+                                                            "primaryAxisSizingMode": "fixed",
+                                                            "back-width": "100%",
+                                                            "position": "relative",
+                                                            "box-sizing": "border-box"
+                                                        },
+                                                        "text": {
+                                                            "data": [],
+                                                            "resource": "",
+                                                            "type": "container",
+                                                            "content": [],
+                                                            "children": [
+                                                                {
+                                                                    "data": [],
+                                                                    "resource": "",
+                                                                    "type": "text",
+                                                                    "content": [
+                                                                        {
+                                                                            "value": "fontsize",
+                                                                            "element": "font"
+                                                                        }
+                                                                    ],
+                                                                    "children": [],
+                                                                    "style": {
+                                                                        "layoutAlign": "{layout.align.y.self.INHERIT}",
+                                                                        "layoutGrow": "{layout.grow.0}",
+                                                                        "fontSizes": {
+                                                                            "value": "fontsize",
+                                                                            "element": "font"
+                                                                        },
+                                                                        "fill": {
+                                                                            "value": "text",
+                                                                            "element": "color"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ],
+                                                            "style": {
+                                                                "display": "{layout.state.display.flex}",
+                                                                "layoutAlign": "{layout.align.y.self.STRETCH}",
+                                                                "layoutWrap": "{layout.wrap.NO_WRAP}",
+                                                                "layoutGrow": "{layout.grow.0}",
+                                                                "counterAxisSizingMode": "{layout.sizing.AUTO}",
+                                                                "layoutMode": "{layout.direction.HORIZONTAL}",
+                                                                "primaryAxisAlignItems": "{layout.align.x.CENTER}",
+                                                                "counterAxisAlignItems": "{layout.align.y.items.CENTER}",
+                                                                "primaryAxisSizingMode": "{layout.sizing.AUTO}",
+                                                                "fontWeight": "400",
+                                                                "text-align": "center"
+                                                            }
+                                                        }
+                                                    },
+                                                    "name-zh": "文本",
+                                                    "name": "text-718",
+                                                    "id": "dd-0c1d9bd8-333c-4c82-b634-fb0bb339ba68",
+                                                    "font": {
+                                                        "fontsize": {
+                                                            "default": {
+                                                                "resource": "{font.size.large}",
+                                                                "data-key": "name",
+                                                                "content": "默认文本",
+                                                                "style": {
+                                                                    "large": {
+                                                                        "type": "fontSizes",
+                                                                        "value": "{font.size.large}",
+                                                                        "key": "font-fontsize"
+                                                                    },
+                                                                    "color": "#000",
+                                                                    "width": "100%",
+                                                                    "fontSize": "14px",
+                                                                    "fontWeight": "400",
+                                                                    "text-align": "center",
+                                                                    "word-break": "break-all"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "text",
+                                                    "state": "default",
+                                                    "events": [
+                                                        {}
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "events": [
+                                            {}
+                                        ]
+                                    }
+                                ]
+                            },
+                            "events": [
+                                {
+                                    "nativeEventKey": "click",
+                                    "dataEventKey": "item"
+                                }
+                            ]
+                        }
