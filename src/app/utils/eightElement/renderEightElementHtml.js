@@ -2129,7 +2129,15 @@ function renderTextElement(element, dataContext) {
     let contentHtml = '';
 
     // 🆕 数据绑定逻辑
-    const dataKey = element['data-key'];
+    // 优先检查 font.fontsize.default.data-key
+    let dataKey = null;
+    if (element.font && element.font.fontsize && element.font.fontsize.default && element.font.fontsize.default['data-key']) {
+        dataKey = element.font.fontsize.default['data-key'];
+    } else {
+        // 回退到根元素的 data-key
+        dataKey = element['data-key'];
+    }
+
     if (dataKey && dataContext && typeof dataContext === 'object') {
         // 尝试从数据上下文中获取值
         const boundValue = dataContext[dataKey];

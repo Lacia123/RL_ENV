@@ -2047,7 +2047,7 @@ wrapper: {
 </hiringListCard>
 
 <commentListCard>
-<loop data="loopData">
+<loop data="loopData" nativeEvent="click">
     <title key="title"></title>
     <desc key="desc"></desc>
 </loop>

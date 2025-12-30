@@ -5,7 +5,7 @@
 
 import { generateUUID } from '../util.js';
 import { DEFAULT_STYLE_CONFIG, LAYOUT_CONSTANTS } from '../styleConfig.js';
-import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';
+import { EVENT_NAME, EVENT_CONFIG, NATIVE_EVENT_KEY } from '../eventConfig.js';
 import { createNativeEventConfig } from '../eventUtils.js';
 import resolveToken from '../../tokens/resolveToken.js';
 import { createTextElement } from './textCreators.js';
@@ -703,7 +703,7 @@ function enrichSlotName(slotData, slotNameCounts) {
  * @param {string} currentMarkdown - 当前 markdown 内容
  * @returns {Object|null} 八要素对象
  */
-export function createElementFromSlotConfig(slotName, slotConfig, slotData, currentMarkdown = '') {
+export function createElementFromSlotConfig(slotName, slotConfig, slotData, currentMarkdown = '', loopDataKey = '') {
     if (!slotConfig) {
         console.warn(`未找到插槽 "${slotName}" 的配置`);
         return null;
@@ -749,6 +749,28 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
         if (attributes && attributes.key) {
             containerElement["data-key"] = attributes.key;
             console.log(`  🔑 映射 data-key="${attributes.key}"`);
+
+            // 🆕 处理 loop 中的 nativeEvent
+            if (attributes.nativeEvent) {
+                const validNativeKeys = Object.values(NATIVE_EVENT_KEY);
+                if (validNativeKeys.includes(attributes.nativeEvent)) {
+                    const eventConfig = {
+                        nativeEventKey: attributes.nativeEvent,
+                        dataEventKey: loopDataKey
+                    };
+                    
+                    if (!containerElement.events) {
+                        containerElement.events = [];
+                    }
+                    
+                    if (containerElement.events.length === 1 && Object.keys(containerElement.events[0]).length === 0) {
+                        containerElement.events[0] = eventConfig;
+                    } else {
+                        containerElement.events.push(eventConfig);
+                    }
+                    console.log(`  🔗 添加 loop nativeEvent: ${attributes.nativeEvent}`);
+                }
+            }
         }
         
         // 如果有内容，创建文本元素作为子元素
@@ -918,6 +940,28 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
         if (attributes && attributes.key) {
             containerElement["data-key"] = attributes.key;
             console.log(`  🔑 映射 data-key="${attributes.key}"`);
+
+            // 🆕 处理 loop 中的 nativeEvent
+            if (attributes.nativeEvent) {
+                const validNativeKeys = Object.values(NATIVE_EVENT_KEY);
+                if (validNativeKeys.includes(attributes.nativeEvent)) {
+                    const eventConfig = {
+                        nativeEventKey: attributes.nativeEvent,
+                        dataEventKey: loopDataKey
+                    };
+                    
+                    if (!containerElement.events) {
+                        containerElement.events = [];
+                    }
+                    
+                    if (containerElement.events.length === 1 && Object.keys(containerElement.events[0]).length === 0) {
+                        containerElement.events[0] = eventConfig;
+                    } else {
+                        containerElement.events.push(eventConfig);
+                    }
+                    console.log(`  🔗 添加 loop nativeEvent: ${attributes.nativeEvent}`);
+                }
+            }
         }
         
         console.log(`  ✅ 创建元素+容器成功`);
@@ -1039,8 +1083,39 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             
             // 🆕 处理 loop 中的 key 属性，映射为 data-key
             if (attributes && attributes.key) {
-                element["data-key"] = attributes.key;
-                console.log(`  🔑 映射 data-key="${attributes.key}"`);
+                // element["data-key"] = attributes.key;
+                
+                // 将 data-key 注入到 font.fontsize.default.data-key
+                if (element.font && element.font.fontsize && element.font.fontsize.default) {
+                    element.font.fontsize.default['data-key'] = attributes.key;
+                    console.log(`  🔑 映射 font.fontsize.default.data-key="${attributes.key}"`);
+                } else {
+                    // 回退：如果找不到 font 结构，则设置在根元素
+                    element["data-key"] = attributes.key;
+                    console.log(`  🔑 映射 element.data-key="${attributes.key}" (font structure not found)`);
+                }
+
+                // 🆕 处理 loop 中的 nativeEvent
+                if (attributes.nativeEvent) {
+                    const validNativeKeys = Object.values(NATIVE_EVENT_KEY);
+                    if (validNativeKeys.includes(attributes.nativeEvent)) {
+                        const eventConfig = {
+                            nativeEventKey: attributes.nativeEvent,
+                            dataEventKey: loopDataKey
+                        };
+                        
+                        if (!element.events) {
+                            element.events = [];
+                        }
+                        
+                        if (element.events.length === 1 && Object.keys(element.events[0]).length === 0) {
+                            element.events[0] = eventConfig;
+                        } else {
+                            element.events.push(eventConfig);
+                        }
+                        console.log(`  🔗 添加 loop nativeEvent: ${attributes.nativeEvent}`);
+                    }
+                }
             }
 
             console.log(`  ✅ 创建直接元素成功`);
@@ -2139,17 +2214,35 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         console.log(`\n🎰 组件 "${variant}" 使用插槽标签系统`);
 
         // 🆕 检查是否存在 <loop> 标签 (处理列表数据绑定)
-        // 匹配 <loop data="xxx">...</loop>
-        const loopMatch = content.match(/<loop\s+data=["']([^"']+)["']\s*>([\s\S]*?)<\/loop>/);
+        // 匹配 <loop data="xxx" ...>...</loop>
+        const loopMatch = content.match(/<loop\s+data=["']([^"']+)["']([^>]*)>([\s\S]*?)<\/loop>/);
         let contentToParse = content;
+        let loopDataKey = 'loopData';
+        let loopEventConfig = null;
         
         if (loopMatch) {
-            const loopDataKey = loopMatch[1];
-            const loopContent = loopMatch[2];
+            loopDataKey = loopMatch[1];
+            const otherAttributesStr = loopMatch[2];
+            const loopContent = loopMatch[3];
             console.log(`  🔄 发现循环数据绑定: data-key="${loopDataKey}"`);
             
             // 设置组件容器的 data-key
             componentElement["data-key"] = loopDataKey;
+
+            // 🆕 处理 loop 中的 nativeEvent
+            if (otherAttributesStr && otherAttributesStr.trim()) {
+                const attributes = parseAttributes(otherAttributesStr);
+                if (attributes.nativeEvent) {
+                    const validNativeKeys = Object.values(NATIVE_EVENT_KEY);
+                    if (validNativeKeys.includes(attributes.nativeEvent)) {
+                        loopEventConfig = {
+                            nativeEventKey: attributes.nativeEvent,
+                            dataEventKey: loopDataKey
+                        };
+                        console.log(`  🔗 捕获 loop nativeEvent (待应用到子元素): ${attributes.nativeEvent}`);
+                    }
+                }
+            }
             
             // 使用 loop 内部的内容进行插槽解析
             contentToParse = loopContent;
@@ -2178,7 +2271,8 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                 slotName,
                 slotConfig,
                 slotData,
-                currentMarkdown
+                currentMarkdown,
+                loopDataKey
             );
             
             if (element) {
@@ -2268,6 +2362,22 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
             // 没有 layoutModes，使用扁平结构（向后兼容）
             componentElement.layout.children = Array.from(slotElementsMap.values());
             console.log(`  📋 未配置布局模式，使用扁平结构（${slotElementsMap.size} 个元素）`);
+        }
+
+        // 🆕 如果有 loopEventConfig，将其应用到所有直接子元素（通常是 layoutMode 生成的组）
+        if (loopEventConfig && componentElement.layout.children && componentElement.layout.children.length > 0) {
+            console.log(`  🔗 将 loop nativeEvent 应用到 ${componentElement.layout.children.length} 个子元素`);
+            componentElement.layout.children.forEach(child => {
+                if (!child.events) {
+                    child.events = [];
+                }
+                // 检查是否已有空事件对象
+                if (child.events.length === 1 && Object.keys(child.events[0]).length === 0) {
+                    child.events[0] = loopEventConfig;
+                } else {
+                    child.events.push(loopEventConfig);
+                }
+            });
         }
     }
     // 处理组件的子元素映射（向后兼容）
