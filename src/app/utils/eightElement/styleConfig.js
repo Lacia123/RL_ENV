@@ -7068,15 +7068,60 @@ export const DEFAULT_STYLE_CONFIG = {
     // commentListCard 数据绑定示例
     commentListCard: {
       type: 'template',
-      example: {
-         loopData: [{
+      layoutModes: [{
+        name: 'default',
+        condition: 'default',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          padding: '16px',
+          backgroundColor: '{color.surface.default}',
+          borderRadius: '{dimension.borderradius.medium}',
+          boxShadow: '{shadow.elevation.low}'
+        },
+        structure: {
+          groups: [
+            {
+              name: 'itemContent',
+              type: 'template',
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                width: '100%'
+              },
+              slots: ['title', 'desc']
+            }
+          ]
+        }
+      }],
+      slots: {
+        title: {
+          metaType: 'text',
+          variant: 'h3',
+          variantStyle: {
+            fontSize: '16px',
+            fontWeight: 'bold',
+            color: '{color.onsurface.black88}'
+          }
+        },
+        desc: {
+          metaType: 'text',
+          variant: 'body',
+          variantStyle: {
+            fontSize: '14px',
+            color: '{color.onsurface.black64}'
+          }
+        }
+      },
+      example: [{
           title: '用户评论1',
           desc: '这是一条用户评论，展示了用户对产品的评价和反馈。'
          }, {
           title: '用户评论2',
           desc: '这是另一条用户评论，展示了用户对产品的评价和反馈。'
          }]
-      }
     }
   }
 };

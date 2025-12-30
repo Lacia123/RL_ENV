@@ -10,6 +10,7 @@ import { Marked, marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
 import markedKatex from 'marked-katex-extension';
+import { DEFAULT_STYLE_CONFIG } from './styleConfig.js';
 
 /**
  * Configure marked globally with KaTeX and Highlight.js
@@ -39,7 +40,50 @@ markedInstance.use(markedKatex(katexOptions));
  * @returns {Object} - 包含HTML字符串和预处理后的八要素结构
  */
 export function renderEightElementToHtml(eightElement, options = {}) {
-    const { width = 1024, height = 768 } = options;
+    const { width = 1024, height = 768, data = null } = options;
+
+    // 🆕 提取所有组件的 example data 并合并到 data 上下文中
+    let combinedData = data || {};
+    
+    // 如果没有传入 data 或需要合并，进行提取
+    const extractedData = {};
+    const extractExampleData = (element) => {
+        if (!element) return;
+        
+        // 检查是否有 metadata 且包含 componentName
+        if (element._metadata && element._metadata.componentName) {
+            const componentName = element._metadata.componentName;
+            // 从 styleConfig 获取 example data
+            if (DEFAULT_STYLE_CONFIG.component && 
+                DEFAULT_STYLE_CONFIG.component[componentName] && 
+                DEFAULT_STYLE_CONFIG.component[componentName].example) {
+                
+                // 检查 example 是否是数组
+                const example = DEFAULT_STYLE_CONFIG.component[componentName].example;
+                if (Array.isArray(example)) {
+                     // 如果是数组，我们需要知道它的 key
+                     // 在 commentListCard 中，container 上有 data-key="loopData"
+                     // 所以我们需要构建一个对象 { loopData: example }
+                     
+                     if (element['data-key']) {
+                         extractedData[element['data-key']] = example;
+                     }
+                } else if (typeof example === 'object') {
+                    // 如果是对象，直接合并
+                    Object.assign(extractedData, example);
+                }
+            }
+        }
+        
+        if (element.layout && element.layout.children) {
+            element.layout.children.forEach(extractExampleData);
+        }
+    };
+    
+    extractExampleData(eightElement);
+    
+    // 合并提取的数据和传入的数据，传入的数据优先级更高
+    combinedData = { ...extractedData, ...combinedData };
 
     // 预处理八要素结构，收集所有classStyle
     const processedEightElement = preProcessEightElement(eightElement);
@@ -205,7 +249,7 @@ export function renderEightElementToHtml(eightElement, options = {}) {
   `;
 
     // 递归渲染主体内容
-    const htmlBody = renderElement(processedEightElement);
+    const htmlBody = renderElement(processedEightElement, combinedData);
 
     // 创建HTML文档尾部
     const htmlFooter = `
@@ -1979,14 +2023,15 @@ function applyLayoutToken(computedStyle, key, value) {
 /**
  * 递归渲染单个元素
  * @param {Object} element - 八要素元素
+ * @param {Object} dataContext - 数据上下文
  * @returns {string} - 渲染的HTML字符串
  */
-function renderElement(element) {
+function renderElement(element, dataContext = null) {
     if (!element) return '';
 
     // 处理layout容器
     if (element.name === 'layout' && element.layout) {
-        return renderLayoutElement(element);
+        return renderLayoutElement(element, dataContext);
     }
 
     // 处理具体元素类型
@@ -1996,45 +2041,74 @@ function renderElement(element) {
         case 'text':
         case 'math':
         case 'list':
-            return renderTextElement(element);
+            return renderTextElement(element, dataContext);
         case 'button':
-            return renderButtonElement(element);
+            return renderButtonElement(element, dataContext);
         case 'background':
         case 'image':
-            return renderImageElement(element);
+            return renderImageElement(element, dataContext);
         case 'icon':
-            return renderIconElement(element);
+            return renderIconElement(element, dataContext);
         case 'table':
-            return renderTableElement(element);
+            return renderTableElement(element, dataContext);
         case 'code':
-            return renderCodeElement(element);
+            return renderCodeElement(element, dataContext);
         case 'chart':
-            return renderChartElement(element);
+            return renderChartElement(element, dataContext);
         case 'video':
-            return renderVideoElement(element);
+            return renderVideoElement(element, dataContext);
         case 'audio':
-            return renderAudioElement(element);
+            return renderAudioElement(element, dataContext);
         default:
-            return renderGenericElement(element);
+            return renderGenericElement(element, dataContext);
     }
 }
 
 /**
  * 渲染布局元素
  * @param {Object} element - 布局元素
+ * @param {Object} dataContext - 数据上下文
  * @returns {string} - 渲染的HTML字符串
  */
-function renderLayoutElement(element) {
-
-
-
+function renderLayoutElement(element, dataContext) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
     const className = element.layout && element.layout.className ? element.layout.className : '';
     const classAttr = className ? `class="${className}"` : '';
 
+    // 🆕 数据绑定逻辑
+    const dataKey = element['data-key'];
+    let currentData = dataContext;
+
+    // 如果有 data-key，尝试解析数据
+    if (dataKey) {
+        if (currentData && typeof currentData === 'object' && !Array.isArray(currentData)) {
+            currentData = currentData[dataKey];
+        } else if (Array.isArray(currentData)) {
+            // 如果上下文是数组，且我们正在寻找数据
+            // 可能是 "example" 模式，直接使用数组作为数据源
+            // 或者如果 key 是数组索引? 暂时假设如果上下文是数组，则直接使用它作为列表数据
+             // 仅当 dataKey 是 "loopData" (styleConfig 示例中的 key) 或者是其他指示列表的 key 时
+             // 这里为了兼容用户的 example: [...] 格式，如果上下文本身就是数组，我们直接使用它
+             // 但前提是这个元素是一个列表容器
+             currentData = currentData;
+        }
+    }
+
     let childrenHtml = '';
-    if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
-        childrenHtml = element.layout.children.map(child => renderElement(child)).join('');
+    
+    // 如果解析出的数据是数组，且该元素有 data-key (意味着它是列表容器)，则进行循环渲染
+    if (Array.isArray(currentData) && dataKey) {
+        if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
+            childrenHtml = currentData.map((item, index) => {
+                // 为每个子项使用 item 作为新的数据上下文
+                return element.layout.children.map(child => renderElement(child, item)).join('');
+            }).join('');
+        }
+    } else {
+        // 正常渲染
+        if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
+            childrenHtml = element.layout.children.map(child => renderElement(child, currentData)).join('');
+        }
     }
 
     return `<div id="${element.id || ''}" ${classAttr} data-element-type="layout" ${styleAttr}>${childrenHtml}</div>`;
@@ -2043,9 +2117,10 @@ function renderLayoutElement(element) {
 /**
  * 渲染文本元素
  * @param {Object} element - 文本元素
+ * @param {Object} dataContext - 数据上下文
  * @returns {string} - 渲染的HTML字符串
  */
-function renderTextElement(element) {
+function renderTextElement(element, dataContext) {
     const styleAttr = generateStyleAttribute(element.computedStyle);
     const className = element.layout && element.layout.className ? element.layout.className : '';
     const classAttr = className ? `class="${className}"` : '';
@@ -2053,8 +2128,20 @@ function renderTextElement(element) {
     // 🔧 修复：优先使用预处理的KaTeX+Markdown内容
     let contentHtml = '';
 
-    // 1. 优先使用经过KaTeX和Markdown处理的内容
-    if (element.katexProcessedContent) {
+    // 🆕 数据绑定逻辑
+    const dataKey = element['data-key'];
+    if (dataKey && dataContext && typeof dataContext === 'object') {
+        // 尝试从数据上下文中获取值
+        const boundValue = dataContext[dataKey];
+        if (boundValue !== undefined && boundValue !== null) {
+            contentHtml = String(boundValue);
+        }
+    }
+
+    // 如果没有绑定数据或绑定数据为空，则回退到默认逻辑
+    if (!contentHtml) {
+        // 1. 优先使用经过KaTeX和Markdown处理的内容
+        if (element.katexProcessedContent) {
         contentHtml = element.katexProcessedContent;
         // 🔧 修复：确保清理段落符号
         if (typeof contentHtml === 'string') {
@@ -2073,6 +2160,7 @@ function renderTextElement(element) {
         if (contentHtml && !contentHtml.includes('<')) {
             contentHtml = escapeHtml(contentHtml).replace(/\\n/g, '<br>');
         }
+    }
     }
 
     if (element.textType === 'text_hyperlink') {

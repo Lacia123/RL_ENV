@@ -744,6 +744,12 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             events: [{}]
         };
         annotateElementSlotMetadata(containerElement, slotName, baseSlotName);
+
+        // 🆕 处理 loop 中的 key 属性，映射为 data-key
+        if (attributes && attributes.key) {
+            containerElement["data-key"] = attributes.key;
+            console.log(`  🔑 映射 data-key="${attributes.key}"`);
+        }
         
         // 如果有内容，创建文本元素作为子元素
         if (slotContent) {
@@ -907,6 +913,12 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             events: [{}]
         };
         annotateElementSlotMetadata(containerElement, slotName, baseSlotName);
+
+        // 🆕 处理 loop 中的 key 属性，映射为 data-key
+        if (attributes && attributes.key) {
+            containerElement["data-key"] = attributes.key;
+            console.log(`  🔑 映射 data-key="${attributes.key}"`);
+        }
         
         console.log(`  ✅ 创建元素+容器成功`);
         return containerElement;
@@ -1024,6 +1036,13 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
         if (element) {
             // 为直接元素添加 slotName 元数据
             annotateElementSlotMetadata(element, slotName, baseSlotName);
+            
+            // 🆕 处理 loop 中的 key 属性，映射为 data-key
+            if (attributes && attributes.key) {
+                element["data-key"] = attributes.key;
+                console.log(`  🔑 映射 data-key="${attributes.key}"`);
+            }
+
             console.log(`  ✅ 创建直接元素成功`);
         } else {
             console.warn(`  ❌ 创建元素失败`);
@@ -2113,11 +2132,31 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
     }
     
     // 🆕 优先处理插槽标签（slotConfigs）
-    if (componentConfig.slotConfigs && content) {
+    // 🔧 兼容 slots 属性
+    const availableSlotConfigs = componentConfig.slotConfigs || componentConfig.slots;
+    
+    if (availableSlotConfigs && content) {
         console.log(`\n🎰 组件 "${variant}" 使用插槽标签系统`);
+
+        // 🆕 检查是否存在 <loop> 标签 (处理列表数据绑定)
+        // 匹配 <loop data="xxx">...</loop>
+        const loopMatch = content.match(/<loop\s+data=["']([^"']+)["']\s*>([\s\S]*?)<\/loop>/);
+        let contentToParse = content;
+        
+        if (loopMatch) {
+            const loopDataKey = loopMatch[1];
+            const loopContent = loopMatch[2];
+            console.log(`  🔄 发现循环数据绑定: data-key="${loopDataKey}"`);
+            
+            // 设置组件容器的 data-key
+            componentElement["data-key"] = loopDataKey;
+            
+            // 使用 loop 内部的内容进行插槽解析
+            contentToParse = loopContent;
+        }
         
         // 解析内容中的所有插槽标签
-        const slots = parseSlotTags(content);
+        const slots = parseSlotTags(contentToParse);
         console.log(`  解析到 ${slots.length} 个插槽:`, slots.map(s => s.slotName));
         
         // 🆕 创建插槽元素并存储到 Map 中（用于后续重新组织）
@@ -2128,7 +2167,7 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         slots.forEach(slotData => {
             const { slotName } = slotData;
             const baseSlotName = slotData.baseSlotName || slotName;
-            const slotConfig = resolveSlotConfig(baseSlotName, componentConfig.slotConfigs);
+            const slotConfig = resolveSlotConfig(baseSlotName, availableSlotConfigs);
             
             if (!slotConfig) {
                 console.warn(`  ⚠️ 未找到插槽 "${baseSlotName}" 的配置`);
