@@ -7116,12 +7116,94 @@ export const DEFAULT_STYLE_CONFIG = {
         }
       },
       example: [{
-          title: '用户评论1',
-          desc: '这是一条用户评论，展示了用户对产品的评价和反馈。'
-         }, {
-          title: '用户评论2',
-          desc: '这是另一条用户评论，展示了用户对产品的评价和反馈。'
-         }]
+        title: '用户评论1',
+        desc: '这是一条用户评论，展示了用户对产品的评价和反馈。'
+      }, {
+        title: '用户评论2',
+        desc: '这是另一条用户评论，展示了用户对产品的评价和反馈。'
+      }]
+    },
+
+    // commentStyleListCard 带样式的评论卡片
+    commentStyleListCard: {
+      type: 'template',
+      layoutModes: [{
+        name: 'default',
+        condition: 'default',
+        style: {
+          display: 'flex',
+          flex: "1",
+          width: '100%',
+          flexDirection: 'column',
+          gap: '{dimension.gap.base}',
+          padding: '{dimension.padding.loose}',
+          borderRadius: '{dimension.borderradius.xl}',
+          background: '{color.surfacecontainer.white100}',
+          boxShadow: '{material.hierarchy.1f}',
+          border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+        },
+        structure: {
+          groups: [{
+            name: 'header',
+            slots: ['title', 'subtitle'],
+            type: 'template',
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '{dimension.gap.supertight}'
+            }
+          }, {
+            name: 'itemContent',
+            slots: ['text'],
+            type: 'template',
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '{dimension.gap.tight}',
+              padding: '{dimension.padding.tight} 0',
+              borderBottom: '1px solid {color.surfacecontainer.black7}'
+            }
+          }]
+        }
+      }],
+      slotConfigs: {
+        title: {
+          metaType: 'text',
+          variant: 'h4',
+          variantStyle: {
+            margin: '0',
+            color: '{color.onsurface.black88}'
+          }
+        },
+        subtitle: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            color: '{color.onsurface.black64}',
+            fontSize: '{font.size.small}'
+          }
+        },
+        text: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.medium}',
+            color: '{color.onsurface.black88}',
+            lineHeight: '1.5'
+          }
+        },
+      },
+      example: [{
+        applyDeptName: '数据智能&用户体验',
+        orderSummary: '申报金额（CNY）：23,0000',
+        beginTime: '2025-08-11 15:34:05'
+      }, {
+        applyDeptName: '数据智能&用户体验12',
+        orderSummary: '申报金额（CNY）：45,0000',
+        beginTime: '2025-08-11 15:34:05'
+      }]
     }
   }
 };
