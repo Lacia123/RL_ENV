@@ -2059,6 +2059,7 @@ wrapper: {
     <loop data="comments" nativeEvent="click">
       <itemContent>
         <avatar src="avatarUrl" key="avatarUrl"></avatar>
+        <name key="approveAuditorName"></name>
         <text key="applyDeptName"></text>
         <desc key="orderSummary"></desc>
         <timestamp key="beginTime"></timestamp>
@@ -2068,32 +2069,7 @@ wrapper: {
 
 </layout:gallery>
 `
-},
-
-  /**
-   * <commentStyleListCard>
-    <title>项目动态</title>
-    <subtitle>最新 3 条更新 · 自动排列列表项</subtitle>
-      <loop data="comments" nativeEvent="click">
-        <itemContent>
-          <text key="applyDeptName"></text>
-        </itemContent>
-      </loop>
-    </commentStyleListCard>
-   */
-
-  
-  /**
-   * 
-   * <commentListCard>
-       <loop data="loopData" nativeEvent="click">
-         <title key="title"></title>
-         <desc key="desc"></desc>
-        </loop>
-     </commentListCard>
-   * 
-   */
-
+  },
   smartCardDemo: {
     name: '🤖 智能自适应卡片',
     description: '展示根据插槽存在性自动调整布局的智能产品卡片',
@@ -2326,6 +2302,26 @@ style: {
 ---
 
 💡 **提示**: 智能卡片的条件样式会在渲染时自动应用，开发者只需关注内容，不需要手动管理布局逻辑。`
+  },
+  hiringNewCard: {
+    name: '新的招聘卡片',
+    description: '用于3D场景演示的新的招聘卡片',
+    markdown: `
+      <layout:root background="transparent">
+      <layout:row>
+        <layout:column flex="2">
+          <hiringNewTitleCard>
+            <title>人才筛选详情</title>
+            <desc>负责核心算法模型的设计、优化与落地</desc>
+            <badge>算法工程师</badge>
+          </hiringNewTitleCard>
+          <layout:row></layout:row>
+        </layout:column>
+        <layout:column flex="1">
+        </layout:column>
+      </layout:row>
+      </layout:root>
+    `
   }
 };
 

@@ -476,40 +476,46 @@ export const DEFAULT_STYLE_CONFIG = {
     },
     // 列布局元素（默认垂直布局）
     column: {
-      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
-      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
-      backgroundColor: "none",
+      style: {
+        padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+        margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+        backgroundColor: "none",
 
-      // 🔧 新增：布局动作所需的默认属性
-      display: 'flex',
-      flexDirection: 'column',
-      flexWrap: 'nowrap',
-      justifyContent: 'flex-start',
-      alignItems: 'flex-start',
-      gap: DIMENSION_CONSTANTS.GAP.base,
+        // 🔧 新增：布局动作所需的默认属性
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'nowrap',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        gap: DIMENSION_CONSTANTS.GAP.base,
 
-      // 网格布局属性（默认不启用，由动作激活）
-      gridTemplateColumns: 'none',
-      gridTemplateAreas: 'none',
-      justifyItems: 'stretch'
+        // 网格布局属性（默认不启用，由动作激活）
+        gridTemplateColumns: 'none',
+        gridTemplateAreas: 'none',
+        justifyItems: 'stretch'
+      },
+      supportedAttributes: ['flex', 'gap']
     },
     // row 布局元素
     row: {
-      padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
-      margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
-      backgroundColor: "none",
+      style: {
+        padding: `${DIMENSION_CONSTANTS.PADDING.tight} 0`,
+        margin: `${DIMENSION_CONSTANTS.MARGIN.tight} 0`,
+        backgroundColor: "none",
 
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'nowrap',
-      justifyContent: 'flex-start',
-      alignItems: 'stretch',
-      gap: DIMENSION_CONSTANTS.GAP.base,
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'nowrap',
+        justifyContent: 'flex-start',
+        alignItems: 'stretch',
+        gap: DIMENSION_CONSTANTS.GAP.base,
 
-      // 网格布局属性（默认不启用，由动作激活）
-      gridTemplateColumns: 'none',
-      gridTemplateAreas: 'none',
-      justifyItems: 'stretch'
+        // 网格布局属性（默认不启用，由动作激活）
+        gridTemplateColumns: 'none',
+        gridTemplateAreas: 'none',
+        justifyItems: 'stretch'
+      },
+      supportedAttributes: ['flex', 'gap']
     },
     // 🆕 类似 Tailwind 的 row 变体
     'row-center': {
@@ -7210,7 +7216,25 @@ export const DEFAULT_STYLE_CONFIG = {
                   gap: '{dimension.gap.supertight}',
                   flex: '1'
                 },
-                slots: ['text', 'desc']
+                groups: [{
+                  name: 'nameGroup',
+                  type: 'template',
+                  slots: ['name', 'text'],
+                  style: {
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: '{dimension.gap.base}',
+                    flex: '1'
+                  }
+                }, {
+                  name: 'descGroup',
+                  type: 'template',
+                  slots: ['desc'],
+                  style: {
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }
+                }],
               }, {
                 name: 'rightGroup',
                 type: 'template',
@@ -7242,6 +7266,16 @@ export const DEFAULT_STYLE_CONFIG = {
             margin: '0',
             color: '{color.onsurface.black64}',
             fontSize: '{font.size.small}'
+          }
+        },
+        name: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.medium}',
+            color: '{color.onsurface.black88}',
+            lineHeight: '1.5'
           }
         },
         text: {
@@ -7279,14 +7313,104 @@ export const DEFAULT_STYLE_CONFIG = {
       },
       example: [{
         applyDeptName: '数据智能&用户体验',
+        approveAuditorName: '李峰',
         avatarUrl: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200',
         orderSummary: '申报金额（CNY）：23,0000',
         beginTime: '2025-08-11 15:34:05'
       }, {
         applyDeptName: '数据智能&用户体验12',
+        approveAuditorName: '李峰2',
         avatarUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200',
         orderSummary: '申报金额（CNY）：45,0000',
         beginTime: '2025-08-11 15:34:05'
+      }]
+    },
+
+    // 新的演示示例卡片
+    // Hiring Title Card
+    hiringNewTitleCard: {
+      type: 'template',
+      hasUpdateEvent: true,
+      layoutModes: [{
+        name: 'default',
+        condition: 'default',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          borderRadius: '{dimension.borderradius.xxxxl}',
+          borderColor: '{color.basic.opacity.white.24}',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          background: '{color.basic.dark-blue.4}',
+          padding: '{dimension.padding.superloose}',
+        },
+        structure: {
+          groups: [{
+            name: 'titleBlock',
+            slots: ['title', 'desc'],
+            type: 'template',
+            style: {
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '{dimension.gap.tight}',
+            }
+          }, {
+            name: 'badgeBlock',
+            slots: ['badge'],
+          }]
+        }
+      }],
+      slotConfigs: {
+        title: {
+          metaType: 'text',
+          variantStyle: {
+            lineHeight: '1',
+            fontSize: '{font.size.xxxl}',
+            color: '{color.basic.opacity.white.100}',
+          }
+        },
+        desc: {
+          metaType: 'text',
+          variantStyle: {
+            width: '70%',
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.48}',
+          }
+        },
+        badge: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.100}',
+            padding: '{dimension.padding.base} {dimension.padding.extraloose}',
+            background: '{color.basic.opacity.white.12}',
+            borderColor: '{color.basic.opacity.white.12}',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            cursor: 'pointer',
+            borderRadius: '{dimension.borderradius.full}',
+          }
+        }
+      }
+    },
+    hiringNewPersonCard: {
+      type: 'template',
+      hasUpdateEvent: true,
+      layoutModes: [{
+        name: 'default',
+        condition: 'default',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          padding: '{dimension.padding.superloose}',
+          borderColor: '{color.basic.opacity.white.24}',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          background: 'linear-gradient(135deg, #CEEEFF 0%, #EBD8FA 50%, #F3F3FD 100%);'
+        }
       }]
     }
   }
