@@ -144,7 +144,7 @@ function createFlexWrapLayout(children = []) {
                 // 使用CSS的flex-wrap属性
                 flexWrap: "wrap",
                 alignSelf: "flex-start",
-                layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+                // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
                 boxSizing: "border-box",
                 // borderStyle: "solid",
                 // borderWidth: "0",
@@ -178,7 +178,7 @@ function createBaseLayout(direction = LAYOUT_CONSTANTS.DIRECTION.VERTICAL, optio
             layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
             // primaryAxisSizingMode: "fixed",
             // layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
-            layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+            // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
             boxSizing: "border-box",
             // borderStyle: "solid",
             // borderWidth: "0",
@@ -437,24 +437,36 @@ function extractLayoutBlock(lines, startIndex) {
     const contentLines = [];
     let i = startIndex + 1;
     let foundEnd = false;
+    let nestingLevel = 1; // 🔧 跟踪嵌套深度，从1开始（当前标签）
 
-    // 查找对应的结束标签
-    while (i < lines.length) {
+    // 查找对应的结束标签，考虑嵌套情况
+    while (i < lines.length && nestingLevel > 0) {
         const line = lines[i];
         const tagInfo = isLayoutTag(line);
 
-        if (tagInfo.isLayoutTag && tagInfo.isClosing && tagInfo.variant === variant) {
-            foundEnd = true;
-            i++;
-            break;
+        if (tagInfo.isLayoutTag && tagInfo.variant === variant) {
+            if (tagInfo.isClosing) {
+                // 遇到结束标签，减少嵌套深度
+                nestingLevel--;
+                if (nestingLevel === 0) {
+                    // 找到了匹配的结束标签
+                    foundEnd = true;
+                    i++;
+                    break;
+                }
+            } else {
+                // 遇到同名的开始标签，增加嵌套深度
+                nestingLevel++;
+            }
         }
 
+        // 将当前行加入内容（包括嵌套的标签）
         contentLines.push(line);
         i++;
     }
 
     if (!foundEnd) {
-        console.warn(`警告: 未找到布局标签 ${variant} 的结束标签`);
+        console.warn(`⚠️  警告: 未找到布局标签 <layout:${variant}> 的结束标签，可能存在标签不匹配`);
     }
 
     return {

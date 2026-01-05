@@ -7335,6 +7335,7 @@ export const DEFAULT_STYLE_CONFIG = {
         name: 'default',
         condition: 'default',
         style: {
+          width: '100%',
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -7374,7 +7375,6 @@ export const DEFAULT_STYLE_CONFIG = {
         desc: {
           metaType: 'text',
           variantStyle: {
-            width: '70%',
             fontSize: '{font.size.medium}',
             color: '{color.basic.opacity.white.48}',
           }
@@ -7404,14 +7404,172 @@ export const DEFAULT_STYLE_CONFIG = {
         style: {
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'flex-start',
           padding: '{dimension.padding.superloose}',
           borderColor: '{color.basic.opacity.white.24}',
+          borderRadius: '{dimension.borderradius.xxxxl}',
           borderWidth: '1px',
           borderStyle: 'solid',
           background: 'linear-gradient(135deg, #CEEEFF 0%, #EBD8FA 50%, #F3F3FD 100%);'
+        },
+        structure: {
+          groups: [{
+            name: 'contentBlock',
+            slots: ['title', 'name', 'badge', 'desc'],
+            type: 'template',
+            style: {
+              display: 'flex',
+              alignItems: 'flex-start',
+              flexDirection: 'column',
+              gap: '{dimension.gap.base}',
+            }
+          }]
         }
-      }]
+      }],
+      slotConfigs: {
+        title: {
+          metaType: 'text',
+          variantStyle: {
+            lineHeight: '1',
+            fontSize: '{font.size.xxl}',
+            color: '{color.basic.opacity.black.100}',
+          }
+        },
+        name: {
+          metaType: 'text',
+          variantStyle: {
+            lineHeight: '1',
+            fontSize: '{font.size.xxxl}',
+            color: '{color.basic.opacity.black.100}',
+            marginBottom: '{dimension.margin.loose}',
+          }
+        },
+        badge: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.100}',
+            padding: '{dimension.padding.base} {dimension.padding.extraloose}',
+            background: '{color.basic.opacity.black.12}',
+            borderColor: '{color.basic.opacity.black.12}',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            cursor: 'pointer',
+            borderRadius: '{dimension.borderradius.full}',
+          }
+        },
+        desc: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.black.48}',
+            width: '60%',
+          }
+        }
+      }
+    },
+    hiringNewAvatarCard: {
+      type: 'template',
+      hasUpdateEvent: true,
+      layoutModes: [{
+        name: 'default',
+        condition: 'default',
+        style: {
+          display: 'flex',
+          flex: '1',
+          borderRadius: '{dimension.borderradius.xxxxl}',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          padding: '{dimension.padding.superloose}',
+          background: 'linear-gradient(135deg, #D57A06 0%, #700B05 50%, #282E8A 100%);'
+        },
+        structure: {
+          groups: [{
+            name: 'rowBlock',
+            type: 'template',
+            style: {
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+            },
+            groups: [{
+              name: 'messageBlock',
+              type: 'template',
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                gap: '{dimension.gap.base}',
+              },
+              slots: ['title', 'name', 'badge', 'desc']
+            }, {
+              name: 'avatarBlock',
+              type: 'template',
+              style: {
+                width: '64px',
+                height: '64px',
+                borderRadius: '{dimension.borderradius.full}',
+                overflow: 'hidden',
+                flexShrink: '0',  // 防止被 flex 压缩
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+              slots: ['avatar']
+            }]
+          }]
+        }
+      }],
+      slotConfigs: {
+        title: {
+          metaType: 'text',
+          variantStyle: {
+            lineHeight: '1',
+            fontSize: '{font.size.xl}',
+            color: '{color.basic.opacity.white.100}',
+          }
+        },
+        name: {
+          metaType: 'text',
+          variantStyle: {
+            lineHeight: '1',
+            fontSize: '{font.size.xxxl}',
+            color: '{color.basic.opacity.white.100}',
+            marginBottom: '{dimension.margin.loose}',
+          }
+        },
+        badge: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.100}',
+            padding: '{dimension.padding.base} {dimension.padding.extraloose}',
+            background: '{color.basic.opacity.white.12}',
+            borderColor: '{color.basic.opacity.white.12}',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            cursor: 'pointer',
+            borderRadius: '{dimension.borderradius.full}',
+          }
+        },
+        desc: {
+          metaType: 'text',
+          variantStyle: {
+            color: '{color.basic.opacity.white.48}',
+            fontSize: '{font.size.medium}',
+          }
+        },
+        avatar: {
+          metaType: 'image',
+          variant: 'avatar',
+          variantStyle: {
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',  // 填充整个圆形区域
+            display: 'block',
+          }
+        },
+      }
     }
   }
 };

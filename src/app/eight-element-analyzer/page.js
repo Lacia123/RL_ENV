@@ -2306,22 +2306,41 @@ style: {
   hiringNewCard: {
     name: '新的招聘卡片',
     description: '用于3D场景演示的新的招聘卡片',
-    markdown: `
-      <layout:root background="transparent">
-      <layout:row>
-        <layout:column flex="2">
-          <hiringNewTitleCard>
-            <title>人才筛选详情</title>
-            <desc>负责核心算法模型的设计、优化与落地</desc>
-            <badge>算法工程师</badge>
-          </hiringNewTitleCard>
-          <layout:row></layout:row>
-        </layout:column>
-        <layout:column flex="1">
-        </layout:column>
-      </layout:row>
-      </layout:root>
-    `
+    markdown: `<layout:root background="transparent">
+<layout:row>
+  <layout:column flex="2">
+      <hiringNewTitleCard>
+        <title>人才筛选详情</title>
+        <desc>负责核心算法模型的设计、优化与落地</desc>
+        <badge>算法工程师</badge>
+      </hiringNewTitleCard> 
+    <layout:row>
+      <hiringNewAvatarCard>
+        <title>算法策略</title>
+        <name>张逸杰</name>
+        <badge>推荐原因</badge>
+        <desc>他在算法优化与模型调参方面有出色表现，多次在业务指标上实现显著提升具备从0到1构建算法系统的经验，对模型评估与实验设计有敏锐洞察力。</desc>
+        <avatar src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200"></avatar>
+      </hiringNewAvatarCard>
+      <hiringNewAvatarCard>
+        <title>算法策略</title>
+        <name>张逸杰</name>
+        <badge>推荐原因</badge>
+        <desc>他在算法优化与模型调参方面有出色表现，多次在业务指标上实现显著提升具备从0到1构建算法系统的经验，对模型评估与实验设计有敏锐洞察力。</desc>
+        <avatar src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200"></avatar>
+      </hiringNewAvatarCard>
+    </layout:row>
+  </layout:column>
+  <layout:column flex="1">
+    <hiringNewPersonCard>
+      <title>杭州电子科技大学</title>
+      <name>张忠元</name>
+      <badge>推荐原因</badge>
+      <desc>他具备扎实的数学与计算机基础，对机器学习、深度学习及优化算法有系统掌握。在项目中能够独立完成从数据清洗、特征工程到模型部署的全流程实现，并能在复杂场景下优化模型性能，是一位兼具科研能力与工程能力的优秀算法工程师。</desc>
+    </hiringNewPersonCard>
+  </layout:column>
+</layout:row>
+</layout:root>`
   }
 };
 
