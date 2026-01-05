@@ -1,8 +1,7 @@
 import { EVENT_NAME, EVENT_CONFIG, NATIVE_EVENT_KEY } from './eventConfig.js';
-import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig } from './styleConfig.js';
+import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG } from './styleConfig.js';
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance } from './util.js';
-import resolveToken from '../tokens/resolveToken.js';
 import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './creators/tableCreators.js';
 import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './creators/codeCreators.js';
 import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot } from './creators/layoutCreators.js';
@@ -21,7 +20,7 @@ import { isAudioTag, createAudioElement } from './creators/audioCreators.js';
 // 检测是否为引用文本
 function isQuoteText(line) {
     return line.trim().match(/^>\s*(.*)$/);
-}``
+}
 
 // 检测是否为图标标签
 function isIconTag(line) {
@@ -106,7 +105,7 @@ function parseEventSyntax(text, elementId, currentMarkdown = '') {
 // 移除文本中的事件语法标记
 function removeEventSyntax(text) {
     // 首先检查是否是完整的事件按钮语法：[event:eventName][buttonText](url)
-    const fullEventMatch = text.match(/^\[event:\w+(?:\([^)]*\))?\]\s*\[([^\]]+)\]\(([^)]+)\)$/); 
+    const fullEventMatch = text.match(/^\[event:\w+(?:\([^)]*\))?\]\s*\[([^\]]+)\]\(([^)]+)\)$/);
     if (fullEventMatch) {
         // 如果是完整的事件按钮语法，返回按钮文本部分
         return fullEventMatch[1].trim();
@@ -120,7 +119,7 @@ function removeEventSyntax(text) {
 
     // 🆕 清理带参数的事件标记：[event:eventName(param1,param2)]
     let cleanedText = text.replace(/\[event:\w+(?:\([^)]*\))?\]/g, '').trim();
-    
+
     // 🆕 清理 nativeEvent 标记
     cleanedText = cleanedText.replace(/\[nativeEvent:\w+;data:\w+\]/g, '').trim();
 
@@ -524,10 +523,10 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     if (linkMatch) {
         const linkText = linkMatch[1].trim();
         const linkUrl = linkMatch[2].trim();
-        
+
         // 🆕 判断是否有 URL
         const hasUrl = linkUrl && linkUrl.length > 0;
-        
+
         // 🆕 没有 URL -> 创建按钮
         if (!hasUrl) {
             const primaryButtonMapping = markdownMapping['button:primary'];
@@ -544,7 +543,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
                 };
             }
         }
-        
+
         // 🆕 有 URL -> 优先创建超链接（不依赖 markdownMapping）
         // 如果 markdownMapping 中有定义，使用它；否则返回 null 让主解析循环处理
         const hyperlinkMapping = markdownMapping['a'] || markdownMapping['hyperlink'];
@@ -559,7 +558,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
                 newListItemCounter: currentListItemCounter
             };
         }
-        
+
         // 🔧 如果没有超链接映射，返回 null 让主解析循环直接创建超链接元素
         // 这样超链接就不会依赖于 markdownMapping 的配置
         return null;
@@ -607,7 +606,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     if (videoTagInfo.isVideoTag) {
         // 使用 video 映射，如果不存在则使用 p 映射或 others 映射
         const templatePath = markdownMapping.video || markdownMapping.p || markdownMapping.others;
-        
+
         // 只有找到有效的映射路径才返回结果
         if (templatePath) {
             return {
@@ -628,7 +627,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     if (audioTagInfo.isAudioTag) {
         // 使用 audio 映射，如果不存在则使用 p 映射或 others 映射
         const templatePath = markdownMapping.audio || markdownMapping.p || markdownMapping.others;
-        
+
         // 只有找到有效的映射路径才返回结果
         if (templatePath) {
             return {
@@ -920,31 +919,31 @@ function processMarkdownWithMathProtection(markdown) {
 function preprocessComponentTags(markdown) {
     // 获取所有已注册的组件名称
     const componentNames = DEFAULT_STYLE_CONFIG.component ? Object.keys(DEFAULT_STYLE_CONFIG.component) : [];
-    
+
     if (componentNames.length === 0) {
         return markdown;
     }
-    
+
     // 构建组件名称的正则模式
     const componentPattern = componentNames.join('|');
-    
+
     // 匹配单行组件标签：<componentName>...</componentName> 或 <componentName attr="value">...</componentName>
     const regex = new RegExp(`<(${componentPattern})([^>]*)>([\\s\\S]*?)<\\/\\1>`, 'g');
-    
+
     return markdown.replace(regex, (match, componentName, attributes, content) => {
         // 检查是否已经是多行格式（包含换行符）
         if (match.includes('\n')) {
             return match; // 已经是多行，不需要处理
         }
-        
+
         // 🆕 在插槽标签之间添加换行符（处理内容中的连续标签）
         // 匹配所有的单行标签：<tagName ...>content</tagName>
         let processedContent = content.replace(/(<\/[\w]+>)(<[\w]+)/g, '$1\n$2');
-        
+
         // 拆分为多行
         const openTag = `<${componentName}${attributes}>`;
         const closeTag = `</${componentName}>`;
-        
+
         return `${openTag}\n${processedContent}\n${closeTag}`;
     });
 }
@@ -1127,7 +1126,7 @@ function parseMarkdown(markdown, options = {}) {
             continue;
         }
 
-        
+
 
         // 🔧 优先处理代码块（避免误把代码块内的表格当作真实表格）
         if (isMarkdownCodeBlock(trimmedLine)) {
@@ -1250,7 +1249,7 @@ function parseMarkdown(markdown, options = {}) {
 
             continue;
         }
-        
+
         // 处理布局标签
         const layoutTagInfo = isLayoutTag(trimmedLine);
         if (layoutTagInfo.isLayoutTag && !layoutTagInfo.isClosing) {
@@ -1481,14 +1480,14 @@ function parseMarkdown(markdown, options = {}) {
                 markedLines.map(item => item.line),
                 i
             );
-            
+
             console.log('  内容:', componentContent);
 
             // 🆕 直接使用 createComponentElement 创建组件
             const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[componentName];
             if (componentConfig) {
                 console.log(`  使用 componentCreators 创建组件`);
-                
+
                 // 直接调用 createComponentElement（同步）
                 const componentElement = createComponentElement(
                     componentContent,
@@ -1498,7 +1497,7 @@ function parseMarkdown(markdown, options = {}) {
                     attributes, // externalParameters
                     currentMarkdown
                 );
-                
+
                 stack[stack.length - 1].elements.push(componentElement);
                 console.log(`✅ 组件元素已创建并添加到栈中\n`);
             } else {
@@ -1856,28 +1855,28 @@ function parseMarkdown(markdown, options = {}) {
                 if (singleLinkMatch) {
                     const linkText = singleLinkMatch[1];
                     const linkUrl = singleLinkMatch[2];
-                    
+
                     // 🆕 检查是否有事件语法
                     const hasEvent = trimmedLine.includes('[event:');
-                    
+
                     // 🆕 判断是否有 URL
                     const hasUrl = linkUrl && linkUrl.trim().length > 0;
-                    
+
                     console.log(`🔗 链接解析: 文本="${linkText}", URL="${linkUrl}", 有事件=${hasEvent}, 有URL=${hasUrl}`);
-                    
+
                     // 🆕 有事件 OR 没有 URL -> 创建按钮
                     if (hasEvent || !hasUrl) {
                         console.log(`  → 创建按钮（${hasEvent ? '有事件' : '无 URL'}）`);
                         // 🔧 修复：传入 linkText 而不是 trimmedLine，确保 buttonText 是纯文本
                         const buttonElement = createButtonElement(linkText, linkUrl || '#', 'primary', currentMarkdown);
                         consecutiveButtons.push(buttonElement);
-                    } 
+                    }
                     // 🆕 有 URL 且无事件 -> 创建超链接
                     else {
                         console.log(`  → 创建超链接`);
                         const hyperlinkElement = createHyperlinkElement(linkText, linkUrl, 'hyperlink');
                         console.log(`  → 超链接ID: ${hyperlinkElement.id}`);
-                        
+
                         // 🆕 超链接作为文本元素处理，不添加到按钮组
                         flushConsecutiveButtons();
                         stack[stack.length - 1].elements.push(hyperlinkElement);
@@ -2185,7 +2184,7 @@ function parseMarkdown(markdown, options = {}) {
     function generateStyledHyperlink(text, url) {
         // 从 styleConfig 获取 hyperlink 样式并解析 tokens
         const hyperlinkStyle = DEFAULT_STYLE_CONFIG.text?.hyperlink || {};
-        
+
         const fontSize = 'inherit';
         const fontWeight = '500';
         const color = '#615eec';
@@ -2193,10 +2192,10 @@ function parseMarkdown(markdown, options = {}) {
         // 🔧 borderBottom 也需要解析 token（可能包含颜色 token）
         const borderBottom = '2px solid #bcbef7';
         const transition = 'all 0.3s ease';
-        
+
         // 同时使用 CSS 类（支持 hover）和内联样式（作为备用）
         const inlineStyle = `font-size: ${fontSize}; font-weight: ${fontWeight}; color: ${color}; text-decoration: ${textDecoration}; border-bottom: ${borderBottom}; transition: ${transition};`;
-        
+
         return `<a href="${url}" class="hyperlink-styled" style="${inlineStyle}">${text}</a>`;
     }
 
@@ -2237,7 +2236,7 @@ function parseMarkdown(markdown, options = {}) {
             const matchIndex = match.index;
             const hasEvent = line.substring(Math.max(0, matchIndex - 20), matchIndex).includes('[event:');
             const hasUrl = linkUrl && linkUrl.trim().length > 0;
-            
+
             if (hasEvent) {
                 hasLinksWithEvent = true;
             }
@@ -2249,41 +2248,41 @@ function parseMarkdown(markdown, options = {}) {
         // 🆕 如果只有文本和超链接（所有链接都有URL且无事件），创建单个文本元素
         if (!hasButtonsOrImages && !hasLinksWithoutUrl && !hasLinksWithEvent && filteredLinkMatches.length > 0) {
             console.log(`  → 纯文本+超链接，创建单个文本元素`);
-            
+
             // 将整行转换为 HTML 字符串
             let htmlContent = '<p>';
             let lastIndex = 0;
-            
+
             // 对所有超链接按位置排序
             const sortedLinks = filteredLinkMatches.sort((a, b) => a.index - b.index);
-            
+
             for (const match of sortedLinks) {
                 const matchIndex = match.index;
                 const linkText = match[1];
                 const linkUrl = match[2];
-                
+
                 // 添加链接前的文本
                 if (matchIndex > lastIndex) {
                     const textBefore = line.substring(lastIndex, matchIndex);
                     htmlContent += textBefore;
                 }
-                
+
                 // 添加超链接
                 console.log(`    → 添加超链接: "${linkText}" -> ${linkUrl}`);
                 htmlContent += generateStyledHyperlink(linkText, linkUrl);
-                
+
                 lastIndex = matchIndex + match[0].length;
             }
-            
+
             // 添加最后的文本
             if (lastIndex < line.length) {
                 htmlContent += line.substring(lastIndex);
             }
-            
+
             htmlContent += '</p>\n';
-            
+
             console.log(`  → 生成的 HTML: ${htmlContent}`);
-            
+
             // 创建文本元素
             const textElement = createTextElement(htmlContent);
             return textElement;
@@ -2291,7 +2290,7 @@ function parseMarkdown(markdown, options = {}) {
 
         // 🆕 如果有按钮或图片，使用原来的 layout 方式
         console.log(`  → 包含按钮/图片，使用 layout 容器`);
-        
+
         // 🔧 生成稳定的内容种子，添加行内容哈希
         const lineHash = line.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
         const contentSeed = `mixed-content-${line.slice(0, 30)}-len${line.length}`;
@@ -2347,21 +2346,21 @@ function parseMarkdown(markdown, options = {}) {
             } else if (type === 'link') {
                 const linkText = match[1];
                 const linkUrl = match[2];
-                
+
                 // 🆕 检查是否有事件语法（通过检查整行）
                 const hasEvent = line.substring(Math.max(0, matchIndex - 20), matchIndex).includes('[event:');
-                
+
                 // 🆕 判断是否有 URL
                 const hasUrl = linkUrl && linkUrl.trim().length > 0;
-                
+
                 console.log(`🔗 混合内容中的链接: 文本="${linkText}", URL="${linkUrl}", 有事件=${hasEvent}, 有URL=${hasUrl}`);
-                
+
                 // 🆕 有事件 OR 没有 URL -> 创建按钮
                 if (hasEvent || !hasUrl) {
                     console.log(`  → 创建按钮（${hasEvent ? '有事件' : '无 URL'}）`);
                     const buttonElement = createButtonElement(linkText, linkUrl || '#', 'primary', currentMarkdown);
                     currentLayout.layout.children.push(buttonElement);
-                } 
+                }
                 // 🆕 有 URL 且无事件 -> 创建带样式的超链接文本元素
                 else {
                     console.log(`  → 创建带样式超链接的文本元素`);
@@ -2409,7 +2408,10 @@ function markdownToEightElement(markdown, styleConfig) {
     // 如果提供了样式配置，设置当前配置
     if (styleConfig) {
         try {
-            setStyleConfig(styleConfig);
+            // 动态导入避免循环依赖
+            import('./styleConfig.js').then(({ setStyleConfig }) => {
+                setStyleConfig(styleConfig);
+            });
         } catch (error) {
             console.warn('设置样式配置失败:', error);
         }
@@ -2451,7 +2453,10 @@ function markdownToEightElement(markdown, styleConfig) {
 
     // 重置为默认配置
     try {
-        resetStyleConfig();
+        // 动态导入避免循环依赖
+        import('./styleConfig.js').then(({ resetStyleConfig }) => {
+            resetStyleConfig();
+        });
     } catch (error) {
         console.warn('重置样式配置失败:', error);
     }
