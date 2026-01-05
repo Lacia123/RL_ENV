@@ -1,6 +1,5 @@
 import next from 'next';
 import { createServer } from 'http';
-import { logAPIRequest } from './src/app/utils/logging/apiLogger.js';
 
 // 判断是否为开发环境
 const dev = !process.env.NODE_ENV;
@@ -12,7 +11,7 @@ const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
 
 // =====================================================
-// 全局错误处理器 - 记录到 API 日志
+// 全局错误处理器 - 只输出到控制台
 // =====================================================
 
 function logServerError(type, error, context = {}) {
@@ -38,29 +37,8 @@ function logServerError(type, error, context = {}) {
   if (error.message.includes('workers') || 
       error.message.includes('Server Action') ||
       error.message.includes('deployment')) {
-    console.error('⚠️  检测到 Next.js 内部错误（workers/Server Action），这可能与资源泄漏相关！');
+    console.error('⚠️  检测到 Next.js 内部错误（workers/Server Action）');
   }
-  
-  // 记录到 API 日志文件
-  logAPIRequest({
-    method: 'SERVER_ERROR',
-    path: context.url || type,
-    origin: 'server',
-    referer: 'none',
-    userAgent: `Node.js ${process.version}`,
-    body: {
-      errorType: type,
-      errorName: error.name,
-      context: context
-    },
-    status: 500,
-    duration: 0,
-    response: null,
-    error: {
-      message: error.message,
-      stack: error.stack
-    }
-  });
 }
 
 // 捕获未处理的 Promise 拒绝
@@ -93,28 +71,6 @@ app.prepare().then(() => {
         const icon = status === 200 ? '✓' : (status === 403 ? '⚠' : '✗');
         console.log(`[${new Date().toLocaleTimeString()}] ${icon} ${req.method} ${req.url} ${status} ${duration}ms`);
         
-        // 如果是错误状态，记录到日志文件
-        if (status >= 400) {
-          logAPIRequest({
-            method: req.method,
-            path: req.url,
-            origin: req.headers.origin || 'none',
-            referer: req.headers.referer || 'none',
-            userAgent: req.headers['user-agent'] || 'none',
-            body: null, // 无法获取已消费的请求体
-            status: status,
-            duration: duration,
-            response: { 
-              note: '通过 server.js 记录的错误响应',
-              statusCode: status,
-              statusText: status === 403 ? 'Forbidden' : status === 404 ? 'Not Found' : 'Error'
-            },
-            error: status >= 500 ? {
-              message: `服务器返回 ${status} 错误`,
-              stack: null
-            } : null
-          });
-        }
       });
     }
     
@@ -136,24 +92,6 @@ app.prepare().then(() => {
         console.error('⚠️  这是与 Server Action/workers 相关的错误！');
       }
       
-      // 记录到日志文件
-      logAPIRequest({
-        method: req.method,
-        path: req.url,
-        origin: req.headers.origin || 'none',
-        referer: req.headers.referer || 'none',
-        userAgent: req.headers['user-agent'] || 'none',
-        body: null,
-        status: 500,
-        duration: 0,
-        response: null,
-        error: {
-          message: errorMessage,
-          stack: err.stack,
-          type: 'Next.js Handler Error'
-        }
-      });
-      
       // 如果响应还没发送，返回 500
       if (!res.headersSent) {
         res.statusCode = 500;
@@ -169,12 +107,6 @@ app.prepare().then(() => {
   // 监听服务器错误
   server.on('error', (err) => {
     console.error('❌ 服务器错误:', err.message);
-    
-    // 记录到日志文件
-    logServerError('serverError', err, {
-      port: port,
-      hostname: hostname
-    });
   });
 
   server.listen(port, (err) => {
@@ -193,12 +125,5 @@ app.prepare().then(() => {
   });
 }).catch((ex) => {
   console.error('❌ Next.js 启动失败:', ex.stack);
-  
-  // 记录启动错误到日志
-  logServerError('appPrepareError', ex, {
-    phase: 'startup',
-    critical: true
-  });
-  
   process.exit(1);
 }); 
