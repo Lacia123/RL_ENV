@@ -2053,9 +2053,46 @@ wrapper: {
 </loop>
 </commentListCard>
 
+<commentStyleListCard>
+  <title>项目动态</title>
+  <subtitle>最新 3 条更新 · 自动排列列表项</subtitle>
+    <loop data="comments" nativeEvent="click">
+      <itemContent>
+        <avatar src="avatarUrl" key="avatarUrl"></avatar>
+        <text key="applyDeptName"></text>
+        <desc key="orderSummary"></desc>
+        <timestamp key="beginTime"></timestamp>
+      </itemContent>
+    </loop>
+</commentStyleListCard>
+
 </layout:gallery>
 `
-  },
+},
+
+  /**
+   * <commentStyleListCard>
+    <title>项目动态</title>
+    <subtitle>最新 3 条更新 · 自动排列列表项</subtitle>
+      <loop data="comments" nativeEvent="click">
+        <itemContent>
+          <text key="applyDeptName"></text>
+        </itemContent>
+      </loop>
+    </commentStyleListCard>
+   */
+
+  
+  /**
+   * 
+   * <commentListCard>
+       <loop data="loopData" nativeEvent="click">
+         <title key="title"></title>
+         <desc key="desc"></desc>
+        </loop>
+     </commentListCard>
+   * 
+   */
 
   smartCardDemo: {
     name: '🤖 智能自适应卡片',

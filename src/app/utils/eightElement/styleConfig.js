@@ -5,7 +5,7 @@
  */
 
 import { text } from 'd3';
-import { fontSize } from '../icons/Edit/index.js';
+import { fontSize, overallReduction } from '../icons/Edit/index.js';
 import resolveToken from '../tokens/resolveToken.js';
 import border from '../tokens/color/border.js';
 import margin from '../tokens/dimension/margin.js';
@@ -7088,10 +7088,27 @@ export const DEFAULT_STYLE_CONFIG = {
               style: {
                 display: 'flex',
                 flexDirection: 'column',
+                padding: '{dimension.padding.base} 0',
+                borderBottom: '1px solid {color.surfacecontainer.black7}',
                 gap: '4px',
                 width: '100%'
               },
-              slots: ['title', 'desc']
+              groups: [{
+                name: 'headerRow',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'flex-start',
+                  gap: '{dimension.gap.base}',
+                  flexWrap: 'wrap'
+                },
+                groups: [{
+                  name: 'titleGroup',
+                  type: 'template',
+                  slots: ['title']
+                }]
+              }]
             }
           ]
         }
@@ -7154,15 +7171,58 @@ export const DEFAULT_STYLE_CONFIG = {
             }
           }, {
             name: 'itemContent',
-            slots: ['text'],
             type: 'template',
             style: {
               display: 'flex',
               flexDirection: 'column',
-              gap: '{dimension.gap.tight}',
-              padding: '{dimension.padding.tight} 0',
-              borderBottom: '1px solid {color.surfacecontainer.black7}'
-            }
+              padding: '{dimension.padding.base} 0',
+              borderBottom: '1px solid {color.surfacecontainer.black7}',
+              gap: '4px',
+              width: '100%'
+            },
+            groups: [{
+              name: 'headerRow',
+              type: 'template',
+              style: {
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'flex-start',
+                gap: '{dimension.gap.base}',
+                flexWrap: 'wrap'
+              },
+              groups: [{
+                name: 'avatarGroup',
+                type: 'template',
+                style: {
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  objectFit: 'cover'
+                },
+                slots: ['avatar']
+              }, {
+                name: 'contentGroup',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '{dimension.gap.supertight}',
+                  flex: '1'
+                },
+                slots: ['text', 'desc']
+              }, {
+                name: 'rightGroup',
+                type: 'template',
+                style: {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  gap: '{dimension.gap.base}'
+                },
+                slots: ['timestamp']
+              }]
+            }]
           }]
         }
       }],
@@ -7194,13 +7254,37 @@ export const DEFAULT_STYLE_CONFIG = {
             lineHeight: '1.5'
           }
         },
+        desc: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.small}',
+            color: '{color.onsurface.black64}'
+          }
+        },
+        timestamp: {
+          metaType: 'text',
+          variant: 'p',
+          variantStyle: {
+            margin: '0',
+            fontSize: '{font.size.tiny}',
+            color: '{color.onsurface.black64}'
+          }
+        },
+        avatar: {
+          metaType: 'image',
+          variant: 'avatar'
+        },
       },
       example: [{
         applyDeptName: '数据智能&用户体验',
+        avatarUrl: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200',
         orderSummary: '申报金额（CNY）：23,0000',
         beginTime: '2025-08-11 15:34:05'
       }, {
         applyDeptName: '数据智能&用户体验12',
+        avatarUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200',
         orderSummary: '申报金额（CNY）：45,0000',
         beginTime: '2025-08-11 15:34:05'
       }]

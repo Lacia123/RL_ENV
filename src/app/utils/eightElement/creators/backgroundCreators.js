@@ -8,7 +8,7 @@ import {
 import { EVENT_NAME } from '../eventConfig.js';
 
 // 创建背景元素（用于图片）
-function createBackgroundElement(imageUrl, variant = 'normal') {
+function createBackgroundElement(imageUrl, variant = 'normal', dataKey = '') {
     const id = generateUUID();
     // 获取图片元素的样式配置
     const imageStyleConfig = getElementStyleConfig('image', variant);
@@ -104,7 +104,7 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
         material: {
             image: {
                 default: {
-                    "data-key": "",
+                    "data-key": dataKey,
                     type: "img",
                     preview: imageUrl,
                     style: {
@@ -121,7 +121,7 @@ function createBackgroundElement(imageUrl, variant = 'normal') {
             },
             elevation: {
                 default: {
-                    "data-key": "",
+                    "data-key": dataKey,
                     style: {
                         elevation: {
                             value: imageStyleConfig.boxShadow || "none",

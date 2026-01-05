@@ -62,11 +62,32 @@ export function renderEightElementToHtml(eightElement, options = {}) {
                 const example = DEFAULT_STYLE_CONFIG.component[componentName].example;
                 if (Array.isArray(example)) {
                      // 如果是数组，我们需要知道它的 key
-                     // 在 commentListCard 中，container 上有 data-key="loopData"
-                     // 所以我们需要构建一个对象 { loopData: example }
+                     // 支持两种模式：
+                     // 1. 简易循环：组件容器上有 data-key
+                     // 2. group 循环：在子元素中查找有 data-key 的 group
                      
                      if (element['data-key']) {
+                         // 简易循环模式
                          extractedData[element['data-key']] = example;
+                     } else {
+                         // group 循环模式：在子元素中查找 data-key
+                         const findDataKey = (el) => {
+                             if (el && el['data-key']) {
+                                 return el['data-key'];
+                             }
+                             if (el && el.layout && el.layout.children) {
+                                 for (const child of el.layout.children) {
+                                     const key = findDataKey(child);
+                                     if (key) return key;
+                                 }
+                             }
+                             return null;
+                         };
+                         
+                         const dataKey = findDataKey(element);
+                         if (dataKey) {
+                             extractedData[dataKey] = example;
+                         }
                      }
                 } else if (typeof example === 'object') {
                     // 如果是对象，直接合并
@@ -2219,7 +2240,7 @@ function renderButtonElement(element) {
  * @param {Object} element - 图片元素
  * @returns {string} - 渲染的HTML字符串
  */
-function renderImageElement(element) {
+function renderImageElement(element, dataContext) {
     console.log('🖼️ 渲染图片元素:', element);
     const styleAttr = generateStyleAttribute(element.computedStyle);
     const className = element.layout && element.layout.className ? element.layout.className : '';
@@ -2236,6 +2257,26 @@ function renderImageElement(element) {
     // 🔧 修复：从src属性获取图片URL
     if (!imageUrl && element.src) {
         imageUrl = element.src;
+    }
+    
+    // 🔧 修复：从 background.url 获取图片URL
+    if (!imageUrl && element.background && element.background.url) {
+        imageUrl = element.background.url;
+    }
+    
+    // 🆕 处理数据绑定：从 material.image.default.data-key 获取数据键
+    let dataKey = null;
+    if (element.material && element.material.image && element.material.image.default && element.material.image.default['data-key']) {
+        dataKey = element.material.image.default['data-key'];
+    }
+    
+    // 🆕 如果有 data-key，从数据上下文中获取值
+    if (dataKey && dataContext && typeof dataContext === 'object') {
+        const boundValue = dataContext[dataKey];
+        if (boundValue !== undefined && boundValue !== null) {
+            imageUrl = String(boundValue);
+            console.log(`  🔑 图片从数据上下文获取: ${dataKey} = ${imageUrl}`);
+        }
     }
     
     // 🆕 获取alt文本，支持多种来源

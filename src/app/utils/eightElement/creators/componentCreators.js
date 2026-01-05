@@ -218,7 +218,7 @@ function selectLayoutMode(layoutModes, actualSlots) {
  * @param {number} depth - 当前嵌套深度（用于调试）
  * @returns {Array} 构建后的子元素数组
  */
-function buildStructureFromMode(mode, slotElementsMap, componentElement, componentConfig, actualSlots, depth = 0) {
+function buildStructureFromMode(mode, slotElementsMap, componentElement, componentConfig, actualSlots, depth = 0, loopGroupName = null, loopDataKey = null, loopEventConfig = null) {
     if (!mode || !mode.structure || !mode.structure.groups) {
         console.warn(`⚠️ 模式 "${mode.name}" 没有有效的 structure 配置`);
         return Array.from(slotElementsMap.values());
@@ -226,6 +226,11 @@ function buildStructureFromMode(mode, slotElementsMap, componentElement, compone
     
     const indent = '  '.repeat(depth);
     console.log(`\n${indent}🏗️ [深度 ${depth}] 根据模式 "${mode.name}" 构建结构...`);
+    
+    // 🆕 如果有循环 group，记录到日志
+    if (loopGroupName) {
+        console.log(`${indent}  🔄 循环 group: "${loopGroupName}", data-key: "${loopDataKey}"`);
+    }
     
     // 🆕 如果没有传入 actualSlots，从 slotElementsMap 获取
     if (!actualSlots) {
@@ -245,7 +250,10 @@ function buildStructureFromMode(mode, slotElementsMap, componentElement, compone
         mode.name,
         componentName,
         componentConfig,
-        depth
+        depth,
+        loopGroupName,  // 🆕 传递循环信息
+        loopDataKey,
+        loopEventConfig
     );
 }
 
@@ -258,9 +266,12 @@ function buildStructureFromMode(mode, slotElementsMap, componentElement, compone
  * @param {string} componentName - 组件名称（用于生成唯一的 group className）
  * @param {Object} componentConfig - 组件配置（用于访问 slotConfigs 等）
  * @param {number} depth - 当前嵌套深度
+ * @param {string} loopGroupName - 循环的 group 名称
+ * @param {string} loopDataKey - 循环的 data-key
+ * @param {Object} loopEventConfig - 循环的事件配置
  * @returns {Array} 构建后的子元素数组
  */
-function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentName, componentConfig, depth = 0) {
+function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentName, componentConfig, depth = 0, loopGroupName = null, loopDataKey = null, loopEventConfig = null) {
     const indent = '  '.repeat(depth);
     const children = [];
     
@@ -293,7 +304,10 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                 modeName,
                 componentName,
                 componentConfig,
-                depth + 1
+                depth + 1,
+                loopGroupName,  // 🆕 传递循环信息
+                loopDataKey,
+                loopEventConfig
             );
             
             if (nestedChildren.length === 0) {
@@ -324,7 +338,45 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                     }
                 };
                 
-                children.push(containerElement);
+                // 🆕 如果当前 group 是循环的 group，包裹在循环容器中
+                if (loopGroupName && group.name === loopGroupName) {
+                    console.log(`${indent}  🔄 为嵌套循环模板 "${group.name}" 创建循环容器`);
+                    
+                    // 应用循环事件配置到模板容器本身
+                    if (loopEventConfig) {
+                        console.log(`${indent}  🔗 将 loop nativeEvent 应用到循环模板`);
+                        if (!containerElement.events) {
+                            containerElement.events = [];
+                        }
+                        if (containerElement.events.length === 1 && Object.keys(containerElement.events[0]).length === 0) {
+                            containerElement.events[0] = loopEventConfig;
+                        } else {
+                            containerElement.events.push(loopEventConfig);
+                        }
+                    }
+                    
+                    // 🔧 创建循环容器，包裹循环模板
+                    const loopContainer = {
+                        id: generateUUID(),
+                        name: 'layout',
+                        'file-type': 'template',
+                        _metadata: {
+                            isLoopContainer: true,
+                            loopGroupName: group.name
+                        },
+                        layout: {
+                            style: {},
+                            classStyle: {},
+                            children: [containerElement]  // 循环模板作为唯一子元素
+                        },
+                        "data-key": loopDataKey  // 循环容器有 data-key
+                    };
+                    
+                    console.log(`${indent}  ✅ 循环容器创建完成，包裹 "${group.name}"`);
+                    children.push(loopContainer);
+                } else {
+                    children.push(containerElement);
+                }
             } else {
                 // 无容器，直接添加嵌套的子元素
                 children.push(...nestedChildren);
@@ -400,8 +452,46 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                     }
                 };
                 
-                console.log(`${indent}  ✅ 容器 "${group.name}" 创建完成，样式键:`, Object.keys(groupStyle));
-                children.push(containerElement);
+                // 🆕 如果当前 group 是循环的 group，包裹在循环容器中
+                if (loopGroupName && group.name === loopGroupName) {
+                    console.log(`${indent}  🔄 为循环模板 "${group.name}" 创建循环容器`);
+                    
+                    // 应用循环事件配置到模板容器本身
+                    if (loopEventConfig) {
+                        console.log(`${indent}  🔗 将 loop nativeEvent 应用到循环模板`);
+                        if (!containerElement.events) {
+                            containerElement.events = [];
+                        }
+                        if (containerElement.events.length === 1 && Object.keys(containerElement.events[0]).length === 0) {
+                            containerElement.events[0] = loopEventConfig;
+                        } else {
+                            containerElement.events.push(loopEventConfig);
+                        }
+                    }
+                    
+                    // 🔧 创建循环容器，包裹循环模板
+                    const loopContainer = {
+                        id: generateUUID(),
+                        name: 'layout',
+                        'file-type': 'template',
+                        _metadata: {
+                            isLoopContainer: true,
+                            loopGroupName: group.name
+                        },
+                        layout: {
+                            style: {},
+                            classStyle: {},
+                            children: [containerElement]  // 循环模板作为唯一子元素
+                        },
+                        "data-key": loopDataKey  // 循环容器有 data-key
+                    };
+                    
+                    console.log(`${indent}  ✅ 循环容器创建完成，包裹 "${group.name}"`);
+                    children.push(loopContainer);
+                } else {
+                    console.log(`${indent}  ✅ 容器 "${group.name}" 创建完成，样式键:`, Object.keys(groupStyle));
+                    children.push(containerElement);
+                }
             } else {
                 // 直接添加元素（无容器）
                 console.log(`${indent}  ➕ 直接添加 ${groupElements.length} 个元素`);
@@ -849,10 +939,12 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             }
         } else if (slotConfig.metaType === 'image') {
             const imageUrl = attributes.src || '';
-            console.log(`    创建图片元素: src=${imageUrl}, variant=${slotConfig.variant}`);
+            const dataKey = attributes.key || '';  // 🆕 提取 data-key
+            console.log(`    创建图片元素: src=${imageUrl}, variant=${slotConfig.variant}, key=${dataKey}`);
             const imageElement = createBackgroundElement(
                 imageUrl,
-                slotConfig.variant || 'normal'
+                slotConfig.variant || 'normal',
+                dataKey  // 🆕 传递 data-key
             );
             
             // 🆕 应用 variantStyle 来覆盖默认样式（特别是 padding 和 margin）
@@ -872,6 +964,27 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                         imageElement.events[0] = nativeEventConfig;
                     } else {
                         imageElement.events.push(nativeEventConfig);
+                    }
+                }
+            }
+            
+            // 🆕 处理 loop 中的 nativeEvent（用于循环数据绑定的事件）
+            if (attributes && attributes.nativeEvent && loopDataKey && imageElement) {
+                const validNativeKeys = Object.values(NATIVE_EVENT_KEY);
+                if (validNativeKeys.includes(attributes.nativeEvent)) {
+                    const eventConfig = {
+                        nativeEventKey: attributes.nativeEvent,
+                        dataEventKey: loopDataKey
+                    };
+                    
+                    if (!imageElement.events) {
+                        imageElement.events = [];
+                    }
+                    // 检查是否已有空事件对象
+                    if (imageElement.events.length === 1 && Object.keys(imageElement.events[0]).length === 0) {
+                        imageElement.events[0] = eventConfig;
+                    } else {
+                        imageElement.events.push(eventConfig);
                     }
                 }
             }
@@ -1024,10 +1137,12 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             }
         } else if (slotConfig.metaType === 'image') {
             const imageUrl = attributes.src || '';
-            console.log(`    创建图片元素: src=${imageUrl}, variant=${slotConfig.variant}`);
+            const dataKey = attributes.key || '';  // 🆕 提取 data-key
+            console.log(`    创建图片元素: src=${imageUrl}, variant=${slotConfig.variant}, key=${dataKey}`);
             element = createBackgroundElement(
                 imageUrl,
-                slotConfig.variant || 'normal'
+                slotConfig.variant || 'normal',
+                dataKey  // 🆕 传递 data-key
             );
             
             // 🆕 应用 variantStyle 来覆盖默认样式（特别是 padding 和 margin）
@@ -1037,6 +1152,27 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                     ...(element.layout.style || {}),
                     ...slotConfig.variantStyle
                 };
+            }
+            
+            // 🆕 处理 loop 中的 nativeEvent
+            if (attributes && attributes.nativeEvent) {
+                const validNativeKeys = Object.values(NATIVE_EVENT_KEY);
+                if (validNativeKeys.includes(attributes.nativeEvent)) {
+                    const eventConfig = {
+                        nativeEventKey: attributes.nativeEvent,
+                        dataEventKey: loopDataKey
+                    };
+                    
+                    if (!element.events) {
+                        element.events = [];
+                    }
+                    // 检查是否已有空事件对象
+                    if (element.events.length === 1 && Object.keys(element.events[0]).length === 0) {
+                        element.events[0] = eventConfig;
+                    } else {
+                        element.events.push(eventConfig);
+                    }
+                }
             }
             
             // 🆕 处理 nativeEvent 和 data 属性
@@ -2219,15 +2355,13 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         let contentToParse = content;
         let loopDataKey = 'loopData';
         let loopEventConfig = null;
+        let loopGroupName = null; // 🆕 记录循环的 group 名称
         
         if (loopMatch) {
             loopDataKey = loopMatch[1];
             const otherAttributesStr = loopMatch[2];
             const loopContent = loopMatch[3];
             console.log(`  🔄 发现循环数据绑定: data-key="${loopDataKey}"`);
-            
-            // 设置组件容器的 data-key
-            componentElement["data-key"] = loopDataKey;
 
             // 🆕 处理 loop 中的 nativeEvent
             if (otherAttributesStr && otherAttributesStr.trim()) {
@@ -2244,8 +2378,37 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                 }
             }
             
-            // 使用 loop 内部的内容进行插槽解析
-            contentToParse = loopContent;
+            // 🆕 检查 loop 内部是否有 group 标签（如 <itemContent>）
+            // 匹配 <groupName>...</groupName>
+            const groupTagMatch = loopContent.match(/<([a-zA-Z][a-zA-Z0-9]*)\s*>([\s\S]*?)<\/\1>/);
+            
+            if (groupTagMatch) {
+                loopGroupName = groupTagMatch[1];
+                const groupContent = groupTagMatch[2];
+                console.log(`  📦 发现循环 group: "${loopGroupName}"`);
+                console.log(`  📦 group 内容:`, groupContent);
+                
+                // 🔧 重要：将整个 loop 标签替换为 group 内部的 slot 标签
+                // 这样可以同时解析 loop 外部的 slots（如 title, subtitle）和 loop 内部的 slots（如 text）
+                // 例如：<title>...</title><subtitle>...</subtitle><loop><itemContent><text>...</text></itemContent></loop>
+                // 替换后：<title>...</title><subtitle>...</subtitle><text>...</text>
+                contentToParse = content.replace(
+                    /<loop\s+data=["'][^"']+["'][^>]*>[\s\S]*?<\/loop>/,
+                    groupContent
+                );
+                console.log(`  📝 处理后的内容（用于解析 slots）:`, contentToParse);
+                
+                // 记录循环 group 的元数据到组件元素（用于传递给 buildGroups）
+                componentElement._loopGroup = loopGroupName;
+                componentElement._loopDataKey = loopDataKey;
+            } else {
+                // 旧的简易循环模式：整个组件容器循环
+                console.log(`  🔄 使用简易循环模式（整个容器循环）`);
+                componentElement["data-key"] = loopDataKey;
+                
+                // 使用 loop 内部的内容进行插槽解析
+                contentToParse = loopContent;
+            }
         }
         
         // 解析内容中的所有插槽标签
@@ -2336,7 +2499,11 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                     slotElementsMap,
                     componentElement,
                     componentConfig,
-                    actualSlots  // 🆕 传入 actualSlots 以支持嵌套分组条件
+                    actualSlots,  // 🆕 传入 actualSlots 以支持嵌套分组条件
+                    0,  // depth
+                    loopGroupName,  // 🆕 传入循环的 group 名称
+                    loopDataKey,  // 🆕 传入循环的 data-key
+                    loopEventConfig  // 🆕 传入循环的事件配置
                 );
                 
                 // 替换原有的 children
@@ -2364,9 +2531,10 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
             console.log(`  📋 未配置布局模式，使用扁平结构（${slotElementsMap.size} 个元素）`);
         }
 
-        // 🆕 如果有 loopEventConfig，将其应用到所有直接子元素（通常是 layoutMode 生成的组）
-        if (loopEventConfig && componentElement.layout.children && componentElement.layout.children.length > 0) {
-            console.log(`  🔗 将 loop nativeEvent 应用到 ${componentElement.layout.children.length} 个子元素`);
+        // 🆕 如果有 loopEventConfig 且没有 loopGroupName（简易循环模式），将其应用到所有直接子元素
+        // 如果有 loopGroupName（group 循环模式），事件已经在 buildGroups 中应用到指定的 group 了
+        if (loopEventConfig && !loopGroupName && componentElement.layout.children && componentElement.layout.children.length > 0) {
+            console.log(`  🔗 [简易循环] 将 loop nativeEvent 应用到 ${componentElement.layout.children.length} 个子元素`);
             componentElement.layout.children.forEach(child => {
                 if (!child.events) {
                     child.events = [];
