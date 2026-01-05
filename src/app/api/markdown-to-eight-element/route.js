@@ -3,13 +3,38 @@ import { markdownToEightElement } from '@/app/utils/eightElement/index';
 import { renderEightElementToHtml } from '@/app/utils/eightElement/renderEightElementHtml';
 import { calculateTokens } from '@/app/utils/seeds/generateTokenBySeed';
 import { setDynamicTokenSystem, clearDynamicTokenSystem } from '@/app/utils/tokens/resolveToken';
-import { logElementStyleErrors } from '@/app/utils/logging/elementStyleLogger';
+import { logAPIRequest } from '@/app/utils/logging/apiLogger';
+// import { logElementStyleErrors } from '@/app/utils/logging/elementStyleLogger';
+
+// 配置请求体大小限制
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '20mb',
+    },
+  },
+};
 
 export async function POST(request) {
+  const startTime = Date.now();
+  let requestData = null;
+  let responseData = null;
+  let statusCode = 200;
+  let error = null;
+  
   try {
-    console.log('收到Markdown转八要素请求');
+    // 记录请求来源（用于诊断 CSRF 问题）
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
+    const userAgent = request.headers.get('user-agent');
     
-    const requestData = await request.json();
+    console.log('收到请求', {
+      origin: origin || 'none',
+      referer: referer || 'none',
+      userAgent: userAgent ? userAgent.substring(0, 50) : 'none'
+    });
+    
+    requestData = await request.json();
     if (!requestData || !requestData.markdown) {
       return NextResponse.json({ 
         success: false, 
@@ -44,22 +69,24 @@ export async function POST(request) {
       const { processedEightElement } = renderEightElementToHtml(eightElement, { width, height });
       
       // 异步记录按钮样式错误，不阻塞接口返回
-      setImmediate(async () => {
-        try {
-          await logElementStyleErrors(markdown, seed, eightElement, { width, height });
-        } catch (error) {
-          console.warn('异步记录元素样式错误失败:', error);
-        }
-      });
+      // setImmediate(async () => {
+      //   try {
+      //     await logElementStyleErrors(markdown, seed, eightElement, { width, height });
+      //   } catch (error) {
+      //     console.warn('异步记录元素样式错误失败:', error);
+      //   }
+      // });
                 
       // 返回八要素结构
-      return NextResponse.json({
+      responseData = {
         success: true,
         eightElement: processedEightElement,
         // originalEightElement: eightElement,
         designTokens: designTokens,
         tokensApplied: !!designTokens
-      }, { status: 200 });
+      };
+      
+      return NextResponse.json(responseData, { status: 200 });
     } finally {
       // 确保清除动态token系统
       if (designTokens) {
@@ -71,12 +98,32 @@ export async function POST(request) {
         }
       }
     }
-  } catch (error) {
-    console.error('Markdown转八要素失败:', error);
-    return NextResponse.json({ 
+  } catch (err) {
+    error = err;
+    statusCode = 500;
+    console.error('Markdown转八要素失败:', err);
+    
+    responseData = { 
       success: false, 
       error: 'Markdown转八要素失败', 
-      message: error.message 
-    }, { status: 500 });
+      message: err.message 
+    };
+    
+    return NextResponse.json(responseData, { status: 500 });
+  } finally {
+    // 记录请求日志到文件
+    const duration = Date.now() - startTime;
+    logAPIRequest({
+      method: 'POST',
+      path: '/api/markdown-to-eight-element',
+      origin: request.headers.get('origin'),
+      referer: request.headers.get('referer'),
+      userAgent: request.headers.get('user-agent'),
+      body: requestData,
+      status: statusCode,
+      duration,
+      response: responseData,
+      error: error ? { message: error.message, stack: error.stack } : null
+    });
   }
 } 

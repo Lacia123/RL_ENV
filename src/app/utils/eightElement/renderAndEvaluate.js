@@ -117,14 +117,19 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
   // 如果需要截图
   let screenshotPath = null;
   let base64Image = null;
+  
+  // ✅ 声明在外部，确保 finally 可以访问
+  let browser = null;
+  let page = null;
 
-  // 尝试使用安全选项启动浏览器
-  const browser = await chromium.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-  });
+  try {
+    // 尝试使用安全选项启动浏览器
+    browser = await chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
 
-  const page = await browser.newPage();
+    page = await browser.newPage();
 
   page.on('console', (message) => {
     console.log(`PAGE LOG: ${message.text()}`);
@@ -452,18 +457,37 @@ async function measureWithPlaywright(htmlContent, processedEightElement, options
 
   }
 
-  await browser.close();
+    // 提取card测量数据到顶层
+    const cardMeasurements = measurements && measurements.cards ? measurements.cards : [];
 
-  // 提取card测量数据到顶层
-  const cardMeasurements = measurements && measurements.cards ? measurements.cards : [];
-
-  return { 
-    measurements, 
-    screenshotPath, 
-    aims, 
-    base64Image,
-    cardMeasurements  // 新增：将card测量数据提取到顶层
-  };
+    return { 
+      measurements, 
+      screenshotPath, 
+      aims, 
+      base64Image,
+      cardMeasurements  // 新增：将card测量数据提取到顶层
+    };
+    
+  } finally {
+    // ✅ 无论成功或失败，都确保清理资源
+    try {
+      if (page) {
+        await page.close();
+        console.log('✓ Playwright page 已关闭');
+      }
+    } catch (err) {
+      console.error('关闭 Playwright page 失败:', err.message);
+    }
+    
+    try {
+      if (browser) {
+        await browser.close();
+        console.log('✓ Playwright browser 已关闭');
+      }
+    } catch (err) {
+      console.error('关闭 Playwright browser 失败:', err.message);
+    }
+  }
 }
 
 function resolveMetrics(aims) {

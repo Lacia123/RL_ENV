@@ -3,12 +3,35 @@ import { markdownToEightElement } from '@/app/utils/eightElement/index';
 import { renderAndEvaluateEightElement } from '@/app/utils/eightElement/renderAndEvaluate';
 import { calculateTokens } from '@/app/utils/seeds/generateTokenBySeed';
 import { setDynamicTokenSystem, clearDynamicTokenSystem } from '@/app/utils/tokens/resolveToken';
+import { logAPIRequest } from '@/app/utils/logging/apiLogger';
+
+// 配置请求体大小限制
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '20mb',
+    },
+  },
+};
 
 export async function POST(request) {
+  const startTime = Date.now();
+  let requestData = null;
+  let responseData = null;
+  let statusCode = 200;
+  let error = null;
+  
   try {
-    console.log('收到Markdown评分请求');
+    // 记录请求来源（用于诊断 CSRF 问题）
+    const origin = request.headers.get('origin');
+    const referer = request.headers.get('referer');
     
-    const requestData = await request.json();
+    console.log('收到评分请求', {
+      origin: origin || 'none',
+      referer: referer || 'none'
+    });
+    
+    requestData = await request.json();
     if (!requestData || !requestData.markdown) {
       return NextResponse.json({ 
         success: false, 
@@ -56,19 +79,19 @@ export async function POST(request) {
     const hasCards = cardMeasurements.length > 0;
     
     // 返回评分结果
-    return NextResponse.json({
+    responseData = {
       success: true,
       score: result.score,
       aims: result.aims,
-      base64Image: result.base64Image,
+      base64Image: result.base64Image ? '[base64 image data]' : null, // 不记录图片数据
       // 🆕 在非aims评分时返回card的渲染尺寸
       cards: !useAims && hasCards ? {
         count: cardMeasurements.length,
         measurements: cardMeasurements.map(card => ({
           id: card.id,
           variant: card.variant,
-          width: Math.round(card.width * 100) / 100, // 保留2位小数
-          height: Math.round(card.height * 100) / 100, // 保留2位小数
+          width: Math.round(card.width * 100) / 100,
+          height: Math.round(card.height * 100) / 100,
           x: Math.round(card.x * 100) / 100,
           y: Math.round(card.y * 100) / 100,
           style: {
@@ -80,13 +103,18 @@ export async function POST(request) {
           content: card.content
         }))
       } : undefined,
-      // 确保scoreDetails与result.score.categories保持一致
-      // scoreDetails: result.score.categories,
-      // 如果使用了自定义设计令牌，返回相关信息
       designTokens: designTokens,
       tokensApplied: !!designTokens
-    }, { status: 200 });
-  } catch (error) {
+    };
+    
+    // 实际返回时包含完整的 base64Image
+    const fullResponse = { ...responseData, base64Image: result.base64Image };
+    return NextResponse.json(fullResponse, { status: 200 });
+    
+  } catch (err) {
+    error = err;
+    statusCode = 500;
+    
     // 确保无论如何都清除动态token系统
     try {
       clearDynamicTokenSystem();
@@ -94,11 +122,29 @@ export async function POST(request) {
       // 忽略清除错误
     }
     
-    console.error('Markdown评分失败:', error);
-    return NextResponse.json({ 
+    console.error('Markdown评分失败:', err);
+    
+    responseData = { 
       success: false, 
       error: 'Markdown评分失败', 
-      message: error.message 
-    }, { status: 500 });
+      message: err.message 
+    };
+    
+    return NextResponse.json(responseData, { status: 500 });
+  } finally {
+    // 记录请求日志到文件
+    const duration = Date.now() - startTime;
+    logAPIRequest({
+      method: 'POST',
+      path: '/api/markdown-evaluate',
+      origin: request.headers.get('origin'),
+      referer: request.headers.get('referer'),
+      userAgent: request.headers.get('user-agent'),
+      body: requestData,
+      status: statusCode,
+      duration,
+      response: responseData, // 不包含 base64Image
+      error: error ? { message: error.message, stack: error.stack } : null
+    });
   }
 } 
