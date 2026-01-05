@@ -5,14 +5,7 @@ import { calculateTokens } from '@/app/utils/seeds/generateTokenBySeed';
 import { setDynamicTokenSystem, clearDynamicTokenSystem } from '@/app/utils/tokens/resolveToken';
 import { logAPIRequest } from '@/app/utils/logging/apiLogger';
 
-// 配置请求体大小限制
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '20mb',
-    },
-  },
-};
+// ✅ Next.js 16: bodyParser 配置已移至 next.config.js 的 serverActions.bodySizeLimit
 
 export async function POST(request) {
   const startTime = Date.now();

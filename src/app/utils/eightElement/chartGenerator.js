@@ -4,11 +4,16 @@
  * 用于生成D3可视化图表的工具函数
  * 支持从表格数据生成各种类型的图表
  * 使用jsdom创建服务器端虚拟DOM环境来利用d3的全部功能
+ * 
+ * ⚠️  此模块仅在服务端使用（需要 jsdom）
  */
 
 import * as d3 from 'd3';
 import { COLOR_CONSTANTS, DEFAULT_STYLE_CONFIG,  } from './styleConfig.js';
 import resolveToken from '../tokens/resolveToken.js';
+
+// ✅ 浏览器环境检测 - 防止在客户端构建时失败
+const isBrowser = typeof window !== 'undefined';
 
 const legendConfig = {
   fontSize: "14px",
@@ -63,9 +68,11 @@ function tryLoadJsdom() {
     return cachedJsdomClass;
   }
 
-  if (typeof require === 'function') {
+  // ✅ 只在服务端环境尝试加载 jsdom
+  if (typeof require === 'function' && !isBrowser) {
     try {
-      const jsdomModule = require('jsdom');
+      // 使用动态 require 避免 Turbopack 构建时错误
+      const jsdomModule = eval('require')('jsdom');
       cachedJsdomClass = jsdomModule?.JSDOM || jsdomModule?.default?.JSDOM || jsdomModule?.default || null;
       return cachedJsdomClass;
     } catch (error) {

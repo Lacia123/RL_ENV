@@ -57,6 +57,33 @@ process.on('uncaughtException', (error, origin) => {
   });
 });
 
+// ✅ 监控内存使用，防止泄漏
+let memoryCheckCount = 0;
+setInterval(() => {
+  const usage = process.memoryUsage();
+  const heapUsedMB = Math.round(usage.heapUsed / 1024 / 1024);
+  const heapTotalMB = Math.round(usage.heapTotal / 1024 / 1024);
+  
+  memoryCheckCount++;
+  
+  // 每10次检查（约5分钟）输出一次
+  if (memoryCheckCount % 10 === 0) {
+    console.log(`📊 内存使用: ${heapUsedMB}MB / ${heapTotalMB}MB`);
+  }
+  
+  // 内存使用超过 1.5GB 时警告
+  if (heapUsedMB > 1536) {
+    console.warn(`⚠️  内存使用过高: ${heapUsedMB}MB`);
+    console.warn('💡 建议检查是否有资源泄漏（Playwright browser/page）');
+  }
+  
+  // 内存使用超过 4GB 时强制 GC（如果可用）
+  if (heapUsedMB > 4096 && global.gc) {
+    console.warn(`🗑️  触发垃圾回收 (${heapUsedMB}MB)`);
+    global.gc();
+  }
+}, 30000); // 每30秒检查一次
+
 // 启动Next.js服务器
 app.prepare().then(() => {
   const server = createServer((req, res) => {
