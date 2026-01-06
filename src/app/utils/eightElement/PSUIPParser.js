@@ -4,11 +4,11 @@ import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance } from './util.js';
 import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './creators/tableCreators.js';
 import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './creators/codeCreators.js';
-import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot } from './creators/layoutCreators.js';
+import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot, createFlexWrapLayout } from './creators/layoutCreators.js';
 
 import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch, processTemplatePathWithWildcard } from './creators/cardCreators.js';
 import { isComponentTag, extractComponentBlock, createComponentElement } from './creators/componentCreators.js';
-import { isListItem, processListItemAndRichText, createTextElement, createHyperlinkElement } from './creators/textCreators.js';
+import { isListItem, processListItemAndRichText, createTextElement, createHyperlinkElement, createHeadingBlockContainer } from './creators/textCreators.js';
 
 import { parseButtonVariant, createButtonElement, createVerticalButtonLayout } from './creators/buttonCreators.js';
 import { createBackgroundElement } from './creators/backgroundCreators.js';
