@@ -494,7 +494,7 @@ export const DEFAULT_STYLE_CONFIG = {
         gridTemplateAreas: 'none',
         justifyItems: 'stretch'
       },
-      supportedAttributes: ['flex', 'gap']
+      supportedAttributes: ['flex', 'gap', 'flexDirection', 'justifyContent', 'alignItems']
     },
     // row 布局元素
     row: {
@@ -7402,6 +7402,7 @@ export const DEFAULT_STYLE_CONFIG = {
         name: 'default',
         condition: 'default',
         style: {
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
           padding: '{dimension.padding.superloose}',
