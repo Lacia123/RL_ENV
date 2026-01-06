@@ -7369,6 +7369,7 @@ export const DEFAULT_STYLE_CONFIG = {
           variantStyle: {
             lineHeight: '1',
             fontSize: '{font.size.xxxl}',
+            marginBottom: '{dimension.margin.base}',
             color: '{color.basic.opacity.white.100}',
           }
         },
@@ -7432,6 +7433,7 @@ export const DEFAULT_STYLE_CONFIG = {
           variantStyle: {
             lineHeight: '1',
             fontSize: '{font.size.xxl}',
+            marginBottom: '{dimension.margin.base}',
             color: '{color.basic.opacity.black.100}',
           }
         },
@@ -7528,6 +7530,112 @@ export const DEFAULT_STYLE_CONFIG = {
             lineHeight: '1',
             fontSize: '{font.size.xl}',
             color: '{color.basic.opacity.white.100}',
+            marginBottom: '{dimension.margin.base}',
+          }
+        },
+        name: {
+          metaType: 'text',
+          variantStyle: {
+            lineHeight: '1',
+            fontSize: '{font.size.xxxl}',
+            color: '{color.basic.opacity.white.100}',
+            marginBottom: '{dimension.margin.loose}',
+          }
+        },
+        badge: {
+          metaType: 'text',
+          variantStyle: {
+            fontSize: '{font.size.medium}',
+            color: '{color.basic.opacity.white.100}',
+            padding: '{dimension.padding.base} {dimension.padding.extraloose}',
+            background: '{color.basic.opacity.white.12}',
+            borderColor: '{color.basic.opacity.white.12}',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            cursor: 'pointer',
+            borderRadius: '{dimension.borderradius.full}',
+          }
+        },
+        desc: {
+          metaType: 'text',
+          variantStyle: {
+            color: '{color.basic.opacity.white.48}',
+            fontSize: '{font.size.medium}',
+          }
+        },
+        avatar: {
+          metaType: 'image',
+          variant: 'avatar',
+          variantStyle: {
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',  // 填充整个圆形区域
+            display: 'block',
+          }
+        },
+      }
+    },
+    hiringDarkNewAvatarCard: {
+      type: 'template',
+      hasUpdateEvent: true,
+      layoutModes: [{
+        name: 'default',
+        condition: 'default',
+        style: {
+          display: 'flex',
+          flex: '1',
+          borderRadius: '{dimension.borderradius.xxxxl}',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          padding: '{dimension.padding.superloose}',
+          background: 'linear-gradient(135deg, #0064B8 0%, #53299E 50%, #2E2881 100%);'
+        },
+        structure: {
+          groups: [{
+            name: 'rowBlock',
+            type: 'template',
+            style: {
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+            },
+            groups: [{
+              name: 'messageBlock',
+              type: 'template',
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                gap: '{dimension.gap.base}',
+              },
+              slots: ['title', 'name', 'badge', 'desc']
+            }, {
+              name: 'avatarBlock',
+              type: 'template',
+              style: {
+                width: '64px',
+                height: '64px',
+                borderRadius: '{dimension.borderradius.full}',
+                overflow: 'hidden',
+                flexShrink: '0',  // 防止被 flex 压缩
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+              slots: ['avatar']
+            }]
+          }]
+        }
+      }],
+      slotConfigs: {
+        title: {
+          metaType: 'text',
+          variantStyle: {
+            lineHeight: '1',
+            fontSize: '{font.size.xl}',
+            color: '{color.basic.opacity.white.100}',
+            marginBottom: '{dimension.margin.base}',
           }
         },
         name: {

@@ -2322,13 +2322,13 @@ style: {
         <desc>他在算法优化与模型调参方面有出色表现，多次在业务指标上实现显著提升具备从0到1构建算法系统的经验，对模型评估与实验设计有敏锐洞察力。</desc>
         <avatar src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200"></avatar>
       </hiringNewAvatarCard>
-      <hiringNewAvatarCard>
+      <hiringDarkNewAvatarCard>
         <title>算法策略</title>
         <name>张逸杰</name>
         <badge>推荐原因</badge>
         <desc>他在算法优化与模型调参方面有出色表现，多次在业务指标上实现显著提升具备从0到1构建算法系统的经验，对模型评估与实验设计有敏锐洞察力。</desc>
         <avatar src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200"></avatar>
-      </hiringNewAvatarCard>
+      </hiringDarkNewAvatarCard>
     </layout:row>
   </layout:column>
   <layout:column flex="1">
