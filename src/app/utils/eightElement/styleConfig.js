@@ -7636,7 +7636,7 @@ export const DEFAULT_STYLE_CONFIG = {
             lineHeight: '1em',
             fontSize: '{font.size.xxxl}',
             color: '{color.basic.opacity.white.100}',
-            marginBottom: '{dimension.margin.loose}',
+            marginBottom: '{dimension.margin.base}',
           }
         },
         badge: {
