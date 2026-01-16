@@ -4,14 +4,6 @@
  * 提供了对不同元素类型样式的完整配置
  */
 
-import { text } from 'd3';
-import { fontSize, overallReduction } from '../icons/Edit/index.js';
-import resolveToken from '../tokens/resolveToken.js';
-import border from '../tokens/color/border.js';
-import margin from '../tokens/dimension/margin.js';
-import lineheight from '../tokens/font/lineheight.js';
-import borderradius from '../tokens/dimension/borderradius.js';
-
 // CSS变量系统
 export const CSS_VARIABLE_SYSTEM = {
   // 字体系统
@@ -7367,7 +7359,7 @@ export const DEFAULT_STYLE_CONFIG = {
         title: {
           metaType: 'text',
           variantStyle: {
-            lineHeight: '1',
+            lineHeight: '1em',
             fontSize: '{font.size.xxxl}',
             marginBottom: '{dimension.margin.base}',
             color: '{color.basic.opacity.white.100}',
@@ -7431,7 +7423,7 @@ export const DEFAULT_STYLE_CONFIG = {
         title: {
           metaType: 'text',
           variantStyle: {
-            lineHeight: '1',
+            lineHeight: '1em',
             fontSize: '{font.size.xxl}',
             marginBottom: '{dimension.margin.base}',
             color: '{color.basic.opacity.black.100}',
@@ -7440,7 +7432,7 @@ export const DEFAULT_STYLE_CONFIG = {
         name: {
           metaType: 'text',
           variantStyle: {
-            lineHeight: '1',
+            lineHeight: '1em',
             fontSize: '{font.size.xxxl}',
             color: '{color.basic.opacity.black.100}',
             marginBottom: '{dimension.margin.loose}',
@@ -7527,7 +7519,7 @@ export const DEFAULT_STYLE_CONFIG = {
         title: {
           metaType: 'text',
           variantStyle: {
-            lineHeight: '1',
+            lineHeight: '1em',
             fontSize: '{font.size.xl}',
             color: '{color.basic.opacity.white.100}',
             marginBottom: '{dimension.margin.base}',
@@ -7536,7 +7528,7 @@ export const DEFAULT_STYLE_CONFIG = {
         name: {
           metaType: 'text',
           variantStyle: {
-            lineHeight: '1',
+            lineHeight: '1em',
             fontSize: '{font.size.xxxl}',
             color: '{color.basic.opacity.white.100}',
             marginBottom: '{dimension.margin.loose}',
@@ -7632,7 +7624,7 @@ export const DEFAULT_STYLE_CONFIG = {
         title: {
           metaType: 'text',
           variantStyle: {
-            lineHeight: '1',
+            lineHeight: '1em',
             fontSize: '{font.size.xl}',
             color: '{color.basic.opacity.white.100}',
             marginBottom: '{dimension.margin.base}',
@@ -7641,7 +7633,7 @@ export const DEFAULT_STYLE_CONFIG = {
         name: {
           metaType: 'text',
           variantStyle: {
-            lineHeight: '1',
+            lineHeight: '1em',
             fontSize: '{font.size.xxxl}',
             color: '{color.basic.opacity.white.100}',
             marginBottom: '{dimension.margin.loose}',
