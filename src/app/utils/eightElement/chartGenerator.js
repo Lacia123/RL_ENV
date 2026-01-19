@@ -9,7 +9,7 @@
  */
 
 import * as d3 from 'd3';
-import { COLOR_CONSTANTS, DEFAULT_STYLE_CONFIG,  } from './styleConfig.js';
+import { COLOR_CONSTANTS } from './styles';
 import resolveToken from '../tokens/resolveToken.js';
 
 // ✅ 浏览器环境检测 - 防止在客户端构建时失败

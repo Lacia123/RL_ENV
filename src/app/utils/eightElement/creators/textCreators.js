@@ -5,7 +5,7 @@ import {
     LAYOUT_CONSTANTS,
     DIMENSION_CONSTANTS,
     FONT_CONSTANTS,
-} from '../styleConfig.js';
+} from '../styles';
 
 import { processText } from '../PSUIPParser.js';
 import resolveToken from '../../tokens/resolveToken.js'

@@ -1,7 +1,7 @@
 import {
     LAYOUT_CONSTANTS,
     getElementStyleConfig
-} from '../styleConfig.js';
+} from '../styles';
 import { generateUUID } from '../util.js';
 import { createTextElement } from './textCreators.js';
 import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';

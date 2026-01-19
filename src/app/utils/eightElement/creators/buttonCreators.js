@@ -5,7 +5,7 @@ import {
     DIMENSION_CONSTANTS,
     COLOR_CONSTANTS,
     FONT_CONSTANTS,
-} from '../styleConfig.js';
+} from '../styles';
 import { createLayoutElement } from './layoutCreators.js';
 import { parseEventSyntax, removeEventSyntax } from '../PSUIPParser.js';
 

@@ -8,12 +8,11 @@ import { createVideoElement } from './videoCreators.js';
 import { createAudioElement } from './audioCreators.js';
 import { createTextElement } from './textCreators.js';
 import { createElementContainer, createBaseLayout, createLayoutElement, isLayoutTag, extractLayoutBlock } from './layoutCreators.js';
-import { LAYOUT_CONSTANTS } from '../styleConfig.js';
+import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, getElementStyleConfig } from '../styles';
+
 import { EVENT_NAME, EVENT_CONFIG } from '../eventConfig.js';
 import { createNativeEventConfig } from '../eventUtils.js';
 import resolveToken from '../../tokens/resolveToken.js';
-import { getElementStyleConfig } from '../styleConfig.js';
-import { DEFAULT_STYLE_CONFIG } from '../styleConfig.js';
 
 // 🆕 导入组件相关的函数
 import {

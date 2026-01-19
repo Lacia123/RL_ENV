@@ -2,7 +2,7 @@ import { parseMarkdown, parseEventSyntax } from '../PSUIPParser.js';
 import { generateUUID } from '../util.js';
 import { createLayoutElement } from './layoutCreators.js';
 import { createTextElement } from './textCreators.js';
-import { getElementStyleConfig, LAYOUT_CONSTANTS } from '../styleConfig.js';
+import { getElementStyleConfig, LAYOUT_CONSTANTS } from '../styles';
 import { EVENT_NAME } from '../eventConfig.js';
 
 // 检测是否为选项卡标签

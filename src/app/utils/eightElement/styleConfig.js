@@ -6,116 +6,6 @@
 
 // CSS变量系统
 export const CSS_VARIABLE_SYSTEM = {
-  // 字体系统
-  FONT: {
-    SIZE_TINY: 'var(--font-size-tiny, 12px)',
-    SIZE_SMALL: 'var(--font-size-small, 14px)',
-    SIZE_MEDIUM: 'var(--font-size-medium, 16px)',
-    SIZE_LARGE: 'var(--font-size-large, 20px)',
-    SIZE_XL: 'var(--font-size-xl, 26px)',
-    SIZE_XXL: 'var(--font-size-xxl, 36px)',
-    SIZE_XXXL: 'var(--font-size-xxxl, 52px)',
-    WEIGHT_LIGHT: 'var(--font-fontweight-light, 100)',
-    WEIGHT_MEDIUM: 'var(--font-fontweight-medium, 200)',
-    WEIGHT_SEMIBOLD: 'var(--font-fontweight-semibold, 400)',
-    WEIGHT_BOLD: 'var(--font-fontweight-bold, 600)',
-    LINE_HEIGHT_BASE: 'var(--font-lineheight-base, 1.4)',
-    LETTER_SPACING_BASE: 'var(--font-letterspacing-base, 0)'
-  },
-
-  // 尺寸系统
-  DIMENSION: {
-    PADDING_NONE: 'var(--dimension-padding-none, 0)',
-    PADDING_SUPERTIGHT: 'var(--dimension-padding-supertight, 2px)',
-    PADDING_EXTRATIGHT: 'var(--dimension-padding-extratight, 4px)',
-    PADDING_TIGHT: 'var(--dimension-padding-tight, 6px)',
-    PADDING_SEMITIGHT: 'var(--dimension-padding-semitight, 8px)',
-    PADDING_BASE: 'var(--dimension-padding-base, 12px)',
-    PADDING_SEMILOOSE: 'var(--dimension-padding-semiloose, 16px)',
-    PADDING_LOOSE: 'var(--dimension-padding-loose, 20px)',
-    PADDING_EXTRALOOSE: 'var(--dimension-padding-extraloose, 24px)',
-    PADDING_SUPERLOOSE: 'var(--dimension-padding-superloose, 32px)',
-    MARGIN_NONE: 'var(--dimension-margin-none, 0)',
-    MARGIN_TIGHT: 'var(--dimension-margin-tight, 6px)',
-    MARGIN_BASE: 'var(--dimension-margin-base, 12px)',
-    MARGIN_LOOSE: 'var(--dimension-margin-loose, 20px)',
-    MARGIN_EXTRALOOSE: 'var(--dimension-margin-extraloose, 24px)',
-    MARGIN_SUPERLOOSE: 'var(--dimension-margin-superloose, 32px)',
-    GAP_TIGHT: 'var(--dimension-gap-tight, 6px)',
-    GAP_BASE: 'var(--dimension-gap-base, 12px)',
-    GAP_LOOSE: 'var(--dimension-gap-loose, 20px)',
-    BORDER_RADIUS_NONE: 'var(--dimension-borderradius-none, 0)',
-    BORDER_RADIUS_XS: 'var(--dimension-borderradius-xs, 4px)',
-    BORDER_RADIUS_SMALL: 'var(--dimension-borderradius-small, 8px)',
-    BORDER_RADIUS_MEDIUM: 'var(--dimension-borderradius-medium, 12px)',
-    BORDER_RADIUS_LARGE: 'var(--dimension-borderradius-large, 16px)',
-    BORDER_RADIUS_XL: 'var(--dimension-borderradius-xl, 20px)',
-    BORDER_RADIUS_XXL: 'var(--dimension-borderradius-xxl, 24px)'
-  },
-
-  // 颜色系统 - 支持主题切换
-  COLOR: {
-    SURFACE_CONTAINER_WHITE100: 'var(--color-surface-container-white100, #ffffff)',
-    ON_SURFACE_BLACK88: 'var(--color-on-surface-black88, rgba(0, 0, 0, 0.88))',
-    ON_SURFACE_BLACK76: 'var(--color-on-surface-black76, rgba(0, 0, 0, 0.76))',
-    ON_SURFACE_BLACK64: 'var(--color-on-surface-black64, rgba(0, 0, 0, 0.64))',
-    ON_SURFACE_BLACK48: 'var(--color-on-surface-black48, rgba(0, 0, 0, 0.48))',
-    SURFACE_GREY0: 'var(--color-surface-grey0, #ffffff)',
-    SURFACE_GREY1: 'var(--color-surface-grey1, #f9fafb)',
-    SURFACE_GREY2: 'var(--color-surface-grey2, #f3f4f6)',
-    SURFACE_CONTAINER_BLACK4: 'var(--color-surface-container-black4, rgba(0, 0, 0, 0.04))',
-    SURFACE_CONTAINER_BLACK7: 'var(--color-surface-container-black7, rgba(0, 0, 0, 0.07))',
-    SURFACE_CONTAINER_BLACK12: 'var(--color-surface-container-black12, rgba(0, 0, 0, 0.12))',
-    SURFACE_CONTAINER_BLACK16: 'var(--color-surface-container-black16, rgba(0, 0, 0, 0.16))',
-    SURFACE_CONTAINER_BLACK20: 'var(--color-surface-container-black20, rgba(0, 0, 0, 0.20))',
-    PRIMARY_BRAND4: 'var(--color-primary-brand4, #2563eb)',
-    PRIMARY_BRAND5: 'var(--color-primary-brand5, #1d4ed8)',
-    PRIMARY_BRAND6: 'var(--color-primary-brand6, #1e40af)',
-    PRIMARY_CONTAINER_BRAND1: 'var(--color-primary-container-brand1, #dbeafe)',
-    PRIMARY_CONTAINER_BRAND2: 'var(--color-primary-container-brand2, #bfdbfe)',
-    SECONDARY_VIOLET4: 'var(--color-secondary-violet4, #9333ea)',
-    SECONDARY_VIOLET5: 'var(--color-secondary-violet5, #7c3aed)',
-    SECONDARY_VIOLET6: 'var(--color-secondary-violet6, #6d28d9)',
-    SECONDARY_CONTAINER_VIOLET1: 'var(--color-secondary-container-violet1, #f3e8ff)',
-    SECONDARY_CONTAINER_VIOLET2: 'var(--color-secondary-container-violet2, #e9d5ff)',
-    ON_SECONDARY_CONTAINER_VIOLET8: 'var(--color-on-secondary-container-violet8, #6b21a8)',
-    SUCCESS_GREEN1: 'var(--color-success-green1, #dcfce7)',
-    SUCCESS_GREEN3: 'var(--color-success-green3, #86efac)',
-    SUCCESS_GREEN5: 'var(--color-success-green5, #22c55e)',
-    SUCCESS_GREEN6: 'var(--color-success-green6, #16a34a)',
-    SUCCESS_GREEN8: 'var(--color-success-green8, #166534)',
-    WARNING_ORANGE1: 'var(--color-warning-orange1, #fef3c7)',
-    WARNING_ORANGE3: 'var(--color-warning-orange3, #fcd34d)',
-    WARNING_ORANGE5: 'var(--color-warning-orange5, #f59e0b)',
-    WARNING_ORANGE6: 'var(--color-warning-orange6, #d97706)',
-    WARNING_ORANGE7: 'var(--color-warning-orange7, #b45309)',
-    WARNING_ORANGE8: 'var(--color-warning-orange8, #92400e)',
-    ON_PRIMARY_WHITE100: 'var(--color-on-primary-white100, rgba(255, 255, 255, 1))',
-    ON_PRIMARY_CONTAINER_BRAND8: 'var(--color-on-primary-container-brand8, #1e40af)',
-    ON_SURFACE_CONTAINER_GREY7: 'var(--color-on-surface-container-grey7, #374151)',
-    ON_SURFACE_CONTAINER_GREY9: 'var(--color-on-surface-container-grey9, #111827)',
-    ON_SURFACE_WHITE88: 'var(--color-on-surface-white88, rgba(255, 255, 255, 0.88))'
-  },
-
-  // 阴影系统
-  SHADOW: {
-    HIERARCHY_B1: 'var(--material-hierarchy-B1, inset 0 1px 8px 0 rgba(31, 31, 42, 0.11))',
-    HIERARCHY_MAIN: 'var(--material-hierarchy-main, 0 1px 8px 0 rgba(31, 31, 42, 0.15))',
-    HIERARCHY_1F: 'var(--material-hierarchy-1f, 0 4px 12px 0 rgba(31, 31, 42, 0.16))',
-    HIERARCHY_2F: 'var(--material-hierarchy-2f, 0 6px 16px 0 rgba(31, 31, 42, 0.17))',
-    HIERARCHY_3F: 'var(--material-hierarchy-3f, 0 8px 20px 0 rgba(31, 31, 42, 0.18))',
-    HIERARCHY_4F: 'var(--material-hierarchy-4f, 0 12px 24px 0 rgba(31, 31, 42, 0.19))'
-  },
-
-  // 渐变系统
-  GRADIENT: {
-    PRIMARY: 'var(--gradient-primary, linear-gradient(135deg, #2563eb 0%, #1e40af 100%))',
-    SECONDARY: 'var(--gradient-secondary, linear-gradient(135deg, #9333ea 0%, #6d28d9 100%))',
-    SUCCESS: 'var(--gradient-success, linear-gradient(135deg, #86efac 0%, #22c55e 100%))',
-    WARNING: 'var(--gradient-warning, linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%))',
-    TEXT_HERO: 'var(--gradient-text-hero, linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%))'
-  },
-
   // 动画系统
   ANIMATION: {
     SMOOTH: 'var(--animation-smooth, all 0.3s cubic-bezier(0.4, 0, 0.2, 1))',
@@ -1541,14 +1431,14 @@ export const DEFAULT_STYLE_CONFIG = {
       '& > :first-child': {
         fontSize: "{font.size.medium}",
         lineHeight: "1.6",
-        color: CSS_VARIABLE_SYSTEM.COLOR.ON_SURFACE_BLACK76,
+        color: '{color.onsurface.black76}',
         marginBottom: "{dimension.margin.tight}",
         display: 'flex',
         alignItems: 'flex-start',
         gap: "{dimension.gap.tight}",
         '& input[type="checkbox"]': {
           marginTop: '4px',
-          accentColor: CSS_VARIABLE_SYSTEM.COLOR.PRIMARY_BRAND5
+          accentColor: '{color.primary.brand5}'
         }
       }
     }

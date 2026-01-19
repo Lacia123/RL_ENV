@@ -4,7 +4,7 @@ import { renderEightElementToHtml } from '../utils/eightElement/renderEightEleme
 import { convertEightElementToLayout } from '../utils/layoutAnalysis/eightElementAnalysis';
 import { markdownToEightElement, applyLayoutControlsToEightElement, analyzeElementsInEightElement, applyActionsToEightElement } from '../utils/eightElement/index';
 import { RL_ACTIONS, createActionSystemManager } from '../utils/seeds/rl_action_engines';
-import { DEFAULT_STYLE_CONFIG } from '../utils/eightElement/styleConfig';
+import { DEFAULT_STYLE_CONFIG } from '../utils/eightElement/styles';
 
 import VisualSpaceEvaluator from '../components/VisualSpaceEvaluator';
 import collectEightElementMeasurements from '../utils/eightElement/collectElementMeasurements.js';

@@ -1,5 +1,4 @@
 import { generateUUID } from '../util.js';
-import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 
 /**
  * 检测是否为 video 标签

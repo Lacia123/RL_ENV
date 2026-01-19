@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { markdownToEightElement, analyzeElementsInEightElement, applyActionsToEightElement, applyLayoutControlsToEightElement } from '@/app/utils/eightElement/index';
 import { renderEightElementToHtml } from '@/app/utils/eightElement/renderEightElementHtml';
 import { createActionSystemManager } from '@/app/utils/seeds/rl_action_engines';
-import { DEFAULT_STYLE_CONFIG } from '@/app/utils/eightElement/styleConfig';
+import { DEFAULT_STYLE_CONFIG } from '@/app/utils/eightElement/styles';
 import { logElementStyleErrors } from '@/app/utils/logging/elementStyleLogger';
 
 export async function POST(request) {

@@ -2,7 +2,7 @@ import { generateUUID, escapeHtml, getMarkedInstance } from '../util.js';
 import {
     getElementStyleConfig,
     FONT_CONSTANTS,
-} from '../styleConfig.js';
+} from '../styles';
 import resolveToken, { isColorDark } from '../../tokens/resolveToken.js';
 
 

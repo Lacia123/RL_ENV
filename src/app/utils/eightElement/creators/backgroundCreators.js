@@ -4,7 +4,7 @@ import {
     LAYOUT_CONSTANTS,
     DIMENSION_CONSTANTS,
     COLOR_CONSTANTS,
-  } from '../styleConfig.js';
+  } from '../styles';
 import { EVENT_NAME } from '../eventConfig.js';
 
 // 创建背景元素（用于图片）

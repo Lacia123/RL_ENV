@@ -1,13 +1,13 @@
 import { generateUUID } from '../util.js';
 import {
     getElementStyleConfig,
-} from '../styleConfig.js';
+    LAYOUT_CONSTANTS
+} from '../styles';
 import { generateChartFromTableData } from '../chartGenerator.js';
 import { extractWildcardMatch } from './cardCreators.js';
 import { parseEventSyntax } from '../PSUIPParser.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createLayoutElement } from './layoutCreators.js';
-import { LAYOUT_CONSTANTS } from '../styleConfig.js';
 import { EVENT_NAME } from '../eventConfig.js';
 import { parseHeaderBackgroundSyntax, parseTableHeaderStyles, removeInlineStyles } from '../styleParser.js';
 

@@ -1,5 +1,5 @@
 import { EVENT_NAME, EVENT_CONFIG, NATIVE_EVENT_KEY } from './eventConfig.js';
-import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig } from './styleConfig.js';
+import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig } from './styles';
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance } from './util.js';
 import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './creators/tableCreators.js';

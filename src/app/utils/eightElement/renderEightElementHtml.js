@@ -10,7 +10,7 @@ import { Marked, marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
 import markedKatex from 'marked-katex-extension';
-import { DEFAULT_STYLE_CONFIG } from './styleConfig.js';
+import { DEFAULT_STYLE_CONFIG } from './styles';
 
 /**
  * Configure marked globally with KaTeX and Highlight.js

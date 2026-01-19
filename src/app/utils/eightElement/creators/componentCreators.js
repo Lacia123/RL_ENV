@@ -4,7 +4,7 @@
  */
 
 import { generateUUID } from '../util.js';
-import { DEFAULT_STYLE_CONFIG, LAYOUT_CONSTANTS } from '../styleConfig.js';
+import { DEFAULT_STYLE_CONFIG } from '../styles';
 import { EVENT_NAME, EVENT_CONFIG, NATIVE_EVENT_KEY } from '../eventConfig.js';
 import { createNativeEventConfig } from '../eventUtils.js';
 import resolveToken from '../../tokens/resolveToken.js';
