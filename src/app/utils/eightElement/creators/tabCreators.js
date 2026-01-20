@@ -226,14 +226,7 @@ function createTabElement(content, attributes = {}, currentMarkdown = '') {
         const activeItemConfig = tabStyleConfig.tabListItem?.active || {};
         // 🔧 修复：始终使用普通配置作为基础，激活状态只通过条件样式应用
         const currentItemConfig = normalItemConfig;
-        
-        // 调试信息
-        // console.log(`选项卡项配置 - ${panel.tabTitle}:`, {
-        //     normalItemConfig,
-        //     activeItemConfig,
-        //     currentItemConfig
-        // });
-        
+                
         // 🔧 修复：创建选项卡标题文本，始终使用普通状态的变体
         const titleText = createTextElement(panel.tabTitle, normalItemConfig.variant || 'body');
         

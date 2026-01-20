@@ -292,20 +292,17 @@ function createTableElement(markdownTableContent) {
                 finalThStyleConfig[key] = value;
             }
         });
-        console.log('🎨 应用表头自定义样式 (保持 token 格式):', headerStyles);
     }
     
     // 🆕 应用表头对齐设置
     if (headerAlign) {
         finalThStyleConfig.textAlign = headerAlign;
-        console.log('🎨 应用表头对齐:', headerAlign);
     }
     
     // 🆕 构建td样式配置，应用单元格对齐设置
     let finalTdStyleConfig = { ...tableCellStyleConfig };
     if (cellAlign) {
         finalTdStyleConfig.textAlign = cellAlign;
-        console.log('🎨 应用单元格对齐:', cellAlign);
     }
 
     // 创建符合要求的表格元素结构
@@ -323,10 +320,6 @@ function createTableElement(markdownTableContent) {
         },
         rawData: cleanedTableContent, // 🆕 使用清理后的内容
         layout: {
-            // classStyle: {
-            //   ...tableContainerStyleConfig
-            // },
-            // className: uniqueClassName,
             style: {
                 // 基础样式
                 "background-color": [],
@@ -334,7 +327,6 @@ function createTableElement(markdownTableContent) {
                 border: [],
                 scale: [],
                 "box-sizing": "border-box",
-                // primaryAxisSizingMode: "fixed",
                 position: "relative",
                 width: "100%",
                 ...layoutStyleConfig,
@@ -344,14 +336,6 @@ function createTableElement(markdownTableContent) {
                 style: {
                     ...tableContainerStyleConfig
                 },
-
-                // borderCollapse: "collapse",
-                // backgroundColor: "transparent",
-                // width: "100%",
-                // color: "#212529",
-                // fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-                // fontSize: FONT_CONSTANTS.SIZE.MEDIUM,
-                // marginBottom: '1rem'
             },
             th: {
                 style: finalThStyleConfig
@@ -361,9 +345,6 @@ function createTableElement(markdownTableContent) {
                 classStyle: {
                     ...tableRowStyleConfig
                 }
-                // borderBottomWidth: DIMENSION_CONSTANTS.BORDER_WIDTH.narrow,
-                // borderBottomColor: COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
-                // borderBottomStyle: "solid"
             },
             td: {
                 style: finalTdStyleConfig
@@ -382,15 +363,7 @@ function addChartEventButton(chartElement, originalFirstLine) {
     // 检测是否有 style:button 标记
     const hasStyleButton = /\[event:[^\]]*style\s*:\s*button/i.test(originalFirstLine);
     
-    console.log('🔍 检查 style:button:', {
-        originalFirstLine,
-        hasStyleButton,
-        chartId: chartElement.id
-    });
-
     if (!hasStyleButton) return;
-
-    console.log('✅ 检测到 style:button，开始创建按钮');
     
     // 从样式配置读取按钮文本与变体
     const buttonStyleFromConfig = getElementStyleConfig('chart', 'event');
@@ -398,22 +371,11 @@ function addChartEventButton(chartElement, originalFirstLine) {
     const buttonText = (buttonConfig && buttonConfig.text) ? buttonConfig.text : '操作';
     const buttonVariant = (buttonConfig && buttonConfig.variant) ? buttonConfig.variant : 'primary';
 
-    console.log('📝 按钮配置:', {
-        buttonStyleFromConfig,
-        buttonConfig,
-        buttonText,
-        buttonVariant
-    });
-
     // 用整行解析事件，绑定目标为图表 id
     const parsedButtonEvents = parseEventSyntax(originalFirstLine, chartElement.id, originalFirstLine) || [];
-    
-    console.log('🎯 解析的按钮事件:', parsedButtonEvents);
-    
+        
     // 构造按钮：不传递 currentMarkdown，避免在 createButtonElement 内部重复解析事件
     const buttonElement = createButtonElement(buttonText, '#', buttonVariant, '', buttonText);
-    
-    console.log('🔧 创建的按钮元素:', buttonElement);
     
     // 覆盖按钮的事件为从图表行解析的事件（若无解析结果则回退构造 chart_changed 事件）
     let finalEvents = parsedButtonEvents;
@@ -460,7 +422,6 @@ function addChartEventButton(chartElement, originalFirstLine) {
     // 应用按钮的样式配置（position: absolute 等）
     if (buttonConfig && buttonConfig.style) {
         Object.assign(buttonElement.layout.style, buttonConfig.style);
-        console.log('🎨 应用按钮样式:', buttonConfig.style);
     }
 
     // 返回按钮元素，由调用方决定放置位置

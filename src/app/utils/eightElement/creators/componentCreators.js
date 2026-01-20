@@ -189,16 +189,12 @@ function selectLayoutMode(layoutModes, actualSlots) {
     if (!layoutModes || !Array.isArray(layoutModes)) {
         return null;
     }
-    
-    console.log(`\n🔍 选择布局模式，实际插槽:`, Array.from(actualSlots));
-    
+        
     // 按顺序检查条件，返回第一个满足的模式
     for (const mode of layoutModes) {
         const satisfied = evaluateLayoutCondition(mode.condition, actualSlots);
-        console.log(`  检查模式 "${mode.name}" (${mode.condition}): ${satisfied ? '✅' : '❌'}`);
         
         if (satisfied) {
-            console.log(`  🎯 选中模式: ${mode.name}`);
             return mode;
         }
     }
@@ -223,15 +219,7 @@ function buildStructureFromMode(mode, slotElementsMap, componentElement, compone
         console.warn(`⚠️ 模式 "${mode.name}" 没有有效的 structure 配置`);
         return Array.from(slotElementsMap.values());
     }
-    
-    const indent = '  '.repeat(depth);
-    console.log(`\n${indent}🏗️ [深度 ${depth}] 根据模式 "${mode.name}" 构建结构...`);
-    
-    // 🆕 如果有循环 group，记录到日志
-    if (loopGroupName) {
-        console.log(`${indent}  🔄 循环 group: "${loopGroupName}", data-key: "${loopDataKey}"`);
-    }
-    
+           
     // 🆕 如果没有传入 actualSlots，从 slotElementsMap 获取
     if (!actualSlots) {
         actualSlots = getActualSlotsFromMap(slotElementsMap);
@@ -279,22 +267,14 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
         // 🆕 检查分组条件（如果存在）
         if (group.condition) {
             const satisfied = evaluateLayoutCondition(group.condition, actualSlots);
-            console.log(`${indent}  检查分组 "${group.name}" 条件 (${group.condition}): ${satisfied ? '✅' : '❌'}`);
             if (!satisfied) {
                 console.log(`${indent}  ⏭️ 跳过不满足条件的分组: ${group.name}`);
                 continue;
             }
         }
         
-        console.log(`${indent}  处理分组: ${group.name}`, {
-            slots: group.slots || [],
-            hasContainer: !!group.type,
-            hasNestedGroups: !!(group.groups && group.groups.length > 0)
-        });
-        
         // 🆕 如果分组有嵌套的 groups，递归处理
         if (group.groups && Array.isArray(group.groups) && group.groups.length > 0) {
-            console.log(`${indent}  🔄 分组 "${group.name}" 包含嵌套分组，递归处理...`);
             
             // 递归构建嵌套分组
             const nestedChildren = buildGroups(
@@ -311,14 +291,12 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
             );
             
             if (nestedChildren.length === 0) {
-                console.log(`${indent}  ⚠️ 嵌套分组 "${group.name}" 没有任何元素，跳过`);
                 continue;
             }
             
             // 创建容器包裹嵌套的子元素
             if (group.type === 'template') {
                 const groupStyle = group.style ? { ...group.style } : {};
-                console.log(`${indent}  📦 创建嵌套容器 "${group.name}"`);
                 
                 const containerElement = {
                     id: generateUUID(),
@@ -340,11 +318,9 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                 
                 // 🆕 如果当前 group 是循环的 group，包裹在循环容器中
                 if (loopGroupName && group.name === loopGroupName) {
-                    console.log(`${indent}  🔄 为嵌套循环模板 "${group.name}" 创建循环容器`);
                     
                     // 应用循环事件配置到模板容器本身
                     if (loopEventConfig) {
-                        console.log(`${indent}  🔗 将 loop nativeEvent 应用到循环模板`);
                         if (!containerElement.events) {
                             containerElement.events = [];
                         }
@@ -372,7 +348,6 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                         "data-key": loopDataKey  // 循环容器有 data-key
                     };
                     
-                    console.log(`${indent}  ✅ 循环容器创建完成，包裹 "${group.name}"`);
                     children.push(loopContainer);
                 } else {
                     children.push(containerElement);
@@ -389,15 +364,11 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
             for (const slotPattern of group.slots) {
                 const matched = collectSlotElements(slotPattern, slotElementsMap);
                 if (matched.length > 0) {
-                    matched.forEach(() => console.log(`${indent}    ✅ 添加插槽: ${slotPattern}`));
                     groupElements.push(...matched);
-                } else {
-                    console.log(`${indent}    ⏭️ 跳过不存在的插槽: ${slotPattern}`);
                 }
             }
             
             if (groupElements.length === 0) {
-                console.log(`${indent}  ⚠️ 分组 "${group.name}" 没有任何元素，跳过`);
                 continue;
             }
 
@@ -407,7 +378,6 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                 if (refSlotConfig) {
                     const refStyles = refSlotConfig.variantStyle || {};
                     if (Object.keys(refStyles).length > 0) {
-                        console.log(`${indent}  🎨 分组 "${group.name}" 使用 styleReference="${group.styleReference}" 覆盖样式`);
                         groupElements.forEach(el => {
                             if (!el || !el.layout) return;
                             // 只对有 slot 元数据的元素应用（避免误伤其他容器）
@@ -432,7 +402,6 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
             // 如果指定了 type: 'template'，创建容器
             if (group.type === 'template') {
                 const groupStyle = group.style ? { ...group.style } : {};
-                console.log(`${indent}  📦 创建容器 "${group.name}"`);
                 
                 const containerElement = {
                     id: generateUUID(),
@@ -454,11 +423,9 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                 
                 // 🆕 如果当前 group 是循环的 group，包裹在循环容器中
                 if (loopGroupName && group.name === loopGroupName) {
-                    console.log(`${indent}  🔄 为循环模板 "${group.name}" 创建循环容器`);
                     
                     // 应用循环事件配置到模板容器本身
                     if (loopEventConfig) {
-                        console.log(`${indent}  🔗 将 loop nativeEvent 应用到循环模板`);
                         if (!containerElement.events) {
                             containerElement.events = [];
                         }
@@ -486,15 +453,12 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                         "data-key": loopDataKey  // 循环容器有 data-key
                     };
                     
-                    console.log(`${indent}  ✅ 循环容器创建完成，包裹 "${group.name}"`);
                     children.push(loopContainer);
                 } else {
-                    console.log(`${indent}  ✅ 容器 "${group.name}" 创建完成，样式键:`, Object.keys(groupStyle));
                     children.push(containerElement);
                 }
             } else {
                 // 直接添加元素（无容器）
-                console.log(`${indent}  ➕ 直接添加 ${groupElements.length} 个元素`);
                 children.push(...groupElements);
             }
         } else {
@@ -502,7 +466,6 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
         }
     }
     
-    console.log(`${indent}  🎉 [深度 ${depth}] 结构构建完成，共 ${children.length} 个元素`);
     return children;
 }
 
@@ -734,20 +697,13 @@ export function parseSlotTags(content) {
     const slots = [];
     const slotNameCounts = {};
     let i = 0;
-    
-    console.log(`\n🔍 开始解析插槽标签...`);
-    console.log(`  总行数: ${lines.length}`);
-    
+        
     while (i < lines.length) {
         const line = lines[i];
-        console.log(`  检查行 ${i}: "${line.trim()}"`);
         
         // 首先尝试解析单行标签
         const singleLineSlot = parseSingleLineSlot(line);
         if (singleLineSlot) {
-            console.log(`  ✅ 发现单行插槽: ${singleLineSlot.slotName}`);
-            console.log(`     内容: "${singleLineSlot.slotContent}"`);
-            console.log(`     属性:`, singleLineSlot.attributes);
             enrichSlotName(singleLineSlot, slotNameCounts);
             slots.push(singleLineSlot);
             i++;
@@ -757,10 +713,7 @@ export function parseSlotTags(content) {
         // 尝试解析多行标签
         const tagInfo = isSlotTag(line);
         if (tagInfo.isSlotTag && !tagInfo.isClosing) {
-            console.log(`  发现多行插槽标签: ${tagInfo.slotName} (行 ${i})`);
             const slotData = extractSlotContent(lines, i);
-            console.log(`    内容: "${slotData.slotContent}"`);
-            console.log(`    属性:`, slotData.attributes);
             enrichSlotName(slotData, slotNameCounts);
             slots.push(slotData);
             i = slotData.endIndex + 1;
@@ -769,7 +722,6 @@ export function parseSlotTags(content) {
         }
     }
     
-    console.log(`  ✅ 共解析到 ${slots.length} 个插槽`);
     return slots;
 }
 
@@ -802,17 +754,9 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
     const { slotContent, attributes } = slotData;
     const baseSlotName = slotData?.baseSlotName || slotName;
     
-    console.log(`\n🎰 创建插槽元素: ${slotName}`);
-    if (baseSlotName !== slotName) {
-        console.log(`  基础插槽名: ${baseSlotName}`);
-    }
-    console.log('  配置:', slotConfig);
-    console.log('  内容:', slotContent);
-    console.log('  属性:', attributes);
     
     // 情况1: 纯容器（只有 type: 'template' 和 style）
     if (slotConfig.type === 'template' && !slotConfig.metaType) {
-        console.log('  模式: 纯容器');
         
         const containerElement = {
             dataKeys: [],
@@ -838,7 +782,6 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
         // 🆕 处理 loop 中的 key 属性，映射为 data-key
         if (attributes && attributes.key) {
             containerElement["data-key"] = attributes.key;
-            console.log(`  🔑 映射 data-key="${attributes.key}"`);
 
             // 🆕 处理 loop 中的 nativeEvent
             if (attributes.nativeEvent) {
@@ -858,7 +801,6 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                     } else {
                         containerElement.events.push(eventConfig);
                     }
-                    console.log(`  🔗 添加 loop nativeEvent: ${attributes.nativeEvent}`);
                 }
             }
         }
@@ -869,19 +811,16 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             containerElement.layout.children.push(textElement);
         }
         
-        console.log(`  ✅ 创建纯容器成功`);
         return containerElement;
     }
     
     // 情况2: 元素+容器（有 type: 'template' 和 metaType）
     if (slotConfig.type === 'template' && slotConfig.metaType) {
-        console.log('  模式: 元素+容器');
         
         // 先创建内部元素（可能是多个，比如 actions 里的多个按钮）
         const innerElements = [];
         
         if (slotConfig.metaType === 'text') {
-            console.log(`    创建文本元素: variant=${slotConfig.variant}`);
             const textElement = createTextElement(
                 slotContent || '',
                 slotConfig.variant || 'p',
@@ -908,7 +847,6 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             const nestedButtons = extractInlineButtons(slotContent);
             
             if (nestedButtons.length > 0) {
-                console.log(`    在插槽 "${slotName}" 中解析到 ${nestedButtons.length} 个 button 标签`);
                 nestedButtons.forEach((buttonDef, index) => {
                     const buttonElement = buildButtonElementFromDefinition(
                         slotConfig,
@@ -940,7 +878,6 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
         } else if (slotConfig.metaType === 'image') {
             const imageUrl = attributes.src || '';
             const dataKey = attributes.key || '';  // 🆕 提取 data-key
-            console.log(`    创建图片元素: src=${imageUrl}, variant=${slotConfig.variant}, key=${dataKey}`);
             const imageElement = createBackgroundElement(
                 imageUrl,
                 slotConfig.variant || 'normal',
@@ -1014,7 +951,6 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                 innerElements.push(feedItemElement);
             }
         } else if (slotConfig.metaType === 'table') {
-            console.log(`    创建表格元素: content length=${slotContent?.length || 0}`);
             const tableElement = createTableElement(slotContent || '');
             if (tableElement) {
                 innerElements.push(tableElement);
@@ -1052,7 +988,6 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
         // 🆕 处理 loop 中的 key 属性，映射为 data-key
         if (attributes && attributes.key) {
             containerElement["data-key"] = attributes.key;
-            console.log(`  🔑 映射 data-key="${attributes.key}"`);
 
             // 🆕 处理 loop 中的 nativeEvent
             if (attributes.nativeEvent) {
@@ -1072,23 +1007,19 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                     } else {
                         containerElement.events.push(eventConfig);
                     }
-                    console.log(`  🔗 添加 loop nativeEvent: ${attributes.nativeEvent}`);
                 }
             }
         }
         
-        console.log(`  ✅ 创建元素+容器成功`);
         return containerElement;
     }
     
     // 情况3: 直接元素（只有 metaType，没有 type: 'template'）
     if (slotConfig.metaType && !slotConfig.type) {
-        console.log('  模式: 直接元素');
         
         let element = null;
         
         if (slotConfig.metaType === 'text') {
-            console.log(`    创建文本元素: variant=${slotConfig.variant}`);
             element = createTextElement(
                 slotContent || '',
                 slotConfig.variant || 'p',
@@ -1110,7 +1041,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
         } else if (slotConfig.metaType === 'button') {
             const buttonUrl = attributes.href || '#';
             const buttonText = slotContent || '';
-            console.log(`    创建按钮元素: text="${buttonText}", url=${buttonUrl}, variant=${slotConfig.variant}`);
+           
             element = createButtonElement(
                 buttonText,
                 buttonUrl,
@@ -1138,7 +1069,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
         } else if (slotConfig.metaType === 'image') {
             const imageUrl = attributes.src || '';
             const dataKey = attributes.key || '';  // 🆕 提取 data-key
-            console.log(`    创建图片元素: src=${imageUrl}, variant=${slotConfig.variant}, key=${dataKey}`);
+
             element = createBackgroundElement(
                 imageUrl,
                 slotConfig.variant || 'normal',
@@ -1188,14 +1119,14 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             }
         } else if (slotConfig.metaType === 'audio') {
             const audioSrc = attributes.src || '';
-            console.log(`    创建音频元素: src=${audioSrc}, variant=${slotConfig.variant}`);
+
             element = createAudioElement(
                 audioSrc,
                 attributes
             );
         } else if (slotConfig.metaType === 'video') {
             const videoSrc = attributes.src || '';
-            console.log(`    创建视频元素: src=${videoSrc}, variant=${slotConfig.variant}`);
+
             element = createVideoElement(
                 videoSrc,
                 attributes
@@ -1208,7 +1139,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                 attributes
             );
         } else if (slotConfig.metaType === 'table') {
-            console.log(`    创建表格元素: content length=${slotContent?.length || 0}`);
+
             // 使用 createTableElement 创建表格元素
             element = createTableElement(slotContent || '');
         }
@@ -1224,11 +1155,9 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                 // 将 data-key 注入到 font.fontsize.default.data-key
                 if (element.font && element.font.fontsize && element.font.fontsize.default) {
                     element.font.fontsize.default['data-key'] = attributes.key;
-                    console.log(`  🔑 映射 font.fontsize.default.data-key="${attributes.key}"`);
                 } else {
                     // 回退：如果找不到 font 结构，则设置在根元素
                     element["data-key"] = attributes.key;
-                    console.log(`  🔑 映射 element.data-key="${attributes.key}" (font structure not found)`);
                 }
 
                 // 🆕 处理 loop 中的 nativeEvent
@@ -1249,12 +1178,10 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                         } else {
                             element.events.push(eventConfig);
                         }
-                        console.log(`  🔗 添加 loop nativeEvent: ${attributes.nativeEvent}`);
                     }
                 }
             }
 
-            console.log(`  ✅ 创建直接元素成功`);
         } else {
             console.warn(`  ❌ 创建元素失败`);
         }
@@ -1315,8 +1242,6 @@ function buildButtonElementFromDefinition(slotConfig, buttonText, buttonAttribut
     
     const buttonUrl = buttonAttributes.href || buttonAttributes.url || outerAttributes.href || outerAttributes.url || '#';
     const buttonVariant = buttonAttributes.variant || slotConfig.variant || 'primary';
-    
-    console.log(`    创建按钮元素${debugLabel ? ` [${debugLabel}]` : ''}: text="${finalText}", url=${buttonUrl}, variant=${buttonVariant}`);
     
     const buttonElement = createButtonElement(
         finalText,
@@ -1471,7 +1396,6 @@ function buildChartElementFromContent(slotName, slotConfig, slotContent, attribu
         chartElement._metadata = chartElement._metadata || {};
         chartElement._metadata.slotName = slotName;
 
-        console.log(`  ✅ 创建图表元素成功: type=${finalChartType}, slots=${slotName}`);
         return chartElement;
     } catch (error) {
         console.error(`  ❌ 创建图表元素失败 (${slotName}):`, error);
@@ -1948,13 +1872,7 @@ export function extractComponentParameters(parameterDefinitions, markdownData, c
     if (!parameterDefinitions) {
         return paramValues;
     }
-    
-    console.log('🔍 开始提取组件参数...');
-    console.log('  参数定义:', parameterDefinitions);
-    console.log('  外部参数:', externalParameters);
-    console.log('  内容:', content);
-    console.log('  markdownData:', markdownData);
-    
+        
     // 遍历所有参数定义
     for (const [paramName, paramConfig] of Object.entries(parameterDefinitions)) {
         let value = null;
@@ -2004,7 +1922,6 @@ export function extractComponentParameters(parameterDefinitions, markdownData, c
         
         if (value !== null) {
             paramValues[paramName] = value;
-            console.log(`  ✅ 参数 ${paramName} = "${value}" (来源: ${valueSource})`);
         } else {
             console.warn(`  ❌ 参数 ${paramName} 提取失败`);
         }
@@ -2041,9 +1958,7 @@ function extractParameterFromContent(paramName, paramConfig, content) {
     
     // 如果找到值且有表达式，应用表达式处理
     if (value && paramConfig.expression) {
-        const beforeExpression = value;
         value = processExpression(value, paramConfig.expression);
-        console.log(`    表达式处理: ${beforeExpression} -> ${value}`);
     }
     
     return value;
@@ -2059,7 +1974,6 @@ function normalizeTokenValue(value) {
     
     // 如果已经是 token 格式，保持不变
     if (value.startsWith('{') && value.endsWith('}')) {
-        console.log(`  📦 参数是 token 格式: ${value}`);
         return value;
     }
     
@@ -2067,7 +1981,6 @@ function normalizeTokenValue(value) {
     // 🔧 修复：不处理 URL
     if (value.includes('.') && !value.startsWith('$') && !value.startsWith('http')) {
         const tokenValue = `{${value}}`;
-        console.log(`  📦 参数转换为 token 格式: ${tokenValue}`);
         return tokenValue;
     }
     
@@ -2104,10 +2017,8 @@ export function applyParametersToStyle(style, paramValues) {
                     // 如果参数值是 token 格式（如 {color.basic.red.0}），解析它
                     if (typeof paramValue === 'string' && paramValue.startsWith('{') && paramValue.endsWith('}')) {
                         const resolvedValue = resolveToken(paramValue);
-                        console.log(`✅ 应用参数 ${paramName}: ${paramValue} -> ${resolvedValue}`);
                         return resolvedValue;
                     } else {
-                        console.log(`✅ 应用参数 ${paramName}: ${paramValue}`);
                         return paramValue;
                     }
                 } else {
@@ -2191,7 +2102,6 @@ function createMetaTypeComponent(content, variant, componentConfig, markdownData
     // 应用参数到样式
     if (Object.keys(paramValues).length > 0) {
         finalStyle = applyParametersToStyle(finalStyle, paramValues);
-        console.log(`🎨 应用参数后的样式 (metaType):`, finalStyle);
     }
     
     let elementInstance = null;
@@ -2304,7 +2214,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
     let processedStyle = componentConfig.style ? JSON.parse(JSON.stringify(componentConfig.style)) : {};
     if (Object.keys(paramValues).length > 0) {
         processedStyle = applyParametersToStyle(processedStyle, paramValues);
-        console.log(`🎨 应用参数后的样式:`, processedStyle);
     }
     
     // 创建组件容器元素
@@ -2347,7 +2256,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
     const availableSlotConfigs = componentConfig.slotConfigs || componentConfig.slots;
     
     if (availableSlotConfigs && content) {
-        console.log(`\n🎰 组件 "${variant}" 使用插槽标签系统`);
 
         // 🆕 检查是否存在 <loop> 标签 (处理列表数据绑定)
         // 匹配 <loop data="xxx" ...>...</loop>
@@ -2361,7 +2269,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
             loopDataKey = loopMatch[1];
             const otherAttributesStr = loopMatch[2];
             const loopContent = loopMatch[3];
-            console.log(`  🔄 发现循环数据绑定: data-key="${loopDataKey}"`);
 
             // 🆕 处理 loop 中的 nativeEvent
             if (otherAttributesStr && otherAttributesStr.trim()) {
@@ -2373,7 +2280,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                             nativeEventKey: attributes.nativeEvent,
                             dataEventKey: loopDataKey
                         };
-                        console.log(`  🔗 捕获 loop nativeEvent (待应用到子元素): ${attributes.nativeEvent}`);
                     }
                 }
             }
@@ -2385,8 +2291,7 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
             if (groupTagMatch) {
                 loopGroupName = groupTagMatch[1];
                 const groupContent = groupTagMatch[2];
-                console.log(`  📦 发现循环 group: "${loopGroupName}"`);
-                console.log(`  📦 group 内容:`, groupContent);
+                
                 
                 // 🔧 重要：将整个 loop 标签替换为 group 内部的 slot 标签
                 // 这样可以同时解析 loop 外部的 slots（如 title, subtitle）和 loop 内部的 slots（如 text）
@@ -2396,14 +2301,12 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                     /<loop\s+data=["'][^"']+["'][^>]*>[\s\S]*?<\/loop>/,
                     groupContent
                 );
-                console.log(`  📝 处理后的内容（用于解析 slots）:`, contentToParse);
                 
                 // 记录循环 group 的元数据到组件元素（用于传递给 buildGroups）
                 componentElement._loopGroup = loopGroupName;
                 componentElement._loopDataKey = loopDataKey;
             } else {
                 // 旧的简易循环模式：整个组件容器循环
-                console.log(`  🔄 使用简易循环模式（整个容器循环）`);
                 componentElement["data-key"] = loopDataKey;
                 
                 // 使用 loop 内部的内容进行插槽解析
@@ -2413,7 +2316,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         
         // 解析内容中的所有插槽标签
         const slots = parseSlotTags(contentToParse);
-        console.log(`  解析到 ${slots.length} 个插槽:`, slots.map(s => s.slotName));
         
         // 🆕 创建插槽元素并存储到 Map 中（用于后续重新组织）
         const slotElementsMap = new Map();
@@ -2439,7 +2341,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
             );
             
             if (element) {
-                console.log(`  ✅ 成功创建插槽元素: ${slotName}`);
                 slotElementsMap.set(slotName, element);
             } else {
                 console.warn(`  ❌ 创建插槽元素失败: ${slotName}`);
@@ -2458,7 +2359,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         
         // 🆕 检查是否有 layoutModes 配置
         if (componentConfig.layoutModes && componentConfig.layoutModes.length > 0) {
-            console.log(`\n🎛️ 组件 "${variant}" 使用布局模式系统`);
             
             // 获取实际存在的插槽名称集合
             const actualSlots = getActualSlotsFromMap(slotElementsMap);
@@ -2473,7 +2373,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                         ...processedStyle,
                         ...componentElement.layout.classStyle
                     };
-                    console.log(`  🎨 应用组件基础样式（含参数）:`, Object.keys(processedStyle));
                 }
 
                 // 🔧 应用选中模式的容器样式（合并到 classStyle，确保优先级）
@@ -2482,7 +2381,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                     let modeStyle = selectedMode.style;
                     if (Object.keys(paramValues).length > 0) {
                         modeStyle = applyParametersToStyle(modeStyle, paramValues);
-                        console.log(`  🎨 模式样式应用参数完成`);
                     }
 
                     // 合并模式样式到 classStyle（覆盖原有样式）
@@ -2490,7 +2388,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                         ...componentElement.layout.classStyle,
                         ...modeStyle
                     };
-                    console.log(`  🎨 应用模式 "${selectedMode.name}" 的样式:`, Object.keys(modeStyle));
                 }
                 
                 // 根据模式构建结构（传入 actualSlots 以支持嵌套分组中的条件评估）
@@ -2513,7 +2410,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                 componentElement._metadata = componentElement._metadata || {};
                 componentElement._metadata.layoutMode = selectedMode.name;
                 
-                console.log(`  🎉 布局模式 "${selectedMode.name}" 应用完成`);
             } else {
                 // 如果没有模式被选中，使用扁平结构（向后兼容）
                 console.warn(`  ⚠️ 未选中任何布局模式，使用扁平结构`);
@@ -2522,19 +2418,17 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                 // 🔧 回退到默认样式（componentConfig.style）
                 if (processedStyle && Object.keys(processedStyle).length > 0) {
                     componentElement.layout.classStyle = { ...processedStyle };
-                    console.log(`  🔄 回退到默认样式`);
                 }
             }
         } else {
             // 没有 layoutModes，使用扁平结构（向后兼容）
             componentElement.layout.children = Array.from(slotElementsMap.values());
-            console.log(`  📋 未配置布局模式，使用扁平结构（${slotElementsMap.size} 个元素）`);
         }
 
         // 🆕 如果有 loopEventConfig 且没有 loopGroupName（简易循环模式），将其应用到所有直接子元素
         // 如果有 loopGroupName（group 循环模式），事件已经在 buildGroups 中应用到指定的 group 了
         if (loopEventConfig && !loopGroupName && componentElement.layout.children && componentElement.layout.children.length > 0) {
-            console.log(`  🔗 [简易循环] 将 loop nativeEvent 应用到 ${componentElement.layout.children.length} 个子元素`);
+
             componentElement.layout.children.forEach(child => {
                 if (!child.events) {
                     child.events = [];
@@ -2587,7 +2481,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
     
     // 🔧 处理 required 容器：确保必需的样式承载容器被渲染
     if (componentConfig.required) {
-        console.log(`  处理组件 "${variant}" 的 required 容器:`, componentConfig.required);
         processRequiredContainers(componentConfig, componentElement.layout.children, componentConfig, paramValues);
     }
 
@@ -2601,7 +2494,6 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
     
     // 🆕 插槽系统：生成数据属性并处理条件样式
     if (componentConfig.slots || componentConfig.autoDataAttributes) {
-        console.log(`\n🎰 组件 "${variant}" 启用插槽系统...`);
         
         // 1. 验证插槽配置（可选）
         if (componentConfig.slots) {
@@ -2626,18 +2518,13 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                 componentElement._metadata.slotDataAttributes = {};
             }
             Object.assign(componentElement._metadata.slotDataAttributes, slotDataAttrs);
-            console.log(`  ✅ 生成了 ${Object.keys(slotDataAttrs).length} 个数据属性`);
         }
         
         // 4. 处理条件样式（如果有）
         if (componentElement.layout.classStyle && Object.keys(componentElement.layout.classStyle).length > 0) {
             const { baseStyles, conditionalStyles } = separateConditionalStyles(componentElement.layout.classStyle);
             
-            console.log(`  📋 基础样式:`, baseStyles);
-            console.log(`  📋 条件样式规则数:`, conditionalStyles.length);
-            
             if (conditionalStyles.length > 0) {
-                console.log(`  🎨 发现 ${conditionalStyles.length} 个条件样式规则`);
                 
                 // 开始时使用基础样式
                 let finalStyles = {};
@@ -2651,17 +2538,11 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                 conditionalStyles.forEach(condStyle => {
                     const condition = `${condStyle.attrName}=${condStyle.attrValue}`;
                     const dataAttrKey = `data-${condStyle.attrName}`;
-                    
-                    console.log(`  🔍 检查条件: ${condition}, 数据属性: ${dataAttrKey}=${slotDataAttrs[dataAttrKey]}`);
-                    
+                                        
                     if (slotDataAttrs[dataAttrKey] === condStyle.attrValue) {
-                        console.log(`  ✅ 条件 "${condition}" 满足，应用条件样式`);
-                        console.log(`     条件样式内容:`, condStyle.styles);
-                        
                         // 🔧 使用扩展运算符确保完全覆盖
                         finalStyles = { ...finalStyles, ...condStyle.styles };
                         
-                        console.log(`     合并后的样式:`, finalStyles);
                     } else {
                         console.log(`  ❌ 条件 "${condition}" 不满足`);
                     }
@@ -2674,11 +2555,8 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                 // 清空 classStyle，避免混淆
                 componentElement.layout.classStyle = {};
                 
-                console.log(`  🎨 最终应用的样式:`, finalStyles);
-                console.log(`  🎨 最终 flexDirection:`, finalStyles.flexDirection);
             } else {
                 // 没有条件样式，直接将 classStyle 移到 style
-                console.log(`  ℹ️ 没有条件样式，直接使用基础样式`);
                 componentElement.layout.style = componentElement.layout.classStyle;
                 componentElement.layout.classStyle = {};
             }

@@ -672,13 +672,8 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
     let processedStyle = cardStyleConfig.style || {};
     
     // 🆕 如果是带参数的组件，先提取参数
-    if (hasParameters) {
-        console.log(`\n📦 处理带参数的组件: ${variant}`);
-        console.log('  组件配置:', cardStyleConfig);
-        console.log('  标签属性:', attributes);
-        console.log('  内容:', content);
-        
-        // 提取参数值
+    if (hasParameters) { 
+       // 提取参数值
         paramValues = extractComponentParameters(
             cardStyleConfig.parameters,
             null, // markdownData
@@ -688,10 +683,8 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
         
         // 应用参数到样式（深拷贝，避免修改原配置）
         if (Object.keys(paramValues).length > 0) {
-            console.log('  原始样式:', cardStyleConfig.style);
             // 🆕 深拷贝样式对象，避免修改原配置（特别是嵌套对象如 &::before）
             processedStyle = applyParametersToStyle(JSON.parse(JSON.stringify(cardStyleConfig.style || {})), paramValues);
-            console.log('  应用参数后的样式:', processedStyle);
         }
     }
     
@@ -708,7 +701,6 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
     
     // 🆕 如果是带参数的组件，处理 required 容器
     if (hasParameters && cardStyleConfig.required) {
-        console.log(`  处理 required 容器:`, cardStyleConfig.required);
         processRequiredContainers(cardStyleConfig, cardChildren, cardStyleConfig, paramValues);
     }
 
@@ -797,13 +789,6 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
             height: "auto",
             alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN
         });
-
-        // 应用卡片样式到布局
-        // Object.entries(cardStyleConfig).forEach(([key, value]) => {
-        //     if (value !== undefined && value !== null) {
-        //         baseLayout.style[key] = value;
-        //     }
-        // });
 
         const cardElement = {
             dataKeys: [],
@@ -1058,13 +1043,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             // 🆕 处理component类型，引用通用组件配置
             // 从 tagConfig 中获取外部参数（如果有的话）
             const externalParameters = tagConfig.parameters || null;
-            // 🔍 调试日志：检查传递给组件的参数
-            console.log(`🔍 创建组件 ${tagConfig.variant}:`, {
-                tagName,
-                content,
-                markdownData,
-                externalParameters
-            });
+
             elementInstance = createComponentElement(content, tagConfig.variant, markdownData, styleOverride, externalParameters, currentMarkdown);
         }
         // 可以在这里添加其他元件类型的支持
@@ -1501,17 +1480,14 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
         if (line.startsWith('<!--')) {
             if (line.endsWith('-->')) {
                 // 单行注释
-                console.log(`⏭️ [卡片内容] 跳过 HTML 注释: ${line}`);
                 i++;
                 continue;
             } else {
                 // 多行注释：跳过直到找到结束标记
-                console.log(`⏭️ [卡片内容] 跳过多行 HTML 注释开始: ${line}`);
                 let j = i + 1;
                 while (j < lines.length) {
                     const commentLine = lines[j].trim();
                     if (commentLine.includes('-->')) {
-                        console.log(`⏭️ [卡片内容] 跳过多行 HTML 注释结束: ${commentLine}`);
                         i = j;
                         break;
                     }
@@ -1548,13 +1524,9 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
             const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[tagName];
             
             if (componentConfig) {
-                console.log(`\n🎨 发现带参数的组件标签: <${tagName}>`);
-                console.log('  标签属性:', attributes);
-                
                 // 这是一个带参数的组件，直接使用
                 // 提取标签内容
                 const { tagContent, endIndex } = extractTemplateTag(lines, i, tagName);
-                console.log('  标签内容:', tagContent);
 
                 // 🆕 提取参数值（从属性和内容中）
                 const paramValues = extractComponentParameters(
@@ -1565,11 +1537,9 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                 );
 
                 // 🆕 应用参数到样式
-                console.log('  原始样式:', componentConfig.style);
                 let processedStyle = componentConfig.style || {};
                 if (Object.keys(paramValues).length > 0) {
                     processedStyle = applyParametersToStyle(processedStyle, paramValues);
-                    console.log('  应用参数后的样式:', processedStyle);
                 }
 
                 // 创建组件容器元素
@@ -1598,7 +1568,6 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
 
                 // 🆕 处理 required 容器
                 if (componentConfig.required) {
-                    console.log(`  处理 required 容器:`, componentConfig.required);
                     processRequiredContainers(componentConfig, componentElement.layout.children, componentConfig, paramValues);
                 }
 
@@ -1618,7 +1587,6 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                     }
                 }
 
-                console.log(`✅ 组件元素创建完成，包含 ${componentElement.layout.children.length} 个子元素\n`);
                 children.push(componentElement);
 
                 i = endIndex + 1;
@@ -1866,8 +1834,6 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                         pureCodeContent = codeContentLines.join('\n');
                     }
 
-                    console.log(`📋 收集到完整代码块，共 ${codeLines.length} 行，提取纯代码内容 ${pureCodeContent.length} 字符`);
-
                     // 创建代码块元素
                     const templateElement = createOrMergeTemplateElement(
                         markdownResult.templatePath,
@@ -2000,8 +1966,6 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                     wrapperLayout, // 传入包裹容器
                                     { ...markdownResult, chartElement: chartElement, chartData: chartResult }
                                 );
-
-                                console.log(`✅ 成功创建图表模板元素: ${markdownResult.chartType} (variant: ${chartVariant})`);
                             } catch (error) {
                                 console.error('生成图表时出错:', error);
                                 // 创建错误图表元素

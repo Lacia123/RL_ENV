@@ -16,10 +16,7 @@ export function generateSlotDataAttributes(componentConfig, children) {
     if (!componentConfig || !componentConfig.autoDataAttributes) {
         return dataAttrs;
     }
-    
-    console.log('🎰 生成插槽数据属性...');
-    console.log('  子元素数量:', children?.length || 0);
-    
+        
     const autoDataAttrs = componentConfig.autoDataAttributes;
     
     // 支持两种格式：
@@ -27,34 +24,25 @@ export function generateSlotDataAttributes(componentConfig, children) {
     // 2. 对象: { 'hasImage': 'image', 'hasActions': 'actions' } - 自定义属性名
     
     if (Array.isArray(autoDataAttrs)) {
-        // 数组形式：插槽名称即为属性名称
-        console.log('  使用数组形式的 autoDataAttributes');
+
         autoDataAttrs.forEach(slotName => {
             const hasSlot = checkSlotExists(children, slotName);
             
             if (hasSlot) {
                 dataAttrs[`data-${slotName}`] = 'true';
-                console.log(`  ✅ 插槽 "${slotName}" 存在，添加 data-${slotName}="true"`);
-            } else {
-                console.log(`  ❌ 插槽 "${slotName}" 不存在`);
             }
         });
     } else if (typeof autoDataAttrs === 'object') {
         // 对象形式：自定义属性名
-        console.log('  使用对象形式的 autoDataAttributes');
         for (const [attrName, slotPath] of Object.entries(autoDataAttrs)) {
             const hasSlot = checkSlotExists(children, slotPath);
             
             if (hasSlot) {
                 dataAttrs[`data-${attrName}`] = 'true';
-                console.log(`  ✅ 插槽 "${slotPath}" 存在，添加 data-${attrName}="true"`);
-            } else {
-                console.log(`  ❌ 插槽 "${slotPath}" 不存在`);
             }
         }
     }
     
-    console.log('📦 最终数据属性:', dataAttrs);
     return dataAttrs;
 }
 

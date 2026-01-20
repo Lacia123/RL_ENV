@@ -349,7 +349,6 @@ function createLayoutElement(direction, children = [], options = {}) {
             dataListenerEvent.parameters.statusKey = statusKey || '';
 
             layout.events = [dataListenerEvent];
-            console.log(`📡 为布局元素 ${layoutId} 创建 DATA_LISTENER 事件:`, dataListenerEvent);
         }
     }
 
@@ -526,7 +525,6 @@ function collectDataVariables(elements) {
         // 检查选项卡元素的绑定数据（优先使用默认选中 tab 值）
         if (element._metadata && element._metadata.isTab && element._metadata.bindingData && element._metadata.defaultTabKey) {
             dataVariables[element._metadata.bindingData] = element._metadata.defaultTabKey;
-            console.log(`🔗 收集到数据变量(选项卡): ${element._metadata.bindingData} = ${element._metadata.defaultTabKey}`);
         }
 
         // 🆕 检查普通布局元素的绑定数据（bindingData），默认值为空字符串
@@ -535,7 +533,6 @@ function collectDataVariables(elements) {
             // 如果之前没有被其他元素（如 Tab）设置过，才初始化
             if (!Object.prototype.hasOwnProperty.call(dataVariables, key)) {
                 dataVariables[key] = '';
-                console.log(`🔗 收集到数据变量(布局): ${key} = ''`);
             }
         }
 
@@ -544,7 +541,6 @@ function collectDataVariables(elements) {
             const statusKey = element._metadata.statusKey;
             if (!Object.prototype.hasOwnProperty.call(dataVariables, statusKey)) {
                 dataVariables[statusKey] = '';
-                console.log(`🔗 收集到状态数据变量: ${statusKey} = ''`);
             }
         }
 
@@ -580,7 +576,6 @@ function collectDataVariables(elements) {
         collectFromElement(elements);
     }
 
-    console.log(`📊 总共收集到 ${Object.keys(dataVariables).length} 个数据变量:`, dataVariables);
     return dataVariables;
 }
 
@@ -597,7 +592,6 @@ function collectEventTargetIds(elements) {
                 if (event && event.EventTargetId && typeof event.EventTargetId === 'string') {
                     if (!eventTargetIds.includes(event.EventTargetId)) {
                         eventTargetIds.push(event.EventTargetId);
-                        console.log(`🎯 收集到EventTargetId: ${event.EventTargetId}`);
                     }
                 }
             });
@@ -635,7 +629,6 @@ function collectEventTargetIds(elements) {
         collectFromElement(elements);
     }
 
-    console.log(`📋 总共收集到 ${eventTargetIds.length} 个EventTargetId:`, eventTargetIds);
     return eventTargetIds;
 }
 

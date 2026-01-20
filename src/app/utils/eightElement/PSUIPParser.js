@@ -344,12 +344,6 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
                 wildcardResult.wildcard || currentListItemCounter.toString()
             );
 
-            console.log(`🎯 列表项通配符匹配: ${listItemKey} -> ${processedTemplatePath}`, {
-                wildcard: wildcardResult.wildcard,
-                pattern: wildcardResult.pattern,
-                originalTemplate: wildcardResult.templatePath,
-                processedTemplate: processedTemplatePath
-            });
             return {
                 markdownResult: {
                     type: 'li',
@@ -365,7 +359,6 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
 
         // 然后尝试精确匹配
         if (markdownMapping[listItemKey]) {
-            console.log(`🎯 使用专门的列表项映射: ${listItemKey} -> ${markdownMapping[listItemKey]}`);
             return {
                 markdownResult: {
                     type: 'li',
@@ -376,7 +369,6 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
                 newListItemCounter: currentListItemCounter
             };
         } else {
-            console.log(`⚪ 无专门的列表项映射: ${listItemKey}，将使用默认处理`);
             // 如果没有专门的li:n映射，重置计数器，让它走通用的ul处理
             currentListItemCounter = listItemCounter;
         }
@@ -1079,16 +1071,13 @@ function parseMarkdown(markdown, options = {}) {
         if (trimmedLine.startsWith('<!--')) {
             if (trimmedLine.endsWith('-->')) {
                 // 单行注释
-                console.log(`⏭️ 跳过 HTML 注释: ${trimmedLine}`);
                 continue;
             } else {
                 // 多行注释：跳过直到找到结束标记
-                console.log(`⏭️ 跳过多行 HTML 注释开始: ${trimmedLine}`);
                 let j = i + 1;
                 while (j < markedLines.length) {
                     const commentLine = markedLines[j].line.trim();
                     if (commentLine.includes('-->')) {
-                        console.log(`⏭️ 跳过多行 HTML 注释结束: ${commentLine}`);
                         i = j;
                         break;
                     }
@@ -1191,8 +1180,7 @@ function parseMarkdown(markdown, options = {}) {
         // 🆕 处理 Video 标签
         const videoTagInfo = isVideoTag(trimmedLine);
         if (videoTagInfo.isVideoTag) {
-            console.log(`🎥 发现视频标签: ${videoTagInfo.src}`);
-
+ 
             // 处理之前累积的内容
             flushTextBlock();
             flushConsecutiveButtons();
@@ -1222,7 +1210,6 @@ function parseMarkdown(markdown, options = {}) {
         // 🆕 处理 Audio 标签
         const audioTagInfo = isAudioTag(trimmedLine);
         if (audioTagInfo.isAudioTag) {
-            console.log(`🔊 发现音频标签: ${audioTagInfo.src}`);
 
             // 处理之前累积的内容
             flushTextBlock();
@@ -1403,7 +1390,6 @@ function parseMarkdown(markdown, options = {}) {
         // 处理卡片标签
         const cardTagInfo = isCardTag(trimmedLine);
         if (cardTagInfo.isCardTag && !cardTagInfo.isClosing) {
-            console.log(`发现卡片标签，行号: ${i}，变体: ${cardTagInfo.variant}`);
 
             // 处理之前累积的内容
             flushTextBlock();
@@ -1453,9 +1439,7 @@ function parseMarkdown(markdown, options = {}) {
         // 处理组件标签（如 <simpleCard> 或 <halfCirclePrecent fillColor={...}>）
         const componentTagInfo = isComponentTag(trimmedLine);
         if (componentTagInfo.isComponentTag && !componentTagInfo.isClosing) {
-            console.log(`\n🎯 发现组件标签: <${componentTagInfo.componentName}>`);
-            console.log('  属性:', componentTagInfo.attributes);
-
+           
             // 处理之前累积的内容
             flushTextBlock();
             flushConsecutiveButtons();
@@ -1481,12 +1465,9 @@ function parseMarkdown(markdown, options = {}) {
                 i
             );
 
-            console.log('  内容:', componentContent);
-
             // 🆕 直接使用 createComponentElement 创建组件
             const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[componentName];
             if (componentConfig) {
-                console.log(`  使用 componentCreators 创建组件`);
 
                 // 直接调用 createComponentElement（同步）
                 const componentElement = createComponentElement(
@@ -1499,7 +1480,6 @@ function parseMarkdown(markdown, options = {}) {
                 );
 
                 stack[stack.length - 1].elements.push(componentElement);
-                console.log(`✅ 组件元素已创建并添加到栈中\n`);
             } else {
                 console.warn(`⚠️ 组件 ${componentName} 的配置未找到`);
             }
@@ -1512,8 +1492,7 @@ function parseMarkdown(markdown, options = {}) {
         // 处理选项卡标签
         const tabTagInfo = isTabTag(trimmedLine);
         if (tabTagInfo.isTabTag && !tabTagInfo.isClosing) {
-            console.log(`发现选项卡标签，行号: ${i}`);
-
+   
             // 处理之前累积的内容
             flushTextBlock();
             flushConsecutiveButtons();
@@ -1801,7 +1780,6 @@ function parseMarkdown(markdown, options = {}) {
                 }
 
                 stack[stack.length - 1].elements.push(backgroundElement);
-                console.log(`✅ 图片元素已添加到栈中`);
 
                 continue;
             }
@@ -1809,8 +1787,7 @@ function parseMarkdown(markdown, options = {}) {
 
         // 检查是否有多个链接或混合内容
         if (trimmedLine.includes('[') && trimmedLine.includes('](') && trimmedLine.includes(')')) {
-            console.log(`🔍 检测到可能的链接内容: "${trimmedLine}"`);
-
+      
             // 首先检查是否是按钮类型标记格式
             const buttonVariantResult = parseButtonVariant(trimmedLine);
 
@@ -1818,11 +1795,8 @@ function parseMarkdown(markdown, options = {}) {
                 // 处理带类型标记的按钮
                 flushTextBlock();
 
-                console.log(`发现按钮类型标记: variant="${buttonVariantResult.variant}", 文本="${buttonVariantResult.text}", URL="${buttonVariantResult.url}"`);
-
                 // 🆕 传入原始完整文本用于事件解析，同时传入提取的按钮文本
                 const buttonElement = createButtonElement(trimmedLine, buttonVariantResult.url, buttonVariantResult.variant, currentMarkdown, buttonVariantResult.text);
-                console.log(`按钮ID: ${buttonElement.id}, 名称: ${buttonElement.name}, 样式: ${buttonVariantResult.variant}`);
                 consecutiveButtons.push(buttonElement);
 
                 continue;
@@ -1862,21 +1836,16 @@ function parseMarkdown(markdown, options = {}) {
                     // 🆕 判断是否有 URL
                     const hasUrl = linkUrl && linkUrl.trim().length > 0;
 
-                    console.log(`🔗 链接解析: 文本="${linkText}", URL="${linkUrl}", 有事件=${hasEvent}, 有URL=${hasUrl}`);
-
                     // 🆕 有事件 OR 没有 URL -> 创建按钮
                     if (hasEvent || !hasUrl) {
-                        console.log(`  → 创建按钮（${hasEvent ? '有事件' : '无 URL'}）`);
                         // 🔧 修复：传入 linkText 而不是 trimmedLine，确保 buttonText 是纯文本
                         const buttonElement = createButtonElement(linkText, linkUrl || '#', 'primary', currentMarkdown);
                         consecutiveButtons.push(buttonElement);
                     }
                     // 🆕 有 URL 且无事件 -> 创建超链接
                     else {
-                        console.log(`  → 创建超链接`);
                         const hyperlinkElement = createHyperlinkElement(linkText, linkUrl, 'hyperlink');
-                        console.log(`  → 超链接ID: ${hyperlinkElement.id}`);
-
+     
                         // 🆕 超链接作为文本元素处理，不添加到按钮组
                         flushConsecutiveButtons();
                         stack[stack.length - 1].elements.push(hyperlinkElement);
@@ -1890,7 +1859,6 @@ function parseMarkdown(markdown, options = {}) {
         // 检测图标标签
         const iconTagInfo = isIconTag(trimmedLine);
         if (iconTagInfo.isIconTag) {
-            console.log(`发现图标标签，行号: ${i}，图标名称: ${iconTagInfo.iconName}，变体: ${iconTagInfo.variant}`);
 
             // 处理之前累积的内容
             flushTextBlock();
@@ -1914,8 +1882,6 @@ function parseMarkdown(markdown, options = {}) {
             // 创建图标元素，使用从标签解析出的变体
             const iconElement = createIconElement(iconTagInfo.iconName, iconTagInfo.variant);
 
-            console.log(`🔧 创建图标元素: ID=${iconElement.id}, 图标名称=${iconTagInfo.iconName}, 变体=${iconTagInfo.variant}`);
-
             stack[stack.length - 1].elements.push(iconElement);
 
             continue;
@@ -1924,8 +1890,7 @@ function parseMarkdown(markdown, options = {}) {
         // 检查是否包含内联图标语法 [icon:path]，但不包含其他复杂元素
         if (trimmedLine.includes('[icon:') && trimmedLine.includes(']') &&
             !trimmedLine.includes('](') && !trimmedLine.includes('![')) {
-            console.log(`🔍 检测到包含内联图标的纯文本: "${trimmedLine}"`);
-
+     
             // 处理之前累积的文本块
             flushTextBlock();
             flushConsecutiveButtons();
@@ -2247,8 +2212,7 @@ function parseMarkdown(markdown, options = {}) {
 
         // 🆕 如果只有文本和超链接（所有链接都有URL且无事件），创建单个文本元素
         if (!hasButtonsOrImages && !hasLinksWithoutUrl && !hasLinksWithEvent && filteredLinkMatches.length > 0) {
-            console.log(`  → 纯文本+超链接，创建单个文本元素`);
-
+    
             // 将整行转换为 HTML 字符串
             let htmlContent = '<p>';
             let lastIndex = 0;
@@ -2281,15 +2245,11 @@ function parseMarkdown(markdown, options = {}) {
 
             htmlContent += '</p>\n';
 
-            console.log(`  → 生成的 HTML: ${htmlContent}`);
-
             // 创建文本元素
             const textElement = createTextElement(htmlContent);
             return textElement;
         }
 
-        // 🆕 如果有按钮或图片，使用原来的 layout 方式
-        console.log(`  → 包含按钮/图片，使用 layout 容器`);
 
         // 🔧 生成稳定的内容种子，添加行内容哈希
         const lineHash = line.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) & 0xfffff, 0);
@@ -2353,17 +2313,14 @@ function parseMarkdown(markdown, options = {}) {
                 // 🆕 判断是否有 URL
                 const hasUrl = linkUrl && linkUrl.trim().length > 0;
 
-                console.log(`🔗 混合内容中的链接: 文本="${linkText}", URL="${linkUrl}", 有事件=${hasEvent}, 有URL=${hasUrl}`);
-
+    
                 // 🆕 有事件 OR 没有 URL -> 创建按钮
                 if (hasEvent || !hasUrl) {
-                    console.log(`  → 创建按钮（${hasEvent ? '有事件' : '无 URL'}）`);
                     const buttonElement = createButtonElement(linkText, linkUrl || '#', 'primary', currentMarkdown);
                     currentLayout.layout.children.push(buttonElement);
                 }
                 // 🆕 有 URL 且无事件 -> 创建带样式的超链接文本元素
                 else {
-                    console.log(`  → 创建带样式超链接的文本元素`);
                     const hyperlinkHtml = generateStyledHyperlink(linkText, linkUrl);
                     const textElement = createTextElement(hyperlinkHtml);
                     currentLayout.layout.children.push(textElement);
@@ -2433,8 +2390,6 @@ function markdownToEightElement(markdown, styleConfig) {
         processedMarkdown += '\n';
     }
 
-    console.log(`处理Markdown文本，长度: ${processedMarkdown.length}`);
-
     // 🆕 创建解析选项对象，用于收集根layout属性
     const parseOptions = {
         rootAttributes: {},
@@ -2443,7 +2398,6 @@ function markdownToEightElement(markdown, styleConfig) {
 
     // 直接使用parseMarkdown函数解析Markdown为元素数组
     const parsedElements = parseMarkdown(processedMarkdown, parseOptions);
-    console.log(`解析得到的元素数量: ${parsedElements.length}`);
 
     // 🆕 使用createEightElementRoot创建八要素根结构，传递根layout属性
     const eightElementRoot = createEightElementRoot(parsedElements, parseOptions.rootAttributes);
