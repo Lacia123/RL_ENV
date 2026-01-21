@@ -1,0 +1,1491 @@
+{
+    "dataKeys": [],
+    "id": "dd-e2fe5874-4d72-4611-9854-98e1d305c264",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-e2fe5874-4d72-4611-9854-98e1d305c264",
+      "style": {
+        "display": "{layout.state.display.flex}",
+        "layoutMode": "{layout.direction.VERTICAL}",
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "组件容器-commentStyleListCard",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "component",
+            "variant": "commentStyleListCard",
+            "isComponent": true,
+            "componentName": "commentStyleListCard",
+            "parameters": {},
+            "layoutMode": "default"
+          },
+          "layout": {
+            "children": [
+              {
+                "id": "dd-d6e6c74c-b438-4c5e-94d7-a1dc888521b4",
+                "name": "layout",
+                "file-type": "template",
+                "_metadata": {
+                  "isGroup": true,
+                  "groupName": "header",
+                  "modeName": "default",
+                  "isNested": false
+                },
+                "layout": {
+                  "style": {
+                    "display": "flex",
+                    "flexDirection": "column",
+                    "gap": "{dimension.gap.supertight}"
+                  },
+                  "classStyle": {
+                    "display": "flex",
+                    "flexDirection": "column",
+                    "gap": "{dimension.gap.supertight}"
+                  },
+                  "className": "group-commentStyleListCard-header-hash582534",
+                  "children": [
+                    {
+                      "id": "dd-3dde3ea8-161a-4aeb-844c-a93d2f35e2ce",
+                      "name": "text",
+                      "name-zh": "文本",
+                      "file-type": "cell-element",
+                      "_metadata": {
+                        "originalType": "text",
+                        "actualType": "text",
+                        "variant": "h4",
+                        "originalVariant": "h4",
+                        "containsMath": false,
+                        "mathType": null,
+                        "isList": false,
+                        "listType": null,
+                        "hasRichText": false,
+                        "slotName": "title",
+                        "slotBaseName": "title",
+                        "slotUniqueName": "title"
+                      },
+                      "layout": {
+                        "classStyle": {
+                          "width": "auto",
+                          "fontSize": "{font.size.large}",
+                          "fontWeight": "{font.fontweight.semibold}",
+                          "lineHeight": "{font.lineheight.base}",
+                          "letterSpacing": "{font.letterspacing.base}",
+                          "color": "{color.onsurface.black88}",
+                          "justifyContent": "center",
+                          "margin": "0",
+                          "padding": "0 0 {dimension.padding.extratight} 0",
+                          "textTransform": "capitalize",
+                          "borderBottom": "2px solid {color.surfacecontainer.black12}"
+                        },
+                        "className": "text-dd-3dde3ea8-161a-4aeb-844c-a93d2f35e2ce",
+                        "style": {
+                          "boxSizing": "border-box",
+                          "position": "relative",
+                          "width": ""
+                        },
+                        "text_body": {
+                          "type": "container",
+                          "content": [
+                            {
+                              "element": "font",
+                              "value": "fontsize",
+                              "prop": "default",
+                              "token": "fontsize"
+                            }
+                          ],
+                          "resource": "",
+                          "data": [],
+                          "style": {
+                            "layoutGrow": "{layout.grow.0}",
+                            "width": "",
+                            "textColor": {
+                              "element": "color",
+                              "value": "text",
+                              "prop": "default",
+                              "token": "text"
+                            },
+                            "fill": {
+                              "element": "color",
+                              "value": "bg",
+                              "prop": "default",
+                              "token": "bg"
+                            }
+                          },
+                          "children": []
+                        },
+                        "text_hyperlink": {
+                          "type": "container",
+                          "content": [
+                            {
+                              "element": "font",
+                              "value": "fontsize",
+                              "prop": "default",
+                              "token": "fontsize"
+                            }
+                          ],
+                          "resource": "",
+                          "data": [],
+                          "style": {
+                            "layoutAlign": "{layout.align.y.self.INHERIT}",
+                            "layoutGrow": "{layout.grow.0}",
+                            "textDecoration": "underline",
+                            "width": "",
+                            "textColor": {
+                              "element": "color",
+                              "value": "text",
+                              "prop": "default",
+                              "token": "hyperlinktext"
+                            },
+                            "fill": {
+                              "element": "color",
+                              "value": "bg",
+                              "prop": "default",
+                              "token": "bg"
+                            }
+                          },
+                          "children": []
+                        }
+                      },
+                      "color": {
+                        "text": {
+                          "default": {
+                            "data-key": "",
+                            "style": {}
+                          }
+                        },
+                        "bg": {
+                          "default": {
+                            "data-key": "",
+                            "style": {
+                              "bg": {
+                                "value": "none",
+                                "type": "color",
+                                "key": "color-bg"
+                              }
+                            },
+                            "resource": "none"
+                          }
+                        }
+                      },
+                      "scale": {
+                        "min_height": {
+                          "default": {
+                            "data-key": "",
+                            "style": {
+                              "min_height": {
+                                "value": "{dimension.basic.dimension.72}",
+                                "type": "sizing",
+                                "key": "scale-min_height"
+                              }
+                            },
+                            "resource": "{dimension.basic.dimension.72}"
+                          }
+                        },
+                        "max_width": {
+                          "default": {
+                            "data-key": "",
+                            "style": {
+                              "max_width": {
+                                "value": "{dimension.basic.dimension.1200}",
+                                "type": "sizing",
+                                "key": "scale-max_width"
+                              }
+                            },
+                            "resource": "{dimension.basic.dimension.1200}"
+                          }
+                        }
+                      },
+                      "font": {
+                        "fontsize": {
+                          "default": {
+                            "data-key": "",
+                            "content": "<p>项目动态</p>\n"
+                          }
+                        },
+                        "fontweight": "{font.fontweight.semibold}"
+                      },
+                      "type": "text_body",
+                      "state": "default",
+                      "events": [
+                        {}
+                      ]
+                    },
+                    {
+                      "id": "dd-27ee5f5b-21e2-4752-b2d5-ebea34446837",
+                      "name": "text",
+                      "name-zh": "文本",
+                      "file-type": "cell-element",
+                      "_metadata": {
+                        "originalType": "text",
+                        "actualType": "text",
+                        "variant": "p",
+                        "originalVariant": "p",
+                        "containsMath": false,
+                        "mathType": null,
+                        "isList": false,
+                        "listType": null,
+                        "hasRichText": false,
+                        "slotName": "subtitle",
+                        "slotBaseName": "subtitle",
+                        "slotUniqueName": "subtitle"
+                      },
+                      "layout": {
+                        "classStyle": {
+                          "fontSize": "{font.size.small}",
+                          "fontWeight": "400",
+                          "lineHeight": "1.7",
+                          "letterSpacing": "{font.letterspacing.base}",
+                          "color": "{color.onsurface.black64}",
+                          "margin": "0",
+                          "textAlign": "justify",
+                          "textJustify": "inter-word"
+                        },
+                        "className": "text-dd-27ee5f5b-21e2-4752-b2d5-ebea34446837",
+                        "style": {
+                          "boxSizing": "border-box",
+                          "position": "relative",
+                          "width": ""
+                        },
+                        "text_body": {
+                          "type": "container",
+                          "content": [
+                            {
+                              "element": "font",
+                              "value": "fontsize",
+                              "prop": "default",
+                              "token": "fontsize"
+                            }
+                          ],
+                          "resource": "",
+                          "data": [],
+                          "style": {
+                            "layoutGrow": "{layout.grow.0}",
+                            "width": "",
+                            "textColor": {
+                              "element": "color",
+                              "value": "text",
+                              "prop": "default",
+                              "token": "text"
+                            },
+                            "fill": {
+                              "element": "color",
+                              "value": "bg",
+                              "prop": "default",
+                              "token": "bg"
+                            }
+                          },
+                          "children": []
+                        },
+                        "text_hyperlink": {
+                          "type": "container",
+                          "content": [
+                            {
+                              "element": "font",
+                              "value": "fontsize",
+                              "prop": "default",
+                              "token": "fontsize"
+                            }
+                          ],
+                          "resource": "",
+                          "data": [],
+                          "style": {
+                            "layoutAlign": "{layout.align.y.self.INHERIT}",
+                            "layoutGrow": "{layout.grow.0}",
+                            "textDecoration": "underline",
+                            "width": "",
+                            "textColor": {
+                              "element": "color",
+                              "value": "text",
+                              "prop": "default",
+                              "token": "hyperlinktext"
+                            },
+                            "fill": {
+                              "element": "color",
+                              "value": "bg",
+                              "prop": "default",
+                              "token": "bg"
+                            }
+                          },
+                          "children": []
+                        }
+                      },
+                      "color": {
+                        "text": {
+                          "default": {
+                            "data-key": "",
+                            "style": {}
+                          }
+                        },
+                        "bg": {
+                          "default": {
+                            "data-key": "",
+                            "style": {
+                              "bg": {
+                                "value": "none",
+                                "type": "color",
+                                "key": "color-bg"
+                              }
+                            },
+                            "resource": "none"
+                          }
+                        }
+                      },
+                      "scale": {
+                        "min_height": {
+                          "default": {
+                            "data-key": "",
+                            "style": {
+                              "min_height": {
+                                "value": "{dimension.basic.dimension.72}",
+                                "type": "sizing",
+                                "key": "scale-min_height"
+                              }
+                            },
+                            "resource": "{dimension.basic.dimension.72}"
+                          }
+                        },
+                        "max_width": {
+                          "default": {
+                            "data-key": "",
+                            "style": {
+                              "max_width": {
+                                "value": "{dimension.basic.dimension.1200}",
+                                "type": "sizing",
+                                "key": "scale-max_width"
+                              }
+                            },
+                            "resource": "{dimension.basic.dimension.1200}"
+                          }
+                        }
+                      },
+                      "font": {
+                        "fontsize": {
+                          "default": {
+                            "data-key": "",
+                            "content": "<p>最新 3 条更新 · 自动排列列表项</p>\n"
+                          }
+                        },
+                        "fontweight": "400"
+                      },
+                      "type": "text_body",
+                      "state": "default",
+                      "events": [
+                        {}
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "dd-fe59fdd3-f413-4186-9953-528f1d75c628",
+                "name": "layout",
+                "file-type": "template",
+                "_metadata": {
+                  "isLoopContainer": true,
+                  "loopGroupName": "itemContent"
+                },
+                "layout": {
+                  "style": {},
+                  "classStyle": {},
+                  "children": [
+                    {
+                      "id": "dd-4b860ad4-803e-476a-a4d2-dfc3a6ff799f",
+                      "name": "layout",
+                      "file-type": "template",
+                      "_metadata": {
+                        "isGroup": true,
+                        "groupName": "itemContent",
+                        "modeName": "default",
+                        "isNested": false
+                      },
+                      "layout": {
+                        "style": {
+                          "display": "flex",
+                          "flexDirection": "column",
+                          "padding": "{dimension.padding.base} 0",
+                          "borderBottom": "1px solid {color.surfacecontainer.black7}",
+                          "gap": "4px",
+                          "width": "100%"
+                        },
+                        "classStyle": {
+                          "display": "flex",
+                          "flexDirection": "column",
+                          "padding": "{dimension.padding.base} 0",
+                          "borderBottom": "1px solid {color.surfacecontainer.black7}",
+                          "gap": "4px",
+                          "width": "100%"
+                        },
+                        "className": "group-commentStyleListCard-itemContent-hash456845",
+                        "children": [
+                          {
+                            "id": "dd-d7415df4-5e5a-4fda-8528-a8fd417186d6",
+                            "name": "layout",
+                            "file-type": "template",
+                            "_metadata": {
+                              "isGroup": true,
+                              "groupName": "headerRow",
+                              "modeName": "default",
+                              "isNested": true
+                            },
+                            "layout": {
+                              "style": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "alignItems": "flex-start",
+                                "gap": "{dimension.gap.base}",
+                                "flexWrap": "wrap"
+                              },
+                              "classStyle": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "alignItems": "flex-start",
+                                "gap": "{dimension.gap.base}",
+                                "flexWrap": "wrap"
+                              },
+                              "className": "group-commentStyleListCard-headerRow-hash419956",
+                              "children": [
+                                {
+                                  "id": "dd-b8149983-ad90-4354-b2e7-e4e01c02b0aa",
+                                  "name": "layout",
+                                  "file-type": "template",
+                                  "_metadata": {
+                                    "isGroup": true,
+                                    "groupName": "avatarGroup",
+                                    "modeName": "default",
+                                    "isNested": true
+                                  },
+                                  "layout": {
+                                    "style": {
+                                      "width": "44px",
+                                      "height": "44px",
+                                      "borderRadius": "50%",
+                                      "overflow": "hidden",
+                                      "objectFit": "cover"
+                                    },
+                                    "classStyle": {
+                                      "width": "44px",
+                                      "height": "44px",
+                                      "borderRadius": "50%",
+                                      "overflow": "hidden",
+                                      "objectFit": "cover"
+                                    },
+                                    "className": "group-commentStyleListCard-avatarGroup-hash911181",
+                                    "children": [
+                                      {
+                                        "id": "dd-600c838a-2cb7-44c6-b8dd-d5c3eee3d91a",
+                                        "name": "background",
+                                        "name-zh": "背景",
+                                        "file-type": "cell-element",
+                                        "_metadata": {
+                                          "actualType": "image",
+                                          "variant": "avatar",
+                                          "isImage": true,
+                                          "imageUrl": "avatarUrl",
+                                          "slotName": "avatar",
+                                          "slotBaseName": "avatar",
+                                          "slotUniqueName": "avatar"
+                                        },
+                                        "layout": {
+                                          "classStyle": {
+                                            "borderRadius": "{dimension.borderradius.medium}",
+                                            "borderWidth": "{dimension.borderwidth.narrow}",
+                                            "borderColor": "{color.surfacecontainer.black16}",
+                                            "borderStyle": "solid",
+                                            "boxShadow": "{material.hierarchy.main}",
+                                            "clipPath": "none",
+                                            "transition": "var(--animation-smooth, all 0.3s cubic-bezier(0.4, 0, 0.2, 1))",
+                                            "maxWidth": "100%",
+                                            "height": "auto",
+                                            "&:hover": {
+                                              "boxShadow": "{material.hierarchy.2f}",
+                                              "transform": "scale(1.02)"
+                                            }
+                                          },
+                                          "className": "background-dd-600c838a-2cb7-44c6-b8dd-d5c3eee3d91a",
+                                          "style": {
+                                            "backgroundColor": "none",
+                                            "font": [],
+                                            "border": [],
+                                            "scale": [],
+                                            "overflow": "hidden",
+                                            "boxSizing": "border-box",
+                                            "position": "relative",
+                                            "padding": "0",
+                                            "margin": "0",
+                                            "display": "flex",
+                                            "flexDirection": "column",
+                                            "flexWrap": "nowrap",
+                                            "justifyContent": "flex-start",
+                                            "alignItems": "flex-start",
+                                            "gap": "{dimension.padding.base}",
+                                            "gridTemplateColumns": "none",
+                                            "gridTemplateAreas": "none",
+                                            "justifyItems": "stretch"
+                                          },
+                                          "background": {
+                                            "type": "container",
+                                            "content": [
+                                              {
+                                                "element": "material",
+                                                "value": "image",
+                                                "prop": "default",
+                                                "token": "image"
+                                              }
+                                            ],
+                                            "resource": "",
+                                            "data": [],
+                                            "style": {
+                                              "display": "{layout.state.display.flex}",
+                                              "layoutMode": "{layout.direction.HORIZONTAL}",
+                                              "layoutWrap": "{layout.wrap.NO_WRAP}",
+                                              "layoutAlign": "{layout.align.y.self.INHERIT}",
+                                              "layoutGrow": "{layout.grow.0}",
+                                              "width": "100%",
+                                              "height": "100%",
+                                              "asset": {
+                                                "element": "material",
+                                                "value": "image",
+                                                "prop": "default",
+                                                "token": "image"
+                                              }
+                                            },
+                                            "children": []
+                                          }
+                                        },
+                                        "material": {
+                                          "image": {
+                                            "default": {
+                                              "data-key": "avatarUrl",
+                                              "type": "img",
+                                              "preview": "avatarUrl",
+                                              "style": {
+                                                "image": {
+                                                  "value": "avatarUrl",
+                                                  "type": "asset",
+                                                  "key": "material-image"
+                                                },
+                                                "width": "100%",
+                                                "height": "100%"
+                                              },
+                                              "resource": "avatarUrl"
+                                            }
+                                          },
+                                          "elevation": {
+                                            "default": {
+                                              "data-key": "avatarUrl",
+                                              "style": {
+                                                "elevation": {
+                                                  "value": "{material.hierarchy.main}",
+                                                  "type": "boxShadow",
+                                                  "key": "material-elevation"
+                                                }
+                                              },
+                                              "resource": "{material.hierarchy.main}"
+                                            }
+                                          }
+                                        },
+                                        "shape": {
+                                          "borderradius": {
+                                            "default": {
+                                              "data-key": "",
+                                              "style": {
+                                                "borderradius": {
+                                                  "value": "{dimension.borderradius.medium}",
+                                                  "type": "borderRadius",
+                                                  "key": "shape-borderradius"
+                                                }
+                                              },
+                                              "resource": "{dimension.borderradius.medium}"
+                                            }
+                                          },
+                                          "borderwidth": {
+                                            "default": {
+                                              "data-key": "",
+                                              "style": {
+                                                "borderwidth": {
+                                                  "value": "{dimension.borderwidth.narrow}",
+                                                  "type": "borderWidth",
+                                                  "key": "shape-borderwidth"
+                                                }
+                                              },
+                                              "resource": "{dimension.borderwidth.narrow}"
+                                            }
+                                          }
+                                        },
+                                        "color": {
+                                          "border": {
+                                            "default": {
+                                              "data-key": "",
+                                              "style": {
+                                                "border": {
+                                                  "value": "{color.surfacecontainer.black16}",
+                                                  "type": "color",
+                                                  "key": "color-border"
+                                                }
+                                              },
+                                              "resource": "{color.surfacecontainer.black16}"
+                                            }
+                                          }
+                                        },
+                                        "type": "background",
+                                        "state": "default",
+                                        "events": [
+                                          {
+                                            "runtimeEventKey": "theme_changed",
+                                            "nativeEventKey": "contextmenu",
+                                            "dataEventKey": [],
+                                            "parameters": {
+                                              "imageUrl": "avatarUrl"
+                                            }
+                                          }
+                                        ],
+                                        "data-key": "avatarUrl"
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "id": "dd-e94aeb4c-0508-4d71-af14-196b1aa56427",
+                                  "name": "layout",
+                                  "file-type": "template",
+                                  "_metadata": {
+                                    "isGroup": true,
+                                    "groupName": "contentGroup",
+                                    "modeName": "default",
+                                    "isNested": true
+                                  },
+                                  "layout": {
+                                    "style": {
+                                      "display": "flex",
+                                      "flexDirection": "column",
+                                      "gap": "{dimension.gap.supertight}",
+                                      "flex": "1"
+                                    },
+                                    "classStyle": {
+                                      "display": "flex",
+                                      "flexDirection": "column",
+                                      "gap": "{dimension.gap.supertight}",
+                                      "flex": "1"
+                                    },
+                                    "className": "group-commentStyleListCard-contentGroup-hash350143",
+                                    "children": [
+                                      {
+                                        "id": "dd-065d8c6c-4d22-4d2b-a612-52e6ef53d8d8",
+                                        "name": "layout",
+                                        "file-type": "template",
+                                        "_metadata": {
+                                          "isGroup": true,
+                                          "groupName": "nameGroup",
+                                          "modeName": "default",
+                                          "isNested": true
+                                        },
+                                        "layout": {
+                                          "style": {
+                                            "display": "flex",
+                                            "flexDirection": "row",
+                                            "gap": "{dimension.gap.base}",
+                                            "flex": "1"
+                                          },
+                                          "classStyle": {
+                                            "display": "flex",
+                                            "flexDirection": "row",
+                                            "gap": "{dimension.gap.base}",
+                                            "flex": "1"
+                                          },
+                                          "className": "group-commentStyleListCard-nameGroup-hash367387",
+                                          "children": [
+                                            {
+                                              "id": "dd-a8854af0-7eda-4a61-823a-adcd43048ffe",
+                                              "name": "text",
+                                              "name-zh": "文本",
+                                              "file-type": "cell-element",
+                                              "_metadata": {
+                                                "originalType": "text",
+                                                "actualType": "text",
+                                                "variant": "p",
+                                                "originalVariant": "p",
+                                                "containsMath": false,
+                                                "mathType": null,
+                                                "isList": false,
+                                                "listType": null,
+                                                "hasRichText": false,
+                                                "slotName": "name",
+                                                "slotBaseName": "name",
+                                                "slotUniqueName": "name"
+                                              },
+                                              "layout": {
+                                                "classStyle": {
+                                                  "fontSize": "{font.size.medium}",
+                                                  "fontWeight": "400",
+                                                  "lineHeight": "1.5",
+                                                  "letterSpacing": "{font.letterspacing.base}",
+                                                  "color": "{color.onsurface.black88}",
+                                                  "margin": "0",
+                                                  "textAlign": "justify",
+                                                  "textJustify": "inter-word"
+                                                },
+                                                "className": "text-dd-a8854af0-7eda-4a61-823a-adcd43048ffe",
+                                                "style": {
+                                                  "boxSizing": "border-box",
+                                                  "position": "relative",
+                                                  "width": ""
+                                                },
+                                                "text_body": {
+                                                  "type": "container",
+                                                  "content": [
+                                                    {
+                                                      "element": "font",
+                                                      "value": "fontsize",
+                                                      "prop": "default",
+                                                      "token": "fontsize"
+                                                    }
+                                                  ],
+                                                  "resource": "",
+                                                  "data": [],
+                                                  "style": {
+                                                    "layoutGrow": "{layout.grow.0}",
+                                                    "width": "",
+                                                    "textColor": {
+                                                      "element": "color",
+                                                      "value": "text",
+                                                      "prop": "default",
+                                                      "token": "text"
+                                                    },
+                                                    "fill": {
+                                                      "element": "color",
+                                                      "value": "bg",
+                                                      "prop": "default",
+                                                      "token": "bg"
+                                                    }
+                                                  },
+                                                  "children": []
+                                                },
+                                                "text_hyperlink": {
+                                                  "type": "container",
+                                                  "content": [
+                                                    {
+                                                      "element": "font",
+                                                      "value": "fontsize",
+                                                      "prop": "default",
+                                                      "token": "fontsize"
+                                                    }
+                                                  ],
+                                                  "resource": "",
+                                                  "data": [],
+                                                  "style": {
+                                                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                                                    "layoutGrow": "{layout.grow.0}",
+                                                    "textDecoration": "underline",
+                                                    "width": "",
+                                                    "textColor": {
+                                                      "element": "color",
+                                                      "value": "text",
+                                                      "prop": "default",
+                                                      "token": "hyperlinktext"
+                                                    },
+                                                    "fill": {
+                                                      "element": "color",
+                                                      "value": "bg",
+                                                      "prop": "default",
+                                                      "token": "bg"
+                                                    }
+                                                  },
+                                                  "children": []
+                                                }
+                                              },
+                                              "color": {
+                                                "text": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {}
+                                                  }
+                                                },
+                                                "bg": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {
+                                                      "bg": {
+                                                        "value": "none",
+                                                        "type": "color",
+                                                        "key": "color-bg"
+                                                      }
+                                                    },
+                                                    "resource": "none"
+                                                  }
+                                                }
+                                              },
+                                              "scale": {
+                                                "min_height": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {
+                                                      "min_height": {
+                                                        "value": "{dimension.basic.dimension.72}",
+                                                        "type": "sizing",
+                                                        "key": "scale-min_height"
+                                                      }
+                                                    },
+                                                    "resource": "{dimension.basic.dimension.72}"
+                                                  }
+                                                },
+                                                "max_width": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {
+                                                      "max_width": {
+                                                        "value": "{dimension.basic.dimension.1200}",
+                                                        "type": "sizing",
+                                                        "key": "scale-max_width"
+                                                      }
+                                                    },
+                                                    "resource": "{dimension.basic.dimension.1200}"
+                                                  }
+                                                }
+                                              },
+                                              "font": {
+                                                "fontsize": {
+                                                  "default": {
+                                                    "data-key": "approveAuditorName",
+                                                    "content": ""
+                                                  }
+                                                },
+                                                "fontweight": "400"
+                                              },
+                                              "type": "text_body",
+                                              "state": "default",
+                                              "events": [
+                                                {}
+                                              ]
+                                            },
+                                            {
+                                              "id": "dd-ba2545ce-4f96-43ee-a2ee-8751ca3b4429",
+                                              "name": "text",
+                                              "name-zh": "文本",
+                                              "file-type": "cell-element",
+                                              "_metadata": {
+                                                "originalType": "text",
+                                                "actualType": "text",
+                                                "variant": "p",
+                                                "originalVariant": "p",
+                                                "containsMath": false,
+                                                "mathType": null,
+                                                "isList": false,
+                                                "listType": null,
+                                                "hasRichText": false,
+                                                "slotName": "text",
+                                                "slotBaseName": "text",
+                                                "slotUniqueName": "text"
+                                              },
+                                              "layout": {
+                                                "classStyle": {
+                                                  "fontSize": "{font.size.medium}",
+                                                  "fontWeight": "400",
+                                                  "lineHeight": "1.5",
+                                                  "letterSpacing": "{font.letterspacing.base}",
+                                                  "color": "{color.onsurface.black88}",
+                                                  "margin": "0",
+                                                  "textAlign": "justify",
+                                                  "textJustify": "inter-word"
+                                                },
+                                                "className": "text-dd-ba2545ce-4f96-43ee-a2ee-8751ca3b4429",
+                                                "style": {
+                                                  "boxSizing": "border-box",
+                                                  "position": "relative",
+                                                  "width": ""
+                                                },
+                                                "text_body": {
+                                                  "type": "container",
+                                                  "content": [
+                                                    {
+                                                      "element": "font",
+                                                      "value": "fontsize",
+                                                      "prop": "default",
+                                                      "token": "fontsize"
+                                                    }
+                                                  ],
+                                                  "resource": "",
+                                                  "data": [],
+                                                  "style": {
+                                                    "layoutGrow": "{layout.grow.0}",
+                                                    "width": "",
+                                                    "textColor": {
+                                                      "element": "color",
+                                                      "value": "text",
+                                                      "prop": "default",
+                                                      "token": "text"
+                                                    },
+                                                    "fill": {
+                                                      "element": "color",
+                                                      "value": "bg",
+                                                      "prop": "default",
+                                                      "token": "bg"
+                                                    }
+                                                  },
+                                                  "children": []
+                                                },
+                                                "text_hyperlink": {
+                                                  "type": "container",
+                                                  "content": [
+                                                    {
+                                                      "element": "font",
+                                                      "value": "fontsize",
+                                                      "prop": "default",
+                                                      "token": "fontsize"
+                                                    }
+                                                  ],
+                                                  "resource": "",
+                                                  "data": [],
+                                                  "style": {
+                                                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                                                    "layoutGrow": "{layout.grow.0}",
+                                                    "textDecoration": "underline",
+                                                    "width": "",
+                                                    "textColor": {
+                                                      "element": "color",
+                                                      "value": "text",
+                                                      "prop": "default",
+                                                      "token": "hyperlinktext"
+                                                    },
+                                                    "fill": {
+                                                      "element": "color",
+                                                      "value": "bg",
+                                                      "prop": "default",
+                                                      "token": "bg"
+                                                    }
+                                                  },
+                                                  "children": []
+                                                }
+                                              },
+                                              "color": {
+                                                "text": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {}
+                                                  }
+                                                },
+                                                "bg": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {
+                                                      "bg": {
+                                                        "value": "none",
+                                                        "type": "color",
+                                                        "key": "color-bg"
+                                                      }
+                                                    },
+                                                    "resource": "none"
+                                                  }
+                                                }
+                                              },
+                                              "scale": {
+                                                "min_height": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {
+                                                      "min_height": {
+                                                        "value": "{dimension.basic.dimension.72}",
+                                                        "type": "sizing",
+                                                        "key": "scale-min_height"
+                                                      }
+                                                    },
+                                                    "resource": "{dimension.basic.dimension.72}"
+                                                  }
+                                                },
+                                                "max_width": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {
+                                                      "max_width": {
+                                                        "value": "{dimension.basic.dimension.1200}",
+                                                        "type": "sizing",
+                                                        "key": "scale-max_width"
+                                                      }
+                                                    },
+                                                    "resource": "{dimension.basic.dimension.1200}"
+                                                  }
+                                                }
+                                              },
+                                              "font": {
+                                                "fontsize": {
+                                                  "default": {
+                                                    "data-key": "applyDeptName",
+                                                    "content": ""
+                                                  }
+                                                },
+                                                "fontweight": "400"
+                                              },
+                                              "type": "text_body",
+                                              "state": "default",
+                                              "events": [
+                                                {}
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      {
+                                        "id": "dd-ef49db0e-8bd5-43ff-9443-3acf7e42fb63",
+                                        "name": "layout",
+                                        "file-type": "template",
+                                        "_metadata": {
+                                          "isGroup": true,
+                                          "groupName": "descGroup",
+                                          "modeName": "default",
+                                          "isNested": true
+                                        },
+                                        "layout": {
+                                          "style": {
+                                            "display": "flex",
+                                            "flexDirection": "column"
+                                          },
+                                          "classStyle": {
+                                            "display": "flex",
+                                            "flexDirection": "column"
+                                          },
+                                          "className": "group-commentStyleListCard-descGroup-hash633557",
+                                          "children": [
+                                            {
+                                              "id": "dd-7f934c2e-b91c-4d5d-a6cc-d437eb00975f",
+                                              "name": "text",
+                                              "name-zh": "文本",
+                                              "file-type": "cell-element",
+                                              "_metadata": {
+                                                "originalType": "text",
+                                                "actualType": "text",
+                                                "variant": "p",
+                                                "originalVariant": "p",
+                                                "containsMath": false,
+                                                "mathType": null,
+                                                "isList": false,
+                                                "listType": null,
+                                                "hasRichText": false,
+                                                "slotName": "desc",
+                                                "slotBaseName": "desc",
+                                                "slotUniqueName": "desc"
+                                              },
+                                              "layout": {
+                                                "classStyle": {
+                                                  "fontSize": "{font.size.small}",
+                                                  "fontWeight": "400",
+                                                  "lineHeight": "1.7",
+                                                  "letterSpacing": "{font.letterspacing.base}",
+                                                  "color": "{color.onsurface.black64}",
+                                                  "margin": "0",
+                                                  "textAlign": "justify",
+                                                  "textJustify": "inter-word"
+                                                },
+                                                "className": "text-dd-7f934c2e-b91c-4d5d-a6cc-d437eb00975f",
+                                                "style": {
+                                                  "boxSizing": "border-box",
+                                                  "position": "relative",
+                                                  "width": ""
+                                                },
+                                                "text_body": {
+                                                  "type": "container",
+                                                  "content": [
+                                                    {
+                                                      "element": "font",
+                                                      "value": "fontsize",
+                                                      "prop": "default",
+                                                      "token": "fontsize"
+                                                    }
+                                                  ],
+                                                  "resource": "",
+                                                  "data": [],
+                                                  "style": {
+                                                    "layoutGrow": "{layout.grow.0}",
+                                                    "width": "",
+                                                    "textColor": {
+                                                      "element": "color",
+                                                      "value": "text",
+                                                      "prop": "default",
+                                                      "token": "text"
+                                                    },
+                                                    "fill": {
+                                                      "element": "color",
+                                                      "value": "bg",
+                                                      "prop": "default",
+                                                      "token": "bg"
+                                                    }
+                                                  },
+                                                  "children": []
+                                                },
+                                                "text_hyperlink": {
+                                                  "type": "container",
+                                                  "content": [
+                                                    {
+                                                      "element": "font",
+                                                      "value": "fontsize",
+                                                      "prop": "default",
+                                                      "token": "fontsize"
+                                                    }
+                                                  ],
+                                                  "resource": "",
+                                                  "data": [],
+                                                  "style": {
+                                                    "layoutAlign": "{layout.align.y.self.INHERIT}",
+                                                    "layoutGrow": "{layout.grow.0}",
+                                                    "textDecoration": "underline",
+                                                    "width": "",
+                                                    "textColor": {
+                                                      "element": "color",
+                                                      "value": "text",
+                                                      "prop": "default",
+                                                      "token": "hyperlinktext"
+                                                    },
+                                                    "fill": {
+                                                      "element": "color",
+                                                      "value": "bg",
+                                                      "prop": "default",
+                                                      "token": "bg"
+                                                    }
+                                                  },
+                                                  "children": []
+                                                }
+                                              },
+                                              "color": {
+                                                "text": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {}
+                                                  }
+                                                },
+                                                "bg": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {
+                                                      "bg": {
+                                                        "value": "none",
+                                                        "type": "color",
+                                                        "key": "color-bg"
+                                                      }
+                                                    },
+                                                    "resource": "none"
+                                                  }
+                                                }
+                                              },
+                                              "scale": {
+                                                "min_height": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {
+                                                      "min_height": {
+                                                        "value": "{dimension.basic.dimension.72}",
+                                                        "type": "sizing",
+                                                        "key": "scale-min_height"
+                                                      }
+                                                    },
+                                                    "resource": "{dimension.basic.dimension.72}"
+                                                  }
+                                                },
+                                                "max_width": {
+                                                  "default": {
+                                                    "data-key": "",
+                                                    "style": {
+                                                      "max_width": {
+                                                        "value": "{dimension.basic.dimension.1200}",
+                                                        "type": "sizing",
+                                                        "key": "scale-max_width"
+                                                      }
+                                                    },
+                                                    "resource": "{dimension.basic.dimension.1200}"
+                                                  }
+                                                }
+                                              },
+                                              "font": {
+                                                "fontsize": {
+                                                  "default": {
+                                                    "data-key": "orderSummary",
+                                                    "content": ""
+                                                  }
+                                                },
+                                                "fontweight": "400"
+                                              },
+                                              "type": "text_body",
+                                              "state": "default",
+                                              "events": [
+                                                {}
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "id": "dd-92252419-d9c6-4a48-9526-072718f134d1",
+                                  "name": "layout",
+                                  "file-type": "template",
+                                  "_metadata": {
+                                    "isGroup": true,
+                                    "groupName": "rightGroup",
+                                    "modeName": "default",
+                                    "isNested": true
+                                  },
+                                  "layout": {
+                                    "style": {
+                                      "display": "flex",
+                                      "flexDirection": "row",
+                                      "alignItems": "flex-end",
+                                      "gap": "{dimension.gap.base}"
+                                    },
+                                    "classStyle": {
+                                      "display": "flex",
+                                      "flexDirection": "row",
+                                      "alignItems": "flex-end",
+                                      "gap": "{dimension.gap.base}"
+                                    },
+                                    "className": "group-commentStyleListCard-rightGroup-hash4668",
+                                    "children": [
+                                      {
+                                        "id": "dd-a783554b-671e-4fd4-9c2a-b9688835cbe8",
+                                        "name": "text",
+                                        "name-zh": "文本",
+                                        "file-type": "cell-element",
+                                        "_metadata": {
+                                          "originalType": "text",
+                                          "actualType": "text",
+                                          "variant": "p",
+                                          "originalVariant": "p",
+                                          "containsMath": false,
+                                          "mathType": null,
+                                          "isList": false,
+                                          "listType": null,
+                                          "hasRichText": false,
+                                          "slotName": "timestamp",
+                                          "slotBaseName": "timestamp",
+                                          "slotUniqueName": "timestamp"
+                                        },
+                                        "layout": {
+                                          "classStyle": {
+                                            "fontSize": "{font.size.tiny}",
+                                            "fontWeight": "400",
+                                            "lineHeight": "1.7",
+                                            "letterSpacing": "{font.letterspacing.base}",
+                                            "color": "{color.onsurface.black64}",
+                                            "margin": "0",
+                                            "textAlign": "justify",
+                                            "textJustify": "inter-word"
+                                          },
+                                          "className": "text-dd-a783554b-671e-4fd4-9c2a-b9688835cbe8",
+                                          "style": {
+                                            "boxSizing": "border-box",
+                                            "position": "relative",
+                                            "width": ""
+                                          },
+                                          "text_body": {
+                                            "type": "container",
+                                            "content": [
+                                              {
+                                                "element": "font",
+                                                "value": "fontsize",
+                                                "prop": "default",
+                                                "token": "fontsize"
+                                              }
+                                            ],
+                                            "resource": "",
+                                            "data": [],
+                                            "style": {
+                                              "layoutGrow": "{layout.grow.0}",
+                                              "width": "",
+                                              "textColor": {
+                                                "element": "color",
+                                                "value": "text",
+                                                "prop": "default",
+                                                "token": "text"
+                                              },
+                                              "fill": {
+                                                "element": "color",
+                                                "value": "bg",
+                                                "prop": "default",
+                                                "token": "bg"
+                                              }
+                                            },
+                                            "children": []
+                                          },
+                                          "text_hyperlink": {
+                                            "type": "container",
+                                            "content": [
+                                              {
+                                                "element": "font",
+                                                "value": "fontsize",
+                                                "prop": "default",
+                                                "token": "fontsize"
+                                              }
+                                            ],
+                                            "resource": "",
+                                            "data": [],
+                                            "style": {
+                                              "layoutAlign": "{layout.align.y.self.INHERIT}",
+                                              "layoutGrow": "{layout.grow.0}",
+                                              "textDecoration": "underline",
+                                              "width": "",
+                                              "textColor": {
+                                                "element": "color",
+                                                "value": "text",
+                                                "prop": "default",
+                                                "token": "hyperlinktext"
+                                              },
+                                              "fill": {
+                                                "element": "color",
+                                                "value": "bg",
+                                                "prop": "default",
+                                                "token": "bg"
+                                              }
+                                            },
+                                            "children": []
+                                          }
+                                        },
+                                        "color": {
+                                          "text": {
+                                            "default": {
+                                              "data-key": "",
+                                              "style": {}
+                                            }
+                                          },
+                                          "bg": {
+                                            "default": {
+                                              "data-key": "",
+                                              "style": {
+                                                "bg": {
+                                                  "value": "none",
+                                                  "type": "color",
+                                                  "key": "color-bg"
+                                                }
+                                              },
+                                              "resource": "none"
+                                            }
+                                          }
+                                        },
+                                        "scale": {
+                                          "min_height": {
+                                            "default": {
+                                              "data-key": "",
+                                              "style": {
+                                                "min_height": {
+                                                  "value": "{dimension.basic.dimension.72}",
+                                                  "type": "sizing",
+                                                  "key": "scale-min_height"
+                                                }
+                                              },
+                                              "resource": "{dimension.basic.dimension.72}"
+                                            }
+                                          },
+                                          "max_width": {
+                                            "default": {
+                                              "data-key": "",
+                                              "style": {
+                                                "max_width": {
+                                                  "value": "{dimension.basic.dimension.1200}",
+                                                  "type": "sizing",
+                                                  "key": "scale-max_width"
+                                                }
+                                              },
+                                              "resource": "{dimension.basic.dimension.1200}"
+                                            }
+                                          }
+                                        },
+                                        "font": {
+                                          "fontsize": {
+                                            "default": {
+                                              "data-key": "beginTime",
+                                              "content": ""
+                                            }
+                                          },
+                                          "fontweight": "400"
+                                        },
+                                        "type": "text_body",
+                                        "state": "default",
+                                        "events": [
+                                          {}
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      "events": [
+                        {
+                          "nativeEventKey": "click",
+                          "dataEventKey": "comments"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "data-key": "comments"
+              }
+            ],
+            "style": {},
+            "className": "component-commentStyleListCard-dd-6b8a00d5-7399-4618-b748-8bc0f5744d0e",
+            "classStyle": {
+              "display": "flex",
+              "flex": "1",
+              "width": "100%",
+              "flexDirection": "column",
+              "gap": "{dimension.gap.base}",
+              "padding": "{dimension.padding.loose}",
+              "borderRadius": "{dimension.borderradius.xl}",
+              "background": "{color.surfacecontainer.white100}",
+              "boxShadow": "{material.hierarchy.1f}",
+              "border": "{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}"
+            }
+          },
+          "id": "dd-6b8a00d5-7399-4618-b748-8bc0f5744d0e",
+          "events": [
+            {}
+          ],
+          "_loopGroup": "itemContent",
+          "_loopDataKey": "comments"
+        }
+      ]
+    },
+    "events": [
+      {}
+    ]
+  }

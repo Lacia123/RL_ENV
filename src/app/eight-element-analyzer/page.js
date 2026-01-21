@@ -2341,6 +2341,23 @@ style: {
   </layout:column>
 </layout:row>
 </layout:root>`
+  },
+  loopNewfeatureCard: {
+    name: '循环新特性卡片',
+    description: '实现循环整个卡片',
+    markdown: `
+      <layout:row>
+        <loop data="cardData">
+          <hiringNewAvatarCard>
+            <title key="title"></title>
+            <name key="name"></name>
+            <badge>推荐原因</badge>
+            <desc key="desc"></desc>
+            <avatar src="avatarUrl" key="avatarUrl"></avatar>
+          </hiringNewAvatarCard>
+        </loop>
+      </layout:row>
+    `
   }
 };
 

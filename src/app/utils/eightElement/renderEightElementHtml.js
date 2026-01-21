@@ -11,6 +11,7 @@ import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
 import markedKatex from 'marked-katex-extension';
 import { DEFAULT_STYLE_CONFIG } from './styles';
+import sampleData from './sampleData.js';  // 🆕 导入统一的示例数据
 
 /**
  * Configure marked globally with KaTeX and Highlight.js
@@ -43,14 +44,32 @@ export function renderEightElementToHtml(eightElement, options = {}) {
     const { width = 1024, height = 768, data = null } = options;
 
     // 🆕 提取所有组件的 example data 并合并到 data 上下文中
-    let combinedData = data || {};
+    // 数据优先级: 传入的 data > styleConfig example > sampleData
+    let combinedData = { ...sampleData, ...(data || {}) };
     
     // 如果没有传入 data 或需要合并，进行提取
     const extractedData = {};
     const extractExampleData = (element) => {
         if (!element) return;
         
-        // 检查是否有 metadata 且包含 componentName
+        // 🆕 检查是否是卡片级 loop 容器
+        if (element._metadata && element._metadata.isCardLevelLoop) {
+            const loopDataKey = element._metadata.loopDataKey;
+            
+            // 优先从 sampleData 获取数据，如果没有再从 styleConfig 查找
+            if (!sampleData[loopDataKey]) {
+                if (element._metadata.templateComponentName) {
+                    const componentName = element._metadata.templateComponentName;
+                    if (DEFAULT_STYLE_CONFIG.component && 
+                        DEFAULT_STYLE_CONFIG.component[componentName] && 
+                        DEFAULT_STYLE_CONFIG.component[componentName].example) {
+                        extractedData[loopDataKey] = DEFAULT_STYLE_CONFIG.component[componentName].example;
+                    }
+                }
+            }
+        }
+        
+        // 检查是否有 metadata 且包含 componentName（卡片内部 loop）
         if (element._metadata && element._metadata.componentName) {
             const componentName = element._metadata.componentName;
             // 从 styleConfig 获取 example data
@@ -67,8 +86,10 @@ export function renderEightElementToHtml(eightElement, options = {}) {
                      // 2. group 循环：在子元素中查找有 data-key 的 group
                      
                      if (element['data-key']) {
-                         // 简易循环模式
-                         extractedData[element['data-key']] = example;
+                         // 简易循环模式 - 只有 sampleData 中没有时才使用
+                         if (!sampleData[element['data-key']]) {
+                             extractedData[element['data-key']] = example;
+                         }
                      } else {
                          // group 循环模式：在子元素中查找 data-key
                          const findDataKey = (el) => {
@@ -85,13 +106,17 @@ export function renderEightElementToHtml(eightElement, options = {}) {
                          };
                          
                          const dataKey = findDataKey(element);
-                         if (dataKey) {
+                         if (dataKey && !sampleData[dataKey]) {
                              extractedData[dataKey] = example;
                          }
                      }
                 } else if (typeof example === 'object') {
-                    // 如果是对象，直接合并
-                    Object.assign(extractedData, example);
+                   // 如果是对象，合并时避免覆盖 sampleData 中已有的键
+                   Object.keys(example).forEach(key => {
+                       if (!sampleData[key]) {
+                           extractedData[key] = example[key];
+                       }
+                   });
                 }
             }
         }
@@ -103,8 +128,8 @@ export function renderEightElementToHtml(eightElement, options = {}) {
     
     extractExampleData(eightElement);
     
-    // 合并提取的数据和传入的数据，传入的数据优先级更高
-    combinedData = { ...extractedData, ...combinedData };
+    // 合并提取的数据，传入的数据优先级最高
+    combinedData = { ...combinedData, ...extractedData, ...(data || {}) };
 
     // 预处理八要素结构，收集所有classStyle
     const processedEightElement = preProcessEightElement(eightElement);

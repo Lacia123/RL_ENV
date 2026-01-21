@@ -1,7 +1,7 @@
 import { EVENT_NAME, EVENT_CONFIG, NATIVE_EVENT_KEY } from './eventConfig.js';
 import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig } from './styles';
 import { getIcon } from '../icons/index.js';
-import { escapeHtml, getMarkedInstance } from './util.js';
+import { escapeHtml, getMarkedInstance, generateUUID } from './util.js';  // 🆕 添加 generateUUID
 import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './creators/tableCreators.js';
 import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './creators/codeCreators.js';
 import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot, createFlexWrapLayout } from './creators/layoutCreators.js';
@@ -16,6 +16,88 @@ import { createIconElement } from './creators/iconCreators.js';
 import { isTabTag, extractTabBlock, createTabElement } from './creators/tabCreators.js';
 import { isVideoTag, createVideoElement } from './creators/videoCreators.js';
 import { isAudioTag, createAudioElement } from './creators/audioCreators.js';
+
+// 🆕 检测是否为 loop 标签（卡片级循环）
+function isLoopTag(line) {
+    const trimmed = line.trim();
+    
+    // 匹配开始标签: <loop data="dataKey" [nativeEvent="click"]>
+    const loopStartMatch = trimmed.match(/^<loop\s+data=["']([^"']+)["']([^>]*)>$/);
+    if (loopStartMatch) {
+        const dataKey = loopStartMatch[1];
+        const otherAttrs = loopStartMatch[2].trim();
+        
+        // 解析其他属性（如 nativeEvent）
+        const attributes = {};
+        if (otherAttrs) {
+            const nativeEventMatch = otherAttrs.match(/nativeEvent=["']([^"']+)["']/);
+            if (nativeEventMatch) {
+                attributes.nativeEvent = nativeEventMatch[1];
+            }
+        }
+        
+        return {
+            isLoopTag: true,
+            isClosing: false,
+            dataKey: dataKey,
+            attributes: attributes
+        };
+    }
+    
+    // 匹配结束标签: </loop>
+    if (trimmed === '</loop>') {
+        return {
+            isLoopTag: true,
+            isClosing: true
+        };
+    }
+    
+    return { isLoopTag: false };
+}
+
+// 🆕 提取 loop 标签块（卡片级循环）
+function extractLoopBlock(lines, startIndex) {
+    const startLine = lines[startIndex];
+    const loopTagInfo = isLoopTag(startLine);
+    
+    if (!loopTagInfo.isLoopTag || loopTagInfo.isClosing) {
+        console.error('无效的 loop 标签起始行');
+        return null;
+    }
+    
+    const dataKey = loopTagInfo.dataKey;
+    const attributes = loopTagInfo.attributes;
+    const contentLines = [];
+    let endIndex = startIndex + 1;
+    let foundClosing = false;
+    
+    // 查找结束标签
+    while (endIndex < lines.length) {
+        const line = lines[endIndex];
+        const checkTag = isLoopTag(line);
+        
+        if (checkTag.isLoopTag && checkTag.isClosing) {
+            foundClosing = true;
+            break;
+        }
+        
+        contentLines.push(line);
+        endIndex++;
+    }
+    
+    if (!foundClosing) {
+        console.warn(`未找到 loop 标签的结束标签`);
+    }
+    
+    const loopContent = contentLines.join('\n');
+    
+    return {
+        dataKey: dataKey,
+        attributes: attributes,
+        loopContent: loopContent,
+        endIndex: endIndex
+    };
+}
 
 // 检测是否为引用文本
 function isQuoteText(line) {
@@ -1434,6 +1516,106 @@ function parseMarkdown(markdown, options = {}) {
             // 跳过已处理的卡片标签行
             i = endIndex;
             continue;
+        }
+
+        // 🆕 处理 <loop> 标签（卡片级循环）
+        const loopTagInfo = isLoopTag(trimmedLine);
+        if (loopTagInfo.isLoopTag && !loopTagInfo.isClosing) {
+            // 处理之前累积的内容
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            // 如果正在处理列表，先结束列表
+            if (inList && listItems.length > 0) {
+                const listLayout = createLayoutElement(
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                    listItems,
+                    {
+                        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                    }
+                );
+                stack[stack.length - 1].elements.push(listLayout);
+                inList = false;
+                listItems = [];
+            }
+
+            // 提取 loop 标签内容
+            const loopBlock = extractLoopBlock(
+                markedLines.map(item => item.line),
+                i
+            );
+
+            if (loopBlock) {
+                const { dataKey, attributes, loopContent, endIndex } = loopBlock;
+
+                // 检查 loop 内容是否是组件标签
+                const contentLines = loopContent.trim().split('\n');
+                if (contentLines.length > 0) {
+                    const firstLine = contentLines[0].trim();
+                    const innerComponentInfo = isComponentTag(firstLine);
+                    
+                    if (innerComponentInfo.isComponentTag && !innerComponentInfo.isClosing) {
+                        // loop 内是组件标签，提取组件
+                        const componentBlock = extractComponentBlock(contentLines, 0);
+                        
+                        if (componentBlock) {
+                            const { componentContent, componentName, attributes: componentAttrs } = componentBlock;
+                            const componentConfig = DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[componentName];
+                            
+                            if (componentConfig) {
+                                // 创建组件元素作为模板
+                                const templateElement = createComponentElement(
+                                    componentContent,
+                                    componentName,
+                                    null,
+                                    null,
+                                    componentAttrs,
+                                    currentMarkdown
+                                );
+
+                                // 🔧 创建 loop 容器元素
+                                const loopContainerElement = {
+                                    id: generateUUID(),
+                                    name: 'layout',
+                                    'name-zh': '循环容器',
+                                    'file-type': 'template',
+                                    _metadata: {
+                                        isCardLevelLoop: true,  // 🆕 标记为卡片级循环
+                                        loopDataKey: dataKey,
+                                        templateComponentName: componentName
+                                    },
+                                    layout: {
+                                        style: {
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            flexWrap: 'wrap',
+                                            gap: '{dimension.gap.base}',
+                                        },
+                                        classStyle: {},
+                                        children: [templateElement]  // 组件作为模板
+                                    },
+                                    "data-key": dataKey,  // 🆕 循环数据键
+                                    events: attributes.nativeEvent ? [{
+                                        nativeEventKey: attributes.nativeEvent,
+                                        dataEventKey: dataKey
+                                    }] : [{}]
+                                };
+
+                                stack[stack.length - 1].elements.push(loopContainerElement);
+                            } else {
+                                console.warn(`⚠️ 组件 ${componentName} 的配置未找到`);
+                            }
+                        }
+                    } else {
+                        console.warn('⚠️ loop 标签内容不是有效的组件标签');
+                    }
+                }
+
+                // 跳过已处理的 loop 标签行
+                i = endIndex;
+                continue;
+            }
         }
 
         // 处理组件标签（如 <simpleCard> 或 <halfCirclePrecent fillColor={...}>）
