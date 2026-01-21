@@ -4,8 +4,7 @@ import { renderEightElementToHtml } from '@/app/utils/eightElement/renderEightEl
 
 export async function POST(request) {
   try {
-    console.log('收到Markdown转HTML请求');
-    
+
     const requestData = await request.json();
     if (!requestData || !requestData.markdown) {
       return NextResponse.json({ 
@@ -21,22 +20,14 @@ export async function POST(request) {
       height = 500 
     } = requestData;
     
-    console.log('接收的参数:', { 
-      markdownLength: markdown.length, 
-      width, 
-      height 
-    });
-    
     // 1. 转换Markdown为八要素结构
     const eightElement = markdownToEightElement(markdown);
-    console.log('Markdown转八要素结构完成');
     
     // 2. 渲染八要素结构为HTML
     const { html, processedEightElement } = renderEightElementToHtml(eightElement, { 
       width, 
       height 
     });
-    console.log('八要素结构渲染为HTML完成');
     
     // 3. 返回HTML结果
     const responseData = {

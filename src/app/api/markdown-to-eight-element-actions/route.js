@@ -7,8 +7,6 @@ import { logElementStyleErrors } from '@/app/utils/logging/elementStyleLogger';
 
 export async function POST(request) {
   try {
-    console.log('收到基于动作的Markdown转八要素请求');
-
     const requestData = await request.json();
     if (!requestData || !requestData.markdown) {
       return NextResponse.json({
@@ -27,9 +25,6 @@ export async function POST(request) {
       layoutControls = []
     } = requestData;
 
-    console.log('接收的动作参数:', actions);
-    console.log('接收的布局调控参数:', layoutControls);
-
     try {
       // 1. 转换Markdown为八要素结构
       let eightElement = markdownToEightElement(markdown);
@@ -42,7 +37,6 @@ export async function POST(request) {
 
       // 3. 应用动作（如果有提供）
       if (actions && actions.length > 0) {
-        console.log('开始应用动作到八要素结构');
 
         // 创建动作系统管理器
         const actionManager = createActionSystemManager(DEFAULT_STYLE_CONFIG);
@@ -67,7 +61,6 @@ export async function POST(request) {
         });
 
         if (validActions.length > 0) {
-          console.log(`应用 ${validActions.length} 个有效动作`);
 
           // 检查动作冲突
           const actionNames = validActions.map(action => action.name);
@@ -91,9 +84,6 @@ export async function POST(request) {
             actionIntensities[action.name] = action.intensity;
           });
 
-          console.log('🎯 准备应用的动作:', selectedActions);
-          console.log('🎯 动作强度映射:', actionIntensities);
-
           try {
             eightElement = applyActionsToEightElement(
               eightElement,
@@ -102,7 +92,6 @@ export async function POST(request) {
               selectedActions,
               actionIntensities
             );
-            console.log('动作应用完成');
           } catch (actionError) {
             console.error('应用动作时出错:', actionError);
             // 继续使用原始的八要素结构
@@ -112,7 +101,6 @@ export async function POST(request) {
 
       // 4. 应用布局调控（如果有提供）
       if (layoutControls && layoutControls.length > 0) {
-        console.log('开始应用布局调控到八要素结构');
 
         // 验证布局调控参数格式
         const validLayoutControls = layoutControls.filter(control => {
@@ -134,7 +122,6 @@ export async function POST(request) {
         });
 
         if (validLayoutControls.length > 0) {
-          console.log(`应用 ${validLayoutControls.length} 个有效布局调控`);
 
           try {
             eightElement = applyLayoutControlsToEightElement(
@@ -142,7 +129,6 @@ export async function POST(request) {
               validLayoutControls,
               pageElements.layoutAnalysis
             );
-            console.log('布局调控应用完成');
           } catch (layoutError) {
             console.error('应用布局调控时出错:', layoutError);
             // 继续使用当前的八要素结构

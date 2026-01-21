@@ -16,17 +16,6 @@ export async function POST(request) {
   let error = null;
   
   try {
-    // 记录请求来源（用于诊断 CSRF 问题）
-    const origin = request.headers.get('origin');
-    const referer = request.headers.get('referer');
-    const userAgent = request.headers.get('user-agent');
-    
-    console.log('收到请求', {
-      origin: origin || 'none',
-      referer: referer || 'none',
-      userAgent: userAgent ? userAgent.substring(0, 50) : 'none'
-    });
-    
     requestData = await request.json();
     if (!requestData || !requestData.markdown) {
       return NextResponse.json({ 
@@ -44,11 +33,9 @@ export async function POST(request) {
       try {
         // 使用seed参数生成设计令牌
         designTokens = calculateTokens(seed);
-        console.log('使用自定义种子生成设计令牌:', seed);
         
         // 使用token解析器的动态token系统
         setDynamicTokenSystem(designTokens);
-        console.log('已将设计令牌设置为动态token系统');
       } catch (tokenError) {
         console.warn('生成设计令牌失败，将使用默认令牌:', tokenError);
       }
@@ -85,7 +72,6 @@ export async function POST(request) {
       if (designTokens) {
         try {
           clearDynamicTokenSystem();
-          console.log('已清除动态token系统');
         } catch (error) {
           console.warn('清除动态token系统失败:', error);
         }
