@@ -505,6 +505,7 @@ const HIRING_CARD_STYLE = {
             style: {
                 display: 'flex',
                 flex: '1',
+                minWidth: '400px',
                 borderRadius: '{dimension.borderradius.xxxxl}',
                 borderWidth: '1px',
                 borderStyle: 'solid',
@@ -611,6 +612,7 @@ const HIRING_CARD_STYLE = {
             style: {
                 display: 'flex',
                 flex: '1',
+                minWidth: '400px',
                 borderRadius: '{dimension.borderradius.xxxxl}',
                 borderWidth: '1px',
                 borderStyle: 'solid',

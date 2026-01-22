@@ -2348,13 +2348,13 @@ style: {
     markdown: `
       <layout:row>
         <loop data="cardData">
-          <hiringNewAvatarCard>
+          <hiringDarkNewAvatarCard>
             <title key="title"></title>
             <name key="name"></name>
             <badge>推荐原因</badge>
             <desc key="desc"></desc>
             <avatar src="avatarUrl" key="avatarUrl"></avatar>
-          </hiringNewAvatarCard>
+          </hiringDarkNewAvatarCard>
         </loop>
       </layout:row>
     `
