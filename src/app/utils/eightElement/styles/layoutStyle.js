@@ -71,7 +71,7 @@ const LAYOUT_STYLE = {
                 gridTemplateAreas: 'none',
                 justifyItems: 'stretch'
             },
-            supportedAttributes: ['flex', 'gap']
+            supportedAttributes: ['flex', 'gap', 'flexWrap']
         },
         // 🆕 类似 Tailwind 的 row 变体
         'row-center': {

@@ -2333,7 +2333,7 @@ style: {
   </layout:column>
   <layout:column flex="1">
     <hiringNewPersonCard>
-      <title>杭州电子科技大学</title>
+      <title>杭州电子科技大学</title>                                                                                                                           
       <name>张忠元</name>
       <badge>推荐原因</badge>
       <desc>他具备扎实的数学与计算机基础，对机器学习、深度学习及优化算法有系统掌握。在项目中能够独立完成从数据清洗、特征工程到模型部署的全流程实现，并能在复杂场景下优化模型性能，是一位兼具科研能力与工程能力的优秀算法工程师。</desc>
@@ -2346,7 +2346,7 @@ style: {
     name: '循环新特性卡片',
     description: '实现循环整个卡片',
     markdown: `
-      <layout:row>
+      <layout:row flexWrap="wrap">
         <loop data="cardData">
           <hiringDarkNewAvatarCard>
             <title key="title"></title>
