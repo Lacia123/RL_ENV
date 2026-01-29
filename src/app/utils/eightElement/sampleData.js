@@ -66,6 +66,50 @@ const sampleData = {
     }, {
         title: '设计评审',
         desc: '通过产品设计评审'
+    }],
+
+    mixedCardData: [{
+        subtitle: '这是副标题',
+        image: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+        avatar: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200',
+        title: '企业超级智能体',
+        blueLabel: '标签1',
+        redLabel: '标签2',
+        purpleLabel: '标签3',
+        content1: '第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描',
+        content2: '第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描',
+        content3: '第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描',
+        imageItem1: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+        imageItem2: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+        imageItem3: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+    }, {
+        subtitle: '这是副标题',
+        image: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+        avatar: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200',
+        title: '企业超级智能体',
+        blueLabel: '标签1',
+        redLabel: '标签2',
+        purpleLabel: '标签3',
+        content1: '第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描',
+        content2: '第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描',
+        content3: '第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描',
+        imageItem1: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+        imageItem2: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+        imageItem3: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+    }, {
+        subtitle: '这是副标题',
+        image: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+        avatar: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200',
+        title: '企业超级智能体',
+        blueLabel: '标签1',
+        redLabel: '标签2',
+        purpleLabel: '标签3',
+        content1: '第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描',
+        content2: '第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描',
+        content3: '第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描第一段：这里是描述文字这里是描述文字这里是描述文字这里是描述文字这里是描这里是描这里是描',
+        imageItem1: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+        imageItem2: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
+        imageItem3: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800',
     }]
 };
 

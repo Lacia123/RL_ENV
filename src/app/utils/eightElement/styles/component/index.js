@@ -2,6 +2,7 @@ import COMMENT_LIST_CARD_STYLE from './commentListCard';
 import MULTIMEDIA_CARD_STYLE from './multimediaCard';
 import METRIC_CARD_STYLE from './metricCard';
 import MEDIA_CARD_SERIES_STYLE from './mediaCardSeries';
+import MIXED_CARD_STYLE from './mixedCard';
 import PRECENT_ITEM_STYLE from './precentItem';
 import PRODUCT_CARD_STYLE from './productCard';
 import LABEL_TITLE_STYLE from './labelTitle';
@@ -15,6 +16,7 @@ const COMPONENT_STYLE = {
         ...MULTIMEDIA_CARD_STYLE,
         ...METRIC_CARD_STYLE,
         ...MEDIA_CARD_SERIES_STYLE,
+        ...MIXED_CARD_STYLE,
         ...PRECENT_ITEM_STYLE,
         ...PRODUCT_CARD_STYLE,
         ...LABEL_TITLE_STYLE,

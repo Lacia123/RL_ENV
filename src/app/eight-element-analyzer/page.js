@@ -2358,6 +2358,32 @@ style: {
         </loop>
       </layout:row>
     `
+  },
+  mixedCard: {
+    name: '混合卡片',
+    description: '用于展示混合卡片',
+    markdown: `
+      <layout:row flexWrap="wrap">
+        <loop data="mixedCardData">
+          <mixedCard flex="1" minWidth="450px">
+            <subtitle key="subtitle"></subtitle>
+            <image key="image" src="image"></image>
+            <avatar key="avatar" src="avatar"></avatar>
+            <title key="title"></title>
+            <detail>详情</detail>
+            <blueLabel key="blueLabel">标签1</blueLabel>
+            <redLabel key="redLabel">标签2</redLabel>
+            <purpleLabel key="purpleLabel">标签3</purpleLabel>
+            <content key="content1"></content>
+            <content key="content2"></content>
+            <content key="content3"></content>
+            <imageItem key="imageItem1" src="imageItem1"></imageItem>
+            <imageItem key="imageItem2" src="imageItem2"></imageItem>
+            <imageItem key="imageItem3" src="imageItem3"></imageItem>
+          </mixedCard>
+        </loop>
+      </layout:row>
+    `
   }
 };
 
