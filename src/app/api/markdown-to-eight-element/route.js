@@ -46,7 +46,12 @@ export async function POST(request) {
       const eightElement = markdownToEightElement(markdown);
                 
       // 预处理八要素结构以应用样式
-      const { processedEightElement } = renderEightElementToHtml(eightElement, { width, height });
+      // 🆕 不需要交互式功能，只需要预处理后的八要素结构
+      const { processedEightElement } = renderEightElementToHtml(eightElement, { 
+        width, 
+        height,
+        includeInteractive: false 
+      });
       
       // 异步记录按钮样式错误，不阻塞接口返回
       // setImmediate(async () => {

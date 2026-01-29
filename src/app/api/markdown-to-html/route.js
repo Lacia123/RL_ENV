@@ -24,18 +24,20 @@ export async function POST(request) {
     const eightElement = markdownToEightElement(markdown);
     
     // 2. 渲染八要素结构为HTML
+    // 🆕 markdown-to-html API 不包含交互式编辑器和脚本
     const { html, processedEightElement } = renderEightElementToHtml(eightElement, { 
       width, 
-      height 
+      height,
+      includeInteractive: false  // 不包含编辑器和脚本
     });
     
     // 3. 返回HTML结果
     const responseData = {
       success: true,
       html: html,
-      width: width,
-      height: height,
-      processedElementsCount: countElements(processedEightElement)
+      // width: width,
+      // height: height,
+      // processedElementsCount: countElements(processedEightElement)
     };
     
     return NextResponse.json(responseData, { status: 200 });

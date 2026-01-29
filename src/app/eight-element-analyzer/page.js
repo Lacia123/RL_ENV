@@ -3244,7 +3244,7 @@ const EightElementAnalyzer = () => {
           style={{ width: `${panelSizes.leftWidth}%` }}
         >
           <div className="p-4 overflow-y-auto flex-1">
-            <h2 className="text-lg font-medium mb-4">Markdown编辑器</h2>
+            <h2 className="text-lg font-medium mb-4">PSUIP 编辑器</h2>
 
             {/* 🆕 模板选择Tab */}
             <div className="mb-4">
@@ -3272,7 +3272,7 @@ const EightElementAnalyzer = () => {
             {/* Markdown编辑器 */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-700">Markdown内容</h3>
+                <h3 className="text-sm font-medium text-gray-700">PSUIP 内容</h3>
                 <span className="text-xs text-gray-500">
                   {markdown.length} 字符 | {markdown.split('\n').length} 行
                 </span>

@@ -38,10 +38,14 @@ markedInstance.use(markedKatex(katexOptions));
  * 渲染八要素结构为HTML字符串，并返回预处理后的八要素结构
  * @param {Object} eightElement - 八要素结构对象
  * @param {Object} options - 渲染选项
+ * @param {number} options.width - 视口宽度
+ * @param {number} options.height - 视口高度
+ * @param {Object} options.data - 数据上下文
+ * @param {boolean} options.includeInteractive - 是否包含交互式编辑器和脚本（默认 true）
  * @returns {Object} - 包含HTML字符串和预处理后的八要素结构
  */
 export function renderEightElementToHtml(eightElement, options = {}) {
-    const { width = 1024, height = 768, data = null } = options;
+    const { width = 1024, height = 768, data = null, includeInteractive = true } = options;
 
     // 🆕 提取所有组件的 example data 并合并到 data 上下文中
     // 数据优先级: 传入的 data > styleConfig example > sampleData
@@ -144,62 +148,8 @@ export function renderEightElementToHtml(eightElement, options = {}) {
         'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css' :
         'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css';
 
-    // 创建HTML文档头部
-    const htmlHeader = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Eight Element Renderer</title>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
-      <link rel="stylesheet" href="${highlightTheme}" crossorigin="anonymous"></link>
-       
-      <style>
-        body {
-          margin: 0;
-          padding: 0;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-        p {
-           margin-block: 0;
-           margin-inline: 0;
-           padding-block: 0;
-           padding-inline: 0;
-        }
-        .eight-element-container {
-          position: relative;
-        }
-        * {
-          box-sizing: border-box;
-        }
-        
-        /* 🆕 超链接样式 */
-        .hyperlink-styled {
-          font-size: inherit;
-          font-weight: 500;
-          color: #615eec;
-          text-decoration: none;
-          border-bottom: 2px solid #bcbef7;
-          transition: all 0.3s ease;
-        }
-        .hyperlink-styled:hover {
-          color: #4f4ac8;
-          border-bottom-color: #bcbef7;
-        }
-        .hyperlink-styled:active {
-          color: #2f2a95;
-        }
-
-        pre code.hljs {
-            display: block;
-            overflow-x: auto;
-            padding: 1em;
-        }
-        code.hljs {
-            padding: 3px 5px;
-        }
-        
+    // 🆕 编辑器样式（仅在 includeInteractive 为 true 时包含）
+    const editorStyles = includeInteractive ? `
         /* 🆕 编辑器相关样式 */
         .editor-overlay {
           position: fixed;
@@ -285,6 +235,64 @@ export function renderEightElementToHtml(eightElement, options = {}) {
           width: 100%;
           height: 100%;
         }
+    ` : '';
+
+    // 创建HTML文档头部
+    const htmlHeader = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Eight Element Renderer</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
+      <link rel="stylesheet" href="${highlightTheme}" crossorigin="anonymous"></link>
+       
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        p {
+           margin-block: 0;
+           margin-inline: 0;
+           padding-block: 0;
+           padding-inline: 0;
+        }
+        .eight-element-container {
+          position: relative;
+        }
+        * {
+          box-sizing: border-box;
+        }
+        
+        /* 🆕 超链接样式 */
+        .hyperlink-styled {
+          font-size: inherit;
+          font-weight: 500;
+          color: #615eec;
+          text-decoration: none;
+          border-bottom: 2px solid #bcbef7;
+          transition: all 0.3s ease;
+        }
+        .hyperlink-styled:hover {
+          color: #4f4ac8;
+          border-bottom-color: #bcbef7;
+        }
+        .hyperlink-styled:active {
+          color: #2f2a95;
+        }
+
+        pre code.hljs {
+            display: block;
+            overflow-x: auto;
+            padding: 1em;
+        }
+        code.hljs {
+            padding: 3px 5px;
+        }
+        ${editorStyles}
         
         /* 动态生成的类样式 */
         ${cssStyles}
@@ -1032,8 +1040,17 @@ export function renderEightElementToHtml(eightElement, options = {}) {
     </html>
   `;
 
+    // 🆕 根据 includeInteractive 选项决定是否包含交互式编辑器和脚本
+    const finalHtml = includeInteractive 
+        ? htmlHeader + htmlBody + htmlFooter
+        : htmlHeader + htmlBody + `
+      </div>
+    </body>
+    </html>
+  `;
+
     return {
-        html: htmlHeader + htmlBody + htmlFooter,
+        html: finalHtml,
         processedEightElement
     };
 }
