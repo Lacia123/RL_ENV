@@ -928,7 +928,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             const imageUrl = markdownData.url || '';
             // 🔧 修复：优先使用tagConfig中的variant，回退到markdownData中的variant或默认值
             const imageVariant = (tagConfig && tagConfig.variant) ? tagConfig.variant : (markdownData.variant || 'normal');
-            elementInstance = createBackgroundElement(imageUrl, imageVariant);
+            elementInstance = createBackgroundElement(imageUrl, imageVariant, '', markdownData.hasPreview);
         } else if (markdownData.type === 'button') {
             // 按钮类型
             const buttonText = content;
@@ -1031,7 +1031,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
         } else if (tagConfig.metaType === 'image') {
             // 🆕 处理image类型，从markdownData中获取URL
             const imageUrl = markdownData && markdownData.url ? markdownData.url : '';
-            elementInstance = createBackgroundElement(imageUrl, tagConfig.variant);
+            elementInstance = createBackgroundElement(imageUrl, tagConfig.variant, '', markdownData.hasPreview);
         } else if (tagConfig.metaType === 'table') {
             // 🆕 处理table类型，直接创建表格元素（不需要variant）
             elementInstance = createTableElement(content);

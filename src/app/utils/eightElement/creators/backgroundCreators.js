@@ -8,7 +8,7 @@ import {
 import { EVENT_NAME } from '../eventConfig.js';
 
 // 创建背景元素（用于图片）
-function createBackgroundElement(imageUrl, variant = 'normal', dataKey = '') {
+function createBackgroundElement(imageUrl, variant = 'normal', dataKey = '', hasPreview = true) {
     const id = generateUUID();
     // 获取图片元素的样式配置
     const imageStyleConfig = getElementStyleConfig('image', variant);
@@ -17,7 +17,7 @@ function createBackgroundElement(imageUrl, variant = 'normal', dataKey = '') {
     // 生成唯一的className
     const uniqueClassName = `background-${id}`;
 
-    return {
+    const res = {
         id,
         name: "background",
         "name-zh": "背景",
@@ -106,7 +106,6 @@ function createBackgroundElement(imageUrl, variant = 'normal', dataKey = '') {
                 default: {
                     "data-key": dataKey,
                     type: "img",
-                    preview: imageUrl,
                     style: {
                         image: {
                             value: imageUrl,
@@ -187,6 +186,10 @@ function createBackgroundElement(imageUrl, variant = 'normal', dataKey = '') {
             }
         }]
     };
+    if (hasPreview) {
+        res.material.image.default.preview = imageUrl;
+    }
+    return res;
 }
 
 export {

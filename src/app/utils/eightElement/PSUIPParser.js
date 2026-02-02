@@ -666,6 +666,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     if (imgMatch && markdownMapping.img) {
         return {
             markdownResult: {
+                hasPreview: line.includes("[event:preview_false]") ? false : true,
                 type: 'img',
                 templatePath: markdownMapping.img,
                 content: imgMatch[1].trim(), // 图片alt文本
@@ -1942,6 +1943,10 @@ function parseMarkdown(markdown, options = {}) {
 
         // 🔧 修复：更宽松的图片检测逻辑
         if (trimmedLine.includes('![') && trimmedLine.includes('](') && trimmedLine.includes(')')) {
+            let hasPreview = true
+            if (trimmedLine.includes("[event:preview_false]")) {
+                hasPreview = false
+            }
             const basicImagePattern = /!\[([^\]]*)\]\(([^)]+)\)/;
             const imgMatch = trimmedLine.match(basicImagePattern);
 
@@ -1954,7 +1959,7 @@ function parseMarkdown(markdown, options = {}) {
                 const imgUrl = imgMatch[2].trim();
 
                 // 创建带有完整信息的背景元素
-                const backgroundElement = createBackgroundElement(imgUrl, 'normal');
+                const backgroundElement = createBackgroundElement(imgUrl, 'normal', '', hasPreview);
 
                 // 🆕 添加图片的alt信息到元数据中
                 if (backgroundElement._metadata) {
