@@ -2067,6 +2067,62 @@ wrapper: {
     </loop>
 </commentStyleListCard>
 
+<summaryCard>
+  <title key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+</summaryCard>
+
+<!-- 示例2: 带图标 -->
+<summaryCard>
+  <icon></icon>
+  <title key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+</summaryCard>
+
+<!-- 示例3: 横向布局，带预览图片 -->
+<summaryCard>
+  <title key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+  <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+</summaryCard>
+
+<!-- 示例4: 横向布局，带图标和预览 -->
+<summaryCard>
+  <icon></icon>
+  <title key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+  <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+</summaryCard>
+
+<!-- 示例5: 图片在上方，小按钮在header -->
+<summaryCard>
+  <topImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></topImage>
+  <icon></icon>
+  <title key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+</summaryCard>
+
+<!-- 示例6: 图片在上方，宽按钮在底部 -->
+<summaryCard>
+  <topImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></topImage>
+  <icon></icon>
+  <title key="title"></title>
+  <text key="summary"></text>
+  <commitWide>查看过程</commitWide>
+</summaryCard>
+
+<!-- 示例7: 图片作为背景，宽按钮在底部 -->
+<summaryCard>
+  <backgroundImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=400&h=400"></backgroundImage>
+  <title key="title"></title>
+  <text key="summary"></text>
+  <commitWide>查看过程</commitWide>
+</summaryCard>
 </layout:gallery>
 `
   },

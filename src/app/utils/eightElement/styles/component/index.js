@@ -9,6 +9,7 @@ import LABEL_TITLE_STYLE from './labelTitle';
 import HALF_CIRCLE_PRECENT_STYLE from './halfCirclePrecent';
 import HIRING_CARD_STYLE from './hiringCard';
 import SIMPLE_CARD_STYLE from './simpleCard';
+import SUMMARY_CARD_STYLE from './summaryCard';
 
 const COMPONENT_STYLE = {
     component: {
@@ -23,6 +24,7 @@ const COMPONENT_STYLE = {
         ...HALF_CIRCLE_PRECENT_STYLE,
         ...HIRING_CARD_STYLE,
         ...SIMPLE_CARD_STYLE,
+        ...SUMMARY_CARD_STYLE,
     }
 }
 
