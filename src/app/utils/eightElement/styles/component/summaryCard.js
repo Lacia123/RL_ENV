@@ -49,7 +49,7 @@ const SUMMARY_CARD_STYLE = {
                           justifyContent: 'flex-end',
                           gap: '{dimension.gap.semiloose}',
                           overflow: 'hidden',
-                          width: '338px',
+                          width: '100%',
                           height: '400px',
                       },
                       groups: [{
@@ -119,7 +119,7 @@ const SUMMARY_CARD_STYLE = {
                   border: '{dimension.borderwidth.narrow} solid {color.basic.opacity.white.64}',
                   position: 'relative',
                   overflow: 'hidden',
-                  width: '338px',
+                  width: '100%',
                   height: '400px',
               },
               structure: {
@@ -220,7 +220,6 @@ const SUMMARY_CARD_STYLE = {
                       type: 'template',
                       style: {
                           width: '100%',
-                          width: '344px',
                           height: '344px',
                           flexShrink: "0",
                           fontSize: '{font.size.medium}',
@@ -299,7 +298,7 @@ const SUMMARY_CARD_STYLE = {
                       slots: ['topImage'],
                       type: 'template',
                       style: {
-                          width: '344px',
+                          width: '100%',
                           height: '344px',
                           flexShrink: "0",
                           fontSize: '{font.size.medium}',
@@ -625,7 +624,10 @@ const SUMMARY_CARD_STYLE = {
                   fontWeight: '900',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis',
+                  '& > p,div': {
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                  }
               }
           },
           icon: {
@@ -749,7 +751,10 @@ const SUMMARY_CARD_STYLE = {
                   fontWeight: '900',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis',
+                  '& > p,div': {
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                  }
               }
           },
           // 背景图片模式下的文本样式（白色字体）
