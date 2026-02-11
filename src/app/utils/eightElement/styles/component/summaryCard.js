@@ -1,5 +1,3 @@
-import { rabbit } from "@/app/utils/icons/Animals"
-import fontweight from "@/app/utils/tokens/font/fontweight"
 
 const SUMMARY_CARD_STYLE = {
   // summaryCard 数据绑定示例
@@ -30,11 +28,11 @@ const SUMMARY_CARD_STYLE = {
                       type: 'template',
                       style: {
                           position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          zIndex: 0,
+                          top: "0px",
+                          left: "0px",
+                          right: "0px",
+                          bottom: "0px",
+                          zIndex: "0",
                           '& > div': {
                             width: '100%',
                             height: '100%',
@@ -45,7 +43,7 @@ const SUMMARY_CARD_STYLE = {
                       type: 'template',
                       style: {
                           position: 'relative',
-                          zIndex: 1,
+                          zIndex: "1",
                           display: 'flex',
                           flexDirection: 'column',
                           justifyContent: 'flex-end',
@@ -131,11 +129,11 @@ const SUMMARY_CARD_STYLE = {
                       type: 'template',
                       style: {
                           position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          zIndex: 0,
+                          top: "0px",
+                          left: "0px",
+                          right: "0px",
+                          bottom: "0px",
+                          zIndex: "0",
                           '& > div': {
                             width: '100%',
                             height: '100%',
@@ -146,7 +144,7 @@ const SUMMARY_CARD_STYLE = {
                       type: 'template',
                       style: {
                           position: 'relative',
-                          zIndex: 1,
+                          zIndex: "1",
                           display: 'flex',
                           flexDirection: 'column',
                           gap: '{dimension.gap.semiloose}',
@@ -181,7 +179,7 @@ const SUMMARY_CARD_STYLE = {
                               slots: ['commit'],
                               type: 'template',
                               style: {
-                                  flexShrink: 0,
+                                  flexShrink: "0",
                               }
                           }]
                       }, {
@@ -224,7 +222,7 @@ const SUMMARY_CARD_STYLE = {
                           width: '100%',
                           width: '344px',
                           height: '344px',
-                          flexShrink: 0,
+                          flexShrink: "0",
                           fontSize: '{font.size.medium}',
                           borderRadius: '{dimension.borderradius.large}',
                           overflow: 'hidden',
@@ -303,7 +301,7 @@ const SUMMARY_CARD_STYLE = {
                       style: {
                           width: '344px',
                           height: '344px',
-                          flexShrink: 0,
+                          flexShrink: "0",
                           fontSize: '{font.size.medium}',
                           borderRadius: '{dimension.borderradius.large}',
                           overflow: 'hidden',
@@ -349,7 +347,7 @@ const SUMMARY_CARD_STYLE = {
                               slots: ['commit'],
                               type: 'template',
                               style: {
-                                  flexShrink: 0,
+                                  flexShrink: "0",
                               }
                           }]
                       }, {
@@ -431,7 +429,7 @@ const SUMMARY_CARD_STYLE = {
                       style: {
                           width: '122px',
                           height: '184px',
-                          flexShrink: 0,
+                          flexShrink: "0",
                           fontSize: '{font.size.medium}',
                           borderRadius: '20px',
                           borderRadius: '{dimension.borderradius.large}',
@@ -541,7 +539,7 @@ const SUMMARY_CARD_STYLE = {
                           slots: ['commit'],
                           type: 'template',
                           style: {
-                              flexShrink: 0,
+                              flexShrink: "0",
                           }
                       }]
                   }, {
@@ -601,7 +599,7 @@ const SUMMARY_CARD_STYLE = {
                           slots: ['commit'],
                           type: 'template',
                           style: {
-                              flexShrink: 0,
+                              flexShrink: "0",
                           }
                       }]
                   }, {
@@ -636,14 +634,14 @@ const SUMMARY_CARD_STYLE = {
                   fontSize: '{font.size.medium}',
                   color: '{color.basic.opacity.white.100}',
                   lineHeight: '1',
-                  flexShrink: 0,
+                  flexShrink: "0",
                   width: '32px',
                   height: '32px',
-                  marginBottom: 0,
+                  marginBottom: '0px',
                   '&::after': {
                         content: '""',
                         position: 'absolute',
-                        right: 0,
+                        right: "0",
                         top: '50%',
                         transform: 'translateY(-50%)',
                         width: '32px',
