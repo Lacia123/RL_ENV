@@ -397,7 +397,7 @@ const SUMMARY_CARD_STYLE = {
                               display: 'flex',
                               flexDirection: 'row',
                               gap: '{dimension.gap.supertight}',
-                              justifyContent: 'space-between',
+                              justifyContent: 'flex-start',
                               alignItems: 'center',
                               overflow: 'hidden',
                           }
