@@ -624,7 +624,12 @@ const SUMMARY_CARD_STYLE = {
                   fontWeight: '900',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
-                  '&   p,div': {
+                  textOverflow: 'ellipsis',
+                  '& p': {
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                  },
+                  '& div': {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                   }
@@ -751,7 +756,12 @@ const SUMMARY_CARD_STYLE = {
                   fontWeight: '900',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
-                  '&   p,div': {
+                  textOverflow: 'ellipsis',
+                  '& p': {
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                  },
+                  '& div': {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                   }
