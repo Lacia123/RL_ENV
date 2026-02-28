@@ -83,6 +83,7 @@ const SUMMARY_CARD_STYLE = {
                           type: 'template',
                           style: {
                               display: 'flex',
+                              flex: '1',
                               flexDirection: 'column',
                               width: '100%'
                           },
@@ -188,6 +189,7 @@ const SUMMARY_CARD_STYLE = {
                           type: 'template',
                           style: {
                               display: 'flex',
+                              flex: '1',
                               flexDirection: 'column',
                               width: '100%'
                           },
@@ -257,6 +259,7 @@ const SUMMARY_CARD_STYLE = {
                           type: 'template',
                           style: {
                               display: 'flex',
+                              flex: '1',
                               flexDirection: 'column',
                               width: '100%'
                           },
@@ -355,6 +358,7 @@ const SUMMARY_CARD_STYLE = {
                           type: 'template',
                           style: {
                               display: 'flex',
+                              flex: '1',
                               flexDirection: 'column',
                               width: '100%'
                           },
@@ -407,6 +411,7 @@ const SUMMARY_CARD_STYLE = {
                           type: 'template',
                           style: {
                               display: 'flex',
+                              flex: '1',
                               flexDirection: 'column',
                               width: '100%'
                           },
@@ -476,6 +481,7 @@ const SUMMARY_CARD_STYLE = {
                       type: 'template',
                       style: {
                           display: 'flex',
+                          flex: '1',
                           flexDirection: 'column',
                           width: '100%'
                       },
@@ -547,6 +553,7 @@ const SUMMARY_CARD_STYLE = {
                       type: 'template',
                       style: {
                           display: 'flex',
+                          flex: '1',
                           flexDirection: 'column',
                           width: '100%'
                       },
@@ -607,6 +614,7 @@ const SUMMARY_CARD_STYLE = {
                       type: 'template',
                       style: {
                           display: 'flex',
+                          flex: '1',
                           flexDirection: 'column',
                           width: '100%'
                       },
@@ -781,7 +789,7 @@ const SUMMARY_CARD_STYLE = {
       },
       example: {
         title: '生成岗位JD完成, 我很长很长很长很长很长',
-        summary: '已生成完整岗位说明文档，包含岗位职责、任职要求及加分项。',
+        summary: '已生成完整岗位。',
     }
   }
 }
