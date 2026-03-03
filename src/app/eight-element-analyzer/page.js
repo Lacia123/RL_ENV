@@ -1979,7 +1979,6 @@ wrapper: {
 <statusCard>
   <status_type>🔄 进行中</status_type>
   <message>正在部署新版本，预计 5 分钟后完成</message>
-  <command>kubectl rollout status deployment/my-app</command>
   <progress>65%</progress>
   <timestamp>刚刚</timestamp>
   <cta href="https://example.com/monitor">监控进度</cta>

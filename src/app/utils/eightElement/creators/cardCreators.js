@@ -1045,6 +1045,13 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             const externalParameters = tagConfig.parameters || null;
 
             elementInstance = createComponentElement(content, tagConfig.variant, markdownData, styleOverride, externalParameters, currentMarkdown);
+        } else if (tagConfig.metaType === 'list') {
+            // 🆕 处理 list 类型，支持 ul/ol 映射到 content.list
+            const listVariant = tagConfig.variant || 'unordered';
+            elementInstance = createTextElement(content, 'p', {
+                isList: true,
+                listType: listVariant
+            });
         }
         // 可以在这里添加其他元件类型的支持
 
