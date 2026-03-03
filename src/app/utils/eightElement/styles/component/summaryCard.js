@@ -1,3 +1,4 @@
+import { COMMAND_SLOT_CONFIG } from './command';
 
 const SUMMARY_CARD_STYLE = {
   // summaryCard 数据绑定示例
@@ -77,6 +78,12 @@ const SUMMARY_CARD_STYLE = {
                               },
                               styleReference: 'titleOnBackground'
                           }]
+                      }, {
+                          name: 'commandBlock',
+                          condition: 'has:command',
+                          slots: ['command'],
+                          type: 'template',
+                          style: { width: '100%' }
                       }, {
                           name: 'itemContent',
                           slots: ['text'],
@@ -786,6 +793,7 @@ const SUMMARY_CARD_STYLE = {
                   lineHeight: '1.5'
               }
           },
+          command: COMMAND_SLOT_CONFIG,
       },
       example: {
         title: '生成岗位JD完成, 我很长很长很长很长很长',

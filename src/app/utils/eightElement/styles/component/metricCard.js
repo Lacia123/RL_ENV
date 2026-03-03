@@ -1,3 +1,5 @@
+import { COMMAND_SLOT_CONFIG } from './command';
+
 const METRIC_CARD_STYLE = {
     // 📊 指标 / KPI 卡片
     metricCard: {
@@ -37,6 +39,13 @@ const METRIC_CARD_STYLE = {
                                 paddingBottom: '{dimension.padding.supertight}',
                                 marginBottom: '{dimension.margin.tight}'
                             }
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command'],
+                            type: 'template',
+                            style: { width: '100%', marginBottom: '{dimension.margin.tight}' }
                         },
                         {
                             name: 'contentRow',
@@ -148,6 +157,13 @@ const METRIC_CARD_STYLE = {
                                 paddingBottom: '{dimension.padding.supertight}',
                                 marginBottom: '{dimension.margin.tight}'
                             }
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command'],
+                            type: 'template',
+                            style: { width: '100%', marginBottom: '{dimension.margin.tight}' }
                         },
                         {
                             name: 'contentRow',
@@ -291,7 +307,8 @@ const METRIC_CARD_STYLE = {
                     textTransform: 'uppercase',
                     color: '{color.primary.brand5}',
                 }
-            }
+            },
+            command: COMMAND_SLOT_CONFIG
         },
         slots: {
             metric_value: { required: true, optional: false },
@@ -300,7 +317,8 @@ const METRIC_CARD_STYLE = {
             trend_value: { required: false, optional: true },
             chart_mini: { required: false, optional: true, supportedAttributes: ['chart', 'title', 'sort'] },
             time_range: { required: false, optional: true },
-            status: { required: false, optional: true }
+            status: { required: false, optional: true },
+            command: { required: false, optional: true }
         }
     },
 }

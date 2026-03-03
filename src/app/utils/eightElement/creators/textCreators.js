@@ -1,4 +1,4 @@
-import { generateUUID, detectMathInHTML, applyCustomStyleOverride } from '../util.js';
+import { generateUUID, detectMathInHTML, applyCustomStyleOverride, escapeHtml } from '../util.js';
 
 import {
     getElementStyleConfig,
@@ -138,8 +138,21 @@ function createTextElement(text, variant = 'p', richTextOptions = {}, customStyl
         }
     }
 
-    // 应用Markdown和KaTeX处理
-    const htmlContent = processText(processedContent);
+    // commandBlock：跳过 Markdown 解析，按纯文本展示
+    // 原因：多行内容若含 XML 缩进，marked 会把 4+ 空格行解析为代码块，导致首行 <p> 其余 <pre><code> 样式不一致
+    let htmlContent;
+    if (variant === 'commandBlock') {
+        const lines = (processedContent || '').split('\n').map((l) => l.trimEnd());
+        const nonEmptyLines = lines.filter((l) => l.length > 0);
+        const minIndent = nonEmptyLines.length > 0
+            ? Math.min(...nonEmptyLines.map((l) => (l.match(/^\s*/)?.[0]?.length ?? 0)))
+            : 0;
+        const normalizedContent = lines.map((l) => (l.length > 0 ? l.slice(minIndent) : '')).join('\n').trim();
+        htmlContent = `<p>${escapeHtml(normalizedContent).replace(/\n/g, '<br>')}</p>`;
+    } else {
+        // 应用Markdown和KaTeX处理
+        htmlContent = processText(processedContent);
+    }
 
     const htmlResult = detectMathInHTML(htmlContent);
 

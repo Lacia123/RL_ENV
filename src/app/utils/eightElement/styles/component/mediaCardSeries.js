@@ -1,3 +1,5 @@
+import { COMMAND_SLOT_CONFIG } from './command';
+
 const MEDIA_CARD_SERIES_STYLE = {
     // 🌄 主视觉说明卡
     heroCard: {
@@ -61,6 +63,15 @@ const MEDIA_CARD_SERIES_STYLE = {
                                 {
                                     name: 'titleBlock',
                                     slots: ['title']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command'],
+                                    type: 'template',
+                                    style: {
+                                        width: '100%'
+                                    }
                                 },
                                 {
                                     name: 'subtitleBlock',
@@ -130,6 +141,15 @@ const MEDIA_CARD_SERIES_STYLE = {
                         {
                             name: 'titleBlock',
                             slots: ['title']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command'],
+                            type: 'template',
+                            style: {
+                                width: '100%'
+                            }
                         },
                         {
                             name: 'subtitleBlock',
@@ -214,6 +234,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 metaType: 'text',
                 variant: 'heroTitle'
             },
+            command: COMMAND_SLOT_CONFIG,
             subtitle: {
                 metaType: 'text',
                 variant: 'heroSubtitle'
@@ -245,6 +266,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             cover_image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
             badge: { required: false, optional: true },
             title: { required: true, optional: false },
+            command: { required: false, optional: true },
             subtitle: { required: false, optional: true },
             metrics: { required: false, optional: true },
             cta_primary: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
@@ -299,6 +321,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                                 {
                                     name: 'titleGroup',
                                     slots: ['title']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command'],
+                                    type: 'template',
+                                    style: { width: '100%' }
                                 },
                                 {
                                     name: 'subtitleGroup',
@@ -397,6 +426,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                                 {
                                     name: 'titleGroup',
                                     slots: ['title']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command'],
+                                    type: 'template',
+                                    style: { width: '100%' }
                                 },
                                 {
                                     name: 'subtitleGroup',
@@ -492,6 +528,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 },
                 supportedAttributes: ['src', 'alt']
             },
+            command: COMMAND_SLOT_CONFIG,
             title: {
                 metaType: 'text',
                 variant: 'h3',
@@ -576,6 +613,7 @@ const MEDIA_CARD_SERIES_STYLE = {
         },
         slots: {
             image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
+            command: { required: false, optional: true },
             title: { required: true, optional: false },
             subtitle: { required: false, optional: true },
             tags: { required: false, optional: true },
@@ -652,6 +690,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                                             slots: ['title']
                                         },
                                         {
+                                            name: 'commandBlock',
+                                            condition: 'has:command',
+                                            slots: ['command'],
+                                            type: 'template',
+                                            style: { width: '100%' }
+                                        },
+                                        {
                                             name: 'descriptionBlock',
                                             condition: 'has:description',
                                             slots: ['description']
@@ -707,6 +752,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                         {
                             name: 'titleBlock',
                             slots: ['title']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command'],
+                            type: 'template',
+                            style: { width: '100%' }
                         },
                         {
                             name: 'descriptionBlock',
@@ -784,6 +836,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     lineHeight: '1.3'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
             description: {
                 metaType: 'text',
                 variant: 'p',
@@ -820,6 +873,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             icon: { required: false, optional: true },
             badge: { required: false, optional: true },
             title: { required: true, optional: false },
+            command: { required: false, optional: true },
             description: { required: false, optional: true },
             cta_primary: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
             cta_secondary: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
@@ -888,6 +942,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     slots: ['event_title']
                                 },
                                 {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command'],
+                                    type: 'template',
+                                    style: { width: '100%' }
+                                },
+                                {
                                     name: 'timeBlock',
                                     condition: 'has:event_time',
                                     slots: ['event_time']
@@ -938,6 +999,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                         {
                             name: 'titleBlock',
                             slots: ['event_title']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command'],
+                            type: 'template',
+                            style: { width: '100%' }
                         },
                         {
                             name: 'timeBlock',
@@ -1008,6 +1076,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     lineHeight: '1.3'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
             event_time: {
                 metaType: 'text',
                 variant: 'p',
@@ -1036,6 +1105,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
             tag: { required: false, optional: true },
             event_title: { required: true, optional: false },
+            command: { required: false, optional: true },
             event_time: { required: false, optional: true },
             cta: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
         }
@@ -1112,6 +1182,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                             ]
                         },
                         {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command'],
+                            type: 'template',
+                            style: { width: '100%', marginTop: '{dimension.margin.tight}' }
+                        },
+                        {
                             name: 'progressBlock',
                             slots: ['progress'],
                             type: 'template',
@@ -1201,6 +1278,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                             ]
                         },
                         {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command'],
+                            type: 'template',
+                            style: { width: '100%', marginTop: '{dimension.margin.tight}' }
+                        },
+                        {
                             name: 'progressBlock',
                             slots: ['progress'],
                             type: 'template',
@@ -1265,6 +1349,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     lineHeight: '1.5'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
             progress: {
                 type: 'template',
                 style: {
@@ -1317,6 +1402,7 @@ const MEDIA_CARD_SERIES_STYLE = {
         slots: {
             status_type: { required: true, optional: false },
             message: { required: true, optional: false },
+            command: { required: false, optional: true },
             progress: { required: false, optional: true },
             timestamp: { required: false, optional: true },
             cta: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
@@ -1330,7 +1416,7 @@ const MEDIA_CARD_SERIES_STYLE = {
         layoutModes: [
             {
                 name: 'full',
-                condition: 'has:title || has:subtitle || has:description || has:icon || has:badge',
+                condition: 'has:title || has:subtitle || has:description || has:icon || has:badge || has:command',
                 style: {
                     display: 'flex',
                     width: '100%',
@@ -1417,6 +1503,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     style: {
                                         marginTop: '{dimension.margin.supertight}'
                                     }
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command'],
+                                    type: 'template',
+                                    style: { width: '100%', marginTop: '{dimension.margin.tight}' }
                                 }
                             ]
                         },
@@ -1550,6 +1643,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     lineHeight: '1.6'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
             table: {
                 type: 'template',
                 metaType: 'table',
@@ -1576,6 +1670,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             title: { required: false, optional: true },
             subtitle: { required: false, optional: true },
             description: { required: false, optional: true },
+            command: { required: false, optional: true },
             table: { required: true, optional: false },
             footer: { required: false, optional: true }
         }
@@ -1613,6 +1708,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                                 flexDirection: 'column',
                                 gap: '{dimension.gap.supertight}'
                             }
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command'],
+                            type: 'template',
+                            style: { width: '100%' }
                         },
                         {
                             name: 'listGroup',
@@ -1659,6 +1761,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.small}'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
             items: {
                 type: 'template',
                 metaType: 'feedItem',
@@ -1837,6 +1940,7 @@ const MEDIA_CARD_SERIES_STYLE = {
         slots: {
             title: { required: false, optional: true },
             subtitle: { required: false, optional: true },
+            command: { required: false, optional: true },
             items: {
                 required: true,
                 optional: false,

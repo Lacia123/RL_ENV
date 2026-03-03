@@ -184,6 +184,37 @@ const TEXT_STYLE = {
             }
         },
 
+        // 命令行块（通用，可嵌入任意卡片）
+        commandBlock: {
+            fontSize: "{font.size.small}",
+            fontWeight: "400",
+            fontFamily: "'Fira Code', 'Monaco', 'Cascadia Code', monospace",
+            backgroundColor: "{color.onsurface.white88}",
+            padding: "{dimension.padding.superloose} {dimension.padding.extraloose} {dimension.padding.loose}",
+            marginTop: "{dimension.margin.base}",
+            lineHeight: "1",
+            marginBottom: "{dimension.margin.base}",
+            borderRadius: "{dimension.borderradius.large}",
+            borderWidth: "{dimension.borderwidth.narrow}",
+            borderColor: "{color.onsurfacecontainer.grey7}",
+            borderStyle: "solid",
+            boxShadow: "{material.hierarchy.2f}",
+            overflow: 'auto',
+            position: 'relative',
+            color: "{color.onsurface.black88}",
+            '&::before': {
+                content: "''",
+                position: 'absolute',
+                top: '12px',
+                left: '16px',
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                backgroundColor: "{color.warning.orange5}",
+                boxShadow: `24px 0 0 {color.warning.orange6}, 48px 0 0 {color.success.green5}`
+            }
+        },
+
         // 超链接文本 TODO: 超链接样式暂不支持，因为超链接会被解析成按钮
         hyperlink: {
             fontSize: "inherit",

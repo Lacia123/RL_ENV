@@ -1842,6 +1842,7 @@ wrapper: {
   <metric_label>准点率</metric_label>
   <metric_value>92%</metric_value>
   <trend_value>+12%</trend_value>
+  <command>SELECT * FROM metrics WHERE period='7d'</command>
   <chart_mini chart="pie" title="笔记本市场占比">
 | 类型 | 占比 |
 |------|------|
@@ -1865,6 +1866,7 @@ wrapper: {
 <heroCard>
   <badge>最新活动</badge>
   <title>AI 峰会 2024</title>
+  <command>npm install @ai-sdk/openai</command>
   <subtitle>探索人工智能的未来，与行业领袖共同探讨前沿技术与应用。</subtitle>
   <metrics>📅 2024年10月26日</metrics>
   <metrics>📍 线上/线下同步</metrics>
@@ -1926,6 +1928,7 @@ wrapper: {
   <icon>🚀</icon>
   <badge>限时优惠</badge>
   <title>升级到专业版</title>
+  <command>curl -s https://example.com/install.sh | bash</command>
   <description>解锁所有高级功能，享受专业级体验。现在升级可享受 30% 折扣优惠。</description>
   <cta_primary href="https://example.com/upgrade">立即升级</cta_primary>
   <cta_secondary href="https://example.com/features">了解功能</cta_secondary>
@@ -1979,6 +1982,7 @@ wrapper: {
 <statusCard>
   <status_type>🔄 进行中</status_type>
   <message>正在部署新版本，预计 5 分钟后完成</message>
+  <command>kubectl rollout status deployment/my-app</command>
   <progress>65%</progress>
   <timestamp>刚刚</timestamp>
   <cta href="https://example.com/monitor">监控进度</cta>
@@ -2123,6 +2127,85 @@ wrapper: {
   <text key="summary"></text>
   <commitWide>查看过程</commitWide>
 </summaryCard>
+</layout:gallery>
+`
+  },
+  commandDemo: {
+    name: '⌨️ 命令行展示',
+    description: '展示各卡片中命令行组件的使用，macOS 窗口风格，可嵌入任意卡片',
+    markdown: `
+<layout:gallery>
+<heroCard>
+  <badge>技术活动</badge>
+  <title>AI 开发工作坊</title>
+  <command>pip install transformers torch</command>
+  <subtitle>从零开始构建大模型应用，动手实践 RAG 与 Agent 开发。</subtitle>
+  <metrics>📅 2024年11月15日</metrics>
+  <metrics>📍 北京 · 中关村</metrics>
+  <cta_primary href="https://example.com/workshop">报名参加</cta_primary>
+  <cta_secondary href="https://example.com/slides">查看讲义</cta_secondary>
+</heroCard>
+
+<contentDisplayCard>
+  <image src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=900"></image>
+  <title>VSCode 插件开发入门</title>
+  <command>npx yo code</command>
+  <subtitle>使用 Yeoman 脚手架快速创建 VSCode 扩展项目，支持 TypeScript 和 Webview。</subtitle>
+  <tags>开发</tags>
+  <tags>教程</tags>
+  <rating>⭐ 4.8 · 2.3k 收藏</rating>
+  <cta href="https://example.com/vscode-ext">开始学习</cta>
+</contentDisplayCard>
+
+<actionCard>
+  <icon>🔧</icon>
+  <badge>快速开始</badge>
+  <title>部署到生产环境</title>
+  <command>docker compose up -d</command>
+  <description>一键启动所有服务，包含 API、数据库和缓存。确保已安装 Docker 和 Docker Compose。</description>
+  <cta_primary href="https://example.com/deploy">部署文档</cta_primary>
+  <cta_secondary href="https://example.com/troubleshoot">故障排查</cta_secondary>
+</actionCard>
+
+<eventCard>
+  <tag>技术分享</tag>
+  <event_title>Kubernetes 实战工作坊</event_title>
+  <command>kubectl apply -f deployment.yaml</command>
+  <event_time>📅 2024年12月1日 14:00-17:00</event_time>
+  <cta href="https://example.com/k8s">查看详情</cta>
+</eventCard>
+
+<statusCard>
+  <status_type>✅ 成功</status_type>
+  <message>CI/CD 流水线执行完成，已自动部署到 staging 环境</message>
+  <command>gh run view 12345 --log-failed</command>
+  <timestamp>3 分钟前</timestamp>
+  <cta href="https://example.com/ci">查看流水线</cta>
+</statusCard>
+
+<tableCard>
+  <icon>📊</icon>
+  <badge>数据导出</badge>
+  <title>用户行为分析报表</title>
+  <subtitle>支持导出 CSV 和 JSON 格式</subtitle>
+  <command>curl -H "Authorization: Bearer $TOKEN" https://api.example.com/export/users</command>
+  <table>
+| 指标 | 数值 | 环比 |
+|------|------|------|
+| DAU | 12.5万 | +8% |
+| 留存率 | 68% | +3% |
+| 转化率 | 4.2% | +0.5% |
+  </table>
+</tableCard>
+
+<metricCard>
+  <status>正常</status>
+  <time_range>今日</time_range>
+  <metric_label>API 响应时间</metric_label>
+  <metric_value>128ms</metric_value>
+  <trend_value>-15ms</trend_value>
+  <command>SELECT p99 FROM latency_metrics WHERE service='api'</command>
+</metricCard>
 </layout:gallery>
 `
   },

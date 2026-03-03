@@ -7,6 +7,7 @@ import PRECENT_ITEM_STYLE from './precentItem';
 import PRODUCT_CARD_STYLE from './productCard';
 import LABEL_TITLE_STYLE from './labelTitle';
 import HALF_CIRCLE_PRECENT_STYLE from './halfCirclePrecent';
+import COMMAND_STYLE from './command';
 import HIRING_CARD_STYLE from './hiringCard';
 import SIMPLE_CARD_STYLE from './simpleCard';
 import SUMMARY_CARD_STYLE from './summaryCard';
@@ -22,6 +23,7 @@ const COMPONENT_STYLE = {
         ...PRODUCT_CARD_STYLE,
         ...LABEL_TITLE_STYLE,
         ...HALF_CIRCLE_PRECENT_STYLE,
+        ...COMMAND_STYLE,
         ...HIRING_CARD_STYLE,
         ...SIMPLE_CARD_STYLE,
         ...SUMMARY_CARD_STYLE,

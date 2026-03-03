@@ -1,3 +1,5 @@
+import { COMMAND_SLOT_CONFIG } from './command';
+
 const HIRING_CARD_STYLE = {
     // Hiring Title Card
     hiringTitleCard: {
@@ -25,6 +27,12 @@ const HIRING_CARD_STYLE = {
                         flexDirection: 'column',
                         gap: '{dimension.gap.tight}',
                     }
+                }, {
+                    name: 'commandBlock',
+                    condition: 'has:command',
+                    slots: ['command'],
+                    type: 'template',
+                    style: { width: '100%' }
                 }, {
                     name: 'badgeBlock',
                     slots: ['badge'],
@@ -58,7 +66,8 @@ const HIRING_CARD_STYLE = {
                     background: '{color.basic.opacity.white.12}',
                     borderRadius: '{dimension.borderradius.full}',
                 }
-            }
+            },
+            command: COMMAND_SLOT_CONFIG
         }
     },
     // Hiring List Card
@@ -154,6 +163,12 @@ const HIRING_CARD_STYLE = {
                         },
                         slots: ['title', 'desc']
                     }]
+                }, {
+                    name: 'commandBlock',
+                    condition: 'has:command',
+                    slots: ['command'],
+                    type: 'template',
+                    style: { width: '100%', marginTop: '{dimension.margin.tight}' }
                 }, {
                     name: 'listContainer',
                     type: 'template',
@@ -293,7 +308,8 @@ const HIRING_CARD_STYLE = {
                     fontSize: 'font.size.medium',
                     color: '{color.basic.opacity.white.64}'
                 }
-            }
+            },
+            command: COMMAND_SLOT_CONFIG
         }
     },
     // Hiring Image Card
@@ -327,6 +343,12 @@ const HIRING_CARD_STYLE = {
                         gap: '{dimension.gap.tight}',
                         minHeight: '320px',
                     }
+                }, {
+                    name: 'commandBlock',
+                    condition: 'has:command',
+                    slots: ['command'],
+                    type: 'template',
+                    style: { width: '100%' }
                 }]
             }
         }],
@@ -346,8 +368,9 @@ const HIRING_CARD_STYLE = {
                     fontSize: '{font.size.medium}',
                     color: '{color.basic.opacity.white.64}'
                 }
-            }
-        },
+            },
+            command: COMMAND_SLOT_CONFIG
+        }
     },
 
     // 新的演示示例卡片
