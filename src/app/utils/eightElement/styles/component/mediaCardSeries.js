@@ -61,6 +61,19 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     }
                                 },
                                 {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    slotConsumeBefore: 'title',
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
+                                },
+                                {
                                     name: 'titleBlock',
                                     slots: ['title']
                                 },
@@ -68,9 +81,14 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     name: 'commandBlock',
                                     condition: 'has:command',
                                     slots: ['command*'],
-                                    slotConsumeOne: true,
+                                    slotConsumeBetween: ['title', 'subtitle'],
                                     type: 'template',
-                                    style: { width: '100%' }
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
                                 },
                                 {
                                     name: 'subtitleBlock',
@@ -81,9 +99,14 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     name: 'commandBlock',
                                     condition: 'has:command',
                                     slots: ['command*'],
-                                    slotConsumeOne: true,
+                                    slotConsumeAfter: 'subtitle',
                                     type: 'template',
-                                    style: { width: '100%' }
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
                                 },
                                 {
                                     name: 'metricsRow',
@@ -146,6 +169,19 @@ const MEDIA_CARD_SERIES_STYLE = {
                             }
                         },
                         {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            slotConsumeBefore: 'title',
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
                             name: 'titleBlock',
                             slots: ['title']
                         },
@@ -153,9 +189,14 @@ const MEDIA_CARD_SERIES_STYLE = {
                             name: 'commandBlock',
                             condition: 'has:command',
                             slots: ['command*'],
-                            slotConsumeOne: true,
+                            slotConsumeBetween: ['title', 'subtitle'],
                             type: 'template',
-                            style: { width: '100%' }
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         },
                         {
                             name: 'subtitleBlock',
@@ -166,9 +207,14 @@ const MEDIA_CARD_SERIES_STYLE = {
                             name: 'commandBlock',
                             condition: 'has:command',
                             slots: ['command*'],
-                            slotConsumeOne: true,
+                            slotConsumeAfter: 'subtitle',
                             type: 'template',
-                            style: { width: '100%' }
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         },
                         {
                             name: 'metricsRow',
@@ -338,16 +384,21 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     slots: ['title']
                                 },
                                 {
-                                    name: 'commandBlock',
-                                    condition: 'has:command',
-                                    slots: ['command'],
-                                    type: 'template',
-                                    style: { width: '100%' }
-                                },
-                                {
                                     name: 'subtitleGroup',
                                     condition: 'has:subtitle',
                                     slots: ['subtitle']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
                                 },
                                 {
                                     name: 'tagRow',
@@ -443,16 +494,21 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     slots: ['title']
                                 },
                                 {
-                                    name: 'commandBlock',
-                                    condition: 'has:command',
-                                    slots: ['command'],
-                                    type: 'template',
-                                    style: { width: '100%' }
-                                },
-                                {
                                     name: 'subtitleGroup',
                                     condition: 'has:subtitle',
                                     slots: ['subtitle']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
                                 },
                                 {
                                     name: 'tagRow',
@@ -544,6 +600,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 supportedAttributes: ['src', 'alt']
             },
             command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             title: {
                 metaType: 'text',
                 variant: 'h3',
@@ -705,16 +762,21 @@ const MEDIA_CARD_SERIES_STYLE = {
                                             slots: ['title']
                                         },
                                         {
-                                            name: 'commandBlock',
-                                            condition: 'has:command',
-                                            slots: ['command'],
-                                            type: 'template',
-                                            style: { width: '100%' }
-                                        },
-                                        {
                                             name: 'descriptionBlock',
                                             condition: 'has:description',
                                             slots: ['description']
+                                        },
+                                        {
+                                            name: 'commandBlock',
+                                            condition: 'has:command',
+                                            slots: ['command*'],
+                                            type: 'template',
+                                            style: {
+                                                width: '100%',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '{dimension.gap.tight}'
+                                            }
                                         }
                                     ]
                                 }
@@ -771,14 +833,31 @@ const MEDIA_CARD_SERIES_STYLE = {
                         {
                             name: 'commandBlock',
                             condition: 'has:command',
-                            slots: ['command'],
+                            slots: ['command*'],
                             type: 'template',
-                            style: { width: '100%' }
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         },
                         {
                             name: 'descriptionBlock',
                             condition: 'has:description',
                             slots: ['description']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         },
                         {
                             name: 'ctaRow',
@@ -852,6 +931,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 }
             },
             command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             description: {
                 metaType: 'text',
                 variant: 'p',
@@ -957,16 +1037,21 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     slots: ['event_title']
                                 },
                                 {
-                                    name: 'commandBlock',
-                                    condition: 'has:command',
-                                    slots: ['command'],
-                                    type: 'template',
-                                    style: { width: '100%' }
-                                },
-                                {
                                     name: 'timeBlock',
                                     condition: 'has:event_time',
                                     slots: ['event_time']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
                                 },
                                 {
                                     name: 'ctaRow',
@@ -1016,16 +1101,21 @@ const MEDIA_CARD_SERIES_STYLE = {
                             slots: ['event_title']
                         },
                         {
-                            name: 'commandBlock',
-                            condition: 'has:command',
-                            slots: ['command'],
-                            type: 'template',
-                            style: { width: '100%' }
-                        },
-                        {
                             name: 'timeBlock',
                             condition: 'has:event_time',
                             slots: ['event_time']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         },
                         {
                             name: 'ctaRow',
@@ -1092,6 +1182,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 }
             },
             command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             event_time: {
                 metaType: 'text',
                 variant: 'p',
@@ -1197,18 +1288,24 @@ const MEDIA_CARD_SERIES_STYLE = {
                             ]
                         },
                         {
-                            name: 'commandBlock',
-                            condition: 'has:command',
-                            slots: ['command'],
-                            type: 'template',
-                            style: { width: '100%', marginTop: '{dimension.margin.tight}' }
-                        },
-                        {
                             name: 'progressBlock',
                             slots: ['progress'],
                             type: 'template',
                             style: {
                                 marginTop: '{dimension.margin.tight}'
+                            }
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                marginTop: '{dimension.margin.tight}',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
                             }
                         },
                         {
@@ -1293,18 +1390,24 @@ const MEDIA_CARD_SERIES_STYLE = {
                             ]
                         },
                         {
-                            name: 'commandBlock',
-                            condition: 'has:command',
-                            slots: ['command'],
-                            type: 'template',
-                            style: { width: '100%', marginTop: '{dimension.margin.tight}' }
-                        },
-                        {
                             name: 'progressBlock',
                             slots: ['progress'],
                             type: 'template',
                             style: {
                                 marginTop: '{dimension.margin.tight}'
+                            }
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                marginTop: '{dimension.margin.tight}',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
                             }
                         },
                         {
@@ -1365,6 +1468,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 }
             },
             command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             progress: {
                 type: 'template',
                 style: {
@@ -1522,9 +1626,15 @@ const MEDIA_CARD_SERIES_STYLE = {
                                 {
                                     name: 'commandBlock',
                                     condition: 'has:command',
-                                    slots: ['command'],
+                                    slots: ['command*'],
                                     type: 'template',
-                                    style: { width: '100%', marginTop: '{dimension.margin.tight}' }
+                                    style: {
+                                        width: '100%',
+                                        marginTop: '{dimension.margin.tight}',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
                                 }
                             ]
                         },
@@ -1659,6 +1769,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 }
             },
             command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             table: {
                 type: 'template',
                 metaType: 'table',
@@ -1727,9 +1838,14 @@ const MEDIA_CARD_SERIES_STYLE = {
                         {
                             name: 'commandBlock',
                             condition: 'has:command',
-                            slots: ['command'],
+                            slots: ['command*'],
                             type: 'template',
-                            style: { width: '100%' }
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         },
                         {
                             name: 'listGroup',
@@ -1777,6 +1893,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 }
             },
             command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             items: {
                 type: 'template',
                 metaType: 'feedItem',

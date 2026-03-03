@@ -41,13 +41,6 @@ const METRIC_CARD_STYLE = {
                             }
                         },
                         {
-                            name: 'commandBlock',
-                            condition: 'has:command',
-                            slots: ['command'],
-                            type: 'template',
-                            style: { width: '100%', marginBottom: '{dimension.margin.tight}' }
-                        },
-                        {
                             name: 'contentRow',
                             type: 'template',
                             style: {
@@ -121,6 +114,19 @@ const METRIC_CARD_STYLE = {
                                     }
                                 }
                             ]
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                marginTop: '{dimension.margin.tight}',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         }
                     ]
                 }
@@ -157,13 +163,6 @@ const METRIC_CARD_STYLE = {
                                 paddingBottom: '{dimension.padding.supertight}',
                                 marginBottom: '{dimension.margin.tight}'
                             }
-                        },
-                        {
-                            name: 'commandBlock',
-                            condition: 'has:command',
-                            slots: ['command'],
-                            type: 'template',
-                            style: { width: '100%', marginBottom: '{dimension.margin.tight}' }
                         },
                         {
                             name: 'contentRow',
@@ -210,7 +209,17 @@ const METRIC_CARD_STYLE = {
                             ]
                         },
                         {
-
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                marginTop: '{dimension.margin.tight}',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         }
                     ]
                 }
@@ -308,7 +317,8 @@ const METRIC_CARD_STYLE = {
                     color: '{color.primary.brand5}',
                 }
             },
-            command: COMMAND_SLOT_CONFIG
+            command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG
         },
         slots: {
             metric_value: { required: true, optional: false },
