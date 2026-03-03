@@ -67,16 +67,23 @@ const MEDIA_CARD_SERIES_STYLE = {
                                 {
                                     name: 'commandBlock',
                                     condition: 'has:command',
-                                    slots: ['command'],
+                                    slots: ['command*'],
+                                    slotConsumeOne: true,
                                     type: 'template',
-                                    style: {
-                                        width: '100%'
-                                    }
+                                    style: { width: '100%' }
                                 },
                                 {
                                     name: 'subtitleBlock',
                                     condition: 'has:subtitle',
                                     slots: ['subtitle']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    slotConsumeOne: true,
+                                    type: 'template',
+                                    style: { width: '100%' }
                                 },
                                 {
                                     name: 'metricsRow',
@@ -145,16 +152,23 @@ const MEDIA_CARD_SERIES_STYLE = {
                         {
                             name: 'commandBlock',
                             condition: 'has:command',
-                            slots: ['command'],
+                            slots: ['command*'],
+                            slotConsumeOne: true,
                             type: 'template',
-                            style: {
-                                width: '100%'
-                            }
+                            style: { width: '100%' }
                         },
                         {
                             name: 'subtitleBlock',
                             condition: 'has:subtitle',
                             slots: ['subtitle']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            slotConsumeOne: true,
+                            type: 'template',
+                            style: { width: '100%' }
                         },
                         {
                             name: 'metricsRow',
@@ -235,6 +249,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 variant: 'heroTitle'
             },
             command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             subtitle: {
                 metaType: 'text',
                 variant: 'heroSubtitle'

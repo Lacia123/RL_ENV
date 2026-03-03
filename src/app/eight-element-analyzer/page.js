@@ -2140,6 +2140,7 @@ wrapper: {
   <title>AI 开发工作坊</title>
   <command>pip install transformers torch</command>
   <subtitle>从零开始构建大模型应用，动手实践 RAG 与 Agent 开发。</subtitle>
+  <command>git clone https://github.com/example/ai-workshop.git</command>
   <metrics>📅 2024年11月15日</metrics>
   <metrics>📍 北京 · 中关村</metrics>
   <cta_primary href="https://example.com/workshop">报名参加</cta_primary>

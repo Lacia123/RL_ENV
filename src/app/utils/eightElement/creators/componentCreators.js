@@ -360,11 +360,17 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
         // 如果分组有 slots，处理插槽
         else if (group.slots && Array.isArray(group.slots)) {
             // 收集该分组中实际存在的插槽元素
+            // slotConsumeOne: 对 command* 等通配符，每次只取一个（按文档顺序）并从 map 移除，支持多个 command 分散在不同位置
             const groupElements = [];
             for (const slotPattern of group.slots) {
-                const matched = collectSlotElements(slotPattern, slotElementsMap);
+                const matched = collectSlotElements(slotPattern, slotElementsMap, !!group.slotConsumeOne);
                 if (matched.length > 0) {
                     groupElements.push(...matched);
+                    if (group.slotConsumeOne && matched.length > 0) {
+                        const el = matched[0];
+                        const keyToRemove = Array.from(slotElementsMap.entries()).find(([, v]) => v === el)?.[0];
+                        if (keyToRemove) slotElementsMap.delete(keyToRemove);
+                    }
                 }
             }
             
@@ -469,7 +475,7 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
     return children;
 }
 
-function collectSlotElements(slotPattern, slotElementsMap) {
+function collectSlotElements(slotPattern, slotElementsMap, takeOneOnly = false) {
     const results = [];
     if (!slotPattern) return results;
     
@@ -478,6 +484,7 @@ function collectSlotElements(slotPattern, slotElementsMap) {
         for (const [key, element] of slotElementsMap.entries()) {
             if (matchesSlotPattern(key, element, base, true)) {
                 results.push(element);
+                if (takeOneOnly) break;
             }
         }
     } else {
