@@ -261,7 +261,7 @@ const TEXT_STYLE = {
             margin: "0"
         },
         heroTitle: {
-            fontSize: "{font.size.xxl}",
+            fontSize: "{font.size.xl}",
             fontWeight: "{font.fontweight.bold}",
             letterSpacing: "-0.02em",
             color: "{color.onprimary.white100}",

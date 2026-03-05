@@ -1451,7 +1451,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 variant: 'p',
                 variantStyle: {
                     margin: '0',
-                    fontSize: '{font.size.small}',
+                    fontSize: '{font.size.medium}',
                     fontWeight: '{font.fontweight.bold}',
                     // 默认样式（成功）
                     color: '{color.basic.brand.6}'
@@ -1462,7 +1462,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 variant: 'p',
                 variantStyle: {
                     margin: '0',
-                    fontSize: '{font.size.medium}',
+                    fontSize: '{font.size.large}',
                     color: '{color.onsurface.black88}',
                     lineHeight: '1.5'
                 }

@@ -180,7 +180,7 @@ const METRIC_CARD_STYLE = {
                                     style: {
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        gap: '{dimension.gap.tight}',
+                                        gap: '{dimension.gap.base}',
                                     },
                                     groups: [
                                         {
@@ -204,7 +204,7 @@ const METRIC_CARD_STYLE = {
                                 {
                                     name: 'status',
                                     slots: ['status'],
-                                    styleReference: 'status_large'
+                                    // styleReference: 'status_large'
                                 }
                             ]
                         },
