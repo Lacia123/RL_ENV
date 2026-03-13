@@ -218,6 +218,7 @@ const SUMMARY_CARD_STYLE = {
                   padding: '{dimension.padding.semiloose}',
                   borderRadius: '{dimension.borderradius.xxxxl}',
                   background: '{color.basic.opacity.white.48}',
+                  backdropFilter: 'blur(7px)',
                   boxShadow: '{material.hierarchy.3f}',
                   border: '{dimension.borderwidth.narrow} solid {color.basic.opacity.white.64}',
                   overflow: 'hidden',
@@ -298,6 +299,7 @@ const SUMMARY_CARD_STYLE = {
                   padding: '{dimension.padding.semiloose}',
                   borderRadius: '{dimension.borderradius.xxxxl}',
                   background: '{color.basic.opacity.white.48}',
+                  backdropFilter: 'blur(7px)',
                   boxShadow: '{material.hierarchy.3f}',
                   border: '{dimension.borderwidth.narrow} solid {color.basic.opacity.white.64}',
                   overflow: 'hidden',
@@ -386,6 +388,7 @@ const SUMMARY_CARD_STYLE = {
                   padding: '{dimension.padding.semiloose}',
                   borderRadius: '{dimension.borderradius.xxxxl}',
                   background: '{color.basic.opacity.white.48}',
+                  backdropFilter: 'blur(7px)',
                   boxShadow: '{material.hierarchy.3f}',
                   border: '{dimension.borderwidth.narrow} solid {color.basic.opacity.white.64}'
               },
@@ -466,6 +469,7 @@ const SUMMARY_CARD_STYLE = {
                   padding: '{dimension.padding.semiloose}',
                   borderRadius: '{dimension.borderradius.xxxxl}',
                   background: '{color.basic.opacity.white.48}',
+                  backdropFilter: 'blur(7px)',
                   boxShadow: '{material.hierarchy.3f}',
                   border: '{dimension.borderwidth.narrow} solid {color.basic.opacity.white.64}'
               },
@@ -478,7 +482,7 @@ const SUMMARY_CARD_STYLE = {
                           display: 'flex',
                           flexDirection: 'row',
                           gap: '{dimension.gap.supertight}',
-                          justifyContent: 'space-between',
+                          justifyContent: 'flex-start',
                           alignItems: 'center',
                           overflow: 'hidden',
                       }
@@ -519,6 +523,7 @@ const SUMMARY_CARD_STYLE = {
                   padding: '{dimension.padding.semiloose}',
                   borderRadius: '{dimension.borderradius.xxxxl}',
                   background: '{color.basic.opacity.white.48}',
+                  backdropFilter: 'blur(7px)',
                   boxShadow: '{material.hierarchy.3f}',
                   border: '{dimension.borderwidth.narrow} solid {color.basic.opacity.white.64}'
               },
@@ -580,6 +585,7 @@ const SUMMARY_CARD_STYLE = {
                   padding: '{dimension.padding.semiloose}',
                   borderRadius: '{dimension.borderradius.xxxxl}',
                   background: '{color.basic.opacity.white.48}',
+                  backdropFilter: 'blur(7px)',
                   boxShadow: '{material.hierarchy.3f}',
                   border: '{dimension.borderwidth.narrow} solid {color.basic.opacity.white.64}'
               },
@@ -631,6 +637,7 @@ const SUMMARY_CARD_STYLE = {
       ],
       slotConfigs: {
           title: {
+              optional: false,
               metaType: 'text',
               variantStyle: {
                   margin: '0',
@@ -651,6 +658,7 @@ const SUMMARY_CARD_STYLE = {
               }
           },
           icon: {
+              optional: true,
               metaType: 'text',
               variantStyle: {
                   fontSize: '{font.size.medium}',
@@ -679,6 +687,7 @@ const SUMMARY_CARD_STYLE = {
               }
           },
           commit: {
+              optional: true,
               metaType: 'text',
               variant: 'p',
               variantStyle: {
@@ -709,6 +718,7 @@ const SUMMARY_CARD_STYLE = {
               }
           },
           commitWide: {
+              optional: true,
               metaType: 'text',
               variant: 'p',
               variantStyle: {
@@ -725,6 +735,7 @@ const SUMMARY_CARD_STYLE = {
               }
           },
           text: {
+              optional: true,
               metaType: 'text',
               variant: 'p',
               variantStyle: {
@@ -735,6 +746,7 @@ const SUMMARY_CARD_STYLE = {
               }
           },
           preview: {
+              optional: true,
               metaType: 'image',
               variantStyle: {
                   width: '100%',
@@ -744,6 +756,7 @@ const SUMMARY_CARD_STYLE = {
               }
           },
           topImage: {
+              optional: true,
               metaType: 'image',
               variantStyle: {
                   width: '100%',
@@ -753,6 +766,7 @@ const SUMMARY_CARD_STYLE = {
               }
           },
           backgroundImage: {
+              optional: true,
               metaType: 'image',
               variantStyle: {
                   width: '100%',
@@ -763,6 +777,7 @@ const SUMMARY_CARD_STYLE = {
           },
           // 背景图片模式下的标题样式（白色字体）
           titleOnBackground: {
+              optional: true,
               metaType: 'text',
               variantStyle: {
                   margin: '0',
@@ -784,6 +799,7 @@ const SUMMARY_CARD_STYLE = {
           },
           // 背景图片模式下的文本样式（白色字体）
           textOnBackground: {
+              optional: true,
               metaType: 'text',
               variant: 'p',
               variantStyle: {
