@@ -2068,22 +2068,22 @@ wrapper: {
 </commentStyleListCard>
 
 <summaryCard>
-  <title key="title"></title>
+  <title title="鼠标悬停可看完整标题">生成岗位JD完成（悬停看 tooltip）</title>
   <commit>查看过程</commit>
   <text key="summary"></text>
 </summaryCard>
 
-<!-- 示例2: 带图标 -->
+<!-- 示例2: 带图标，支持 title 透传原生 tooltip -->
 <summaryCard>
   <icon></icon>
-  <title key="title"></title>
+  <title title="查看详情" key="title"></title>
   <commit>查看过程</commit>
   <text key="summary"></text>
 </summaryCard>
 
 <!-- 示例3: 横向布局，带预览图片 -->
 <summaryCard>
-  <title key="title"></title>
+  <title title="卡片标题提示" key="title"></title>
   <commit>查看过程</commit>
   <text key="summary"></text>
   <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
@@ -2092,7 +2092,7 @@ wrapper: {
 <!-- 示例4: 横向布局，带图标和预览 -->
 <summaryCard>
   <icon></icon>
-  <title key="title"></title>
+  <title title="悬停显示此标题" key="title"></title>
   <commit>查看过程</commit>
   <text key="summary"></text>
   <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
@@ -2102,7 +2102,7 @@ wrapper: {
 <summaryCard>
   <topImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></topImage>
   <icon></icon>
-  <title key="title"></title>
+  <title title="标题提示" key="title"></title>
   <commit>查看过程</commit>
   <text key="summary"></text>
 </summaryCard>
@@ -2111,7 +2111,7 @@ wrapper: {
 <summaryCard>
   <topImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></topImage>
   <icon></icon>
-  <title key="title"></title>
+  <title title="完整标题说明" key="title"></title>
   <text key="summary"></text>
   <commitWide>查看过程</commitWide>
 </summaryCard>
@@ -2119,7 +2119,7 @@ wrapper: {
 <!-- 示例7: 图片作为背景，宽按钮在底部 -->
 <summaryCard>
   <backgroundImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=400&h=400"></backgroundImage>
-  <title key="title"></title>
+  <title title="背景卡片标题" key="title"></title>
   <text key="summary"></text>
   <commitWide>查看过程</commitWide>
 </summaryCard>
