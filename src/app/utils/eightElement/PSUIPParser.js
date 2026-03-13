@@ -392,7 +392,38 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     // 🆕 首先检查是否是自定义样式标签
     const customStyleResult = parseCustomStyleTag(line);
     if (customStyleResult) {
-        // 解析内容部分的markdown格式（如 #### 15%）
+        const headingTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+        const isHeadingTag = headingTags.includes(customStyleResult.variant);
+
+        // 🆕 标准标题标签（如 <h3 color={...}>）直接作为对应标题处理，样式同 ### 并支持 supportedAttributes
+        if (isHeadingTag && markdownMapping[customStyleResult.variant]) {
+            return {
+                markdownResult: {
+                    type: customStyleResult.variant,
+                    templatePath: markdownMapping[customStyleResult.variant],
+                    content: customStyleResult.content.trim(),
+                    customVariant: customStyleResult.variant,
+                    customStyles: customStyleResult.customStyles
+                },
+                newListItemCounter: currentListItemCounter
+            };
+        }
+
+        // 🆕 正文标签（如 <p color={...}>）直接作为对应段落处理，支持 supportedAttributes
+        if (customStyleResult.variant === 'p' && markdownMapping.p) {
+            return {
+                markdownResult: {
+                    type: 'p',
+                    templatePath: markdownMapping.p,
+                    content: customStyleResult.content.trim(),
+                    customVariant: 'p',
+                    customStyles: customStyleResult.customStyles
+                },
+                newListItemCounter: currentListItemCounter
+            };
+        }
+
+        // 解析内容部分的markdown格式（如 <percentValue color={...}>#### 15%</percentValue>）
         const contentResult = parseMarkdownToTemplate(customStyleResult.content, markdownMapping, currentListItemCounter);
         if (contentResult && contentResult.markdownResult) {
             // 将自定义样式附加到解析结果
@@ -1745,6 +1776,126 @@ function parseMarkdown(markdown, options = {}) {
 
             // 跳过已处理的引用块行
             i = endIndex;
+            continue;
+        }
+
+        // 🆕 解析根级自定义标题标签，如 <h3 color={color.basic.opacity.white.20}>  📫 【会议邀请】</h3>
+        const customHeadingResult = parseCustomStyleTag(trimmedLine);
+        const headingTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+        if (customHeadingResult && headingTags.includes(customHeadingResult.variant)) {
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            if (inList && listItems.length > 0) {
+                const listLayout = createLayoutElement(
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                    listItems,
+                    {
+                        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                    }
+                );
+                stack[stack.length - 1].elements.push(listLayout);
+                inList = false;
+                listItems = [];
+            }
+
+            const level = parseInt(customHeadingResult.variant.replace('h', ''), 10);
+            const content = customHeadingResult.content.trim();
+            const customStyles = customHeadingResult.customStyles || {};
+
+            if (level === 1) {
+                if (currentH1Block) {
+                    h1Blocks.push(currentH1Block);
+                }
+                const rootElements = stack[0].elements;
+                const newHeadingLayout = createHeadingLayout(content, [], level, customStyles);
+                if (rootElements.length > 0) {
+                    newHeadingLayout.layout.children.unshift(...rootElements);
+                    rootElements.length = 0;
+                }
+                currentH1Block = newHeadingLayout;
+                while (stack.length > 1) {
+                    stack.pop();
+                }
+                stack.push({ level, elements: newHeadingLayout.layout.children });
+            } else {
+                while (stack.length > 1 && stack[stack.length - 1].level >= level) {
+                    stack.pop();
+                }
+                const newHeadingLayout = createHeadingLayout(content, [], level, customStyles);
+                if (disableSiblingGrouping) {
+                    stack[stack.length - 1].elements.push(newHeadingLayout);
+                } else {
+                    const parentElements = stack[stack.length - 1].elements;
+                    const existingSiblingHeading = parentElements.find(element =>
+                        element._metadata?.actualType === 'layout' &&
+                        element._metadata?.headingLevel === level &&
+                        !element._metadata?.isSiblingGroup
+                    );
+                    const existingSiblingGroup = parentElements.find(element =>
+                        element._metadata?.actualType === 'layout' &&
+                        element._metadata?.isSiblingGroup === true &&
+                        element._metadata?.headingLevel === level
+                    );
+                    if (existingSiblingHeading && !existingSiblingGroup) {
+                        const siblingIndex = parentElements.indexOf(existingSiblingHeading);
+                        parentElements.splice(siblingIndex, 1);
+                        const siblingContentSeed = `sibling-h${level}-${existingSiblingHeading.id}-${newHeadingLayout.id}`;
+                        const siblingGroupContainer = createLayoutElement(
+                            LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                            [existingSiblingHeading, newHeadingLayout],
+                            {
+                                alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                                counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN,
+                                variant: 'column',
+                                contentSeed: siblingContentSeed,
+                                position: `sibling-group-${level}`
+                            }
+                        );
+                        siblingGroupContainer._metadata = {
+                            ...siblingGroupContainer._metadata,
+                            actualType: 'layout',
+                            variant: 'column',
+                            isSiblingGroup: true,
+                            headingLevel: level,
+                            isLayout: true
+                        };
+                        parentElements.push(siblingGroupContainer);
+                    } else if (existingSiblingGroup) {
+                        existingSiblingGroup.layout.children.push(newHeadingLayout);
+                    } else {
+                        parentElements.push(newHeadingLayout);
+                    }
+                }
+                stack.push({ level, elements: newHeadingLayout.layout.children });
+            }
+            continue;
+        }
+
+        // 🆕 解析根级自定义正文标签，如 <p color={color.basic.opacity.white.20}>您受邀参加以下会议</p>
+        if (customHeadingResult && customHeadingResult.variant === 'p') {
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            if (inList && listItems.length > 0) {
+                const listLayout = createLayoutElement(
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                    listItems,
+                    {
+                        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                    }
+                );
+                stack[stack.length - 1].elements.push(listLayout);
+                inList = false;
+                listItems = [];
+            }
+
+            const content = customHeadingResult.content.trim();
+            const pCustomStyles = customHeadingResult.customStyles || {};
+            const textElement = createTextElement(content, 'p', {}, pCustomStyles);
+            stack[stack.length - 1].elements.push(textElement);
             continue;
         }
 

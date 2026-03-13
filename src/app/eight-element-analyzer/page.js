@@ -2448,7 +2448,7 @@ style: {
   hiringNewCard: {
     name: '新的招聘卡片',
     description: '用于3D场景演示的新的招聘卡片',
-    markdown: `<layout:root background="transparent">
+    markdown: `<layout:root backgroundColor="transparent">
 <layout:row>
   <layout:column flex="2">
       <hiringNewTitleCard>
@@ -2525,6 +2525,78 @@ style: {
           </mixedCard>
         </loop>
       </layout:row>
+    `
+  },
+  customFeature: {
+    name: '自定义样式',
+    description: '用于展示自定义样式',
+    markdown: `
+      <h3 color={color.basic.opacity.white.20}>  📫 【会议邀请】AIGUI 产品讨论 </h3>
+      <p color={color.basic.opacity.white.20}>您受邀参加以下会议，期待您的出席</p>
+
+<layout:row>
+<heroCard>
+  <cover_image src="https://sop-cdn.dingcloud.com/aigui/file/ag4baygrjj38y128iauxh0yy7isdpcj820260311162754792.png"></cover_image>
+  <badge>会议邀请</badge>
+  <title>AIGUI 产品讨论</title>
+  <subtitle>以下为会议时间及会议地点</subtitle>
+  <metrics>🕙 时间：2024年11月15日  10:00-12:00 </metrics>
+  <metrics>🏘 地点：神盾局</metrics>
+
+</heroCard>
+
+<feedListTranCard>
+  <title>🗓<strong> 会议日程 </strong></title>
+  <subtitle>请关注本次会议日程，提前准备相关资料</subtitle>
+
+  <items>
+
+    <icon>🆕</icon>
+    <text> <strong>10:00–-11:00　</strong> <br>项目进展回顾</text>
+
+  </items>
+
+  <items>
+
+    <icon>🆕</icon>
+    <text> <strong>11:00–-11:30　</strong><br>产品遗留问题确认</text>
+
+  </items>
+
+    <items>
+
+    <icon>🆕</icon>
+    <text> <strong>11:30–-12:00　</strong><br>规划讨论与决策</text>
+
+  </items>
+</feedListTranCard>
+
+<feedListTranCard>
+  <title>🗒<strong> 会议人员信息</strong></title>
+  <subtitle>请提前安排好时间，准时参会。如有疑问，请联系邀请人。</subtitle>
+
+  <items>
+
+    <icon>🕴 </icon>
+    <text><strong>邀请人</strong></text>
+  </items>
+  <items>
+    <text>闫立刚（yanlg@dingdao.com）</text>
+  </items>
+
+  <items>
+
+    <icon>🕴🕴 </icon>
+    <text>  <strong>参会人</strong>  </text>
+ </items>
+ <items>
+  <text>闫立刚（yanlg@dingdao.com）<br>高楠（gaonan@dingdao.com）<br>闫井亮（yanjl@dingdao.com）<br>曲祥（quxiang@dingdao.com）</text>
+ </items>
+
+  </items>
+</feedListTranCard>
+
+</layout:row>
     `
   }
 };

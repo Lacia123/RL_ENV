@@ -5,14 +5,17 @@ const TEXT_STYLE = {
     text: {
         // 正文文本
         p: {
-            fontSize: "{font.size.medium}",
-            fontWeight: "400",
-            lineHeight: "1.7",
-            letterSpacing: "{font.letterspacing.base}",
-            color: "{color.onsurface.black76}",
-            margin: "0 0 {dimension.margin.base} 0",
-            textAlign: "justify",
-            textJustify: "inter-word"
+            style: {
+                fontSize: "{font.size.medium}",
+                fontWeight: "400",
+                lineHeight: "1.7",
+                letterSpacing: "{font.letterspacing.base}",
+                color: "{color.onsurface.black76}",
+                margin: "0 0 {dimension.margin.base} 0",
+                textAlign: "justify",
+                textJustify: "inter-word"
+            },
+            supportedAttributes: ['color']
         },
         // 标题文本（h1 - h6）
         h1: {
@@ -58,16 +61,19 @@ const TEXT_STYLE = {
             boxShadow: "{material.hierarchy.main}"
         },
         h3: {
-            width: "100%",
-            display: "flex",
-            textAlign: "left",
-            fontSize: "{font.size.xl}",
-            fontWeight: "{font.fontweight.semibold}",
-            lineHeight: "{font.lineheight.base}",
-            letterSpacing: "{font.letterspacing.base}",
-            color: "{color.onsurface.black76}",
-            margin: "{dimension.margin.loose} 0 {dimension.margin.base} 0",
-            position: 'relative',
+            style: {
+                width: "100%",
+                display: "flex",
+                textAlign: "left",
+                fontSize: "{font.size.xl}",
+                fontWeight: "{font.fontweight.semibold}",
+                lineHeight: "{font.lineheight.base}",
+                letterSpacing: "{font.letterspacing.base}",
+                color: "{color.onsurface.black76}",
+                margin: "{dimension.margin.loose} 0 {dimension.margin.base} 0",
+                position: 'relative',
+            },
+            supportedAttributes: ['color'],
             // '&::before': {
             //   content: "'#'",
             //   color: "{color.primary.brand5}",

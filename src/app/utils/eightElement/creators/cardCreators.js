@@ -1010,6 +1010,11 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             if (markdownData.customVariant === finalVariant) {
                 styleOverride = markdownData.customStyles;
             }
+            // 🆕 标准标题/正文标签（如 <h3 color={...}>、<p color={...}>）使用 customVariant 作为 variant，以应用 textStyle 中的 supportedAttributes
+            else if (markdownData.customStyles && ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'].includes(markdownData.customVariant)) {
+                finalVariant = markdownData.customVariant;
+                styleOverride = markdownData.customStyles;
+            }
         }
         
         // 🔧 修复：tagConfig.style 是容器样式，不应该作为 styleOverride 传递给文本元素
