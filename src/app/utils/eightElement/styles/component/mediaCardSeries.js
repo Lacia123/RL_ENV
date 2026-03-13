@@ -2100,7 +2100,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     borderRadius: '{dimension.borderradius.xl}',
                     background: 'transparent',
                     boxShadow: '{material.hierarchy.1f}',
-                    border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+                    border: '{dimension.borderwidth.narrow} solid {color.onprimary.white76}'
                 },
                 structure: {
                     groups: [
