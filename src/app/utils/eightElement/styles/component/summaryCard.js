@@ -219,8 +219,8 @@ const SUMMARY_CARD_STYLE = {
                   borderRadius: '{dimension.borderradius.xxxxl}',
                   background: '{color.basic.opacity.white.48}',
                   backdropFilter: 'blur(7px)',
-                  boxShadow: '{material.hierarchy.3f}',
                   border: '{dimension.borderwidth.narrow} solid {color.basic.opacity.white.64}',
+                  boxShadow: '6px -2px 20.047px 0 rgba(63, 223, 255, 0.18), -6px 6px 20.047px 0 rgba(63, 71, 255, 0.18)',
                   overflow: 'hidden',
               },
               structure: {
