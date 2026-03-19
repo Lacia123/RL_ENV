@@ -155,14 +155,14 @@ const FEED_LIST_CHART_TRAN_CARD_STYLE = {
       // ],
       // 坐标系与图表内文字颜色（支持 token 或 hex）
       axis: {
-        fill: '{color.basic.opacity.white.100}',           // 坐标轴刻度/标签颜色
+        fill: '#fff',           // 坐标轴刻度/标签颜色
         stroke: '{color.basic.opacity.white.48}',          // 坐标轴线、刻度线颜色
         fontSize: '{font.size.tiny}',
         fontweight: '{font.fontweight.medium}',
       },
       // 柱顶数值标签（800、1000 等）：不配则与轴同色同字号，配了可与轴区分
       dataLabel: {
-        fill: '{color.basic.opacity.white.32}',           // 柱顶数字颜色，可与 axis.fill 不同
+        fill: '#fff',           // 柱顶数字颜色，可与 axis.fill 不同
         fontSize: '{font.size.tiny}',                      // 柱顶数字字号
         fontweight: '{font.fontweight.medium}',
       },
@@ -172,13 +172,13 @@ const FEED_LIST_CHART_TRAN_CARD_STYLE = {
       },
       // legend：图例文字颜色
       legend: {
-        fill: '{color.basic.opacity.white.100}',
+        fill: '#fff',
         fontSize: '{font.size.tiny}',           // 可选
         fontweight: '{font.fontweight.medium}',
       },
       // title：图表标题文字颜色（图表内标题）
       title: {
-        fill: '{color.surfacecontainer.white100}',
+        fill: '#fff',
         fontSize: '{font.size.medium}',         // 可选
         fontweight: '{font.fontweight.bold}',
       },
