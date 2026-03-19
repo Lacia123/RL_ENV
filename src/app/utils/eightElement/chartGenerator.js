@@ -261,6 +261,118 @@ function resolveColor(color) {
 }
 
 /**
+ * 在图表 SVG 内绘制背景 rect（作为第一个子元素，位于最底层）
+ * 配置了 chartBackgroundColor 时，背景色已应用到外层容器，此处用 transparent 避免两层半透明叠加。
+ * @param {Object} svg - D3 的 svg 选择
+ * @param {number} width - SVG 宽度
+ * @param {number} height - SVG 高度
+ * @param {Object} chartStyleConfig - 可含 chartBackgroundColor（token 或 hex）
+ */
+function applyChartSvgBackground(svg, width, height, chartStyleConfig = null) {
+  const bg = chartStyleConfig?.chartBackgroundColor;
+  if (bg == null) return;
+  if (String(bg).toLowerCase() === 'transparent') return;
+  svg.insert('rect', ':first-child')
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('width', width)
+    .attr('height', height)
+    .attr('fill', 'transparent');
+}
+
+/**
+ * 从 chartStyleConfig.chartColors 解析出 colorValues 与 colorClass，供图表透传颜色使用。
+ * 颜色与内容对应：chartColors[i] 固定对应「第 i 个」数据维度（第 i 个系列/第 i 根柱子/第 i 个扇形），
+ * 图例与图形按同一顺序使用，多出部分循环取色。
+ * @param {Object} chartStyleConfig - 图表样式配置，可含 chartColors 数组（建议 design token）
+ * @param {Object} defaultColors - 默认 { colorValues, colorClass }
+ * @returns {{ colorValues: string[], colorClass: string[], useCustomColors: boolean }}
+ */
+function getChartColorsFromConfig(chartStyleConfig = null, defaultColors = {}) {
+  const custom = chartStyleConfig?.chartColors;
+  if (custom && Array.isArray(custom) && custom.length > 0) {
+    const colorValues = custom.map(c => resolveColor(c));
+    const colorClass = colorValues.map((_, i) => `color-custom-${i}`);
+    return { colorValues, colorClass, useCustomColors: true };
+  }
+  return {
+    colorValues: defaultColors.colorValues || [],
+    colorClass: defaultColors.colorClass || [],
+    useCustomColors: false
+  };
+}
+
+/** 从 chartStyleConfig 解析轴样式（优先使用透传的 axis.fill/stroke/fontSize，否则用默认 axisConfig） */
+function getResolvedAxisStyle(displayConfig, chartStyleConfig) {
+  const base = displayConfig?.isSmallChart ? smallAxisConfig : axisConfig;
+  const fill = chartStyleConfig?.axis?.fill != null ? (resolveToken(chartStyleConfig.axis.fill) || resolveColor(chartStyleConfig.axis.fill)) : resolveToken(base.fill);
+  const stroke = chartStyleConfig?.axis?.stroke != null ? (resolveToken(chartStyleConfig.axis.stroke) || resolveColor(chartStyleConfig.axis.stroke)) : null;
+  const fontSize = chartStyleConfig?.axis?.fontSize != null ? (resolveToken(chartStyleConfig.axis.fontSize) || chartStyleConfig.axis.fontSize) : resolveToken(base.fontSize);
+  const fontWeight = chartStyleConfig?.axis?.fontWeight != null ? (resolveToken(chartStyleConfig.axis.fontWeight) || chartStyleConfig.axis.fontWeight) : resolveToken(base.fontWeight);
+  return { fill: fill || '#666', stroke: stroke || '#666', fontSize, fontWeight: fontWeight || '400' };
+}
+
+/** 从 chartStyleConfig 解析图例文字样式 */
+function getResolvedLegendStyle(displayConfig, chartStyleConfig) {
+  const base = displayConfig?.isSmallChart ? smalllegendConfig : legendConfig;
+  const fill = chartStyleConfig?.legend?.fill != null ? (resolveToken(chartStyleConfig.legend.fill) || resolveColor(chartStyleConfig.legend.fill)) : resolveToken(base.fill);
+  const fontSize = chartStyleConfig?.legend?.fontSize != null ? (resolveToken(chartStyleConfig.legend.fontSize) || chartStyleConfig.legend.fontSize) : resolveToken(base.fontSize);
+  const fontWeight = chartStyleConfig?.legend?.fontWeight != null ? (resolveToken(chartStyleConfig.legend.fontWeight) || chartStyleConfig.legend.fontWeight) : resolveToken(base.fontWeight);
+  return { fill: fill || '#666', fontSize, fontWeight: fontWeight || '400' };
+}
+
+/** 从 chartStyleConfig 解析图表标题样式 */
+function getResolvedTitleStyle(chartStyleConfig) {
+  const fill = chartStyleConfig?.title?.fill != null ? (resolveToken(chartStyleConfig.title.fill) || resolveColor(chartStyleConfig.title.fill)) : resolveToken(titleConfig.fill);
+  const fontSize = chartStyleConfig?.title?.fontSize != null ? (resolveToken(chartStyleConfig.title.fontSize) || chartStyleConfig.title.fontSize) : resolveToken(titleConfig.fontSize);
+  const fontWeight = chartStyleConfig?.title?.fontWeight != null ? (resolveToken(chartStyleConfig.title.fontWeight) || chartStyleConfig.title.fontWeight) : resolveToken(titleConfig.fontWeight);
+  return { fill: fill || '#111', fontSize, fontWeight: fontWeight || '400' };
+}
+
+/** 从 chartStyleConfig 解析网格线样式 */
+function getResolvedGridStyle(chartStyleConfig) {
+  const stroke = chartStyleConfig?.grid?.stroke != null ? (resolveToken(chartStyleConfig.grid.stroke) || resolveColor(chartStyleConfig.grid.stroke)) : '#e0e0e0';
+  const strokeOpacity = chartStyleConfig?.grid?.strokeOpacity != null ? chartStyleConfig.grid.strokeOpacity : 0.7;
+  return { stroke, strokeOpacity };
+}
+
+/** 从 chartStyleConfig 解析柱顶数值标签样式（未配置时回退到 axis 样式） */
+function getResolvedDataLabelStyle(displayConfig, chartStyleConfig, axisStyleFallback) {
+  const dl = chartStyleConfig?.dataLabel;
+  const fill = dl?.fill != null ? (resolveToken(dl.fill) || resolveColor(dl.fill)) : (axisStyleFallback?.fill || '#666');
+  const fontSize = dl?.fontSize != null ? (resolveToken(dl.fontSize) || dl.fontSize) : (axisStyleFallback?.fontSize || displayConfig?.dataLabelSize || '8px');
+  return { fill, fontSize };
+}
+
+/**
+ * 向 SVG 的 defs 中注入图表主题样式（轴体、网格、图例、标题），用 CSS 覆盖默认 defs，便于外部再用 CSS 覆盖
+ * @param {Object} svg - D3 的 svg 选择
+ * @param {Object} options - { axisStyle, gridStyle, legendStyle, titleStyle }，可为 null 则跳过对应项
+ */
+function injectChartThemeStyle(svg, options = {}) {
+  const { axisStyle, gridStyle, legendStyle, titleStyle } = options;
+  const rules = [];
+  if (axisStyle) {
+    rules.push(`.axis line, .axis path { stroke: ${axisStyle.stroke}; }`);
+    rules.push(`.axis text { fill: ${axisStyle.fill}; }`);
+  }
+  if (gridStyle) {
+    rules.push(`.grid line { stroke: ${gridStyle.stroke}; stroke-opacity: ${gridStyle.strokeOpacity}; }`);
+  }
+  if (legendStyle) {
+    rules.push(`.legend text { fill: ${legendStyle.fill}; }`);
+  }
+  if (titleStyle) {
+    rules.push(`.ee-chart-title-wrap text { fill: ${titleStyle.fill}; }`);
+  }
+  if (rules.length === 0) return;
+  const defs = svg.select('defs');
+  if (!defs.empty()) {
+    defs.append('style').attr('type', 'text/css').attr('data-chart-theme', 'true').text(rules.join('\n'));
+  }
+}
+
+/**
  * 生成图例
  * @param {Object} g - D3图表组
  * @param {number} innerHeight - 图表内部高度
@@ -290,6 +402,8 @@ function generateLegend(g, innerHeight, items, displayConfig, chartStyleConfig, 
     const legendItem = legend.append('g')
       .attr('transform', `translate(${x}, ${y})`);
     
+    // 图例色块使用 item.color（透传颜色或默认解析色），无则回退 #000 依赖外部 CSS
+    const legendColor = item.color || '#000';
     // 根据图例类型绘制不同的样式示例
     if (item.type === 'line') {
       // 绘制线样式示例
@@ -299,7 +413,7 @@ function generateLegend(g, innerHeight, items, displayConfig, chartStyleConfig, 
         .attr('x2', 15)
         .attr('y2', 6)
         .attr('class', `line line-${item.colorClass}`)
-        .attr('stroke', '#000')
+        .attr('stroke', legendColor)
         .attr('stroke-width', item.style?.strokeWidth || 2.5)
         .attr('stroke-dasharray', item.style?.dashArray || '0');
       
@@ -309,24 +423,24 @@ function generateLegend(g, innerHeight, items, displayConfig, chartStyleConfig, 
         .attr('cy', 6)
         .attr('r', 3)
         .attr('class', `dot dot-${item.colorClass}`)
-        .attr('fill', '#000')
+        .attr('fill', legendColor)
         .attr('stroke', '#fff')
         .attr('stroke-width', 1);
     } else if (item.type === 'bar') {
-      // 绘制柱状图样式示例
+      // 绘制柱状图样式示例（与柱子颜色一致）
       legendItem.append('rect')
         .attr('width', 15)
         .attr('height', 12)
         .attr('class', `bar bar-${item.colorClass}`)
-        .attr('fill', '#000');
+        .attr('fill', legendColor);
     } else if (item.type === 'area') {
       // 绘制面积图样式示例
       legendItem.append('path')
         .attr('d', 'M0,12 L15,3 L15,12 Z')
         .attr('class', `area area-${item.colorClass}`)
-        .attr('fill', '#000')
+        .attr('fill', legendColor)
         .attr('fill-opacity', item.style?.fillOpacity || 0.6)
-        .attr('stroke', '#000')
+        .attr('stroke', legendColor)
         .attr('stroke-width', item.style?.strokeWidth || 2);
     } else if (item.type === 'donut') {
       // 绘制环状图样式示例
@@ -335,28 +449,23 @@ function generateLegend(g, innerHeight, items, displayConfig, chartStyleConfig, 
         .attr('cy', 6)
         .attr('r', 6)
         .attr('class', `donut donut-${item.colorClass}`)
-        .attr('fill', '#000')
+        .attr('fill', legendColor)
         .attr('stroke', '#fff')
         .attr('stroke-width', 1);
     }
     
-    // 获取图例样式配置
+    // 获取图例样式配置（优先使用透传的 chartStyleConfig.legend）
     const legendClassName = chartStyleConfig?.legend?.className || 'legend-label';
-    
-    // 🆕 根据图表大小选择合适的图例配置
-    const currentLegendConfig = displayConfig.isSmallChart ? smalllegendConfig : legendConfig;
-    const resolvedFontSize = resolveToken(currentLegendConfig.fontSize);
-    const resolvedFontWeight = resolveToken(currentLegendConfig.fontWeight);
-    const resolvedFill = resolveToken(currentLegendConfig.fill);
+    const legendStyle = getResolvedLegendStyle(displayConfig, chartStyleConfig);
     
     // 添加图例文字
     const text = legendItem.append('text')
       .attr('class', legendClassName)
       .attr('x', 20)
       .attr('y', 9)
-      .attr('font-size', resolvedFontSize || displayConfig.legendLabelSize || '8px')
-      .attr('font-weight', resolvedFontWeight || '400')
-      .attr('fill', resolvedFill || '#666')
+      .attr('font-size', legendStyle.fontSize || displayConfig.legendLabelSize || '8px')
+      .attr('font-weight', legendStyle.fontWeight || '400')
+      .attr('fill', legendStyle.fill || '#666')
       .attr('alignment-baseline', 'middle')
       .text(item.label);
     
@@ -581,18 +690,16 @@ function generateTreeMindChart(tableData, chartTitle = null) {
   // 创建JSDOM SVG
   const { svg } = createJsdomEnv(baseWidth, Math.max(240, height));
 
-  // 标题
+  // 标题（支持 chartStyleConfig.title 透传）
   if (chartTitle) {
-    const resolvedTitleWeight = resolveToken(titleConfig.fontWeight);
-    const resolvedTitleFill = resolveToken(titleConfig.fill);
-    const titleFontSize = '14px'; // 与其他图表标题保持一致的小一号字号
+    const titleStyleTree = getResolvedTitleStyle(chartStyleConfig);
     svg.append('text')
       .attr('x', baseWidth / 2)
       .attr('y', titleYOffset)
       .attr('text-anchor', 'middle')
-      .attr('font-size', titleFontSize)
-      .attr('font-weight', resolvedTitleWeight || '600')
-      .attr('fill', resolvedTitleFill || '#111')
+      .attr('font-size', titleStyleTree.fontSize || '14px')
+      .attr('font-weight', titleStyleTree.fontWeight || '600')
+      .attr('fill', titleStyleTree.fill)
       .text(chartTitle);
   }
 
@@ -711,31 +818,16 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
   try {
     
     const { svg, document } = createJsdomEnv(width, height);
+    applyChartSvgBackground(svg, width, height, chartStyleConfig);
     
     const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
     const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
     const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
     const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
-    
-    const colorValues = [
-      colorBrand5,
-      colorBrand4,
-      colorBrand3,
-      '#76b7b2', 
-      '#59a14f', 
-      '#edc949', 
-      '#af7aa1', 
-      '#ff9da7', 
-      '#9c755f', 
-      '#bab0ab'
-    ];
-
-    const colorClass = [
-      'color-brand6',
-      'color-brand5',
-      'color-brand4'
-    ]
-        const lineStyles = [
+    const defaultColorValues = [colorBrand5, colorBrand4, colorBrand3, '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'];
+    const defaultColorClass = ['color-brand6', 'color-brand5', 'color-brand4'];
+    const { colorValues, colorClass } = getChartColorsFromConfig(chartStyleConfig, { colorValues: defaultColorValues, colorClass: defaultColorClass });
+    const lineStyles = [
       { strokeWidth: 3, dashArray: "0" },   
       { strokeWidth: 2.5, dashArray: "0" },  
       { strokeWidth: 2, dashArray: "0" },    
@@ -959,11 +1051,9 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
         });
     });
 
-    // 🆕 根据图表大小选择合适的轴配置
-    const currentAxisConfig = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
-    const resolvedAxisFontSize = resolveToken(currentAxisConfig.fontSize);
-    const resolvedAxisFontWeight = resolveToken(currentAxisConfig.fontWeight);
-    const resolvedAxisFill = resolveToken(currentAxisConfig.fill);
+    // 🆕 根据图表大小与透传配置解析轴、网格样式（坐标系与文字颜色可由 chartStyleConfig 覆盖）
+    const axisStyle = getResolvedAxisStyle(displayConfig, chartStyleConfig);
+    const gridStyle = getResolvedGridStyle(chartStyleConfig);
     
     // 添加X轴网格线
     g.append('g')
@@ -976,8 +1066,8 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       .attr('y1', 0)
       .attr('x2', d => xScale(d))
       .attr('y2', innerHeight)
-      .attr('stroke', '#e0e0e0')
-      .attr('stroke-opacity', 0.7);
+      .attr('stroke', gridStyle.stroke)
+      .attr('stroke-opacity', gridStyle.strokeOpacity);
     
     // 添加Y轴网格线
     const yTickCount = displayConfig.yTickCount || 5; // 🆕 使用动态刻度数量
@@ -992,19 +1082,23 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       .attr('y1', d => yScale(d))
       .attr('x2', innerWidth)
       .attr('y2', d => yScale(d))
-      .attr('stroke', '#e0e0e0')
-      .attr('stroke-opacity', 0.7);
+      .attr('stroke', gridStyle.stroke)
+      .attr('stroke-opacity', gridStyle.strokeOpacity);
     
-    // 添加X轴
+    // 添加X轴（含轴体：底部水平线，使用 axis.stroke）
     const xAxis = g.append('g')
       .attr('class', 'axis x-axis')
-      .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
+      .attr('font-size', axisStyle.fontSize || displayConfig.axisLabelSize || '10px')
       .attr('transform', `translate(0,${innerHeight})`);
+    xAxis.insert('line', ':first-child')
+      // .attr('x1', 0)
+      // .attr('y1', 0)
+      // .attr('x2', innerWidth)
+      // .attr('y2', 0)
+      .attr('stroke', axisStyle.stroke)
+      .attr('stroke-width', 1);
     
-    // 获取轴样式配置
     const axisClassName = chartStyleConfig?.axis?.className || 'axis-label';
-    
-    
     
     // 🆕 显示所有X轴标签，优化日期显示
     xAxis.selectAll('g')
@@ -1018,9 +1112,9 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       .attr('dy', '.71em')
       .attr('transform', displayConfig.xLabelRotation ? `rotate(${displayConfig.xLabelRotation})` : 'rotate(45)') // 🆕 使用动态旋转角度
       .attr('text-anchor', displayConfig.xLabelRotation <= 15 ? 'middle' : 'start') // 🆕 小角度旋转时居中对齐
-      .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
-      .attr('font-weight', resolvedAxisFontWeight || '400') // 🆕 使用token中的字体粗细
-      .attr('fill', resolvedAxisFill || '#666') // 🆕 使用token中的颜色
+      .attr('font-size', axisStyle.fontSize || displayConfig.axisLabelSize || '10px')
+      .attr('font-weight', axisStyle.fontWeight || '400')
+      .attr('fill', axisStyle.fill)
       .text(d => {
         // 🆕 优化日期显示，截取月-日部分
         if (d.includes('-')) {
@@ -1032,9 +1126,16 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
         return d;
       });
     
-    // 添加Y轴
+    // 添加Y轴（含轴体：左侧竖线，使用 axis.stroke）
     const yAxis = g.append('g')
       .attr('class', 'axis y-axis');
+    yAxis.insert('line', ':first-child')
+      // .attr('x1', 0)
+      // .attr('y1', 0)
+      // .attr('x2', 0)
+      // .attr('y2', innerHeight)
+      .attr('stroke', axisStyle.stroke)
+      .attr('stroke-width', 1);
     
     yAxis.selectAll('g')
       .data(yTicks)
@@ -1044,15 +1145,15 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       .call(g => {
         g.append('line')
           .attr('x2', -6)
-          .attr('stroke', '#666');
+          .attr('stroke', axisStyle.stroke);
         g.append('text')
           .attr('class', axisClassName)
           .attr('x', -9)
           .attr('dy', '.32em')
           .attr('text-anchor', 'end')
-          .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
-          .attr('font-weight', resolvedAxisFontWeight || '400') // 🆕 使用token中的字体粗细
-          .attr('fill', resolvedAxisFill || '#666') // 🆕 使用token中的颜色
+          .attr('font-size', axisStyle.fontSize || displayConfig.axisLabelSize || '10px')
+          .attr('font-weight', axisStyle.fontWeight || '400')
+          .attr('fill', axisStyle.fill)
           .text(d => {
             // 🆕 智能格式化数字：整数不显示小数点，小数最多显示1位
             if (d % 1 === 0) {
@@ -1065,19 +1166,16 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
           });
       });
     
-    // 🆕 添加图表标题（使用SVG绝对坐标确保所有图表标题在同一行）
     if (chartTitle) {
-      const titleFontSize = resolveToken(titleConfig.fontSize)
-      const titleFontWeight = titleConfig.fontWeight
-      const titleFill = resolveToken(titleConfig.fill)
-      
-      svg.append('text')
+      const titleStyle = getResolvedTitleStyle(chartStyleConfig);
+      svg.append('g').attr('class', 'ee-chart-title-wrap')
+        .append('text')
         .attr('x', width / 2)
-        .attr('y', 25)  // 🆕 使用SVG绝对坐标，与饼图保持一致
+        .attr('y', 25)
         .attr('text-anchor', 'middle')
-        .attr('font-size', titleFontSize)
-        .attr('font-weight', titleFontWeight)
-        .attr('fill', titleFill)
+        .attr('font-size', titleStyle.fontSize)
+        .attr('font-weight', titleStyle.fontWeight)
+        .attr('fill', titleStyle.fill)
         .text(chartTitle);
     }
 
@@ -1090,10 +1188,16 @@ function generateGroupedLineChart(data, dateField, valueFields, width, height, m
       style: lineStyles[i % lineStyles.length]
     }));
     
-    // 使用封装的图例生成函数
     generateLegend(g, innerHeight, legendItems, displayConfig, chartStyleConfig, 80);
     
-    // 将SVG转换为字符串
+    // 注入主题 CSS，覆盖 defs 默认样式，便于外部再用 CSS 覆盖
+    injectChartThemeStyle(svg, {
+      axisStyle,
+      gridStyle,
+      legendStyle: getResolvedLegendStyle(displayConfig, chartStyleConfig),
+      titleStyle: getResolvedTitleStyle(chartStyleConfig)
+    });
+    
     return svg.node().outerHTML;
   } catch (error) {
     console.error('生成分组折线图时发生错误:', error);
@@ -1119,31 +1223,20 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
     
     // 创建JSDOM环境
     const { svg, document } = createJsdomEnv(width, height);
+    applyChartSvgBackground(svg, width, height, chartStyleConfig);
     
-    // 解析颜色
+    // 解析颜色（支持透传 chartColors）
     const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
     const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
     const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
-    
-    // 定义颜色数组
-    const colorValues = [
+    const defaultColorValues = [
       colorBrand5,
       colorBrand4,
       colorBrand3,
-      '#76b7b2', 
-      '#59a14f', 
-      '#edc949', 
-      '#af7aa1', 
-      '#ff9da7', 
-      '#9c755f', 
-      '#bab0ab'
+      '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'
     ];
-
-    const colorClass = [
-      'color-brand6',
-      'color-brand5',
-      'color-brand4'
-    ];
+    const defaultColorClass = ['color-brand6', 'color-brand5', 'color-brand4'];
+    const { colorValues, colorClass, useCustomColors } = getChartColorsFromConfig(chartStyleConfig, { colorValues: defaultColorValues, colorClass: defaultColorClass });
     
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
@@ -1179,11 +1272,8 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
       .range([innerHeight, 0]);
 
     
-    // 🆕 根据图表大小选择合适的轴配置
-    const currentAxisConfig2 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
-    const resolvedAxisFontSize2 = resolveToken(currentAxisConfig2.fontSize);
-    const resolvedAxisFontWeight2 = resolveToken(currentAxisConfig2.fontWeight);
-    const resolvedAxisFill2 = resolveToken(currentAxisConfig2.fill);
+    const axisStyle2 = getResolvedAxisStyle(displayConfig, chartStyleConfig);
+    const gridStyle2 = getResolvedGridStyle(chartStyleConfig);
     
     // 添加垂直网格线
     g.append('g')
@@ -1196,14 +1286,21 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
       .attr('y1', d => yScale(d))
       .attr('x2', innerWidth)
       .attr('y2', d => yScale(d))
-      .attr('stroke', '#e0e0e0')
-      .attr('stroke-opacity', 0.7);
+      .attr('stroke', gridStyle2.stroke)
+      .attr('stroke-opacity', gridStyle2.strokeOpacity);
     
-    // 🆕 手动创建X轴标签，设置合适的字体大小
+    // 手动创建X轴（含轴体：底部水平线）
     const xAxis = g.append('g')
       .attr('class', 'axis x-axis')
-      .attr('font-size', resolvedAxisFontSize2 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置 
+      .attr('font-size', axisStyle2.fontSize || displayConfig.axisLabelSize || '10px')
       .attr('transform', `translate(0,${innerHeight})`);
+    xAxis.insert('line', ':first-child')
+      // .attr('x1', 0)
+      // .attr('y1', 0)
+      // .attr('x2', innerWidth)
+      // .attr('y2', 0)
+      .attr('stroke', axisStyle2.stroke)
+      .attr('stroke-width', 1);
     
     // 添加X轴刻度线和标签（品牌名称）
     xAxis.selectAll('.tick')
@@ -1213,44 +1310,41 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
       .attr('class', 'tick')
       .attr('transform', d => `translate(${xScale(d) + xScale.bandwidth() / 2}, 0)`)
       .call(g => {
-        // 添加刻度线
         g.append('line')
           .attr('y2', 6)
-          .attr('stroke', '#666');
-        
-        // 🆕 添加标签文字，使用token样式
+          .attr('stroke', axisStyle2.stroke);
         g.append('text')
           .attr('y', 9)
           .attr('dy', '.71em')
           .attr('text-anchor', 'middle')
-          .attr('font-size', resolvedAxisFontSize2 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
-          .attr('font-weight', resolvedAxisFontWeight2 || '400') // 🆕 使用token中的字体粗细
-          .attr('fill', resolvedAxisFill2 || '#333') // 🆕 使用token中的颜色
+          .attr('font-size', axisStyle2.fontSize || displayConfig.axisLabelSize || '10px')
+          .attr('font-weight', axisStyle2.fontWeight || '400')
+          .attr('fill', axisStyle2.fill)
           .text(d => d);
       });
     
-    // 添加y轴
+    // 添加y轴（刻度文字与轴线颜色由 axisStyle2 透传）
     const yAxis = g.append('g')
       .attr('class', 'axis y-axis')
       .call(d3.axisLeft(yScale).ticks(displayConfig.isSmallChart ? 3 : 5));
+    yAxis.selectAll('.tick text').attr('fill', axisStyle2.fill).attr('font-size', axisStyle2.fontSize || displayConfig.axisLabelSize || '10px');
+    yAxis.selectAll('.tick line').attr('stroke', axisStyle2.stroke);
+    yAxis.selectAll('path.domain').attr('stroke', axisStyle2.stroke);
     
-    // 获取柱状图颜色
-    const barColor = colorValues[0];
-    const colorClassSuffix = colorClass[0];
-    
-    // 绘制垂直柱状图
+    // 柱状图颜色：透传时每根柱子按类别顺序用 chartColors[i]，与图例一一对应；否则单色依赖外部 CSS
     const bars = g.selectAll('.bar')
       .data(data)
       .enter()
       .append('rect')
-      .attr('class', `bar bar-${colorClassSuffix}`)
+      .attr('class', (d, i) => `bar bar-${colorClass[i % colorClass.length]}`)
       .attr('x', d => xScale(d[dateField]))
       .attr('y', d => yScale(parseFloat(d[valueField].toString().replace(/[,%]/g, '')) || 0))
       .attr('width', xScale.bandwidth())
       .attr('height', d => innerHeight - yScale(parseFloat(d[valueField].toString().replace(/[,%]/g, '')) || 0))
-      .attr('fill', '#000');
+      .attr('fill', (d, i) => (useCustomColors ? colorValues[i % colorValues.length] : '#000'));
     
-    // 添加数值标签
+    // 添加数值标签：优先用 chartCard.dataLabel（可与轴颜色/字号不同），无则用 axis
+    const dataLabelStyle2 = getResolvedDataLabelStyle(displayConfig, chartStyleConfig, axisStyle2);
     g.selectAll('.bar-label')
       .data(data)
       .enter()
@@ -1259,38 +1353,37 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
       .attr('x', d => xScale(d[dateField]) + xScale.bandwidth() / 2)
       .attr('y', d => yScale(parseFloat(d[valueField].toString().replace(/[,%]/g, '')) || 0) - 5)
       .attr('text-anchor', 'middle')
-      .attr('fill', '#333')
-      .attr('font-size', displayConfig.dataLabelSize || '8px') // 🆕 使用动态数据标签字体大小
+      .attr('fill', dataLabelStyle2.fill)
+      .attr('font-size', dataLabelStyle2.fontSize)
       .text(d => d[valueField]);
     
-    // 🆕 添加图表标题（使用SVG绝对坐标确保所有图表标题在同一行）
     if (chartTitle) {
-      const titleFontSize = resolveToken(titleConfig.fontSize)
-      const titleFontWeight = titleConfig.fontWeight
-      const titleFill = resolveToken(titleConfig.fill)
-      
-      svg.append('text')
+      const titleStyle2 = getResolvedTitleStyle(chartStyleConfig);
+      svg.append('g').attr('class', 'ee-chart-title-wrap')
+        .append('text')
         .attr('x', width / 2)
-        .attr('y', 25)  // 🆕 使用SVG绝对坐标，与所有图表保持一致
+        .attr('y', 25)
         .attr('text-anchor', 'middle')
-        .attr('font-size', titleFontSize)
-        .attr('font-weight', titleFontWeight)
-        .attr('fill', titleFill)
+        .attr('font-size', titleStyle2.fontSize)
+        .attr('font-weight', titleStyle2.fontWeight)
+        .attr('fill', titleStyle2.fill)
         .text(chartTitle);
     }
 
-    // 生成图例数据 - 对于柱状图，图例应该显示品牌名称而不是数据字段名
     const legendItems = categories.map((category, i) => ({
       label: category,
       color: colorValues[i % colorValues.length],
       colorClass: colorClass[i % colorClass.length],
       type: 'bar'
     }));
-    
-    // 使用封装的图例生成函数
     generateLegend(g, innerHeight, legendItems, displayConfig, chartStyleConfig, 80);
-    
-    // 将SVG转换为字符串
+
+    injectChartThemeStyle(svg, {
+      axisStyle: axisStyle2,
+      gridStyle: gridStyle2,
+      legendStyle: getResolvedLegendStyle(displayConfig, chartStyleConfig),
+      titleStyle: getResolvedTitleStyle(chartStyleConfig)
+    });
     return svg.node().outerHTML;
   } catch (error) {
     console.error('生成垂直柱状图时发生错误:', error);
@@ -1315,31 +1408,15 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
   try {    
     // 创建JSDOM环境
     const { svg, document } = createJsdomEnv(width, height);
+    applyChartSvgBackground(svg, width, height, chartStyleConfig);
     
-    // 解析颜色
+    // 解析颜色（支持透传 chartColors）
     const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
     const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
     const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
-    
-    // 定义颜色数组
-    const colorValues = [
-      colorBrand5,
-      colorBrand4,
-      colorBrand3,
-      '#76b7b2', 
-      '#59a14f', 
-      '#edc949', 
-      '#af7aa1', 
-      '#ff9da7', 
-      '#9c755f', 
-      '#bab0ab'
-    ];
-
-    const colorClass = [
-      'color-brand6',
-      'color-brand5',
-      'color-brand4'
-    ]
+    const defaultColorValues = [colorBrand5, colorBrand4, colorBrand3, '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'];
+    const defaultColorClass = ['color-brand6', 'color-brand5', 'color-brand4'];
+    const { colorValues, colorClass, useCustomColors } = getChartColorsFromConfig(chartStyleConfig, { colorValues: defaultColorValues, colorClass: defaultColorClass });
     
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
@@ -1364,11 +1441,8 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
     // 处理单个数据系列的情况
     const valueField = valueFields[0]; // 只使用第一个数据系列
 
-    // 🆕 根据图表大小选择合适的轴配置
-    const currentAxisConfig3 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
-    const resolvedAxisFontSize3 = resolveToken(currentAxisConfig3.fontSize);
-    const resolvedAxisFontWeight3 = resolveToken(currentAxisConfig3.fontWeight);
-    const resolvedAxisFill3 = resolveToken(currentAxisConfig3.fill);
+    const axisStyle3 = getResolvedAxisStyle(displayConfig, chartStyleConfig);
+    const gridStyle3 = getResolvedGridStyle(chartStyleConfig);
     
     // 创建x和y轴的比例尺 - 确保严格按照原始数据顺序
     const xScale = d3.scaleLinear()
@@ -1384,31 +1458,36 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
     g.append('g')
       .attr('class', 'grid y-grid')
       .selectAll('line')
-      .data(xScale.ticks(displayConfig.isSmallChart ? 3 : 5)) // 🆕 小图表减少网格线数量
+      .data(xScale.ticks(displayConfig.isSmallChart ? 3 : 5))
       .enter()
       .append('line')
       .attr('x1', d => xScale(d))
       .attr('y1', 0)
       .attr('x2', d => xScale(d))
       .attr('y2', innerHeight)
-      .attr('stroke', '#e0e0e0')
-      .attr('stroke-opacity', 0.7);
+      .attr('stroke', gridStyle3.stroke)
+      .attr('stroke-opacity', gridStyle3.strokeOpacity);
     
     // 添加x轴
     const xAxis = g.append('g')
       .attr('class', 'axis x-axis')
       .attr('transform', `translate(0,${innerHeight})`)
-      .attr('font-size', resolvedAxisFontSize3 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
+      .attr('font-size', axisStyle3.fontSize || displayConfig.axisLabelSize || '10px')
       .call(d3.axisBottom(xScale).ticks(5).tickFormat(d => d));
-
-
-      xAxis.selectAll('g').attr('font-size', resolvedAxisFontSize3 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
+    xAxis.selectAll('.tick text').attr('fill', axisStyle3.fill).attr('font-size', axisStyle3.fontSize || displayConfig.axisLabelSize || '10px');
+    xAxis.selectAll('.tick line').attr('stroke', axisStyle3.stroke);
+    xAxis.selectAll('path.domain').attr('stroke', axisStyle3.stroke);
     
-    // 🆕 手动创建Y轴标签，设置合适的字体大小
+    // 手动创建Y轴（含轴体：左侧竖线）
     const yAxis = g.append('g')
-      .attr('class', 'axis y-axis')
-    
-     
+      .attr('class', 'axis y-axis');
+    yAxis.insert('line', ':first-child')
+      // .attr('x1', 0)
+      // .attr('y1', 0)
+      // .attr('x2', 0)
+      // .attr('y2', innerHeight)
+      .attr('stroke', axisStyle3.stroke)
+      .attr('stroke-width', 1);
     // 添加Y轴刻度线和标签
     yAxis.selectAll('.tick')
       .data(categories)
@@ -1417,38 +1496,33 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('class', 'tick')
       .attr('transform', d => `translate(0, ${yScale(d) + yScale.bandwidth() / 2})`)
       .call(g => {
-        // 添加刻度线
         g.append('line')
           .attr('x2', -6)
-          .attr('stroke', '#666');
-        
-        // 🆕 添加标签文字，使用token样式
+          .attr('stroke', axisStyle3.stroke);
         g.append('text')
           .attr('x', -9)
           .attr('dy', '.32em')
           .attr('text-anchor', 'end')
-          .attr('font-size', resolvedAxisFontSize3 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
-          .attr('font-weight', resolvedAxisFontWeight3 || '400') // 🆕 使用token中的字体粗细
-          .attr('fill', resolvedAxisFill3 || '#333') // 🆕 使用token中的颜色
+          .attr('font-size', axisStyle3.fontSize || displayConfig.axisLabelSize || '10px')
+          .attr('font-weight', axisStyle3.fontWeight || '400')
+          .attr('fill', axisStyle3.fill)
           .text(d => d);
       });
     
-    // 获取柱状图颜色
-    const barColor = colorValues[0];
-    const colorClassSuffix = colorClass[0];
-    // 绘制水平柱状图
+    // 水平柱状图颜色：透传时每根柱子按类别顺序用 chartColors[i]，与图例一一对应
     const bars = g.selectAll('.bar')
       .data(data)
       .enter()
       .append('rect')
-      .attr('class', `bar bar-${colorClassSuffix}`)
+      .attr('class', (d, i) => `bar bar-${colorClass[i % colorClass.length]}`)
       .attr('y', d => yScale(d[dateField]))
       .attr('x', 0)
       .attr('height', yScale.bandwidth())
       .attr('width', d => xScale(parseFloat(d[valueField].toString().replace(',', '')) || 0))
-      .attr('fill', '#000');
+      .attr('fill', (d, i) => (useCustomColors ? colorValues[i % colorValues.length] : '#000'));
     
-    // 添加数值标签
+    // 添加数值标签：优先用 chartCard.dataLabel（可与轴颜色/字号不同），无则用 axis
+    const dataLabelStyle3 = getResolvedDataLabelStyle(displayConfig, chartStyleConfig, axisStyle3);
     g.selectAll('.bar-label')
       .data(data)
       .enter()
@@ -1458,19 +1532,11 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('x', d => xScale(parseFloat(d[valueField].toString().replace(',', '')) || 0) + 5)
       .attr('dy', '.35em')
       .attr('text-anchor', 'start')
-      .attr('fill', '#333')
-      .attr('font-size', resolvedAxisFontSize3 || displayConfig.dataLabelSize || '8px') // 🆕 使用动态数据标签字体大小
+      .attr('fill', dataLabelStyle3.fill)
+      .attr('font-size', dataLabelStyle3.fontSize)
       .text(d => d[valueField]);
     
-    
-    // 获取轴样式配置
     const axisClassName = chartStyleConfig?.axis?.className || 'axis-title';
-    
-    // 🆕 根据图表大小选择合适的轴配置
-    const currentAxisConfig4 = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
-    const resolvedAxisFontSize4 = resolveToken(currentAxisConfig4.fontSize);
-    const resolvedAxisFontWeight4 = resolveToken(currentAxisConfig4.fontWeight);
-    const resolvedAxisFill4 = resolveToken(currentAxisConfig4.fill);
     
     // 添加X轴标题
     g.append('text')
@@ -1478,9 +1544,9 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('x', innerWidth / 2)
       .attr('y', innerHeight + 40)
       .attr('text-anchor', 'middle')
-      .attr('font-size', resolvedAxisFontSize4 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
-      .attr('font-weight', resolvedAxisFontWeight4 || '400') // 🆕 使用token中的字体粗细
-      .attr('fill', resolvedAxisFill4 || '#333') // 🆕 使用token中的颜色
+      .attr('font-size', axisStyle3.fontSize || displayConfig.axisLabelSize || '10px')
+      .attr('font-weight', axisStyle3.fontWeight || '400')
+      .attr('fill', axisStyle3.fill)
       .text(valueField);
     
     // 添加Y轴标题
@@ -1490,39 +1556,38 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('x', -innerHeight / 2)
       .attr('y', -60)
       .attr('text-anchor', 'middle')
-      .attr('font-size', resolvedAxisFontSize4 || displayConfig.axisLabelSize || '10px') // 🆕 优先使用token，其次使用动态配置
-      .attr('font-weight', resolvedAxisFontWeight4 || '400') // 🆕 使用token中的字体粗细
-      .attr('fill', resolvedAxisFill4 || '#333') // 🆕 使用token中的颜色
+      .attr('font-size', axisStyle3.fontSize || displayConfig.axisLabelSize || '10px')
+      .attr('font-weight', axisStyle3.fontWeight || '400')
+      .attr('fill', axisStyle3.fill)
       .text(dateField);
     
-    // 🆕 添加图表标题（使用SVG绝对坐标确保所有图表标题在同一行）
     if (chartTitle) {
-      const titleFontSize = resolveToken(titleConfig.fontSize)
-      const titleFontWeight = titleConfig.fontWeight
-      const titleFill = resolveToken(titleConfig.fill)
-      
-      svg.append('text')
+      const titleStyle3 = getResolvedTitleStyle(chartStyleConfig);
+      svg.append('g').attr('class', 'ee-chart-title-wrap')
+        .append('text')
         .attr('x', width / 2)
-        .attr('y', 25)  // 🆕 使用SVG绝对坐标，与所有图表保持一致
+        .attr('y', 25)
         .attr('text-anchor', 'middle')
-        .attr('font-size', titleFontSize)
-        .attr('font-weight', titleFontWeight)
-        .attr('fill', titleFill)
+        .attr('font-size', titleStyle3.fontSize)
+        .attr('font-weight', titleStyle3.fontWeight)
+        .attr('fill', titleStyle3.fill)
         .text(chartTitle);
     }
 
-    // 生成图例数据 - 对于水平柱状图，图例应该显示品牌名称而不是数据字段名
     const legendItems = categories.map((category, i) => ({
       label: category,
       color: colorValues[i % colorValues.length],
       colorClass: colorClass[i % colorClass.length],
       type: 'bar'
     }));
-    
-    // 使用封装的图例生成函数
     generateLegend(g, innerHeight, legendItems, displayConfig, chartStyleConfig, 80);
-    
-    // 将SVG转换为字符串
+
+    injectChartThemeStyle(svg, {
+      axisStyle: axisStyle3,
+      gridStyle: gridStyle3,
+      legendStyle: getResolvedLegendStyle(displayConfig, chartStyleConfig),
+      titleStyle: getResolvedTitleStyle(chartStyleConfig)
+    });
     return svg.node().outerHTML;
   } catch (error) {
     console.error('生成水平柱状图时发生错误:', error);
@@ -1546,30 +1611,14 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
 function generateAreaChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
   try {    
     const { svg, document } = createJsdomEnv(width, height);
+    applyChartSvgBackground(svg, width, height, chartStyleConfig);
     
-    const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
     const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
     const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
     const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
-    
-    const colorValues = [
-      colorBrand5,
-      colorBrand4,
-      colorBrand3,
-      '#76b7b2', 
-      '#59a14f', 
-      '#edc949', 
-      '#af7aa1', 
-      '#ff9da7', 
-      '#9c755f', 
-      '#bab0ab'
-    ];
-
-    const colorClass = [
-      'color-brand6',
-      'color-brand5',
-      'color-brand4'
-    ];
+    const defaultColorValues = [colorBrand5, colorBrand4, colorBrand3, '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'];
+    const defaultColorClass = ['color-brand6', 'color-brand5', 'color-brand4'];
+    const { colorValues, colorClass } = getChartColorsFromConfig(chartStyleConfig, { colorValues: defaultColorValues, colorClass: defaultColorClass });
     
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
@@ -1599,11 +1648,8 @@ function generateAreaChart(data, dateField, valueFields, width, height, margin, 
       .domain([yMin, yMax])
       .range([innerHeight, 0]);
     
-    // 🆕 根据图表大小选择合适的轴配置
-    const currentAxisConfig = displayConfig.isSmallChart ? smallAxisConfig : axisConfig;
-    const resolvedAxisFontSize = resolveToken(currentAxisConfig.fontSize);
-    const resolvedAxisFontWeight = resolveToken(currentAxisConfig.fontWeight);
-    const resolvedAxisFill = resolveToken(currentAxisConfig.fill);
+    const axisStyleArea = getResolvedAxisStyle(displayConfig, chartStyleConfig);
+    const gridStyleArea = getResolvedGridStyle(chartStyleConfig);
     
     // 添加X轴网格线
     g.append('g')
@@ -1616,8 +1662,8 @@ function generateAreaChart(data, dateField, valueFields, width, height, margin, 
       .attr('y1', 0)
       .attr('x2', d => xScale(d))
       .attr('y2', innerHeight)
-      .attr('stroke', '#e0e0e0')
-      .attr('stroke-opacity', 0.7);
+      .attr('stroke', gridStyleArea.stroke)
+      .attr('stroke-opacity', gridStyleArea.strokeOpacity);
     
     // 添加Y轴网格线
     const yTickCount = displayConfig.yTickCount || 5;
@@ -1632,8 +1678,8 @@ function generateAreaChart(data, dateField, valueFields, width, height, margin, 
       .attr('y1', d => yScale(d))
       .attr('x2', innerWidth)
       .attr('y2', d => yScale(d))
-      .attr('stroke', '#e0e0e0')
-      .attr('stroke-opacity', 0.7);
+      .attr('stroke', gridStyleArea.stroke)
+      .attr('stroke-opacity', gridStyleArea.strokeOpacity);
     
     // 绘制面积图 - 为每个数据系列创建面积
     valueFields.forEach((field, fieldIndex) => {
@@ -1690,16 +1736,21 @@ function generateAreaChart(data, dateField, valueFields, width, height, margin, 
         .text(d => d.y.toFixed(1));
     });
     
-    // 添加X轴
+    // 添加X轴（含轴体：底部水平线）
     const xAxis = g.append('g')
       .attr('class', 'axis x-axis')
-      .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px')
+      .attr('font-size', axisStyleArea.fontSize || displayConfig.axisLabelSize || '10px')
       .attr('transform', `translate(0,${innerHeight})`);
+    xAxis.insert('line', ':first-child')
+      // .attr('x1', 0)
+      // .attr('y1', 0)
+      // .attr('x2', innerWidth)
+      // .attr('y2', 0)
+      .attr('stroke', axisStyleArea.stroke)
+      .attr('stroke-width', 1);
     
-    // 获取轴样式配置
     const axisClassName = chartStyleConfig?.axis?.className || 'axis-label';
     
-    // 🆕 显示所有X轴标签，优化日期显示
     xAxis.selectAll('g')
       .data(xValues)
       .enter()
@@ -1711,23 +1762,29 @@ function generateAreaChart(data, dateField, valueFields, width, height, margin, 
       .attr('dy', '.71em')
       .attr('transform', displayConfig.xLabelRotation ? `rotate(${displayConfig.xLabelRotation})` : 'rotate(45)')
       .attr('text-anchor', displayConfig.xLabelRotation <= 15 ? 'middle' : 'start')
-      .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px')
-      .attr('font-weight', resolvedAxisFontWeight || '400')
-      .attr('fill', resolvedAxisFill || '#666')
+      .attr('font-size', axisStyleArea.fontSize || displayConfig.axisLabelSize || '10px')
+      .attr('font-weight', axisStyleArea.fontWeight || '400')
+      .attr('fill', axisStyleArea.fill)
       .text(d => {
-        // 🆕 优化日期显示，截取月-日部分
         if (d.includes('.')) {
           const parts = d.split('.');
           if (parts.length === 3) {
-            return `${parts[1]}.${parts[2]}`; // 显示 "04.10" 而不是 "2025.04.10"
+            return `${parts[1]}.${parts[2]}`;
           }
         }
         return d;
       });
     
-    // 添加Y轴
+    // 添加Y轴（含轴体：左侧竖线）
     const yAxis = g.append('g')
       .attr('class', 'axis y-axis');
+    yAxis.insert('line', ':first-child')
+      // .attr('x1', 0)
+      // .attr('y1', 0)
+      // .attr('x2', 0)
+      // .attr('y2', innerHeight)
+      .attr('stroke', axisStyleArea.stroke)
+      .attr('stroke-width', 1);
     
     yAxis.selectAll('g')
       .data(yTicks)
@@ -1737,17 +1794,16 @@ function generateAreaChart(data, dateField, valueFields, width, height, margin, 
       .call(g => {
         g.append('line')
           .attr('x2', -6)
-          .attr('stroke', '#666');
+          .attr('stroke', axisStyleArea.stroke);
         g.append('text')
           .attr('class', axisClassName)
           .attr('x', -9)
           .attr('dy', '.32em')
           .attr('text-anchor', 'end')
-          .attr('font-size', resolvedAxisFontSize || displayConfig.axisLabelSize || '10px')
-          .attr('font-weight', resolvedAxisFontWeight || '400')
-          .attr('fill', resolvedAxisFill || '#666')
+          .attr('font-size', axisStyleArea.fontSize || displayConfig.axisLabelSize || '10px')
+          .attr('font-weight', axisStyleArea.fontWeight || '400')
+          .attr('fill', axisStyleArea.fill)
           .text(d => {
-            // 🆕 智能格式化数字：整数不显示小数点，小数最多显示1位
             if (d % 1 === 0) {
               return d.toString();
             } else if (Math.abs(d) >= 100) {
@@ -1758,23 +1814,19 @@ function generateAreaChart(data, dateField, valueFields, width, height, margin, 
           });
       });
     
-    // 🆕 添加图表标题（使用SVG绝对坐标确保所有图表标题在同一行）
     if (chartTitle) {
-      const titleFontSize = resolveToken(titleConfig.fontSize)
-      const titleFontWeight = titleConfig.fontWeight
-      const titleFill = resolveToken(titleConfig.fill)
-      
-      svg.append('text')
+      const titleStyleArea = getResolvedTitleStyle(chartStyleConfig);
+      svg.append('g').attr('class', 'ee-chart-title-wrap')
+        .append('text')
         .attr('x', width / 2)
         .attr('y', 25)
         .attr('text-anchor', 'middle')
-        .attr('font-size', titleFontSize)
-        .attr('font-weight', titleFontWeight)
-        .attr('fill', titleFill)
+        .attr('font-size', titleStyleArea.fontSize)
+        .attr('font-weight', titleStyleArea.fontWeight)
+        .attr('fill', titleStyleArea.fill)
         .text(chartTitle);
     }
 
-    // 生成图例数据
     const legendItems = valueFields.map((field, i) => ({
       label: field,
       color: colorValues[i % colorValues.length],
@@ -1782,11 +1834,14 @@ function generateAreaChart(data, dateField, valueFields, width, height, margin, 
       type: 'area',
       style: { fillOpacity: 0.6, strokeWidth: 2 }
     }));
-    
-    // 使用封装的图例生成函数
     generateLegend(g, innerHeight, legendItems, displayConfig, chartStyleConfig, 80);
-    
-    // 将SVG转换为字符串
+
+    injectChartThemeStyle(svg, {
+      axisStyle: axisStyleArea,
+      gridStyle: gridStyleArea,
+      legendStyle: getResolvedLegendStyle(displayConfig, chartStyleConfig),
+      titleStyle: getResolvedTitleStyle(chartStyleConfig)
+    });
     return svg.node().outerHTML;
   } catch (error) {
     console.error('生成面积图时发生错误:', error);
@@ -1812,27 +1867,15 @@ function generateDonutChart(data, dateField, valueFields, width, height, margin,
     
     // 创建JSDOM环境
     const { svg, document } = createJsdomEnv(width, height);
+    applyChartSvgBackground(svg, width, height, chartStyleConfig);
     
-    // 解析颜色配置
+    // 解析颜色配置（支持透传 chartColors）
     const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
     const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
     const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
     const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
-    
-    // 扩展颜色数组用于多个扇形
-    const colorValues = [
-      colorBrand5,
-      colorBrand4,
-      colorBrand3,
-      colorBrand6,
-      '#76b7b2', 
-      '#59a14f', 
-      '#edc949', 
-      '#af7aa1', 
-      '#ff9da7', 
-      '#9c755f', 
-      '#bab0ab'
-    ];
+    const defaultColorValues = [colorBrand5, colorBrand4, colorBrand3, colorBrand6, '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'];
+    const { colorValues } = getChartColorsFromConfig(chartStyleConfig, { colorValues: defaultColorValues, colorClass: [] });
     
     // 处理环状图数据 - 使用第一个值字段
     const valueField = valueFields[0];
@@ -1861,19 +1904,15 @@ function generateDonutChart(data, dateField, valueFields, width, height, margin,
       baseRadius - 10 :  // 小图表：减少留白
       baseRadius - 20;   // 普通图表：保留一些空间给标签
     
-    // 🆕 添加图表标题
     if (chartTitle) {
-      const titleFontSize = resolveToken(titleConfig.fontSize)
-      const titleFontWeight = titleConfig.fontWeight
-      const titleFill = resolveToken(titleConfig.fill)
-      
+      const titleStyleDonut = getResolvedTitleStyle(chartStyleConfig);
       svg.append('text')
-        .attr('x', width / 2)  // 环状图使用完整宽度的一半
-        .attr('y', 25)         // 🆕 与其他图表保持一致的Y坐标
+        .attr('x', width / 2)
+        .attr('y', 25)
         .attr('text-anchor', 'middle')
-        .attr('font-size', titleFontSize)
-        .attr('font-weight', titleFontWeight)
-        .attr('fill', titleFill)
+        .attr('font-size', titleStyleDonut.fontSize)
+        .attr('font-weight', titleStyleDonut.fontWeight)
+        .attr('fill', titleStyleDonut.fill)
         .text(chartTitle);
     }
 
@@ -1957,27 +1996,15 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
   try {    
     // 创建JSDOM环境
     const { svg, document } = createJsdomEnv(width, height);
+    applyChartSvgBackground(svg, width, height, chartStyleConfig);
     
-    // 解析颜色配置
+    // 解析颜色配置（支持透传 chartColors）
     const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
     const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
     const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
     const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
-    
-    // 扩展颜色数组用于多个扇形
-    const colorValues = [
-      colorBrand5,
-      colorBrand4,
-      colorBrand3,
-      colorBrand6,
-      '#76b7b2', 
-      '#59a14f', 
-      '#edc949', 
-      '#af7aa1', 
-      '#ff9da7', 
-      '#9c755f', 
-      '#bab0ab'
-    ];
+    const defaultColorValues = [colorBrand5, colorBrand4, colorBrand3, colorBrand6, '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab'];
+    const { colorValues } = getChartColorsFromConfig(chartStyleConfig, { colorValues: defaultColorValues, colorClass: [] });
     
     // 处理饼图数据 - 使用第一个值字段
     const valueField = valueFields[0];
@@ -2006,19 +2033,15 @@ function generatePieChart(data, dateField, valueFields, width, height, margin, c
       baseRadius - 10 :  // 小图表：减少留白，图例可能在外部
       baseRadius - 20;   // 普通图表：保留一些空间给标签
     
-    // 🆕 添加图表标题
     if (chartTitle) {
-      const titleFontSize = resolveToken(titleConfig.fontSize)
-      const titleFontWeight = titleConfig.fontWeight
-      const titleFill = resolveToken(titleConfig.fill)
-      
+      const titleStylePie = getResolvedTitleStyle(chartStyleConfig);
       svg.append('text')
-        .attr('x', width / 2)  // 饼图使用完整宽度的一半
-        .attr('y', 25)         // 🆕 与其他图表保持一致的Y坐标
+        .attr('x', width / 2)
+        .attr('y', 25)
         .attr('text-anchor', 'middle')
-        .attr('font-size', titleFontSize)
-        .attr('font-weight', titleFontWeight)
-        .attr('fill', titleFill)
+        .attr('font-size', titleStylePie.fontSize)
+        .attr('font-weight', titleStylePie.fontWeight)
+        .attr('fill', titleStylePie.fill)
         .text(chartTitle);
     }
 

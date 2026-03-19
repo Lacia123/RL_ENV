@@ -12,6 +12,7 @@ import HIRING_CARD_STYLE from './hiringCard';
 import SIMPLE_CARD_STYLE from './simpleCard';
 import SUMMARY_CARD_STYLE from './summaryCard';
 import HISTORY_CARD_STYLE from './historyCard';
+import FEED_LIST_CHART_TRAN_CARD_STYLE from './feedListChartTranCard';
 
 const COMPONENT_STYLE = {
     component: {
@@ -29,6 +30,7 @@ const COMPONENT_STYLE = {
         ...SIMPLE_CARD_STYLE,
         ...SUMMARY_CARD_STYLE,
         ...HISTORY_CARD_STYLE,
+        ...FEED_LIST_CHART_TRAN_CARD_STYLE,
     }
 }
 

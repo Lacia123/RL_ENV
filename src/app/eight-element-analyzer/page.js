@@ -385,6 +385,25 @@ const a = 1;
 优雅青蓝卡片系列为您的内容提供专业、精致的展示方式。`
   },
 
+  feedListChartTranCardExample: {
+    name: '📊 关键数据透明卡片',
+    description: 'feedListChartTranCard：透明背景 + 白色文字，内嵌条形图',
+    markdown: `<feedListChartTranCard>
+ <title>🗒<strong> 关键数据1</strong></title>
+ <subtitle>本次会议讨论中提及的关键数据指标2</subtitle>
+
+ <card:minimalistChartCard>
+[chart:bar|年收益预估（万元）]
+| 类型 | 占比 |
+|------|------|
+|2026年 | 800 |
+|2027年 | 1000 |
+|2028年 | 1500|
+  </card:minimalistChartCard>
+
+</feedListChartTranCard>`
+  },
+
   techGradientSeries: {
     name: '🚀 科技渐变系列',
     description: '展示科技渐变风格：标准布局和头部动作两种设计',

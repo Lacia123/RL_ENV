@@ -1443,9 +1443,13 @@ function buildChartElementFromContent(slotName, slotConfig, slotContent, attribu
 
         const chartStyleConfig = {
             variant: slotConfig.variant || 'mini',
-            title: chartElement.layout?.title,
-            legend: chartElement.layout?.legend,
-            axis: chartElement.layout?.axis
+            title: slotConfig.title ?? chartElement.layout?.title,
+            legend: slotConfig.legend ?? chartElement.layout?.legend,
+            axis: slotConfig.axis ?? chartElement.layout?.axis,
+            grid: slotConfig.grid,
+            chartColors: slotConfig.chartColors || undefined,
+            chartBackgroundColor: slotConfig.chartBackgroundColor ?? undefined,
+            dataLabel: slotConfig.dataLabel
         };
 
         const svgContent = generateChartSvg(finalChartType, sortedTableData, chartStyleConfig, finalChartTitle);
@@ -2560,7 +2564,33 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         const textElement = createTextElement(content);
         componentElement.layout.children.push(textElement);
     }
-    
+
+    // 🆕 有 layoutModes 但走了 markdownMapping 分支（无 slotConfigs）时，未进入上方 layoutModes 应用逻辑，
+    // 此处补上：选用 condition 为 'default' 的模式或首个模式，将其 style 应用到最外层组件容器。
+    const hasSlotConfigs = !!(componentConfig.slotConfigs || componentConfig.slots);
+    if (
+        componentConfig.layoutModes &&
+        componentConfig.layoutModes.length > 0 &&
+        !hasSlotConfigs
+    ) {
+        const defaultMode =
+            componentConfig.layoutModes.find((m) => m.condition === 'default') ||
+            componentConfig.layoutModes[0];
+        if (defaultMode && defaultMode.style) {
+            let modeStyle = defaultMode.style;
+            if (Object.keys(paramValues).length > 0) {
+                modeStyle = applyParametersToStyle(
+                    typeof modeStyle === 'object' && !Array.isArray(modeStyle) ? { ...modeStyle } : modeStyle,
+                    paramValues
+                );
+            }
+            componentElement.layout.classStyle = {
+                ...(componentElement.layout.classStyle || {}),
+                ...modeStyle
+            };
+        }
+    }
+
     // 🔧 处理 required 容器：确保必需的样式承载容器被渲染
     if (componentConfig.required) {
         processRequiredContainers(componentConfig, componentElement.layout.children, componentConfig, paramValues);
