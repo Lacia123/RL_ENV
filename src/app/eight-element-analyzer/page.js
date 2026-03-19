@@ -2123,6 +2123,30 @@ wrapper: {
   <text key="summary"></text>
   <commitWide>查看过程</commitWide>
 </summaryCard>
+
+<!-- ========== historyCard 示例：仅 标题 内容 时间；3 种卡片 大(紫最深) / 中(紫第二深) / 小(浅色) ========== -->
+<!-- 大的 - 紫色最深 -->
+<historyCard>
+  <title>完成规划文案撰写完成规划文案撰写完成规划文案撰写完成规划文案撰写完成规划文案撰写完成规划文案撰写完成规划文案撰写完成规划文案撰写</title>
+  <timestamp>12.28</timestamp>
+  <text>根据李老师给您的飞书消息，我已经帮您完成了规划文案撰写。</text>
+  <cardLarge></cardLarge>
+</historyCard>
+
+<!-- 中等 - 紫色第二深 -->
+<historyCard>
+  <title>完成音频处理</title>
+  <timestamp>10.8</timestamp>
+  <text>根据李老师给您的飞书消息，我已经帮您完成</text>
+  <cardMedium></cardMedium>
+</historyCard>
+
+<!-- 小的 - 浅色 -->
+<historyCard>
+  <title>会话名称</title>
+  <timestamp>10.8</timestamp>
+  <text>已生成完整岗位说明文档，包含岗位职责、任职要求及加分项1111111111111111111111111111111111111111111111111111。</text>
+</historyCard>
 </layout:gallery>
 `
   },

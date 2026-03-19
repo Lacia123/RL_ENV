@@ -11,6 +11,7 @@ import COMMAND_STYLE from './command';
 import HIRING_CARD_STYLE from './hiringCard';
 import SIMPLE_CARD_STYLE from './simpleCard';
 import SUMMARY_CARD_STYLE from './summaryCard';
+import HISTORY_CARD_STYLE from './historyCard';
 
 const COMPONENT_STYLE = {
     component: {
@@ -27,6 +28,7 @@ const COMPONENT_STYLE = {
         ...HIRING_CARD_STYLE,
         ...SIMPLE_CARD_STYLE,
         ...SUMMARY_CARD_STYLE,
+        ...HISTORY_CARD_STYLE,
     }
 }
 
