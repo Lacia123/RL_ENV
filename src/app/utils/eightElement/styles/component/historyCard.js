@@ -107,17 +107,85 @@ const cardStyleBase = {
   backgroundRepeat: 'no-repeat',
 };
 
+// 右缘：中间高、两侧低、全程弧线；高斯×sin 收窄鼓包
+function historyCardBellPathD(peakX, h = 100, steps = 56, sigmaRatio = 0.2) {
+  const cy = h / 2;
+  const sigma = h * sigmaRatio;
+  const parts = [`M 0 0 L 0 ${h}`];
+  for (let i = 0; i <= steps; i += 1) {
+    const y = h * (1 - i / steps);
+    const gauss = Math.exp(-Math.pow((y - cy) / sigma, 2));
+    const w = Math.sin((Math.PI * y) / h);
+    const x = peakX * gauss * w;
+    parts.push(`L ${x.toFixed(3)} ${y.toFixed(3)}`);
+  }
+  parts.push('Z');
+  return parts.join(' ');
+}
+
+// 仅形状的白填充 SVG → mask；颜色用伪元素 background:inherit 跟卡片同一套 token 渐变（content:url(彩色svg) 无法被外层 CSS 染色）
+function historyCardBulgeMaskUrl(peakX = 46) {
+  const vbW = peakX + 6;
+  const pathD = historyCardBellPathD(peakX);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vbW} 100" preserveAspectRatio="none"><path d="${pathD}" fill="#fff"/></svg>`;
+  return `url('data:image/svg+xml,${encodeURIComponent(svg)}')`;
+}
+
+const HISTORY_CARD_BULGE_MASK = historyCardBulgeMaskUrl(46);
+
+const historyCardLargeMediumHoverBulge = {
+  position: 'relative',
+  overflow: 'hidden',
+  '&:hover': {
+    overflow: 'visible',
+  },
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    right: '-18px',
+    top: '0',
+    bottom: '0',
+    width: '24px',
+    height: '100%',
+    background: 'inherit',
+    WebkitMaskImage: HISTORY_CARD_BULGE_MASK,
+    maskImage: HISTORY_CARD_BULGE_MASK,
+    WebkitMaskRepeat: 'no-repeat',
+    maskRepeat: 'no-repeat',
+    WebkitMaskSize: '100% 100%',
+    maskSize: '100% 100%',
+    WebkitMaskPosition: 'left center',
+    maskPosition: 'left center',
+    pointerEvents: 'none',
+    opacity: '0',
+    transition: 'opacity 0.32s ease',
+  },
+  '&:hover::before': {
+    opacity: '1',
+  },
+};
+
 const layoutModes = [
   {
     name: 'large',
     condition: 'has:cardLarge',
-    style: { background: PLACEHOLDER.cardLarge, minHeight: '250px', ...cardStyleBase },
+    style: {
+      background: PLACEHOLDER.cardLarge,
+      minHeight: '250px',
+      ...cardStyleBase,
+      ...historyCardLargeMediumHoverBulge,
+    },
     structure,
   },
   {
     name: 'medium',
     condition: 'has:cardMedium',
-    style: { background: PLACEHOLDER.cardMedium, minHeight: '250px', ...cardStyleBase },
+    style: {
+      background: PLACEHOLDER.cardMedium,
+      minHeight: '250px',
+      ...cardStyleBase,
+      ...historyCardLargeMediumHoverBulge,
+    },
     structure,
   },
   {

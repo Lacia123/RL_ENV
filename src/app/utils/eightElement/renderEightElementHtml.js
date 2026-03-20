@@ -1266,6 +1266,10 @@ function convertToCSSProperty(property) {
     const specialProperties = {
         'WebkitBackgroundClip': '-webkit-background-clip',
         'WebkitTextFillColor': '-webkit-text-fill-color',
+        'WebkitMaskImage': '-webkit-mask-image',
+        'WebkitMaskRepeat': '-webkit-mask-repeat',
+        'WebkitMaskSize': '-webkit-mask-size',
+        'WebkitMaskPosition': '-webkit-mask-position',
         'MozBackgroundClip': '-moz-background-clip',
         'MsBackgroundClip': '-ms-background-clip'
     };
