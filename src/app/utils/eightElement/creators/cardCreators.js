@@ -2045,6 +2045,17 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                     chartBackgroundColor,
                                     dataLabel: slotConfigForChart?.dataLabel ?? cardStyleConfig._inheritedChartDataLabel
                                 };
+
+                                // 同步最终样式到八要素图表节点，避免只在 SVG 内生效
+                                chartElement.layout = chartElement.layout || {};
+                                if (chartStyleConfig.title) chartElement.layout.title = chartStyleConfig.title;
+                                if (chartStyleConfig.legend) chartElement.layout.legend = chartStyleConfig.legend;
+                                if (chartStyleConfig.axis) chartElement.layout.axis = chartStyleConfig.axis;
+                                if (chartStyleConfig.grid) chartElement.layout.grid = chartStyleConfig.grid;
+                                if (chartStyleConfig.dataLabel) chartElement.layout.dataLabel = chartStyleConfig.dataLabel;
+                                if (chartStyleConfig.chartColors !== undefined) chartElement.layout.chartColors = chartStyleConfig.chartColors;
+                                if (chartStyleConfig.chartBackgroundColor !== undefined) chartElement.layout.chartBackgroundColor = chartStyleConfig.chartBackgroundColor;
+
                                 const svgContent = generateChartSvg(chartResult.chartType, chartResult.tableData, chartStyleConfig, chartResult.chartTitle);
                                 chartElement.svgContent = svgContent;
 

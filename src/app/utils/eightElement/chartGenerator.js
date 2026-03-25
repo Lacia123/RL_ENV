@@ -304,6 +304,7 @@ function getChartColorsFromConfig(chartStyleConfig = null, defaultColors = {}) {
 
 /** 从 chartStyleConfig 解析轴样式（优先使用透传的 axis.fill/stroke/fontSize，否则用默认 axisConfig） */
 function getResolvedAxisStyle(displayConfig, chartStyleConfig) {
+  console.log("chartStyleConfig--------", chartStyleConfig);
   const base = displayConfig?.isSmallChart ? smallAxisConfig : axisConfig;
   const fill = chartStyleConfig?.axis?.fill != null ? (resolveToken(chartStyleConfig.axis.fill) || resolveColor(chartStyleConfig.axis.fill)) : resolveToken(base.fill);
   const stroke = chartStyleConfig?.axis?.stroke != null ? (resolveToken(chartStyleConfig.axis.stroke) || resolveColor(chartStyleConfig.axis.stroke)) : null;
@@ -1340,8 +1341,11 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
       .attr('x', d => xScale(d[dateField]))
       .attr('y', d => yScale(parseFloat(d[valueField].toString().replace(/[,%]/g, '')) || 0))
       .attr('width', xScale.bandwidth())
-      .attr('height', d => innerHeight - yScale(parseFloat(d[valueField].toString().replace(/[,%]/g, '')) || 0))
-      .attr('fill', (d, i) => (useCustomColors ? colorValues[i % colorValues.length] : '#000'));
+      .attr('height', d => innerHeight - yScale(parseFloat(d[valueField].toString().replace(/[,%]/g, '')) || 0));
+    // 非自定义颜色时不设置内联 fill，让 .bar-color-* 类样式生效
+    if (useCustomColors) {
+      bars.attr('fill', (d, i) => colorValues[i % colorValues.length]);
+    }
     
     // 添加数值标签：优先用 chartCard.dataLabel（可与轴颜色/字号不同），无则用 axis
     const dataLabelStyle2 = getResolvedDataLabelStyle(displayConfig, chartStyleConfig, axisStyle2);
@@ -1518,8 +1522,11 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
       .attr('y', d => yScale(d[dateField]))
       .attr('x', 0)
       .attr('height', yScale.bandwidth())
-      .attr('width', d => xScale(parseFloat(d[valueField].toString().replace(',', '')) || 0))
-      .attr('fill', (d, i) => (useCustomColors ? colorValues[i % colorValues.length] : '#000'));
+      .attr('width', d => xScale(parseFloat(d[valueField].toString().replace(',', '')) || 0));
+    // 非自定义颜色时不设置内联 fill，让 .bar-color-* 类样式生效
+    if (useCustomColors) {
+      bars.attr('fill', (d, i) => colorValues[i % colorValues.length]);
+    }
     
     // 添加数值标签：优先用 chartCard.dataLabel（可与轴颜色/字号不同），无则用 axis
     const dataLabelStyle3 = getResolvedDataLabelStyle(displayConfig, chartStyleConfig, axisStyle3);

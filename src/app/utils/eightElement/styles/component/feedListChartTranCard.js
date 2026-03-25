@@ -1,5 +1,3 @@
-import fontweight from "@/app/utils/tokens/font/fontweight";
-
 /**
  * feedListChartTranCard - 带图表的信息列表卡片（透明背景 + 白色文字）
  * 结构：标题、副标题 + 内嵌 minimalistChartCard
@@ -65,7 +63,7 @@ const FEED_LIST_CHART_TRAN_CARD_STYLE = {
                 display: 'flex',
                 flexDirection: 'column',
                 width: '100%',
-                backgroundColor: 'blue',
+                backgroundColor: 'transparent',
               },
             },
           ],
@@ -158,13 +156,13 @@ const FEED_LIST_CHART_TRAN_CARD_STYLE = {
         fill: '#fff',           // 坐标轴刻度/标签颜色
         stroke: '{color.basic.opacity.white.48}',          // 坐标轴线、刻度线颜色
         fontSize: '{font.size.tiny}',
-        fontweight: '{font.fontweight.medium}',
+        fontWeight: '{font.fontweight.medium}',
       },
       // 柱顶数值标签（800、1000 等）：不配则与轴同色同字号，配了可与轴区分
       dataLabel: {
         fill: '#fff',           // 柱顶数字颜色，可与 axis.fill 不同
         fontSize: '{font.size.tiny}',                      // 柱顶数字字号
-        fontweight: '{font.fontweight.medium}',
+        fontWeight: '{font.fontweight.medium}',
       },
       // grid：网格线颜色 
       grid: {
@@ -174,13 +172,13 @@ const FEED_LIST_CHART_TRAN_CARD_STYLE = {
       legend: {
         fill: '#fff',
         fontSize: '{font.size.tiny}',           // 可选
-        fontweight: '{font.fontweight.medium}',
+        fontWeight: '{font.fontweight.medium}',
       },
       // title：图表标题文字颜色（图表内标题）
       title: {
         fill: '#fff',
         fontSize: '{font.size.medium}',         // 可选
-        fontweight: '{font.fontweight.bold}',
+        fontWeight: '{font.fontweight.bold}',
       },
     },
   },

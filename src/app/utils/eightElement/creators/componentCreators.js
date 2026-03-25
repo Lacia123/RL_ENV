@@ -1452,6 +1452,16 @@ function buildChartElementFromContent(slotName, slotConfig, slotContent, attribu
             dataLabel: slotConfig.dataLabel
         };
 
+        // 将最终图表样式同步回八要素，避免只影响 svgContent 而节点数据仍为默认值
+        chartElement.layout = chartElement.layout || {};
+        if (chartStyleConfig.title) chartElement.layout.title = chartStyleConfig.title;
+        if (chartStyleConfig.legend) chartElement.layout.legend = chartStyleConfig.legend;
+        if (chartStyleConfig.axis) chartElement.layout.axis = chartStyleConfig.axis;
+        if (chartStyleConfig.grid) chartElement.layout.grid = chartStyleConfig.grid;
+        if (chartStyleConfig.dataLabel) chartElement.layout.dataLabel = chartStyleConfig.dataLabel;
+        if (chartStyleConfig.chartColors !== undefined) chartElement.layout.chartColors = chartStyleConfig.chartColors;
+        if (chartStyleConfig.chartBackgroundColor !== undefined) chartElement.layout.chartBackgroundColor = chartStyleConfig.chartBackgroundColor;
+
         const svgContent = generateChartSvg(finalChartType, sortedTableData, chartStyleConfig, finalChartTitle);
         chartElement.svgContent = svgContent;
 

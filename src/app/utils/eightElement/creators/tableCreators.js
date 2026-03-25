@@ -435,9 +435,11 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
 
     // 🆕 根据 variant 获取对应的图表样式配置
     const chartContainerStyleConfig = getElementStyleConfig('chart', variant, 'container');
-    const chartTitleStyleConfig = getElementStyleConfig('chart', variant, 'title');
-    const chartLegendStyleConfig = getElementStyleConfig('chart', variant, 'legend');
-    const chartAxisStyleConfig = getElementStyleConfig('chart', variant, 'axis');
+    // getElementStyleConfig 的第 3 个参数用于 attributes，不是子配置 key。
+    // 这里补齐 chartGenerator 直读的语义字段，避免样式丢失。
+    const chartTitleStyleConfig = {};
+    const chartLegendStyleConfig = {};
+    const chartAxisStyleConfig = {};
 
     // 生成唯一的className
     const uniqueClassName = `chart-${id}`;
@@ -497,20 +499,40 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
                 className: uniqueTitleClassName,
                 classStyle: {
                     ...chartTitleStyleConfig
-                }
+                },
+                fontSize: "{font.size.xl}",
+                fontWeight: "400",
+                fill: "{color.onsurface.black88}"
             },
             legend: {
                 className: uniqueLegendClassName,
                 classStyle: {
                     ...chartLegendStyleConfig
-                }
+                },
+                fontSize: "14px",
+                fontWeight: "400",
+                fill: "{color.onsurface.black88}"
             },
             axis: {
                 className: uniqueAxisClassName,
                 classStyle: {
                     ...chartAxisStyleConfig
-                }
-            }
+                },
+                fontSize: "14px",
+                fontWeight: "400",
+                fill: "{color.onsurface.black88}"
+            },
+            grid: {
+                stroke: "{color.basic.opacity.black.12}",
+                strokeOpacity: 0.7
+            },
+            dataLabel: {
+                fill: "{color.onsurface.black88}",
+                fontSize: "14px",
+                fontWeight: "400"
+            },
+            chartColors: undefined,
+            chartBackgroundColor: undefined
         },
         events: events.length > 0 ? events : [{}]
     };
@@ -578,7 +600,11 @@ function processTableOrChartData(result, stack) {
                 variant: 'normal',
                 title: chartElement.layout.title,
                 legend: chartElement.layout.legend,
-                axis: chartElement.layout.axis
+                axis: chartElement.layout.axis,
+                grid: chartElement.layout.grid,
+                dataLabel: chartElement.layout.dataLabel,
+                chartColors: chartElement.layout.chartColors || undefined,
+                chartBackgroundColor: chartElement.layout.chartBackgroundColor ?? undefined
             };
 
             // 生成SVG图表，传入样式配置和标题，使用排序后的数据
