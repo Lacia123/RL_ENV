@@ -506,7 +506,7 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
     
     // 🆕 特殊类型：tree_mind 树状图
     if (chartType === 'tree_mind') {
-      return generateTreeMindChart(tableData, chartTitle);
+      return generateTreeMindChart(tableData, chartTitle, chartStyleConfig);
     }
 
     // 设置图表尺寸和边距
@@ -657,7 +657,7 @@ function buildHierarchyFromTable(headers, rows, title = 'Tree') {
 }
 
 // 🆕 生成 TreeMind 树状图（静态展开版）
-function generateTreeMindChart(tableData, chartTitle = null) {
+function generateTreeMindChart(tableData, chartTitle = null, chartStyleConfig = null) {
   const headers = tableData[0];
   const rows = tableData.slice(1);
 
