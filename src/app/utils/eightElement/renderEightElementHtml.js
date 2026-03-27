@@ -2337,7 +2337,7 @@ function renderImageElement(element, dataContext) {
         // 添加图片标签
         return `
       <div id="${element.id || ''}" ${classAttr} data-element-type="image" ${styleAttr}>
-        <img src="${imageUrl}" alt="${altText}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+        <img src="${imageUrl}" alt="${altText}" style="width:100%;height:100%;object-fit:cover;" referrerpolicy="no-referrer" loading="lazy">
       </div>
     `;
     } else {
