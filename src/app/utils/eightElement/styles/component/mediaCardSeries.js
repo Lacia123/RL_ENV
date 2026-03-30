@@ -364,7 +364,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                                 width: '100%',
                                 borderRadius: '{dimension.borderradius.large}',
                                 overflow: 'hidden',
-                                aspectRatio: '4 / 3',
+                                aspectRatio: '16 / 9',
                                 margin: 0,
                                 padding: 0,
                                 background: '{color.surfacecontainer.black7}'
@@ -595,6 +595,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     margin: 0,
                     padding: 0,
                     objectFit: 'cover',
+                    objectPosition: 'center top',
                     display: 'block'
                 },
                 supportedAttributes: ['src', 'alt']
@@ -1149,6 +1150,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
+                    objectPosition: 'center top',
                     display: 'block',
                     padding: '0',
                     margin: '0'
