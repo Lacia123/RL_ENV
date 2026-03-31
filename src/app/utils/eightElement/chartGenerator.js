@@ -509,6 +509,10 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
       return generateTreeMindChart(tableData, chartTitle, chartStyleConfig);
     }
 
+    if (chartType === 'candlestick') {
+      return generateCandlestickChart(tableData, chartTitle, chartStyleConfig);
+    }
+
     // 设置图表尺寸和边距
     // 🆕 增大基础尺寸，让图表占满容器，特别是为柱状图增加更多底部空间
     const width = 600;  // 增大宽度，充分利用容器空间
@@ -601,6 +605,231 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
     console.error('生成图表时发生错误:', error);
     return generateErrorSvg(error.message);
   }
+}
+
+/** 蜡烛图：cn_a 涨红跌绿（A 股常见）；intl 涨绿跌红 */
+const CANDLESTICK_SCHEME_COLORS = {
+  cn_a: { rising: '#ef4444', falling: '#22c55e' },
+  intl: { rising: '#22c55e', falling: '#ef4444' },
+};
+
+function resolveCandlestickColumnIndex(headers, spec, key, fallbacks) {
+  const wanted = spec[key];
+  if (wanted) {
+    const i = headers.findIndex((h) => h === String(wanted).trim());
+    if (i >= 0) return i;
+  }
+  for (const fb of fallbacks) {
+    const i = headers.findIndex((h) => h === fb);
+    if (i >= 0) return i;
+  }
+  return -1;
+}
+
+/**
+ * 从表格生成蜡烛图（OHLC）。列通过 chartStyleConfig.candlestick 的 time/open/high/low/close 指向表头原文，
+ * 缺省时尝试中英文默认列名。
+ */
+function generateCandlestickChart(tableData, chartTitle, chartStyleConfig = null) {
+  const spec = chartStyleConfig?.candlestick || {};
+  const headers = tableData[0].map((h) => String(h).trim());
+  const rows = tableData.slice(1);
+  if (rows.length === 0) {
+    throw new Error('蜡烛图至少需要一行数据');
+  }
+
+  const iT = resolveCandlestickColumnIndex(headers, spec, 'time', [
+    '日期',
+    'Date',
+    '时间',
+    'time',
+    'Time',
+  ]);
+  const iO = resolveCandlestickColumnIndex(headers, spec, 'open', ['开盘', 'Open', 'open', '开盘价']);
+  const iH = resolveCandlestickColumnIndex(headers, spec, 'high', ['最高', 'High', 'high', '最高价']);
+  const iL = resolveCandlestickColumnIndex(headers, spec, 'low', ['最低', 'Low', 'low', '最低价']);
+  const iC = resolveCandlestickColumnIndex(headers, spec, 'close', ['收盘', 'Close', 'close', '收盘价']);
+
+  if (iT < 0 || iO < 0 || iH < 0 || iL < 0 || iC < 0) {
+    throw new Error(
+      '蜡烛图列不匹配：请在标签中用 time=、open=、high=、low=、close= 指向表头原文，或使用默认可识别列名（如 日期/开盘/最高/最低/收盘）'
+    );
+  }
+
+  const schemeKey = String(spec.scheme || 'cn_a').toLowerCase();
+  const schemeDefaults =
+    schemeKey === 'intl' || schemeKey === 'us' || schemeKey === 'global'
+      ? CANDLESTICK_SCHEME_COLORS.intl
+      : CANDLESTICK_SCHEME_COLORS.cn_a;
+
+  let risingColor = schemeDefaults.rising;
+  let fallingColor = schemeDefaults.falling;
+  if (spec.rising) {
+    risingColor = resolveColor(spec.rising) || spec.rising;
+  }
+  if (spec.falling) {
+    fallingColor = resolveColor(spec.falling) || spec.falling;
+  }
+
+  const cc = chartStyleConfig?.chartColors;
+  const hasMarkdownColorIntent = !!(spec.rising || spec.falling || spec.scheme);
+  if (Array.isArray(cc) && cc.length >= 2 && !hasMarkdownColorIntent) {
+    risingColor = resolveColor(cc[0]) || cc[0] || risingColor;
+    fallingColor = resolveColor(cc[1]) || cc[1] || fallingColor;
+  }
+
+  const parseNum = (cell) => parseFloat(String(cell ?? '').replace(/[,%]/g, '')) || 0;
+
+  const data = rows.map((row) => {
+    let o = parseNum(row[iO]);
+    let h = parseNum(row[iH]);
+    let l = parseNum(row[iL]);
+    let c = parseNum(row[iC]);
+    const t = String(row[iT] ?? '');
+    const topBody = Math.max(o, c);
+    const botBody = Math.min(o, c);
+    h = Math.max(h, topBody);
+    l = Math.min(l, botBody);
+    return { t, o, h, l, c };
+  });
+
+  data.sort((a, b) => (a.t < b.t ? -1 : a.t > b.t ? 1 : 0));
+  const ord = chartStyleConfig?.sortOrder;
+  if (ord && String(ord).toLowerCase() === 'desc') {
+    data.reverse();
+  }
+
+  const width = 600;
+  const height = 600;
+  const isSmallChart = chartStyleConfig?.variant === 'small';
+  const margin = isSmallChart
+    ? { top: 15, right: 20, bottom: 100, left: 70 }
+    : { top: 40, right: 45, bottom: 110, left: 85 };
+  const innerWidth = width - margin.left - margin.right;
+  const innerHeight = height - margin.top - margin.bottom;
+
+  const displayConfig = {
+    isSmallChart,
+    yTickCount: isSmallChart ? 3 : 5,
+    xLabelRotation: isSmallChart ? 35 : 45,
+    axisLabelSize: isSmallChart ? '18px' : '11px',
+  };
+
+  const ys = data.flatMap((d) => [d.h, d.l]);
+  const yMin = Math.min(...ys);
+  const yMax = Math.max(...ys);
+  const yPad = (yMax - yMin) * 0.06 || Math.abs(yMax) * 0.02 || 1;
+
+  const { svg } = createJsdomEnv(width, height);
+  applyChartSvgBackground(svg, width, height, chartStyleConfig);
+
+  const chartOffsetY = chartTitle ? 22 : 0;
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top + chartOffsetY})`);
+
+  const xScale = d3
+    .scaleBand()
+    .domain(data.map((d) => d.t))
+    .range([0, innerWidth])
+    .padding(0.25);
+
+  const yScale = d3.scaleLinear().domain([yMin - yPad, yMax + yPad]).range([innerHeight, 0]);
+
+  const axisStyle = getResolvedAxisStyle(displayConfig, chartStyleConfig);
+  const gridStyle = getResolvedGridStyle(chartStyleConfig);
+
+  g.append('g')
+    .attr('class', 'grid')
+    .call(
+      d3
+        .axisLeft(yScale)
+        .ticks(displayConfig.yTickCount)
+        .tickSize(-innerWidth)
+        .tickFormat(d3.format('~f'))
+    )
+    .call((sel) => sel.select('.domain').remove())
+    .call((sel) => sel.selectAll('text').remove())
+    .selectAll('line')
+    .attr('stroke', gridStyle.stroke)
+    .attr('stroke-opacity', gridStyle.strokeOpacity);
+
+  const xAxisG = g.append('g').attr('class', 'axis axis-x').attr('transform', `translate(0,${innerHeight})`).call(d3.axisBottom(xScale));
+
+  xAxisG
+    .selectAll('text')
+    .attr('font-size', axisStyle.fontSize)
+    .attr('fill', axisStyle.fill)
+    .style('text-anchor', 'end')
+    .attr('dx', '-0.35em')
+    .attr('dy', '0.35em')
+    .attr('transform', `rotate(-${displayConfig.xLabelRotation})`);
+
+  xAxisG.selectAll('path, line').attr('stroke', axisStyle.stroke || '#bdbdbd');
+
+  const yAxisG = g.append('g').attr('class', 'axis axis-y').call(
+    d3.axisLeft(yScale).ticks(displayConfig.yTickCount).tickFormat(d3.format('~f'))
+  );
+  yAxisG.selectAll('text').attr('font-size', axisStyle.fontSize).attr('fill', axisStyle.fill);
+  yAxisG.selectAll('path, line').attr('stroke', axisStyle.stroke || '#bdbdbd');
+
+  const strokeWick = isSmallChart ? 1.2 : 1;
+
+  data.forEach((d) => {
+    const cx = xScale(d.t) + xScale.bandwidth() / 2;
+    const yH = yScale(d.h);
+    const yL = yScale(d.l);
+    const yO = yScale(d.o);
+    const yC = yScale(d.c);
+    const top = Math.min(yO, yC);
+    const bot = Math.max(yO, yC);
+    const isRising = d.c >= d.o;
+    const fill = isRising ? risingColor : fallingColor;
+
+    g.append('line')
+      .attr('x1', cx)
+      .attr('x2', cx)
+      .attr('y1', yH)
+      .attr('y2', yL)
+      .attr('stroke', fill)
+      .attr('stroke-width', strokeWick);
+
+    const bw = xScale.bandwidth() * 0.62;
+    const x0 = cx - bw / 2;
+    const hBody = Math.max(bot - top, 1);
+
+    if (Math.abs(d.c - d.o) < 1e-9) {
+      g.append('line')
+        .attr('x1', x0)
+        .attr('x2', x0 + bw)
+        .attr('y1', yC)
+        .attr('y2', yC)
+        .attr('stroke', fill)
+        .attr('stroke-width', Math.max(strokeWick * 1.5, 1.5));
+    } else {
+      g.append('rect')
+        .attr('x', x0)
+        .attr('y', top)
+        .attr('width', bw)
+        .attr('height', hBody)
+        .attr('fill', fill)
+        .attr('stroke', fill)
+        .attr('stroke-width', 0.5);
+    }
+  });
+
+  if (chartTitle) {
+    const titleS = getResolvedTitleStyle(chartStyleConfig);
+    svg
+      .append('text')
+      .attr('x', width / 2)
+      .attr('y', margin.top / 2 + 8)
+      .attr('text-anchor', 'middle')
+      .attr('font-size', titleS.fontSize)
+      .attr('font-weight', titleS.fontWeight)
+      .attr('fill', titleS.fill)
+      .text(chartTitle);
+  }
+
+  return svg.node().outerHTML;
 }
 
 // 🆕 将层级表格转换为树状结构

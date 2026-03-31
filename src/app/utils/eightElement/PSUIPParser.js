@@ -3,6 +3,7 @@ import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfi
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance, generateUUID } from './util.js';  // 🆕 添加 generateUUID
 import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './creators/tableCreators.js';
+import { parseChartTagSpec } from './chartSpecParse.js';
 import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './creators/codeCreators.js';
 import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot, createFlexWrapLayout } from './creators/layoutCreators.js';
 
@@ -819,13 +820,10 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
     const chartMatch = line.match(/^\[chart:(.+?)\]/);
     if (chartMatch) {
         const fullChartSpec = chartMatch[1];
-        // 🆕 解析图表类型、可选标题和可选排序参数
-        const parts = fullChartSpec.split('|').map(s => s.trim());
-        let chartType = parts[0];
-        // 🆕 统一命名：将 TreeMind 兼容为 tree_mind
-        if (chartType === 'TreeMind') chartType = 'tree_mind';
-        const chartTitle = parts[1] || null;
-        const sortOrder = parts[2] || null; // asc 或 desc
+        const parsed = parseChartTagSpec(fullChartSpec);
+        let chartType = parsed.chartType;
+        const chartTitle = parsed.chartTitle;
+        const sortOrder = parsed.sortOrder;
 
         const chartKey = `chart:${chartType}`;
 

@@ -1,7 +1,16 @@
 import { parseMarkdownToTemplate, parseMarkdown, parseEventSyntax } from '../PSUIPParser.js';
 import { generateUUID } from '../util.js';
 import { createCodeElement } from './codeCreators.js';
-import { createTableElement, extractTableOrChartData, getChartVariantFromConfig, createChartElement, generateChartSvg, addChartEventButton } from './tableCreators.js';
+import {
+    createTableElement,
+    extractTableOrChartData,
+    getChartVariantFromConfig,
+    createChartElement,
+    generateChartSvg,
+    addChartEventButton,
+    sortTableData,
+    sortCandlestickTableData
+} from './tableCreators.js';
 import { createBackgroundElement } from './backgroundCreators.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createVideoElement } from './videoCreators.js';
@@ -1960,6 +1969,15 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                         if (chartResult.isChart) {
                             // 创建图表元素
                             try {
+                                const sortedChartTableData =
+                                    chartResult.chartType === 'candlestick'
+                                        ? sortCandlestickTableData(
+                                              chartResult.tableData,
+                                              chartResult.sortOrder,
+                                              chartResult.candlestickSpec
+                                          )
+                                        : sortTableData(chartResult.tableData, chartResult.sortOrder);
+
                                 // 🆕 获取图表的 variant 配置
                                 const chartVariant = getChartVariantFromConfig(markdownResult.templatePath, cardStyleConfig);
 
@@ -1971,7 +1989,15 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                     chartEvents.push(...events);
                                 }
 
-                                const chartElement = createChartElement(chartResult.chartType, '', chartResult.tableData, chartResult.tableContent, chartVariant, chartResult.chartTitle, chartEvents);
+                                const chartElement = createChartElement(
+                                    chartResult.chartType,
+                                    '',
+                                    sortedChartTableData,
+                                    chartResult.tableContent,
+                                    chartVariant,
+                                    chartResult.chartTitle,
+                                    chartEvents
+                                );
 
                                 // 🆕 生成按钮元素（如果需要）
                                 let buttonElement = addChartEventButton(chartElement, chartResult.originalFirstLine);
@@ -2043,7 +2069,12 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                     grid: slotConfigForChart?.grid ?? cardStyleConfig._inheritedChartGrid,
                                     chartColors: cardStyleConfig._inheritedChartColors || slotConfigForChart?.chartColors || undefined,
                                     chartBackgroundColor,
-                                    dataLabel: slotConfigForChart?.dataLabel ?? cardStyleConfig._inheritedChartDataLabel
+                                    dataLabel: slotConfigForChart?.dataLabel ?? cardStyleConfig._inheritedChartDataLabel,
+                                    candlestick:
+                                        chartResult.chartType === 'candlestick'
+                                            ? chartResult.candlestickSpec || {}
+                                            : undefined,
+                                    sortOrder: chartResult.sortOrder || undefined
                                 };
 
                                 // 同步最终样式到八要素图表节点，避免只在 SVG 内生效
@@ -2055,8 +2086,19 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                 if (chartStyleConfig.dataLabel) chartElement.layout.dataLabel = chartStyleConfig.dataLabel;
                                 if (chartStyleConfig.chartColors !== undefined) chartElement.layout.chartColors = chartStyleConfig.chartColors;
                                 if (chartStyleConfig.chartBackgroundColor !== undefined) chartElement.layout.chartBackgroundColor = chartStyleConfig.chartBackgroundColor;
+                                if (chartResult.chartType === 'candlestick' && chartResult.candlestickSpec) {
+                                    chartElement.layout.candlestick = chartResult.candlestickSpec;
+                                }
+                                if (chartResult.sortOrder) {
+                                    chartElement.layout.sortOrder = chartResult.sortOrder;
+                                }
 
-                                const svgContent = generateChartSvg(chartResult.chartType, chartResult.tableData, chartStyleConfig, chartResult.chartTitle);
+                                const svgContent = generateChartSvg(
+                                    chartResult.chartType,
+                                    sortedChartTableData,
+                                    chartStyleConfig,
+                                    chartResult.chartTitle
+                                );
                                 chartElement.svgContent = svgContent;
 
                                 // 将 SVG 作为子元素添加到图表容器中
