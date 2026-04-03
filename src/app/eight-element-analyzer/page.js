@@ -401,7 +401,22 @@ const a = 1;
 |2028年 | 1500|
   </card:minimalistChartCard>
 
-</feedListChartTranCard>`
+</feedListChartTranCard>
+
+
+   [chart:candlestick|心流模拟K线|scheme=cn_a|time=日期|open=开盘|high=最高|low=最低|close=收盘]
+    | 日期 | 开盘 | 最高 | 最低 | 收盘 |
+    | --- | --- | --- | --- | --- |
+    | 2025-03-10 | 2.4 | 2.7 | 2.3 | 2.55 |
+    | 2025-03-11 | 2.55 | 2.6 | 2.15 | 2.22 |
+    | 2025-03-12 | 2.22 | 2.75 | 2.2 | 2.64 |
+    | 2025-03-13 | 2.64 | 3.0 | 2.5 | 2.94 |
+
+
+
+
+
+`
   },
 
   techGradientSeries: {
