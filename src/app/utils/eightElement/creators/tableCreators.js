@@ -10,6 +10,7 @@ import { createButtonElement } from './buttonCreators.js';
 import { createLayoutElement } from './layoutCreators.js';
 import { EVENT_NAME } from '../eventConfig.js';
 import { parseHeaderBackgroundSyntax, parseTableHeaderStyles, removeInlineStyles } from '../styleParser.js';
+import { parseChartTagSpec } from '../chartSpecParse.js';
 
 // 注意：parseHeaderBackgroundSyntax 和相关函数已移至 styleParser.js 作为通用工具
 
@@ -44,6 +45,30 @@ function parseTableData(tableContent) {
     }
 
     return data;
+}
+
+/**
+ * 蜡烛图：按时间列（可配置表头名）做字典序排序，避免沿用「按第二列数值排序」的旧逻辑。
+ */
+function sortCandlestickTableData(tableData, sortOrder, candlestickSpec) {
+    if (!sortOrder || !tableData || tableData.length < 2) {
+        return tableData;
+    }
+    const headers = tableData[0].map(h => String(h).trim());
+    const wantedTime = candlestickSpec && candlestickSpec.time;
+    let timeIdx = 0;
+    if (wantedTime) {
+        const i = headers.findIndex(h => h === String(wantedTime).trim());
+        if (i >= 0) timeIdx = i;
+    }
+    const dataRows = tableData.slice(1);
+    const sorted = dataRows.sort((a, b) => {
+        const sa = String(a[timeIdx] ?? '');
+        const sb = String(b[timeIdx] ?? '');
+        const cmp = sa < sb ? -1 : sa > sb ? 1 : 0;
+        return sortOrder.toLowerCase() === 'desc' ? -cmp : cmp;
+    });
+    return [tableData[0], ...sorted];
 }
 
 // 🆕 根据排序参数对表格数据进行排序
@@ -194,14 +219,17 @@ function extractTableOrChartData(lines, startIndex) {
     let chartType = null;
     let chartTitle = null;
     let sortOrder = null;
+    let candlestickSpec = null;
 
     if (isChart) {
         const fullChartSpec = chartMatch[1];
-        // 🆕 解析图表类型、可选标题和可选排序参数
-        const parts = fullChartSpec.split('|').map(s => s.trim());
-        chartType = parts[0];
-        chartTitle = parts[1] || null;
-        sortOrder = parts[2] || null; // asc 或 desc
+        const parsed = parseChartTagSpec(fullChartSpec);
+        chartType = parsed.chartType;
+        chartTitle = parsed.chartTitle;
+        sortOrder = parsed.sortOrder;
+        if (chartType === 'candlestick') {
+            candlestickSpec = parsed.options || {};
+        }
     }
 
     // 处理第一行 - 如果是图表，移除图表标记和事件语法
@@ -241,6 +269,7 @@ function extractTableOrChartData(lines, startIndex) {
         chartType: chartType,
         chartTitle: chartTitle, // 🆕 添加图表标题
         sortOrder: sortOrder, // 🆕 添加排序参数
+        candlestickSpec,
         tableContent: originalContent, // 🔧 修复：返回原始内容（包含样式语法），让 createTableElement 来解析和清理
         tableData: tableData,
         endIndex: startIndex + i,
@@ -435,9 +464,11 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
 
     // 🆕 根据 variant 获取对应的图表样式配置
     const chartContainerStyleConfig = getElementStyleConfig('chart', variant, 'container');
-    const chartTitleStyleConfig = getElementStyleConfig('chart', variant, 'title');
-    const chartLegendStyleConfig = getElementStyleConfig('chart', variant, 'legend');
-    const chartAxisStyleConfig = getElementStyleConfig('chart', variant, 'axis');
+    // getElementStyleConfig 的第 3 个参数用于 attributes，不是子配置 key。
+    // 这里补齐 chartGenerator 直读的语义字段，避免样式丢失。
+    const chartTitleStyleConfig = {};
+    const chartLegendStyleConfig = {};
+    const chartAxisStyleConfig = {};
 
     // 生成唯一的className
     const uniqueClassName = `chart-${id}`;
@@ -497,20 +528,40 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
                 className: uniqueTitleClassName,
                 classStyle: {
                     ...chartTitleStyleConfig
-                }
+                },
+                fontSize: "{font.size.xl}",
+                fontWeight: "400",
+                fill: "{color.onsurface.black88}"
             },
             legend: {
                 className: uniqueLegendClassName,
                 classStyle: {
                     ...chartLegendStyleConfig
-                }
+                },
+                fontSize: "14px",
+                fontWeight: "400",
+                fill: "{color.onsurface.black88}"
             },
             axis: {
                 className: uniqueAxisClassName,
                 classStyle: {
                     ...chartAxisStyleConfig
-                }
-            }
+                },
+                fontSize: "14px",
+                fontWeight: "400",
+                fill: "{color.onsurface.black88}"
+            },
+            grid: {
+                stroke: "{color.basic.opacity.black.12}",
+                strokeOpacity: 0.7
+            },
+            dataLabel: {
+                fill: "{color.onsurface.black88}",
+                fontSize: "14px",
+                fontWeight: "400"
+            },
+            chartColors: undefined,
+            chartBackgroundColor: undefined
         },
         events: events.length > 0 ? events : [{}]
     };
@@ -536,13 +587,15 @@ function generateChartSvg(chartType, data, chartStyleConfig = null, chartTitle =
 
 // 处理表格数据 - 决定创建普通表格还是图表元素
 function processTableOrChartData(result, stack) {
-    const { isChart, chartType, chartTitle, sortOrder, tableContent, tableData, endIndex, originalFirstLine } = result;
+    const { isChart, chartType, chartTitle, sortOrder, candlestickSpec, tableContent, tableData, endIndex, originalFirstLine } = result;
 
     if (isChart) {
         // 处理为图表
         try {
-            // 🆕 根据排序参数对表格数据进行排序
-            const sortedTableData = sortTableData(tableData, sortOrder);
+            const sortedTableData =
+                chartType === 'candlestick'
+                    ? sortCandlestickTableData(tableData, sortOrder, candlestickSpec)
+                    : sortTableData(tableData, sortOrder);
             
             // 先创建基础图表元素（无事件），以便拿到图表 id 作为事件载体
             const tempChartElement = createChartElement(chartType, '', sortedTableData, tableContent, 'normal', chartTitle, []);
@@ -578,8 +631,21 @@ function processTableOrChartData(result, stack) {
                 variant: 'normal',
                 title: chartElement.layout.title,
                 legend: chartElement.layout.legend,
-                axis: chartElement.layout.axis
+                axis: chartElement.layout.axis,
+                grid: chartElement.layout.grid,
+                dataLabel: chartElement.layout.dataLabel,
+                chartColors: chartElement.layout.chartColors || undefined,
+                chartBackgroundColor: chartElement.layout.chartBackgroundColor ?? undefined,
+                candlestick: chartType === 'candlestick' ? candlestickSpec || {} : undefined,
+                sortOrder: sortOrder || undefined
             };
+
+            if (chartType === 'candlestick' && candlestickSpec) {
+                chartElement.layout.candlestick = candlestickSpec;
+            }
+            if (sortOrder) {
+                chartElement.layout.sortOrder = sortOrder;
+            }
 
             // 生成SVG图表，传入样式配置和标题，使用排序后的数据
             const svgContent = generateChartSvg(chartType, sortedTableData, chartStyleConfig, chartTitle);
@@ -668,6 +734,7 @@ export {
     addChartEventButton,
     isTableOrChartData,
     extractTableOrChartData,
+    sortCandlestickTableData,
     processTableOrChartData,
     getChartVariantFromConfig,
     generateChartSvg,

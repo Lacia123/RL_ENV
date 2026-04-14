@@ -230,7 +230,10 @@ function buildStructureFromMode(mode, slotElementsMap, componentElement, compone
         (componentElement && componentElement._metadata && componentElement._metadata.componentName) ||
         componentConfig?.name ||
         'component';
-    
+
+    // 位置感知收集需要原始文档顺序，因 anchor（如 subtitle）会被先消费并从 map 移除
+    const originalEntries = Array.from(slotElementsMap.entries());
+
     return buildGroups(
         mode.structure.groups,
         slotElementsMap,
@@ -239,9 +242,10 @@ function buildStructureFromMode(mode, slotElementsMap, componentElement, compone
         componentName,
         componentConfig,
         depth,
-        loopGroupName,  // 🆕 传递循环信息
+        loopGroupName,
         loopDataKey,
-        loopEventConfig
+        loopEventConfig,
+        originalEntries
     );
 }
 
@@ -259,7 +263,7 @@ function buildStructureFromMode(mode, slotElementsMap, componentElement, compone
  * @param {Object} loopEventConfig - 循环的事件配置
  * @returns {Array} 构建后的子元素数组
  */
-function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentName, componentConfig, depth = 0, loopGroupName = null, loopDataKey = null, loopEventConfig = null) {
+function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentName, componentConfig, depth = 0, loopGroupName = null, loopDataKey = null, loopEventConfig = null, originalEntries = null) {
     const indent = '  '.repeat(depth);
     const children = [];
     
@@ -285,9 +289,10 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                 componentName,
                 componentConfig,
                 depth + 1,
-                loopGroupName,  // 🆕 传递循环信息
+                loopGroupName,
                 loopDataKey,
-                loopEventConfig
+                loopEventConfig,
+                originalEntries
             );
             
             if (nestedChildren.length === 0) {
@@ -360,11 +365,28 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
         // 如果分组有 slots，处理插槽
         else if (group.slots && Array.isArray(group.slots)) {
             // 收集该分组中实际存在的插槽元素
+            // slotConsumeOne: 每次只取一个（按文档顺序），支持多个 command 分散在不同位置
+            // slotConsumeBefore/After/Between: 按文档顺序位置收集，支持同一位置 N 个 command
             const groupElements = [];
             for (const slotPattern of group.slots) {
-                const matched = collectSlotElements(slotPattern, slotElementsMap);
+                let matched;
+                if (group.slotConsumeBefore || group.slotConsumeAfter || (group.slotConsumeBetween && group.slotConsumeBetween.length >= 2)) {
+                    matched = collectSlotElementsByPosition(slotPattern, slotElementsMap, {
+                        before: group.slotConsumeBefore,
+                        after: group.slotConsumeAfter,
+                        between: group.slotConsumeBetween
+                    }, originalEntries);
+                } else {
+                    matched = collectSlotElements(slotPattern, slotElementsMap, !!group.slotConsumeOne);
+                }
                 if (matched.length > 0) {
                     groupElements.push(...matched);
+                    // 从 map 移除已消费的元素
+                    const toRemove = group.slotConsumeOne ? [matched[0]] : matched;
+                    toRemove.forEach(el => {
+                        const keyToRemove = Array.from(slotElementsMap.entries()).find(([, v]) => v === el)?.[0];
+                        if (keyToRemove) slotElementsMap.delete(keyToRemove);
+                    });
                 }
             }
             
@@ -469,7 +491,7 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
     return children;
 }
 
-function collectSlotElements(slotPattern, slotElementsMap) {
+function collectSlotElements(slotPattern, slotElementsMap, takeOneOnly = false) {
     const results = [];
     if (!slotPattern) return results;
     
@@ -478,6 +500,7 @@ function collectSlotElements(slotPattern, slotElementsMap) {
         for (const [key, element] of slotElementsMap.entries()) {
             if (matchesSlotPattern(key, element, base, true)) {
                 results.push(element);
+                if (takeOneOnly) break;
             }
         }
     } else {
@@ -489,6 +512,65 @@ function collectSlotElements(slotPattern, slotElementsMap) {
         }
     }
     
+    return results;
+}
+
+/**
+ * 按文档顺序位置收集插槽元素（用于 command* 等通配符）
+ * @param {string} slotPattern - 如 'command*'
+ * @param {Map} slotElementsMap - 插槽映射（用于校验元素仍存在，未被消费）
+ * @param {Object} position - { before, after, between }
+ * @param {Array} originalEntries - 原始文档顺序 [(key, element), ...]，anchor 可能已被消费，必须用此查找位置
+ */
+function collectSlotElementsByPosition(slotPattern, slotElementsMap, { before, after, between }, originalEntries = null) {
+    const results = [];
+    if (!slotPattern || !slotPattern.endsWith('*')) return results;
+    const base = slotPattern.slice(0, -1);
+    const entries = originalEntries && originalEntries.length > 0
+        ? originalEntries
+        : Array.from(slotElementsMap.entries());
+
+    const findFirstIndex = (anchor) => {
+        for (let i = 0; i < entries.length; i++) {
+            const [key, el] = entries[i];
+            const elBase = el?._metadata?.slotBaseName || el?._metadata?.slotName || key;
+            const keyBase = key.includes('#') ? key.split('#')[0] : key;
+            if (key === anchor || keyBase === anchor || key.startsWith(anchor) || elBase === anchor) return i;
+        }
+        return -1;
+    };
+
+    let startIdx = 0, endIdx = entries.length;
+    if (before) {
+        const idx = findFirstIndex(before);
+        if (idx >= 0) endIdx = idx;
+        else endIdx = 0;
+    }
+    if (after) {
+        const idx = findFirstIndex(after);
+        if (idx >= 0) startIdx = idx + 1;
+        else startIdx = entries.length;
+    }
+    if (between && Array.isArray(between) && between.length >= 2) {
+        const startAnchor = findFirstIndex(between[0]);
+        const endAnchor = findFirstIndex(between[1]);
+        if (startAnchor >= 0) {
+            startIdx = startAnchor + 1;
+            endIdx = endAnchor >= 0 && endAnchor > startAnchor ? endAnchor : entries.length;
+        } else {
+            endIdx = 0;
+        }
+    }
+
+    for (let i = startIdx; i < endIdx; i++) {
+        const [key, element] = entries[i];
+        if (matchesSlotPattern(key, element, base, true)) {
+            // 仅收集仍存在于当前 map 中的元素（未被其他分组消费）
+            if (slotElementsMap.has(key)) {
+                results.push(element);
+            }
+        }
+    }
     return results;
 }
 
@@ -1361,10 +1443,24 @@ function buildChartElementFromContent(slotName, slotConfig, slotContent, attribu
 
         const chartStyleConfig = {
             variant: slotConfig.variant || 'mini',
-            title: chartElement.layout?.title,
-            legend: chartElement.layout?.legend,
-            axis: chartElement.layout?.axis
+            title: slotConfig.title ?? chartElement.layout?.title,
+            legend: slotConfig.legend ?? chartElement.layout?.legend,
+            axis: slotConfig.axis ?? chartElement.layout?.axis,
+            grid: slotConfig.grid,
+            chartColors: slotConfig.chartColors || undefined,
+            chartBackgroundColor: slotConfig.chartBackgroundColor ?? undefined,
+            dataLabel: slotConfig.dataLabel
         };
+
+        // 将最终图表样式同步回八要素，避免只影响 svgContent 而节点数据仍为默认值
+        chartElement.layout = chartElement.layout || {};
+        if (chartStyleConfig.title) chartElement.layout.title = chartStyleConfig.title;
+        if (chartStyleConfig.legend) chartElement.layout.legend = chartStyleConfig.legend;
+        if (chartStyleConfig.axis) chartElement.layout.axis = chartStyleConfig.axis;
+        if (chartStyleConfig.grid) chartElement.layout.grid = chartStyleConfig.grid;
+        if (chartStyleConfig.dataLabel) chartElement.layout.dataLabel = chartStyleConfig.dataLabel;
+        if (chartStyleConfig.chartColors !== undefined) chartElement.layout.chartColors = chartStyleConfig.chartColors;
+        if (chartStyleConfig.chartBackgroundColor !== undefined) chartElement.layout.chartBackgroundColor = chartStyleConfig.chartBackgroundColor;
 
         const svgContent = generateChartSvg(finalChartType, sortedTableData, chartStyleConfig, finalChartTitle);
         chartElement.svgContent = svgContent;
@@ -2478,7 +2574,33 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
         const textElement = createTextElement(content);
         componentElement.layout.children.push(textElement);
     }
-    
+
+    // 🆕 有 layoutModes 但走了 markdownMapping 分支（无 slotConfigs）时，未进入上方 layoutModes 应用逻辑，
+    // 此处补上：选用 condition 为 'default' 的模式或首个模式，将其 style 应用到最外层组件容器。
+    const hasSlotConfigs = !!(componentConfig.slotConfigs || componentConfig.slots);
+    if (
+        componentConfig.layoutModes &&
+        componentConfig.layoutModes.length > 0 &&
+        !hasSlotConfigs
+    ) {
+        const defaultMode =
+            componentConfig.layoutModes.find((m) => m.condition === 'default') ||
+            componentConfig.layoutModes[0];
+        if (defaultMode && defaultMode.style) {
+            let modeStyle = defaultMode.style;
+            if (Object.keys(paramValues).length > 0) {
+                modeStyle = applyParametersToStyle(
+                    typeof modeStyle === 'object' && !Array.isArray(modeStyle) ? { ...modeStyle } : modeStyle,
+                    paramValues
+                );
+            }
+            componentElement.layout.classStyle = {
+                ...(componentElement.layout.classStyle || {}),
+                ...modeStyle
+            };
+        }
+    }
+
     // 🔧 处理 required 容器：确保必需的样式承载容器被渲染
     if (componentConfig.required) {
         processRequiredContainers(componentConfig, componentElement.layout.children, componentConfig, paramValues);

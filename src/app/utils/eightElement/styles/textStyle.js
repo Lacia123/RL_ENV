@@ -5,14 +5,17 @@ const TEXT_STYLE = {
     text: {
         // 正文文本
         p: {
-            fontSize: "{font.size.medium}",
-            fontWeight: "400",
-            lineHeight: "1.7",
-            letterSpacing: "{font.letterspacing.base}",
-            color: "{color.onsurface.black76}",
-            margin: "0 0 {dimension.margin.base} 0",
-            textAlign: "justify",
-            textJustify: "inter-word"
+            style: {
+                fontSize: "{font.size.medium}",
+                fontWeight: "400",
+                lineHeight: "1.7",
+                letterSpacing: "{font.letterspacing.base}",
+                color: "{color.onsurface.black76}",
+                margin: "0 0 {dimension.margin.base} 0",
+                textAlign: "justify",
+                textJustify: "inter-word"
+            },
+            supportedAttributes: ['color']
         },
         // 标题文本（h1 - h6）
         h1: {
@@ -58,16 +61,19 @@ const TEXT_STYLE = {
             boxShadow: "{material.hierarchy.main}"
         },
         h3: {
-            width: "100%",
-            display: "flex",
-            textAlign: "left",
-            fontSize: "{font.size.xl}",
-            fontWeight: "{font.fontweight.semibold}",
-            lineHeight: "{font.lineheight.base}",
-            letterSpacing: "{font.letterspacing.base}",
-            color: "{color.onsurface.black76}",
-            margin: "{dimension.margin.loose} 0 {dimension.margin.base} 0",
-            position: 'relative',
+            style: {
+                width: "100%",
+                display: "flex",
+                textAlign: "left",
+                fontSize: "{font.size.xl}",
+                fontWeight: "{font.fontweight.semibold}",
+                lineHeight: "{font.lineheight.base}",
+                letterSpacing: "{font.letterspacing.base}",
+                color: "{color.onsurface.black76}",
+                margin: "{dimension.margin.loose} 0 {dimension.margin.base} 0",
+                position: 'relative',
+            },
+            supportedAttributes: ['color'],
             // '&::before': {
             //   content: "'#'",
             //   color: "{color.primary.brand5}",
@@ -184,6 +190,37 @@ const TEXT_STYLE = {
             }
         },
 
+        // 命令行块（通用，可嵌入任意卡片）
+        commandBlock: {
+            fontSize: "{font.size.small}",
+            fontWeight: "400",
+            fontFamily: "'Fira Code', 'Monaco', 'Cascadia Code', monospace",
+            backgroundColor: "{color.onsurface.white88}",
+            padding: "{dimension.padding.superloose} {dimension.padding.extraloose} {dimension.padding.loose}",
+            marginTop: "{dimension.margin.base}",
+            lineHeight: "1",
+            marginBottom: "{dimension.margin.base}",
+            borderRadius: "{dimension.borderradius.large}",
+            borderWidth: "{dimension.borderwidth.narrow}",
+            borderColor: "{color.onsurfacecontainer.grey7}",
+            borderStyle: "solid",
+            boxShadow: "{material.hierarchy.2f}",
+            overflow: 'auto',
+            position: 'relative',
+            color: "{color.onsurface.black88}",
+            '&::before': {
+                content: "''",
+                position: 'absolute',
+                top: '12px',
+                left: '16px',
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                backgroundColor: "{color.warning.orange5}",
+                boxShadow: `24px 0 0 {color.warning.orange6}, 48px 0 0 {color.success.green5}`
+            }
+        },
+
         // 超链接文本 TODO: 超链接样式暂不支持，因为超链接会被解析成按钮
         hyperlink: {
             fontSize: "inherit",
@@ -230,7 +267,7 @@ const TEXT_STYLE = {
             margin: "0"
         },
         heroTitle: {
-            fontSize: "{font.size.xxl}",
+            fontSize: "{font.size.xl}",
             fontWeight: "{font.fontweight.bold}",
             letterSpacing: "-0.02em",
             color: "{color.onprimary.white100}",

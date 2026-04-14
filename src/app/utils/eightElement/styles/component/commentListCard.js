@@ -1,3 +1,5 @@
+import { COMMAND_SLOT_CONFIG } from './command';
+
 const COMMENT_LIST_CARD_STYLE = {
     // commentListCard 数据绑定示例
     commentListCard: {
@@ -16,6 +18,13 @@ const COMMENT_LIST_CARD_STYLE = {
             },
             structure: {
                 groups: [
+                    {
+                        name: 'commandBlock',
+                        condition: 'has:command',
+                        slots: ['command'],
+                        type: 'template',
+                        style: { width: '100%', marginBottom: '{dimension.margin.tight}' }
+                    },
                     {
                         name: 'itemContent',
                         type: 'template',
@@ -64,7 +73,8 @@ const COMMENT_LIST_CARD_STYLE = {
                     fontSize: '14px',
                     color: '{color.onsurface.black64}'
                 }
-            }
+            },
+            command: COMMAND_SLOT_CONFIG
         },
         example: [{
             title: '用户评论1',
@@ -103,6 +113,12 @@ const COMMENT_LIST_CARD_STYLE = {
                         flexDirection: 'column',
                         gap: '{dimension.gap.supertight}'
                     }
+                }, {
+                    name: 'commandBlock',
+                    condition: 'has:command',
+                    slots: ['command'],
+                    type: 'template',
+                    style: { width: '100%' }
                 }, {
                     name: 'itemContent',
                     type: 'template',
@@ -196,6 +212,7 @@ const COMMENT_LIST_CARD_STYLE = {
                     fontSize: '{font.size.small}'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
             name: {
                 metaType: 'text',
                 variant: 'p',

@@ -1,7 +1,16 @@
 import { parseMarkdownToTemplate, parseMarkdown, parseEventSyntax } from '../PSUIPParser.js';
 import { generateUUID } from '../util.js';
 import { createCodeElement } from './codeCreators.js';
-import { createTableElement, extractTableOrChartData, getChartVariantFromConfig, createChartElement, generateChartSvg, addChartEventButton } from './tableCreators.js';
+import {
+    createTableElement,
+    extractTableOrChartData,
+    getChartVariantFromConfig,
+    createChartElement,
+    generateChartSvg,
+    addChartEventButton,
+    sortTableData,
+    sortCandlestickTableData
+} from './tableCreators.js';
 import { createBackgroundElement } from './backgroundCreators.js';
 import { createButtonElement } from './buttonCreators.js';
 import { createVideoElement } from './videoCreators.js';
@@ -688,6 +697,20 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
         }
     }
     
+    // 图表颜色透传：将外部传入的 chartColors 挂到配置上，供 parseTemplateCardContent 内构建图表时使用
+    if (options.chartColors && Array.isArray(options.chartColors)) {
+        cardStyleConfig._inheritedChartColors = options.chartColors;
+    }
+    // 图表 SVG 背景透传：供 parseTemplateCardContent 内生成图表时写入 chartStyleConfig
+    if (options.chartBackgroundColor != null) {
+        cardStyleConfig._inheritedChartBackgroundColor = options.chartBackgroundColor;
+    }
+    // 坐标系与图表内文字颜色透传：axis/legend/title/grid 供 chartGenerator 使用
+    if (options.axis != null) cardStyleConfig._inheritedChartAxis = options.axis;
+    if (options.legend != null) cardStyleConfig._inheritedChartLegend = options.legend;
+    if (options.title != null) cardStyleConfig._inheritedChartTitle = options.title;
+    if (options.grid != null) cardStyleConfig._inheritedChartGrid = options.grid;
+    if (options.dataLabel != null) cardStyleConfig._inheritedChartDataLabel = options.dataLabel;
     if (content && content.trim()) {
         if (isTemplateCard || hasParameters) {
             // 对于模板类型的卡片或带参数的组件，解析嵌套的模板标签
@@ -780,6 +803,13 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
             id,
             events: cardEvents
         };
+
+        if (options.nestedContainerStyle && typeof options.nestedContainerStyle === 'object') {
+            cardElement.layout.classStyle = { ...(cardElement.layout.classStyle || {}), ...options.nestedContainerStyle };
+            if (cardElement.layout.style) {
+                cardElement.layout.style = { ...cardElement.layout.style, ...options.nestedContainerStyle };
+            }
+        }
 
         return cardElement;
     } else {
@@ -928,7 +958,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             const imageUrl = markdownData.url || '';
             // 🔧 修复：优先使用tagConfig中的variant，回退到markdownData中的variant或默认值
             const imageVariant = (tagConfig && tagConfig.variant) ? tagConfig.variant : (markdownData.variant || 'normal');
-            elementInstance = createBackgroundElement(imageUrl, imageVariant);
+            elementInstance = createBackgroundElement(imageUrl, imageVariant, '', markdownData.hasPreview);
         } else if (markdownData.type === 'button') {
             // 按钮类型
             const buttonText = content;
@@ -1010,17 +1040,23 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             if (markdownData.customVariant === finalVariant) {
                 styleOverride = markdownData.customStyles;
             }
+            // 🆕 标准标题/正文标签（如 <h3 color={...}>、<p color={...}>）使用 customVariant 作为 variant，以应用 textStyle 中的 supportedAttributes
+            else if (markdownData.customStyles && ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'].includes(markdownData.customVariant)) {
+                finalVariant = markdownData.customVariant;
+                styleOverride = markdownData.customStyles;
+            }
         }
         
         // 🔧 修复：tagConfig.style 是容器样式，不应该作为 styleOverride 传递给文本元素
         // 容器样式会通过容器的 classStyle 应用，文本元素应该只使用 variant 对应的样式
         // styleOverride 只应该来自 markdownData.customStyles（如果存在）
+        const textCustomStyles = { ...(tagConfig.variantStyle || {}), ...(styleOverride || {}) };
 
         // 根据 metaType 创建对应的元件
         let elementInstance = null;
         if (tagConfig.metaType === 'text') {
-            // 🔧 修复：不传递 tagConfig.style 作为 styleOverride，只传递 markdownData.customStyles
-            elementInstance = createTextElement(content, finalVariant, {}, styleOverride);
+            // 传入 textCustomStyles（模板 variantStyle + markdown 自定义样式）以应用标题/副标题等样式
+            elementInstance = createTextElement(content, finalVariant, {}, textCustomStyles);
         } else if (tagConfig.metaType === 'button') {
             // 🆕 处理button类型，从markdownData中获取URL和变体信息
             const buttonText = content;
@@ -1031,7 +1067,7 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
         } else if (tagConfig.metaType === 'image') {
             // 🆕 处理image类型，从markdownData中获取URL
             const imageUrl = markdownData && markdownData.url ? markdownData.url : '';
-            elementInstance = createBackgroundElement(imageUrl, tagConfig.variant);
+            elementInstance = createBackgroundElement(imageUrl, tagConfig.variant, '', markdownData.hasPreview);
         } else if (tagConfig.metaType === 'table') {
             // 🆕 处理table类型，直接创建表格元素（不需要variant）
             elementInstance = createTableElement(content);
@@ -1045,6 +1081,13 @@ function createTemplateTagElement(tagName, content, cardStyleConfig, markdownDat
             const externalParameters = tagConfig.parameters || null;
 
             elementInstance = createComponentElement(content, tagConfig.variant, markdownData, styleOverride, externalParameters, currentMarkdown);
+        } else if (tagConfig.metaType === 'list') {
+            // 🆕 处理 list 类型，支持 ul/ol 映射到 content.list
+            const listVariant = tagConfig.variant || 'unordered';
+            elementInstance = createTextElement(content, 'p', {
+                isList: true,
+                listType: listVariant
+            });
         }
         // 可以在这里添加其他元件类型的支持
 
@@ -1514,6 +1557,40 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
             continue;
         }
 
+        // 🆕 检查是否为嵌套卡片标签（如 <card:minimalistChartCard>...</card:minimalistChartCard>）
+        // 槽位路径仅从当前卡片的 markdownMapping 读取，不写死业务槽名
+        const cardTagInfo = isCardTag(line);
+        if (cardTagInfo.isCardTag && !cardTagInfo.isClosing) {
+            const block = extractCardBlock(lines, i);
+            const slotPath = cardStyleConfig.markdownMapping
+                ? (cardStyleConfig.markdownMapping[`card:${block.variant}`] ?? cardStyleConfig.markdownMapping['card:*'])
+                : null;
+            // 图表颜色、图表 SVG 背景、坐标系与文字颜色透传：从当前卡片的槽位配置读取并传入嵌套卡片
+            const slotConfig = slotPath && cardStyleConfig[slotPath] ? cardStyleConfig[slotPath] : null;
+            const chartColors = slotConfig?.chartColors;
+            const chartBackgroundColor = slotConfig?.chartBackgroundColor;
+            const chartAxis = slotConfig?.axis;
+            const chartLegend = slotConfig?.legend;
+            const chartTitle = slotConfig?.title;
+            const chartGrid = slotConfig?.grid;
+            const chartDataLabel = slotConfig?.dataLabel;
+            const nestedContainerStyle = slotConfig?.nestedContainerStyle;
+            const nestedCardElement = createCardElement(
+                block.cardContent,
+                block.variant,
+                block.attributes,
+                currentMarkdown,
+                { rawTag: block.rawTag, attributeMeta: block.attributeMeta || {}, chartColors, chartBackgroundColor, axis: chartAxis, legend: chartLegend, title: chartTitle, grid: chartGrid, dataLabel: chartDataLabel, nestedContainerStyle }
+            );
+            if (slotPath) {
+                createOrMergeTemplateElement(slotPath, '', cardStyleConfig, containerMap, children, nestedCardElement, null, currentMarkdown);
+            } else {
+                children.push(nestedCardElement);
+            }
+            i = block.endIndex + 1;
+            continue;
+        }
+
         // 🆕 检查是否为带属性的模板标签（如 <halfCirclePrecent fillColor={...}>）
         const templateTagWithAttrsInfo = isTemplateTagWithAttributes(line);
         if (templateTagWithAttrsInfo.isTemplateTag) {
@@ -1892,6 +1969,15 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                         if (chartResult.isChart) {
                             // 创建图表元素
                             try {
+                                const sortedChartTableData =
+                                    chartResult.chartType === 'candlestick'
+                                        ? sortCandlestickTableData(
+                                              chartResult.tableData,
+                                              chartResult.sortOrder,
+                                              chartResult.candlestickSpec
+                                          )
+                                        : sortTableData(chartResult.tableData, chartResult.sortOrder);
+
                                 // 🆕 获取图表的 variant 配置
                                 const chartVariant = getChartVariantFromConfig(markdownResult.templatePath, cardStyleConfig);
 
@@ -1903,7 +1989,15 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                     chartEvents.push(...events);
                                 }
 
-                                const chartElement = createChartElement(chartResult.chartType, '', chartResult.tableData, chartResult.tableContent, chartVariant, chartResult.chartTitle, chartEvents);
+                                const chartElement = createChartElement(
+                                    chartResult.chartType,
+                                    '',
+                                    sortedChartTableData,
+                                    chartResult.tableContent,
+                                    chartVariant,
+                                    chartResult.chartTitle,
+                                    chartEvents
+                                );
 
                                 // 🆕 生成按钮元素（如果需要）
                                 let buttonElement = addChartEventButton(chartElement, chartResult.originalFirstLine);
@@ -1923,15 +2017,88 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                 }
                                 wrapperLayout.layout.children.push(chartElement);
 
-                                // 生成SVG图表 - 传递 variant 信息和标题
+                                // 生成SVG图表 - 透传坐标系与文字颜色：先 layout，再当前卡片槽位（按 templatePath），最后继承配置（嵌套卡传入），保证 axis/legend 生效
+                                const slotPathFirst = markdownResult.templatePath?.split('.')[0];
+                                const slotConfigForChart = slotPathFirst && cardStyleConfig[slotPathFirst] ? cardStyleConfig[slotPathFirst] : null;
+                                const mergedAxis = {
+                                    ...(chartElement.layout?.axis || {}),
+                                    ...(slotConfigForChart?.axis || {}),
+                                    ...(cardStyleConfig._inheritedChartAxis || {})
+                                };
+                                const mergedLegend = {
+                                    ...(chartElement.layout?.legend || {}),
+                                    ...(slotConfigForChart?.legend || {}),
+                                    ...(cardStyleConfig._inheritedChartLegend || {})
+                                };
+                                const mergedTitle = {
+                                    ...(chartElement.layout?.title || {}),
+                                    ...(slotConfigForChart?.title || {}),
+                                    ...(cardStyleConfig._inheritedChartTitle || {})
+                                };
+
+                                // 🆕 如果外部传入了 chartBackgroundColor，同步覆盖图表外层容器背景，
+                                // 让 SVG 内 rect 的颜色与容器背景一致（避免出现灰边/露出 padding）。
+                                const chartBackgroundColor =
+                                    cardStyleConfig._inheritedChartBackgroundColor ??
+                                    slotConfigForChart?.chartBackgroundColor ??
+                                    undefined;
+
+                                if (chartBackgroundColor != null) {
+                                    // chartElement.layout.classStyle 更像是外层 div 的样式入口；
+                                    // 同时也兜底写入 background/backgroundColor，避免实现差异导致覆盖失败。
+                                    if (chartElement.layout?.classStyle) {
+                                        chartElement.layout.classStyle.background = chartBackgroundColor;
+                                        chartElement.layout.classStyle.backgroundColor = chartBackgroundColor;
+                                    }
+                                    if (chartElement.layout?.style) {
+                                        chartElement.layout.style.background = chartBackgroundColor;
+                                        chartElement.layout.style.backgroundColor = chartBackgroundColor;
+                                    }
+                                    if (chartElement.layout?.chart?.style) {
+                                        chartElement.layout.chart.style.background = chartBackgroundColor;
+                                        chartElement.layout.chart.style.backgroundColor = chartBackgroundColor;
+                                    }
+                                }
+
                                 const chartStyleConfig = {
                                     variant: chartVariant,
                                     container: chartElement.layout?.container,
-                                    title: chartElement.layout?.title,
-                                    legend: chartElement.layout?.legend,
-                                    axis: chartElement.layout?.axis
+                                    title: Object.keys(mergedTitle).length ? mergedTitle : undefined,
+                                    legend: Object.keys(mergedLegend).length ? mergedLegend : undefined,
+                                    axis: Object.keys(mergedAxis).length ? mergedAxis : undefined,
+                                    grid: slotConfigForChart?.grid ?? cardStyleConfig._inheritedChartGrid,
+                                    chartColors: cardStyleConfig._inheritedChartColors || slotConfigForChart?.chartColors || undefined,
+                                    chartBackgroundColor,
+                                    dataLabel: slotConfigForChart?.dataLabel ?? cardStyleConfig._inheritedChartDataLabel,
+                                    candlestick:
+                                        chartResult.chartType === 'candlestick'
+                                            ? chartResult.candlestickSpec || {}
+                                            : undefined,
+                                    sortOrder: chartResult.sortOrder || undefined
                                 };
-                                const svgContent = generateChartSvg(chartResult.chartType, chartResult.tableData, chartStyleConfig, chartResult.chartTitle);
+
+                                // 同步最终样式到八要素图表节点，避免只在 SVG 内生效
+                                chartElement.layout = chartElement.layout || {};
+                                if (chartStyleConfig.title) chartElement.layout.title = chartStyleConfig.title;
+                                if (chartStyleConfig.legend) chartElement.layout.legend = chartStyleConfig.legend;
+                                if (chartStyleConfig.axis) chartElement.layout.axis = chartStyleConfig.axis;
+                                if (chartStyleConfig.grid) chartElement.layout.grid = chartStyleConfig.grid;
+                                if (chartStyleConfig.dataLabel) chartElement.layout.dataLabel = chartStyleConfig.dataLabel;
+                                if (chartStyleConfig.chartColors !== undefined) chartElement.layout.chartColors = chartStyleConfig.chartColors;
+                                if (chartStyleConfig.chartBackgroundColor !== undefined) chartElement.layout.chartBackgroundColor = chartStyleConfig.chartBackgroundColor;
+                                if (chartResult.chartType === 'candlestick' && chartResult.candlestickSpec) {
+                                    chartElement.layout.candlestick = chartResult.candlestickSpec;
+                                }
+                                if (chartResult.sortOrder) {
+                                    chartElement.layout.sortOrder = chartResult.sortOrder;
+                                }
+
+                                const svgContent = generateChartSvg(
+                                    chartResult.chartType,
+                                    sortedChartTableData,
+                                    chartStyleConfig,
+                                    chartResult.chartTitle
+                                );
                                 chartElement.svgContent = svgContent;
 
                                 // 将 SVG 作为子元素添加到图表容器中

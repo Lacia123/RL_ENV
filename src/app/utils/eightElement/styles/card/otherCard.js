@@ -17,10 +17,10 @@ const OTHER_CARD_STYLE = {
                 '&::before': {
                     content: '""',
                     position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                    bottom: '0',
                     background: `
   linear-gradient(0deg, transparent 24%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 26%, transparent 27%, transparent 74%, rgba(255,255,255,0.1) 75%, rgba(255,255,255,0.1) 76%, transparent 77%),
   linear-gradient(90deg, transparent 24%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 26%, transparent 27%, transparent 74%, rgba(255,255,255,0.1) 75%, rgba(255,255,255,0.1) 76%, transparent 77%)
@@ -41,10 +41,10 @@ const OTHER_CARD_STYLE = {
                 '&::before': {
                     content: '""',
                     position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                    bottom: '0',
                     background: `
   radial-gradient(circle at 10% 20%, rgba(255,255,255,0.1) 1px, transparent 2px),
   radial-gradient(circle at 80% 80%, rgba(255,255,255,0.08) 1px, transparent 2px),
@@ -67,10 +67,10 @@ const OTHER_CARD_STYLE = {
                 '&::before': {
                     content: '""',
                     position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                    bottom: '0',
                     background: `
   linear-gradient(115deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%),
   linear-gradient(245deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%),
@@ -92,10 +92,10 @@ const OTHER_CARD_STYLE = {
                 '&::before': {
                     content: '""',
                     position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                    bottom: '0',
                     background: `
   repeating-linear-gradient(
     45deg,
@@ -121,10 +121,10 @@ const OTHER_CARD_STYLE = {
                 '&::before': {
                     content: '""',
                     position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                    bottom: '0',
                     background: `
   radial-gradient(circle at 10px 10px, rgba(255,255,255,0.15) 1px, transparent 1px)
 `,
@@ -144,10 +144,10 @@ const OTHER_CARD_STYLE = {
                 '&::before': {
                     content: '""',
                     position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                    bottom: '0',
                     background: `
         /* 几何线条纹理 */
         linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%),

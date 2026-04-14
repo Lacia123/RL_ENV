@@ -385,6 +385,40 @@ const a = 1;
 优雅青蓝卡片系列为您的内容提供专业、精致的展示方式。`
   },
 
+  feedListChartTranCardExample: {
+    name: '📊 关键数据透明卡片',
+    description: 'feedListChartTranCard：透明背景 + 白色文字，内嵌条形图',
+    markdown: `<feedListChartTranCard>
+ <title>🗒<strong> 关键数据1</strong></title>
+ <subtitle>本次会议讨论中提及的关键数据指标2</subtitle>
+
+ <card:minimalistChartCard>
+[chart:bar|年收益预估（万元）]
+| 类型 | 占比 |
+|------|------|
+|2026年 | 800 |
+|2027年 | 1000 |
+|2028年 | 1500|
+  </card:minimalistChartCard>
+
+</feedListChartTranCard>
+
+
+   [chart:candlestick|心流模拟K线|scheme=cn_a|time=日期|open=开盘|high=最高|low=最低|close=收盘]
+    | 日期 | 开盘 | 最高 | 最低 | 收盘 |
+    | --- | --- | --- | --- | --- |
+    | 2025-03-10 | 2.4 | 2.7 | 2.3 | 2.55 |
+    | 2025-03-11 | 2.55 | 2.6 | 2.15 | 2.22 |
+    | 2025-03-12 | 2.22 | 2.75 | 2.2 | 2.64 |
+    | 2025-03-13 | 2.64 | 3.0 | 2.5 | 2.94 |
+
+
+
+
+
+`
+  },
+
   techGradientSeries: {
     name: '🚀 科技渐变系列',
     description: '展示科技渐变风格：标准布局和头部动作两种设计',
@@ -1475,6 +1509,14 @@ const userRoles = {
     | 2025-03-12 | 0.0 | 0.36 | 2.64 |
     | 2025-03-13 | 0.0 | 0.32 | 2.94 |
 
+    [chart:candlestick|心流模拟K线|scheme=cn_a|time=日期|open=开盘|high=最高|low=最低|close=收盘]
+    | 日期 | 开盘 | 最高 | 最低 | 收盘 |
+    | --- | --- | --- | --- | --- |
+    | 2025-03-10 | 2.4 | 2.7 | 2.3 | 2.55 |
+    | 2025-03-11 | 2.55 | 2.6 | 2.15 | 2.22 |
+    | 2025-03-12 | 2.22 | 2.75 | 2.2 | 2.64 |
+    | 2025-03-13 | 2.64 | 3.0 | 2.5 | 2.94 |
+
     [chart:pie|笔记本市场占比]
     | 类型 | 占比 |
     |------|------|
@@ -2067,6 +2109,172 @@ wrapper: {
     </loop>
 </commentStyleListCard>
 
+<summaryCard>
+  <title title="鼠标悬停可看完整标题">生成岗位JD完成（悬停看 tooltip）</title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+</summaryCard>
+
+<!-- 示例2: 带图标，支持 title 透传原生 tooltip -->
+<summaryCard>
+  <icon></icon>
+  <title title="查看详情" key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+</summaryCard>
+
+<!-- 示例3: 横向布局，带预览图片 -->
+<summaryCard>
+  <title title="卡片标题提示" key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+  <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+</summaryCard>
+
+<!-- 示例4: 横向布局，带图标和预览 -->
+<summaryCard>
+  <icon></icon>
+  <title title="悬停显示此标题" key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+  <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+</summaryCard>
+
+<!-- 示例5: 图片在上方，小按钮在header -->
+<summaryCard>
+  <topImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></topImage>
+  <icon></icon>
+  <title title="标题提示" key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+</summaryCard>
+
+<!-- 示例6: 图片在上方，宽按钮在底部 -->
+<summaryCard>
+  <topImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></topImage>
+  <icon></icon>
+  <title title="完整标题说明" key="title"></title>
+  <text key="summary"></text>
+  <commitWide>查看过程</commitWide>
+</summaryCard>
+
+<!-- 示例7: 图片作为背景，宽按钮在底部 -->
+<summaryCard>
+  <backgroundImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=400&h=400"></backgroundImage>
+  <title title="背景卡片标题" key="title"></title>
+  <text key="summary"></text>
+  <commitWide>查看过程</commitWide>
+</summaryCard>
+
+<!-- ========== historyCard 示例：仅 标题 内容 时间；3 种卡片 大(紫最深) / 中(紫第二深) / 小(浅色) ========== -->
+<!-- 大的 - 紫色最深 -->
+<historyCard>
+  <title>完成规划文案撰写完成规划文案撰写完成规划文案撰写完成规划文案撰写完成规划文案撰写完成规划文案撰写完成规划文案撰写完成规划文案撰写</title>
+  <timestamp>12.28</timestamp>
+  <text>根据李老师给您的飞书消息，我已经帮您完成了规划文案撰写。</text>
+  <cardLarge></cardLarge>
+</historyCard>
+
+<!-- 中等 - 紫色第二深 -->
+<historyCard>
+  <title>完成音频处理</title>
+  <timestamp>10.8</timestamp>
+  <text>根据李老师给您的飞书消息，我已经帮您完成</text>
+  <cardMedium></cardMedium>
+</historyCard>
+
+<!-- 小的 - 浅色 -->
+<historyCard>
+  <title>会话名称</title>
+  <timestamp>10.8</timestamp>
+  <text>已生成完整岗位说明文档，包含岗位职责、任职要求及加分项1111111111111111111111111111111111111111111111111111。</text>
+</historyCard>
+</layout:gallery>
+`
+  },
+  commandDemo: {
+    name: '⌨️ 命令行展示',
+    description: '展示各卡片中命令行组件的使用，支持 N 个 command 按插入顺序显示，macOS 窗口风格',
+    markdown: `
+<layout:gallery>
+<heroCard>
+  <badge>技术活动</badge>
+  <title>AI 开发工作坊</title>
+  <command>pip install transformers torch</command>
+  <subtitle>从零开始构建大模型应用，动手实践 RAG 与 Agent 开发。</subtitle>
+  <command>git clone https://github.com/example/ai-workshop.git</command>
+  <metrics>📅 2024年11月15日</metrics>
+  <metrics>📍 北京 · 中关村</metrics>
+  <cta_primary href="https://example.com/workshop">报名参加</cta_primary>
+  <cta_secondary href="https://example.com/slides">查看讲义</cta_secondary>
+</heroCard>
+
+<contentDisplayCard>
+  <image src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=900"></image>
+  <title>VSCode 插件开发入门</title>
+  <command>npx yo code</command>
+  <subtitle>使用 Yeoman 脚手架快速创建 VSCode 扩展项目，支持 TypeScript 和 Webview。</subtitle>
+  <command>npm run compile</command>
+  <tags>开发</tags>
+  <tags>教程</tags>
+  <rating>⭐ 4.8 · 2.3k 收藏</rating>
+  <cta href="https://example.com/vscode-ext">开始学习</cta>
+</contentDisplayCard>
+
+<actionCard>
+  <icon>🔧</icon>
+  <badge>快速开始</badge>
+  <title>部署到生产环境</title>
+  <command>docker compose up -d</command>
+  <description>一键启动所有服务，包含 API、数据库和缓存。确保已安装 Docker 和 Docker Compose。</description>
+  <command>docker compose logs -f api</command>
+  <cta_primary href="https://example.com/deploy">部署文档</cta_primary>
+  <cta_secondary href="https://example.com/troubleshoot">故障排查</cta_secondary>
+</actionCard>
+
+<eventCard>
+  <tag>技术分享</tag>
+  <event_title>Kubernetes 实战工作坊</event_title>
+  <command>kubectl apply -f deployment.yaml</command>
+  <event_time>📅 2024年12月1日 14:00-17:00</event_time>
+  <command>kubectl get pods -w</command>
+  <cta href="https://example.com/k8s">查看详情</cta>
+</eventCard>
+
+<statusCard>
+  <status_type>✅ 成功</status_type>
+  <message>CI/CD 流水线执行完成，已自动部署到 staging 环境</message>
+  <command>gh run view 12345 --log-failed</command>
+  <timestamp>3 分钟前</timestamp>
+  <command>gh run watch 12345</command>
+  <cta href="https://example.com/ci">查看流水线</cta>
+</statusCard>
+
+<tableCard>
+  <icon>📊</icon>
+  <badge>数据导出</badge>
+  <title>用户行为分析报表</title>
+  <subtitle>支持导出 CSV 和 JSON 格式</subtitle>
+  <command>curl -H "Authorization: Bearer $TOKEN" https://api.example.com/export/users</command>
+  <command>jq '.data[] | select(.active)' users.json</command>
+  <table>
+| 指标 | 数值 | 环比 |
+|------|------|------|
+| DAU | 12.5万 | +8% |
+| 留存率 | 68% | +3% |
+| 转化率 | 4.2% | +0.5% |
+  </table>
+</tableCard>
+
+<metricCard>
+  <status>正常</status>
+  <time_range>今日</time_range>
+  <metric_label>API 响应时间</metric_label>
+  <metric_value>128ms</metric_value>
+  <trend_value>-15ms</trend_value>
+  <command>SELECT p99 FROM latency_metrics WHERE service='api'</command>
+  <command>SELECT COUNT(*) FROM requests WHERE status=200</command>
+</metricCard>
 </layout:gallery>
 `
   },
@@ -2306,7 +2514,7 @@ style: {
   hiringNewCard: {
     name: '新的招聘卡片',
     description: '用于3D场景演示的新的招聘卡片',
-    markdown: `<layout:root background="transparent">
+    markdown: `<layout:root backgroundColor="transparent">
 <layout:row>
   <layout:column flex="2">
       <hiringNewTitleCard>
@@ -2383,6 +2591,78 @@ style: {
           </mixedCard>
         </loop>
       </layout:row>
+    `
+  },
+  customFeature: {
+    name: '自定义样式',
+    description: '用于展示自定义样式',
+    markdown: `
+      <h3 color={color.basic.opacity.white.20}>  📫 【会议邀请】AIGUI 产品讨论 </h3>
+      <p color={color.basic.opacity.white.20}>您受邀参加以下会议，期待您的出席</p>
+
+<layout:row>
+<heroCard>
+  <cover_image src="https://sop-cdn.dingcloud.com/aigui/file/ag4baygrjj38y128iauxh0yy7isdpcj820260311162754792.png"></cover_image>
+  <badge>会议邀请</badge>
+  <title>AIGUI 产品讨论</title>
+  <subtitle>以下为会议时间及会议地点</subtitle>
+  <metrics>🕙 时间：2024年11月15日  10:00-12:00 </metrics>
+  <metrics>🏘 地点：神盾局</metrics>
+
+</heroCard>
+
+<feedListTranCard>
+  <title>🗓<strong> 会议日程 </strong></title>
+  <subtitle>请关注本次会议日程，提前准备相关资料</subtitle>
+
+  <items>
+
+    <icon>🆕</icon>
+    <text> <strong>10:00–-11:00　</strong> <br>项目进展回顾</text>
+
+  </items>
+
+  <items>
+
+    <icon>🆕</icon>
+    <text> <strong>11:00–-11:30　</strong><br>产品遗留问题确认</text>
+
+  </items>
+
+    <items>
+
+    <icon>🆕</icon>
+    <text> <strong>11:30–-12:00　</strong><br>规划讨论与决策</text>
+
+  </items>
+</feedListTranCard>
+
+<feedListTranCard>
+  <title>🗒<strong> 会议人员信息</strong></title>
+  <subtitle>请提前安排好时间，准时参会。如有疑问，请联系邀请人。</subtitle>
+
+  <items>
+
+    <icon>🕴 </icon>
+    <text><strong>邀请人</strong></text>
+  </items>
+  <items>
+    <text>闫立刚（yanlg@dingdao.com）</text>
+  </items>
+
+  <items>
+
+    <icon>🕴🕴 </icon>
+    <text>  <strong>参会人</strong>  </text>
+ </items>
+ <items>
+  <text>闫立刚（yanlg@dingdao.com）<br>高楠（gaonan@dingdao.com）<br>闫井亮（yanjl@dingdao.com）<br>曲祥（quxiang@dingdao.com）</text>
+ </items>
+
+  </items>
+</feedListTranCard>
+
+</layout:row>
     `
   }
 };
@@ -3964,11 +4244,22 @@ const updateChartTypeInEightElement = async (eightElement, chartId, newChartType
           variant: 'normal',
           title: chartElement.layout.title,
           legend: chartElement.layout.legend,
-          axis: chartElement.layout.axis
+          axis: chartElement.layout.axis,
+          grid: chartElement.layout.grid,
+          dataLabel: chartElement.layout.dataLabel,
+          chartColors: chartElement.layout.chartColors,
+          chartBackgroundColor: chartElement.layout.chartBackgroundColor,
+          candlestick: element.layout?.candlestick,
+          sortOrder: element.layout?.sortOrder
         };
 
         // 生成新的SVG内容
-        const svgContent = generateChartSvg(newChartType, element.tableData || [], chartStyleConfig, element.chartTitle);
+        const svgContent = generateChartSvg(
+          newChartType,
+          element.tableData || [],
+          chartStyleConfig,
+          element._metadata?.title ?? element.chartTitle
+        );
 
         // 更新SVG内容
         element.svgContent = svgContent;

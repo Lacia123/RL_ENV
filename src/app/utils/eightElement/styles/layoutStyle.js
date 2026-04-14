@@ -28,7 +28,7 @@ const LAYOUT_STYLE = {
                 gridTemplateAreas: 'none',
                 justifyItems: 'stretch',
             },
-            supportedAttributes: ['backgroundImage', 'backgroundRepeat', 'backgroundSize', 'backgroundPosition', 'backgroundColor', 'background']
+            supportedAttributes: ['backgroundImage', 'backgroundRepeat', 'backgroundSize', 'backgroundPosition', 'backgroundColor', 'background', 'padding', 'margin', 'borderRadius']
         },
         // 列布局元素（默认垂直布局）
         column: {

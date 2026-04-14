@@ -1,3 +1,5 @@
+import { COMMAND_SLOT_CONFIG } from './command';
+
 const MEDIA_CARD_SERIES_STYLE = {
     // 🌄 主视觉说明卡
     heroCard: {
@@ -59,13 +61,52 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     }
                                 },
                                 {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    slotConsumeBefore: 'title',
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
+                                },
+                                {
                                     name: 'titleBlock',
                                     slots: ['title']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    slotConsumeBetween: ['title', 'subtitle'],
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
                                 },
                                 {
                                     name: 'subtitleBlock',
                                     condition: 'has:subtitle',
                                     slots: ['subtitle']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    slotConsumeAfter: 'subtitle',
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
                                 },
                                 {
                                     name: 'metricsRow',
@@ -128,13 +169,52 @@ const MEDIA_CARD_SERIES_STYLE = {
                             }
                         },
                         {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            slotConsumeBefore: 'title',
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
                             name: 'titleBlock',
                             slots: ['title']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            slotConsumeBetween: ['title', 'subtitle'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         },
                         {
                             name: 'subtitleBlock',
                             condition: 'has:subtitle',
                             slots: ['subtitle']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            slotConsumeAfter: 'subtitle',
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         },
                         {
                             name: 'metricsRow',
@@ -214,6 +294,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                 metaType: 'text',
                 variant: 'heroTitle'
             },
+            command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             subtitle: {
                 metaType: 'text',
                 variant: 'heroSubtitle'
@@ -245,6 +327,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             cover_image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
             badge: { required: false, optional: true },
             title: { required: true, optional: false },
+            command: { required: false, optional: true },
             subtitle: { required: false, optional: true },
             metrics: { required: false, optional: true },
             cta_primary: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
@@ -281,7 +364,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                                 width: '100%',
                                 borderRadius: '{dimension.borderradius.large}',
                                 overflow: 'hidden',
-                                aspectRatio: '4 / 3',
+                                aspectRatio: '16 / 9',
                                 margin: 0,
                                 padding: 0,
                                 background: '{color.surfacecontainer.black7}'
@@ -304,6 +387,18 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     name: 'subtitleGroup',
                                     condition: 'has:subtitle',
                                     slots: ['subtitle']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
                                 },
                                 {
                                     name: 'tagRow',
@@ -402,6 +497,18 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     name: 'subtitleGroup',
                                     condition: 'has:subtitle',
                                     slots: ['subtitle']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
                                 },
                                 {
                                     name: 'tagRow',
@@ -488,10 +595,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                     margin: 0,
                     padding: 0,
                     objectFit: 'cover',
+                    objectPosition: 'center top',
                     display: 'block'
                 },
                 supportedAttributes: ['src', 'alt']
             },
+            command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             title: {
                 metaType: 'text',
                 variant: 'h3',
@@ -576,6 +686,7 @@ const MEDIA_CARD_SERIES_STYLE = {
         },
         slots: {
             image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
+            command: { required: false, optional: true },
             title: { required: true, optional: false },
             subtitle: { required: false, optional: true },
             tags: { required: false, optional: true },
@@ -655,6 +766,18 @@ const MEDIA_CARD_SERIES_STYLE = {
                                             name: 'descriptionBlock',
                                             condition: 'has:description',
                                             slots: ['description']
+                                        },
+                                        {
+                                            name: 'commandBlock',
+                                            condition: 'has:command',
+                                            slots: ['command*'],
+                                            type: 'template',
+                                            style: {
+                                                width: '100%',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: '{dimension.gap.tight}'
+                                            }
                                         }
                                     ]
                                 }
@@ -709,9 +832,33 @@ const MEDIA_CARD_SERIES_STYLE = {
                             slots: ['title']
                         },
                         {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
                             name: 'descriptionBlock',
                             condition: 'has:description',
                             slots: ['description']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
                         },
                         {
                             name: 'ctaRow',
@@ -784,6 +931,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     lineHeight: '1.3'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             description: {
                 metaType: 'text',
                 variant: 'p',
@@ -820,6 +969,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             icon: { required: false, optional: true },
             badge: { required: false, optional: true },
             title: { required: true, optional: false },
+            command: { required: false, optional: true },
             description: { required: false, optional: true },
             cta_primary: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
             cta_secondary: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
@@ -893,6 +1043,18 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     slots: ['event_time']
                                 },
                                 {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
+                                },
+                                {
                                     name: 'ctaRow',
                                     condition: 'has:cta',
                                     slots: ['cta'],
@@ -945,6 +1107,18 @@ const MEDIA_CARD_SERIES_STYLE = {
                             slots: ['event_time']
                         },
                         {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
                             name: 'ctaRow',
                             condition: 'has:cta',
                             slots: ['cta'],
@@ -976,6 +1150,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
+                    objectPosition: 'center top',
                     display: 'block',
                     padding: '0',
                     margin: '0'
@@ -1008,6 +1183,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     lineHeight: '1.3'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             event_time: {
                 metaType: 'text',
                 variant: 'p',
@@ -1036,6 +1213,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
             tag: { required: false, optional: true },
             event_title: { required: true, optional: false },
+            command: { required: false, optional: true },
             event_time: { required: false, optional: true },
             cta: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
         }
@@ -1120,6 +1298,19 @@ const MEDIA_CARD_SERIES_STYLE = {
                             }
                         },
                         {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                marginTop: '{dimension.margin.tight}',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
                             name: 'footerRow',
                             type: 'template',
                             style: {
@@ -1209,6 +1400,19 @@ const MEDIA_CARD_SERIES_STYLE = {
                             }
                         },
                         {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                marginTop: '{dimension.margin.tight}',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
                             name: 'footerRow',
                             type: 'template',
                             style: {
@@ -1249,7 +1453,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                 variant: 'p',
                 variantStyle: {
                     margin: '0',
-                    fontSize: '{font.size.small}',
+                    fontSize: '{font.size.medium}',
                     fontWeight: '{font.fontweight.bold}',
                     // 默认样式（成功）
                     color: '{color.basic.brand.6}'
@@ -1260,11 +1464,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                 variant: 'p',
                 variantStyle: {
                     margin: '0',
-                    fontSize: '{font.size.medium}',
+                    fontSize: '{font.size.large}',
                     color: '{color.onsurface.black88}',
                     lineHeight: '1.5'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             progress: {
                 type: 'template',
                 style: {
@@ -1317,6 +1523,7 @@ const MEDIA_CARD_SERIES_STYLE = {
         slots: {
             status_type: { required: true, optional: false },
             message: { required: true, optional: false },
+            command: { required: false, optional: true },
             progress: { required: false, optional: true },
             timestamp: { required: false, optional: true },
             cta: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
@@ -1330,7 +1537,7 @@ const MEDIA_CARD_SERIES_STYLE = {
         layoutModes: [
             {
                 name: 'full',
-                condition: 'has:title || has:subtitle || has:description || has:icon || has:badge',
+                condition: 'has:title || has:subtitle || has:description || has:icon || has:badge || has:command',
                 style: {
                     display: 'flex',
                     width: '100%',
@@ -1416,6 +1623,19 @@ const MEDIA_CARD_SERIES_STYLE = {
                                     type: 'template',
                                     style: {
                                         marginTop: '{dimension.margin.supertight}'
+                                    }
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        marginTop: '{dimension.margin.tight}',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
                                     }
                                 }
                             ]
@@ -1550,6 +1770,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     lineHeight: '1.6'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             table: {
                 type: 'template',
                 metaType: 'table',
@@ -1576,6 +1798,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             title: { required: false, optional: true },
             subtitle: { required: false, optional: true },
             description: { required: false, optional: true },
+            command: { required: false, optional: true },
             table: { required: true, optional: false },
             footer: { required: false, optional: true }
         }
@@ -1612,6 +1835,18 @@ const MEDIA_CARD_SERIES_STYLE = {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '{dimension.gap.supertight}'
+                            }
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
                             }
                         },
                         {
@@ -1659,6 +1894,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.small}'
                 }
             },
+            command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
             items: {
                 type: 'template',
                 metaType: 'feedItem',
@@ -1837,6 +2074,288 @@ const MEDIA_CARD_SERIES_STYLE = {
         slots: {
             title: { required: false, optional: true },
             subtitle: { required: false, optional: true },
+            command: { required: false, optional: true },
+            items: {
+                required: true,
+                optional: false,
+                supportedAttributes: ['avatar', 'icon', 'timestamp', 'cta_label', 'cta_href', 'cta_variant']
+            }
+        }
+    },
+
+
+    // 🗞️ 信息列表卡 背景透明 （Feed / List）
+    feedListTranCard: {
+        type: 'template',
+        hasUpdateEvent: true,
+        layoutModes: [
+            {
+                name: 'default',
+                condition: 'default',
+                style: {
+                    display: 'flex',
+                    flex: "1",
+                    width: '100%',
+                    flexDirection: 'column',
+                    gap: '{dimension.gap.base}',
+                    padding: '{dimension.padding.loose}',
+                    borderRadius: '{dimension.borderradius.xl}',
+                    background: 'transparent',
+                    boxShadow: '{material.hierarchy.1f}',
+                    border: '{dimension.borderwidth.narrow} solid {color.onprimary.white76}'
+                },
+                structure: {
+                    groups: [
+                        {
+                            name: 'header',
+                            condition: 'has:title || has:subtitle',
+                            slots: ['title', 'subtitle'],
+                            type: 'template',
+                            style: {
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.supertight}'
+                            }
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
+                            name: 'listGroup',
+                            condition: 'has:items',
+                            slots: ['items*'],
+                            type: 'template',
+                            style: {
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        style: {
+            display: 'flex',
+            flex: "1",
+            width: '100%',
+            flexDirection: 'column',
+            gap: '{dimension.gap.base}',
+            padding: '{dimension.padding.loose}',
+            borderRadius: '{dimension.borderradius.xl}',
+            background: 'transparent',
+            boxShadow: '{material.hierarchy.1f}',
+            border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
+        },
+        slotConfigs: {
+            title: {
+                metaType: 'text',
+                variant: 'h4',
+                variantStyle: {
+                    margin: '0',
+                    color: '{color.onprimary.white100}',
+                    borderBottom: '1px solid {color.basic.opacity.white.20}',
+                }
+            },
+            subtitle: {
+                metaType: 'text',
+                variant: 'p',
+                variantStyle: {
+                    margin: '0',
+                    color: '{color.onprimary.white100}',
+                    fontSize: '{font.size.small}'
+                }
+            },
+            command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
+            items: {
+                type: 'template',
+                metaType: 'feedItem',
+                style: {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '{dimension.gap.tight}',
+                    padding: '{dimension.padding.tight} 0',
+                    borderBottom: '1px solid {color.basic.opacity.white.5}'
+                },
+                itemStyles: {
+                    row: {
+                        display: 'flex',
+                        flexDirection: 'row',
+                        gap: '{dimension.gap.base}',
+                        alignItems: 'flex-start'
+                    },
+                    leading: {
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: '{dimension.gap.supertight}'
+                    },
+                    avatar: {
+                        width: '44px',
+                        height: '44px',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        background: '{color.surfacecontainer.black4}',
+                        flexShrink: '0'
+                    },
+                    content: {
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '{dimension.gap.supertight}',
+                        flex: '1'
+                    },
+                    textRow: {
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'flex-start',
+                        gap: '{dimension.gap.supertight}'
+                    },
+                    icon: {
+                        margin: '0',
+                        fontSize: '{font.size.medium}',
+                        color: '{color.primary.brand5}'
+                    },
+                    text: {
+                        margin: '0',
+                        fontSize: '{font.size.medium}',
+                        color: '{color.onsurface.black88}',
+                        lineHeight: '1.5'
+                    },
+                    timestamp: {
+                        margin: '0',
+                        fontSize: '{font.size.tiny}',
+                        color: '{color.onsurface.black64}',
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase'
+                    },
+                    meta: {
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end',
+                        gap: '{dimension.gap.supertight}',
+                        marginLeft: '{dimension.margin.tight}'
+                    },
+                    ctaVariant: 'link'
+                },
+                subSlots: {
+                    avatar: {
+                        metaType: 'image',
+                        variant: 'avatar',
+                        variantStyle: {
+                            width: '44px',
+                            height: '44px',
+                            borderRadius: '50%',
+                            objectFit: 'cover'
+                        }
+                    },
+                    icon: {
+                        metaType: 'text',
+                        variant: 'p',
+                        variantStyle: {
+                            margin: '0',
+                            fontSize: '{font.size.medium}',
+                            color: '{color.onprimary.white100}'
+                        }
+                    },
+                    text: {
+                        metaType: 'text',
+                        variant: 'p',
+                        variantStyle: {
+                            margin: '0',
+                            fontSize: '{font.size.medium}',
+                            color: '{color.onprimary.white100}',
+                            lineHeight: '1.5'
+                        }
+                    },
+                    timestamp: {
+                        metaType: 'text',
+                        variant: 'p',
+                        variantStyle: {
+                            margin: '0',
+                            fontSize: '{font.size.tiny}',
+                            color: '{color.onprimary.white100}',
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase'
+                        }
+                    },
+                    cta_inline: {
+                        metaType: 'button',
+                        variant: 'link',
+                        variantStyle: {
+                            fontSize: '{font.size.small}',
+                            fontWeight: '{font.fontweight.semibold}',
+                            textDecoration: 'none'
+                        }
+                    }
+                },
+                itemLayout: [
+                    {
+                        name: 'leading',
+                        condition: 'has:avatar',
+                        style: {
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: '{dimension.gap.supertight}',
+                            width: '44px',
+                            height: '44px',
+                            borderRadius: '50%',
+                            overflow: 'hidden',
+                            background: '{color.surfacecontainer.black4}',
+                            flexShrink: '0'
+                        },
+                        slots: ['avatar']
+                    },
+                    {
+                        name: 'content',
+                        style: {
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '{dimension.gap.supertight}',
+                            flex: '1'
+                        },
+                        slotGroups: [
+                            {
+                                name: 'textRow',
+                                style: {
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    alignItems: 'flex-start',
+                                    gap: '{dimension.gap.supertight}'
+                                },
+                                slots: ['icon', 'text']
+                            }
+                        ]
+                    },
+                    {
+                        name: 'meta',
+                        condition: 'has:timestamp || has:cta_inline',
+                        style: {
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'flex-end',
+                            gap: '{dimension.gap.supertight}',
+                            marginLeft: '{dimension.margin.tight}'
+                        },
+                        slots: ['timestamp', 'cta_inline']
+                    }
+                ]
+            }
+        },
+        slots: {
+            title: { required: false, optional: true },
+            subtitle: { required: false, optional: true },
+            command: { required: false, optional: true },
             items: {
                 required: true,
                 optional: false,

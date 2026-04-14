@@ -477,7 +477,7 @@ function extractLayoutBlock(lines, startIndex) {
 }
 
 // 更新标题布局创建函数
-function createHeadingLayout(headingContent, subElements = [], headingLevel = 1) {
+function createHeadingLayout(headingContent, subElements = [], headingLevel = 1, customStyles = null) {
     // 所有标题布局都使用左对齐
     // 注意：标题文本的对齐方式由createTextElement函数根据变体（h1、h2等）自动处理
     const layout = createLayoutElement(
@@ -499,9 +499,9 @@ function createHeadingLayout(headingContent, subElements = [], headingLevel = 1)
         isLayout: true
     };
 
-    // 添加标题文本，根据标题级别选择文本样式
+    // 添加标题文本，根据标题级别选择文本样式，支持 customStyles（如 <h3 color={...}>）
     const headingVariant = `h${headingLevel}`;
-    const headingText = createTextElement(headingContent, headingVariant);
+    const headingText = createTextElement(headingContent, headingVariant, {}, customStyles || undefined);
 
     // 不需要额外设置textAlign和width，createTextElement已经处理了
 
