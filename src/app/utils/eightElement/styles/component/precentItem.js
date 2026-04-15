@@ -41,6 +41,7 @@ const PRECENT_ITEM_STYLE = {
             display: 'flex',
             flexDirection: 'column',
             flex: "1",
+            flexGrow: "1",
             minWidth: "200px",
             padding: "{dimension.padding.base}",
             alignItems: "center",

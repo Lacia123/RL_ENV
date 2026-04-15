@@ -3,7 +3,7 @@ const SIMPLE_CARD_STYLE = {
     simpleCard: {
         type: 'template',
         style: {
-            flex: "0 0 48%",
+            flex: "1",
             borderRadius: "{dimension.borderradius.large}",
             background: "{color.basic.brand.1}",
             display: 'flex',
