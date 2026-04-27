@@ -531,6 +531,7 @@ function generateLegend(g, innerHeight, items, displayConfig, chartStyleConfig, 
 export function generateChartFromTableData(tableData, chartType, chartStyleConfig = null, chartTitle = null) {
   try {    
     chartType = chartType === 'groupedBar' ? 'grouped_bar' : chartType;
+    const wideCanvasChartTypes = new Set(['bar', 'grouped_bar', 'area_chart', 'donut_chart']);
 
     // 确保至少有标题行和一行数据
     if (!tableData || tableData.length < 2) {
@@ -548,12 +549,12 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
 
     // 设置图表尺寸和边距
     // 🆕 增大基础尺寸，让图表占满容器，特别是为柱状图增加更多底部空间
-    const width = chartType === 'grouped_bar' ? 800 : 600;  // 簇状柱默认 16:9，其他图表维持原尺寸
-    const height = chartType === 'grouped_bar' ? 450 : 600; // 簇状柱默认 16:9，其他图表维持原尺寸
+    const width = wideCanvasChartTypes.has(chartType) ? 800 : 600;  // 需要并排等高的图表统一为 16:9
+    const height = wideCanvasChartTypes.has(chartType) ? 450 : 600; // 需要并排等高的图表统一为 16:9
     // 🆕 根据图表宽度动态调整显示参数
     const isSmallChart = chartStyleConfig?.variant === 'small'
     // 🆕 根据是否为小图表优化边距，增加底部边距为图例留空间
-    const optimizedMargin = chartType === 'grouped_bar'
+    const optimizedMargin = wideCanvasChartTypes.has(chartType)
       ? (isSmallChart
           ? { top: 20, right: 24, bottom: 96, left: 64 }
           : { top: 32, right: 36, bottom: 108, left: 72 })
@@ -1710,7 +1711,6 @@ function generateGroupedBarChart(data, dateField, valueFields, width, height, ma
 
     const axisStyle = getResolvedAxisStyle(displayConfig, chartStyleConfig);
     const gridStyle = getResolvedGridStyle(chartStyleConfig);
-    const dataLabelStyle = getResolvedDataLabelStyle(displayConfig, chartStyleConfig, axisStyle);
     const categories = data.map(d => d[dateField]);
     const tickCount = displayConfig.isSmallChart ? 4 : 6;
 
@@ -1819,23 +1819,6 @@ function generateGroupedBarChart(data, dateField, valueFields, width, height, ma
     if (useCustomColors) {
       groupedBars.attr('fill', d => colorValues[d.fieldIndex % colorValues.length]);
     }
-
-    barGroups.selectAll('.bar-label')
-      .data(row => valueFields.map((field, fieldIndex) => ({
-        field,
-        fieldIndex,
-        value: parseChartNumericValue(row[field])
-      })))
-      .enter()
-      .append('text')
-      .attr('class', 'bar-label')
-      .attr('x', d => x1Scale(d.field) + x1Scale.bandwidth() / 2)
-      .attr('y', d => yScale(d.value) - 6)
-      .attr('text-anchor', 'middle')
-      .attr('fill', dataLabelStyle.fill)
-      .attr('font-size', dataLabelStyle.fontSize)
-      .attr('font-weight', chartStyleConfig?.dataLabel?.fontWeight || '400')
-      .text(d => formatCompactChartValue(d.value));
 
     if (chartTitle) {
       const titleStyle = getResolvedTitleStyle(chartStyleConfig);
