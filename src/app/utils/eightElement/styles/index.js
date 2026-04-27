@@ -3,23 +3,23 @@
  * 八要素结构的样式配置系统
  * 提供了对不同元素类型样式的完整配置
  */
-import LAYOUT_STYLE from './layoutStyle';
-import TEXT_STYLE from './textStyle';
-import MATH_STYLE from './mathStyle';
-import CHART_STYLE from './chartStyle';
-import TABLE_STYLE from './tableStyle';
-import BUTTON_STYLE from './buttonStyle';
-import LIST_STYLE from './listStyle';
-import ALERT_STYLE from './alertStyle';
-import CARD_STYLE from './card';
-import COMPONENT_STYLE from './component';
-import TAB_STYLE from './tabStyle';
-import VIDEO_STYLE from './videoStyle';
-import AUDIO_STYLE from './audioStyle';
-import IMAGE_STYLE from './imageStyle';
-import ICON_STYLE from './iconStyle';
+import LAYOUT_STYLE from './layoutStyle.js';
+import TEXT_STYLE from './textStyle.js';
+import MATH_STYLE from './mathStyle.js';
+import CHART_STYLE from './chartStyle.js';
+import TABLE_STYLE from './tableStyle.js';
+import BUTTON_STYLE from './buttonStyle.js';
+import LIST_STYLE from './listStyle.js';
+import ALERT_STYLE from './alertStyle.js';
+import CARD_STYLE from './card/index.js';
+import COMPONENT_STYLE from './component/index.js';
+import TAB_STYLE from './tabStyle.js';
+import VIDEO_STYLE from './videoStyle.js';
+import AUDIO_STYLE from './audioStyle.js';
+import IMAGE_STYLE from './imageStyle.js';
+import ICON_STYLE from './iconStyle.js';
 
-import { CSS_VARIABLE_SYSTEM, LAYOUT_CONSTANTS, COLOR_CONSTANTS, DIMENSION_CONSTANTS, FONT_CONSTANTS } from './constant';
+import { CSS_VARIABLE_SYSTEM, LAYOUT_CONSTANTS, COLOR_CONSTANTS, DIMENSION_CONSTANTS, FONT_CONSTANTS } from './constant.js';
 
 /**
  * 默认样式配置
@@ -203,9 +203,5 @@ export {
     LAYOUT_CONSTANTS,
     COLOR_CONSTANTS,
     DIMENSION_CONSTANTS,
-    FONT_CONSTANTS,
-    DEFAULT_STYLE_CONFIG,
-    setStyleConfig,
-    resetStyleConfig,
-    getElementStyleConfig
-}; 
+    FONT_CONSTANTS
+};
