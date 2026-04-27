@@ -9,7 +9,7 @@
  */
 
 import * as d3 from 'd3';
-import { COLOR_CONSTANTS } from './styles';
+import { COLOR_CONSTANTS } from './styles/index.js';
 import resolveToken from '../tokens/resolveToken.js';
 
 // ✅ 浏览器环境检测 - 防止在客户端构建时失败
@@ -345,6 +345,37 @@ function getResolvedDataLabelStyle(displayConfig, chartStyleConfig, axisStyleFal
   return { fill, fontSize };
 }
 
+function parseChartNumericValue(value) {
+  return parseFloat(String(value ?? '').replace(/[,%]/g, '')) || 0;
+}
+
+function formatCompactChartValue(value) {
+  const numericValue = Number(value) || 0;
+  const absoluteValue = Math.abs(numericValue);
+
+  if (absoluteValue >= 1e9) {
+    return `${(numericValue / 1e9).toFixed(1)}B`;
+  }
+
+  if (absoluteValue >= 1e6) {
+    return `${(numericValue / 1e6).toFixed(1)}M`;
+  }
+
+  if (absoluteValue >= 1e3) {
+    return `${(numericValue / 1e3).toFixed(1)}K`;
+  }
+
+  if (numericValue % 1 === 0) {
+    return numericValue.toString();
+  }
+
+  if (absoluteValue >= 100) {
+    return numericValue.toFixed(0);
+  }
+
+  return numericValue.toFixed(1);
+}
+
 /**
  * 向 SVG 的 defs 中注入图表主题样式（轴体、网格、图例、标题），用 CSS 覆盖默认 defs，便于外部再用 CSS 覆盖
  * @param {Object} svg - D3 的 svg 选择
@@ -499,6 +530,8 @@ function generateLegend(g, innerHeight, items, displayConfig, chartStyleConfig, 
  */
 export function generateChartFromTableData(tableData, chartType, chartStyleConfig = null, chartTitle = null) {
   try {    
+    chartType = chartType === 'groupedBar' ? 'grouped_bar' : chartType;
+
     // 确保至少有标题行和一行数据
     if (!tableData || tableData.length < 2) {
       throw new Error('图表数据不足，至少需要标题行和一行数据');
@@ -515,14 +548,18 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
 
     // 设置图表尺寸和边距
     // 🆕 增大基础尺寸，让图表占满容器，特别是为柱状图增加更多底部空间
-    const width = 600;  // 增大宽度，充分利用容器空间
-    const height = 600; // 增加高度，为图例留出更多空间
+    const width = chartType === 'grouped_bar' ? 800 : 600;  // 簇状柱默认 16:9，其他图表维持原尺寸
+    const height = chartType === 'grouped_bar' ? 450 : 600; // 簇状柱默认 16:9，其他图表维持原尺寸
     // 🆕 根据图表宽度动态调整显示参数
     const isSmallChart = chartStyleConfig?.variant === 'small'
     // 🆕 根据是否为小图表优化边距，增加底部边距为图例留空间
-    const optimizedMargin = isSmallChart ? 
-      { top: 15, right: 20, bottom: 120, left: 80 } :   
-      { top: 40, right: 50, bottom: 120, left: 90 };  
+    const optimizedMargin = chartType === 'grouped_bar'
+      ? (isSmallChart
+          ? { top: 20, right: 24, bottom: 96, left: 64 }
+          : { top: 32, right: 36, bottom: 108, left: 72 })
+      : (isSmallChart
+          ? { top: 15, right: 20, bottom: 120, left: 80 }
+          : { top: 40, right: 50, bottom: 120, left: 90 });
     
     const margin = optimizedMargin;
     const innerWidth = width - margin.left - margin.right;
@@ -591,6 +628,8 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
         return generateAreaChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'bar':
         return generateBarChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
+      case 'grouped_bar':
+        return generateGroupedBarChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'barh':
         return generateBarHChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'pie':
@@ -1625,6 +1664,215 @@ function generateBarChart(data, dateField, valueFields, width, height, margin, c
 }
 
 /**
+ * 生成簇状柱形图
+ * @param {Array} data - 图表数据
+ * @param {string} dateField - 分类字段名
+ * @param {Array} valueFields - 系列字段名数组
+ * @param {number} width - 图表宽度
+ * @param {number} height - 图表高度
+ * @param {Object} margin - 图表边距
+ * @param {Object} chartStyleConfig - 图表样式配置
+ * @param {Object} displayConfig - 显示配置
+ * @param {string} chartTitle - 图表标题
+ * @returns {string} SVG 字符串
+ */
+function generateGroupedBarChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
+  try {
+    const { svg } = createJsdomEnv(width, height);
+    applyChartSvgBackground(svg, width, height, chartStyleConfig);
+
+    const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
+    const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
+    const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
+    const defaultColorValues = [
+      colorBrand6,
+      colorBrand5,
+      colorBrand4,
+      '#f59e0b',
+      '#fde68a',
+      '#d9f99d',
+      '#86efac',
+      '#67e8f9',
+      '#60a5fa',
+      '#3b82f6'
+    ];
+    const defaultColorClass = ['color-brand6', 'color-brand5', 'color-brand4'];
+    const { colorValues, colorClass, useCustomColors } = getChartColorsFromConfig(chartStyleConfig, {
+      colorValues: defaultColorValues,
+      colorClass: defaultColorClass
+    });
+
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const chartOffsetY = chartTitle ? 12 : 0;
+    const g = svg.append('g')
+      .attr('transform', `translate(${margin.left},${margin.top + chartOffsetY})`);
+
+    const axisStyle = getResolvedAxisStyle(displayConfig, chartStyleConfig);
+    const gridStyle = getResolvedGridStyle(chartStyleConfig);
+    const dataLabelStyle = getResolvedDataLabelStyle(displayConfig, chartStyleConfig, axisStyle);
+    const categories = data.map(d => d[dateField]);
+    const tickCount = displayConfig.isSmallChart ? 4 : 6;
+
+    const maxValue = d3.max(data, row =>
+      d3.max(valueFields, field => parseChartNumericValue(row[field]))
+    ) || 0;
+    const yMax = maxValue > 0 ? maxValue * 1.08 : 1;
+
+    const x0Scale = d3.scaleBand()
+      .domain(categories)
+      .range([0, innerWidth])
+      .padding(displayConfig.isSmallChart ? 0.16 : 0.22);
+
+    const x1Scale = d3.scaleBand()
+      .domain(valueFields)
+      .range([0, x0Scale.bandwidth()])
+      .padding(displayConfig.isSmallChart ? 0.08 : 0.14);
+
+    const yScale = d3.scaleLinear()
+      .domain([0, yMax])
+      .nice(tickCount)
+      .range([innerHeight, 0]);
+
+    g.append('g')
+      .attr('class', 'grid x-grid')
+      .selectAll('line')
+      .data(yScale.ticks(tickCount))
+      .enter()
+      .append('line')
+      .attr('x1', 0)
+      .attr('y1', d => yScale(d))
+      .attr('x2', innerWidth)
+      .attr('y2', d => yScale(d))
+      .attr('stroke', gridStyle.stroke)
+      .attr('stroke-opacity', gridStyle.strokeOpacity);
+
+    const xAxis = g.append('g')
+      .attr('class', 'axis x-axis')
+      .attr('font-size', axisStyle.fontSize || displayConfig.axisLabelSize || '10px')
+      .attr('transform', `translate(0,${innerHeight})`);
+
+    xAxis.insert('line', ':first-child')
+      .attr('x1', 0)
+      .attr('y1', 0)
+      .attr('x2', innerWidth)
+      .attr('y2', 0)
+      .attr('stroke', axisStyle.stroke)
+      .attr('stroke-width', 1);
+
+    xAxis.selectAll('.tick')
+      .data(categories)
+      .enter()
+      .append('g')
+      .attr('class', 'tick')
+      .attr('transform', d => `translate(${x0Scale(d) + x0Scale.bandwidth() / 2}, 0)`)
+      .call(group => {
+        group.append('line')
+          .attr('y2', 6)
+          .attr('stroke', axisStyle.stroke);
+
+        group.append('text')
+          .attr('y', 9)
+          .attr('dy', '.71em')
+          .attr('text-anchor', 'middle')
+          .attr('font-size', axisStyle.fontSize || displayConfig.axisLabelSize || '10px')
+          .attr('font-weight', axisStyle.fontWeight || '400')
+          .attr('fill', axisStyle.fill)
+          .text(d => d);
+      });
+
+    const yAxis = g.append('g')
+      .attr('class', 'axis y-axis')
+      .call(
+        d3.axisLeft(yScale)
+          .ticks(tickCount)
+          .tickFormat(d => formatCompactChartValue(d))
+      );
+    yAxis.selectAll('.tick text')
+      .attr('fill', axisStyle.fill)
+      .attr('font-size', axisStyle.fontSize || displayConfig.axisLabelSize || '10px');
+    yAxis.selectAll('.tick line').attr('stroke', axisStyle.stroke);
+    yAxis.selectAll('path.domain').attr('stroke', axisStyle.stroke);
+
+    const barGroups = g.selectAll('.bar-group')
+      .data(data)
+      .enter()
+      .append('g')
+      .attr('class', 'bar-group')
+      .attr('transform', d => `translate(${x0Scale(d[dateField])},0)`);
+
+    const groupedBars = barGroups.selectAll('rect')
+      .data(row => valueFields.map((field, fieldIndex) => ({
+        category: row[dateField],
+        field,
+        fieldIndex,
+        value: parseChartNumericValue(row[field])
+      })))
+      .enter()
+      .append('rect')
+      .attr('class', d => `bar bar-${colorClass[d.fieldIndex % colorClass.length]}`)
+      .attr('x', d => x1Scale(d.field))
+      .attr('y', d => yScale(d.value))
+      .attr('width', x1Scale.bandwidth())
+      .attr('height', d => innerHeight - yScale(d.value));
+
+    if (useCustomColors) {
+      groupedBars.attr('fill', d => colorValues[d.fieldIndex % colorValues.length]);
+    }
+
+    barGroups.selectAll('.bar-label')
+      .data(row => valueFields.map((field, fieldIndex) => ({
+        field,
+        fieldIndex,
+        value: parseChartNumericValue(row[field])
+      })))
+      .enter()
+      .append('text')
+      .attr('class', 'bar-label')
+      .attr('x', d => x1Scale(d.field) + x1Scale.bandwidth() / 2)
+      .attr('y', d => yScale(d.value) - 6)
+      .attr('text-anchor', 'middle')
+      .attr('fill', dataLabelStyle.fill)
+      .attr('font-size', dataLabelStyle.fontSize)
+      .attr('font-weight', chartStyleConfig?.dataLabel?.fontWeight || '400')
+      .text(d => formatCompactChartValue(d.value));
+
+    if (chartTitle) {
+      const titleStyle = getResolvedTitleStyle(chartStyleConfig);
+      svg.append('g').attr('class', 'ee-chart-title-wrap')
+        .append('text')
+        .attr('x', width / 2)
+        .attr('y', 24)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', titleStyle.fontSize)
+        .attr('font-weight', titleStyle.fontWeight)
+        .attr('fill', titleStyle.fill)
+        .text(chartTitle);
+    }
+
+    const legendItems = valueFields.map((field, i) => ({
+      label: field,
+      color: colorValues[i % colorValues.length],
+      colorClass: colorClass[i % colorClass.length],
+      type: 'bar'
+    }));
+    generateLegend(g, innerHeight, legendItems, displayConfig, chartStyleConfig, 52);
+
+    injectChartThemeStyle(svg, {
+      axisStyle,
+      gridStyle,
+      legendStyle: getResolvedLegendStyle(displayConfig, chartStyleConfig),
+      titleStyle: getResolvedTitleStyle(chartStyleConfig)
+    });
+
+    return svg.node().outerHTML;
+  } catch (error) {
+    console.error('生成簇状柱形图时发生错误:', error);
+    return generateErrorSvg('生成簇状柱形图失败: ' + error.message);
+  }
+}
+
+/**
  * 生成水平柱状图
  * @param {Array} data - 图表数据
  * @param {string} dateField - 日期字段名
@@ -2443,6 +2691,7 @@ function generateErrorSvg(errorMessage) {
 export default {
   generateChartFromTableData,
   generateGroupedLineChart,
+  generateGroupedBarChart,
   generateAreaChart,
   generateBarChart,
   generateBarHChart,

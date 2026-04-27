@@ -13,6 +13,8 @@ export function parseChartTagSpec(fullChartSpec) {
   let chartType = parts[0] || null;
   if (chartType === 'TreeMind') {
     chartType = 'tree_mind';
+  } else if (chartType === 'groupedBar') {
+    chartType = 'grouped_bar';
   }
 
   const options = {};
