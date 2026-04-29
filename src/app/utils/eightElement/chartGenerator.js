@@ -1685,20 +1685,23 @@ function generateGroupedBarChart(data, dateField, valueFields, width, height, ma
     const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
     const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
     const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
+    const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
+    // 与簇内柱序一致：第 0 根最深，沿序变浅，再多系列用区分色（不再紫/蓝交错，避免明暗跳跃）
     const defaultColorValues = [
       colorBrand6,
       colorBrand5,
       colorBrand4,
-      '#f59e0b',
-      '#fde68a',
-      '#d9f99d',
-      '#86efac',
-      '#67e8f9',
-      '#60a5fa',
-      '#3b82f6'
+      colorBrand3,
+      '#76b7b2',
+      '#59a14f',
+      '#edc949',
+      '#af7aa1',
+      '#ff9da7',
+      '#9c755f',
+      '#bab0ab'
     ];
-    const defaultColorClass = ['color-brand6', 'color-brand5', 'color-brand4'];
-    const { colorValues, colorClass, useCustomColors } = getChartColorsFromConfig(chartStyleConfig, {
+    const defaultColorClass = defaultColorValues.map((_, i) => `grouped-${i}`);
+    const { colorValues, colorClass } = getChartColorsFromConfig(chartStyleConfig, {
       colorValues: defaultColorValues,
       colorClass: defaultColorClass
     });
@@ -1816,9 +1819,7 @@ function generateGroupedBarChart(data, dateField, valueFields, width, height, ma
       .attr('width', x1Scale.bandwidth())
       .attr('height', d => innerHeight - yScale(d.value));
 
-    if (useCustomColors) {
-      groupedBars.attr('fill', d => colorValues[d.fieldIndex % colorValues.length]);
-    }
+    groupedBars.attr('fill', d => colorValues[d.fieldIndex % colorValues.length]);
 
     if (chartTitle) {
       const titleStyle = getResolvedTitleStyle(chartStyleConfig);
