@@ -287,7 +287,8 @@ const MINIMALIST_CARD_STYLE = {
             // 左侧标题
             headerTitle: {
                 style: {
-                    width: '105px',
+                    // width: '105px',
+                    width: 'auto',
                 },
                 metaType: 'text',
                 variant: 'minimalistChartCardHeaderTitle',
