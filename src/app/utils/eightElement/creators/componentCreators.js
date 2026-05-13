@@ -1384,6 +1384,7 @@ function buildChartElementFromContent(slotName, slotConfig, slotContent, attribu
     const chartType = attributes.chart || 'line';
     const chartTitle = attributes.title || null;
     const sortOrder = attributes.sort || null;
+    const chartRate = attributes.rate || null;
     const tableLines = trimmedContent
         .split('\n')
         .map(line => line.trimEnd())
@@ -1400,6 +1401,9 @@ function buildChartElementFromContent(slotName, slotConfig, slotContent, attribu
     }
     if (sortOrder) {
         headerParts.push(sortOrder);
+    }
+    if (chartRate) {
+        headerParts.push(`rate=${chartRate}`);
     }
     const syntheticHeader = `[chart:${headerParts.join('|')}]`;
     const syntheticLines = [syntheticHeader, ...tableLines];
@@ -1438,7 +1442,8 @@ function buildChartElementFromContent(slotName, slotConfig, slotContent, attribu
             chartData.tableContent,
             slotConfig.variant || 'mini',
             finalChartTitle,
-            []
+            [],
+            chartData.chartRate
         );
 
         const chartStyleConfig = {
@@ -2703,4 +2708,3 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
 
     return componentElement;
 }
-

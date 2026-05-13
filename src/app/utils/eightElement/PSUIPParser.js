@@ -824,6 +824,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
         let chartType = parsed.chartType;
         const chartTitle = parsed.chartTitle;
         const sortOrder = parsed.sortOrder;
+        const chartRate = parsed.chartRate || null;
 
         const chartKey = `chart:${chartType}`;
 
@@ -841,6 +842,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
                     chartType: chartType,
                     chartTitle: chartTitle, // 🆕 添加图表标题
                     sortOrder: sortOrder, // 🆕 添加排序参数
+                    chartRate,
                     templatePath: processedTemplatePath,
                     content: line.trim(),
                     wildcard: wildcardResult.wildcard,
@@ -860,6 +862,7 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
                     chartType: chartType,
                     chartTitle: chartTitle, // 🆕 添加图表标题
                     sortOrder: sortOrder, // 🆕 添加排序参数
+                    chartRate,
                     templatePath: templatePath,
                     content: line.trim()
                 },

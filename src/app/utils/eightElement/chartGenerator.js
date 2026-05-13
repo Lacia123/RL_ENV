@@ -531,7 +531,7 @@ function generateLegend(g, innerHeight, items, displayConfig, chartStyleConfig, 
 export function generateChartFromTableData(tableData, chartType, chartStyleConfig = null, chartTitle = null) {
   try {    
     chartType = chartType === 'groupedBar' ? 'grouped_bar' : chartType;
-    const wideCanvasChartTypes = new Set(['bar', 'grouped_bar', 'area_chart', 'donut_chart']);
+    const wideCanvasChartTypes = new Set(['bar', 'grouped_bar', 'area_chart', 'donut_chart', 'funnel']);
 
     // 确保至少有标题行和一行数据
     if (!tableData || tableData.length < 2) {
@@ -598,7 +598,7 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
       const item = { [dateField]: row[0] };
       valueFields.forEach((field, i) => {
         // 尝试转换为数字，如果失败则保留为0
-        item[field] = parseFloat(row[i + 1]) || 0;
+        item[field] = parseChartNumericValue(row[i + 1]);
       });
       return item;
     });
@@ -633,6 +633,8 @@ export function generateChartFromTableData(tableData, chartType, chartStyleConfi
         return generateGroupedBarChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'barh':
         return generateBarHChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
+      case 'funnel':
+        return generateFunnelChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'pie':
         return generatePieChart(chartData, dateField, valueFields, width, height, margin, chartStyleConfig, displayConfig, chartTitle);
       case 'donut_chart':
@@ -2060,6 +2062,227 @@ function generateBarHChart(data, dateField, valueFields, width, height, margin, 
   } catch (error) {
     console.error('生成水平柱状图时发生错误:', error);
     return generateErrorSvg('生成水平柱状图失败: ' + error.message);
+  }
+}
+
+/**
+ * 生成漏斗图
+ * @param {Array} data - 图表数据
+ * @param {string} dateField - 阶段字段名
+ * @param {Array} valueFields - 数值字段名数组，漏斗图固定只使用第二列
+ * @param {number} width - 图表宽度
+ * @param {number} height - 图表高度
+ * @param {Object} margin - 图表边距
+ * @param {Object} chartStyleConfig - 图表样式配置
+ * @param {Object} displayConfig - 显示配置
+ * @param {string} chartTitle - 图表标题
+ * @returns {string} - SVG图表的HTML字符串
+ */
+function generateFunnelChart(data, dateField, valueFields, width, height, margin, chartStyleConfig = null, displayConfig = {}, chartTitle = null) {
+  try {
+    if (!valueFields || valueFields.length !== 1) {
+      throw new Error('漏斗图固定两列：第一列为阶段名称，第二列为数量值');
+    }
+
+    const valueField = valueFields[0];
+    const funnelData = data
+      .map((row) => ({
+        name: String(row[dateField] ?? ''),
+        value: parseChartNumericValue(row[valueField])
+      }))
+      .filter((row) => row.name.length > 0);
+
+    if (funnelData.length === 0) {
+      throw new Error('漏斗图至少需要一行有效数据');
+    }
+
+    const { svg } = createJsdomEnv(width, height);
+    applyChartSvgBackground(svg, width, height, chartStyleConfig);
+
+    const colorBrand6 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND6);
+    const colorBrand5 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND5);
+    const colorBrand4 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND4);
+    const colorBrand3 = resolveColor(COLOR_CONSTANTS.PRIMARY.BRAND3);
+    const defaultColorValues = [
+      colorBrand6,
+      colorBrand5,
+      colorBrand4,
+      colorBrand3,
+      '#76b7b2',
+      '#59a14f',
+      '#f28e2c',
+      '#e15759',
+      '#af7aa1',
+      '#9c755f'
+    ];
+    const defaultColorClass = defaultColorValues.map((_, i) => `funnel-${i}`);
+    const { colorValues, colorClass } = getChartColorsFromConfig(chartStyleConfig, {
+      colorValues: defaultColorValues,
+      colorClass: defaultColorClass
+    });
+
+    const chartOffsetY = chartTitle ? 12 : 0;
+    const funnelMargin = {
+      top: Math.max(margin.top, chartTitle ? 44 : 28),
+      right: Math.max(margin.right, 56),
+      bottom: Math.max(displayConfig.isSmallChart ? 28 : 36, 32),
+      left: Math.max(margin.left, 56)
+    };
+    const innerWidth = width - funnelMargin.left - funnelMargin.right;
+    const innerHeight = height - funnelMargin.top - funnelMargin.bottom - chartOffsetY;
+    const g = svg.append('g')
+      .attr('transform', `translate(${funnelMargin.left},${funnelMargin.top + chartOffsetY})`);
+
+    const titleStyle = getResolvedTitleStyle(chartStyleConfig);
+    const dataLabelStyle = getResolvedDataLabelStyle(displayConfig, chartStyleConfig, {
+      fill: '#fff',
+      fontSize: displayConfig.isSmallChart ? '18px' : '14px'
+    });
+
+    const sectionHeight = innerHeight / funnelData.length;
+    const minWidthRatio = 0.12;
+    const centerX = innerWidth / 2;
+    const maxSectionWidth = innerWidth;
+    const minSectionWidth = innerWidth * minWidthRatio;
+
+    const boundaryWidths = Array.from({ length: funnelData.length + 1 }, (_, i) => {
+      const progress = funnelData.length === 0 ? 0 : i / funnelData.length;
+      return maxSectionWidth - (maxSectionWidth - minSectionWidth) * progress;
+    });
+    const leftBoundaryPoints = boundaryWidths.map((boundaryWidth, i) => ({
+      x: centerX - boundaryWidth / 2,
+      y: i * sectionHeight
+    }));
+    const rightBoundaryPoints = boundaryWidths.map((boundaryWidth, i) => ({
+      x: centerX + boundaryWidth / 2,
+      y: i * sectionHeight
+    }));
+
+    const buildMonotoneSideSegments = (points) => {
+      const count = points.length;
+      const segmentCount = count - 1;
+      const h = [];
+      const delta = [];
+      const slopes = Array(count).fill(0);
+
+      for (let i = 0; i < segmentCount; i++) {
+        h[i] = points[i + 1].y - points[i].y;
+        delta[i] = h[i] === 0 ? 0 : (points[i + 1].x - points[i].x) / h[i];
+      }
+
+      slopes[0] = delta[0] || 0;
+      slopes[count - 1] = delta[segmentCount - 1] || 0;
+      for (let i = 1; i < segmentCount; i++) {
+        slopes[i] = delta[i - 1] * delta[i] <= 0
+          ? 0
+          : (delta[i - 1] + delta[i]) / 2;
+      }
+
+      for (let i = 0; i < segmentCount; i++) {
+        if (delta[i] === 0) {
+          slopes[i] = 0;
+          slopes[i + 1] = 0;
+          continue;
+        }
+
+        const alpha = slopes[i] / delta[i];
+        const beta = slopes[i + 1] / delta[i];
+        const sum = alpha * alpha + beta * beta;
+        if (sum > 9) {
+          const tau = 3 / Math.sqrt(sum);
+          slopes[i] = tau * alpha * delta[i];
+          slopes[i + 1] = tau * beta * delta[i];
+        }
+      }
+
+      return Array.from({ length: segmentCount }, (_, i) => {
+        const start = points[i];
+        const end = points[i + 1];
+        const controlOffset = h[i] / 3;
+
+        return {
+          start,
+          end,
+          c1: {
+            x: start.x + slopes[i] * controlOffset,
+            y: start.y + controlOffset
+          },
+          c2: {
+            x: end.x - slopes[i + 1] * controlOffset,
+            y: end.y - controlOffset
+          }
+        };
+      });
+    };
+
+    const leftSideSegments = buildMonotoneSideSegments(leftBoundaryPoints);
+    const rightSideSegments = buildMonotoneSideSegments(rightBoundaryPoints);
+
+    const buildSmoothSegmentPath = (index) => {
+      const leftSide = leftSideSegments[index];
+      const rightSide = rightSideSegments[index];
+
+      return [
+        `M ${leftSide.start.x},${leftSide.start.y}`,
+        `L ${rightSide.start.x},${rightSide.start.y}`,
+        `C ${rightSide.c1.x},${rightSide.c1.y} ${rightSide.c2.x},${rightSide.c2.y} ${rightSide.end.x},${rightSide.end.y}`,
+        `L ${leftSide.end.x},${leftSide.end.y}`,
+        `C ${leftSide.c2.x},${leftSide.c2.y} ${leftSide.c1.x},${leftSide.c1.y} ${leftSide.start.x},${leftSide.start.y}`,
+        'Z'
+      ].join(' ');
+    };
+
+    funnelData.forEach((d, i) => {
+      const y0 = i * sectionHeight;
+      const color = colorValues[i % colorValues.length];
+      const colorClassSuffix = colorClass[i % colorClass.length];
+
+      const segment = g.append('path')
+        .attr('class', `funnel-segment funnel-segment-${colorClassSuffix}`)
+        .attr('d', buildSmoothSegmentPath(i))
+        .attr('fill', color)
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 2)
+        .attr('fill-opacity', 0.88);
+
+      segment.append('title').text(`${d.name}: ${formatCompactChartValue(d.value)}`);
+
+      const label = `${d.name} | ${formatCompactChartValue(d.value)}`;
+      g.append('text')
+        .attr('class', 'funnel-label')
+        .attr('x', centerX)
+        .attr('y', y0 + sectionHeight / 2)
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'middle')
+        .attr('font-size', dataLabelStyle.fontSize)
+        .attr('font-weight', '600')
+        .attr('fill', '#fff')
+        .attr('stroke', 'rgba(0,0,0,0.18)')
+        .attr('stroke-width', '2px')
+        .attr('paint-order', 'stroke')
+        .text(label);
+    });
+
+    if (chartTitle) {
+      svg.append('g').attr('class', 'ee-chart-title-wrap')
+        .append('text')
+        .attr('x', width / 2)
+        .attr('y', 25)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', titleStyle.fontSize)
+        .attr('font-weight', titleStyle.fontWeight)
+        .attr('fill', titleStyle.fill)
+        .text(chartTitle);
+    }
+
+    injectChartThemeStyle(svg, {
+      titleStyle
+    });
+
+    return svg.node().outerHTML;
+  } catch (error) {
+    console.error('生成漏斗图时发生错误:', error);
+    return generateErrorSvg('生成漏斗图失败: ' + error.message);
   }
 }
 

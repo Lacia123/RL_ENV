@@ -2723,13 +2723,19 @@ function renderChartElement(element) {
         return '<div>图表元素结构不完整</div>';
     }
 
-    // 生成容器样式
-    const containerStyleAttr = generateStyleAttribute(element.computedStyle || {});
+    const containerStyle = { ...(element.computedStyle || {}) };
+    const chartAspectRatio = getChartAspectRatioStyle(element);
+    if (chartAspectRatio) {
+        delete containerStyle['aspect-ratio'];
+        containerStyle.aspectRatio = chartAspectRatio;
+        containerStyle.boxSizing = containerStyle.boxSizing || 'border-box';
+    }
 
     // 获取SVG内容
     const svgContent = element.svgContent || '';
 
     if (!svgContent) {
+        const containerStyleAttr = generateStyleAttribute(containerStyle);
         return `<div id="${element.id || ''}" data-element-type="chart" ${containerStyleAttr}>
               <p>图表内容为空</p>
               <pre>${escapeHtml(element.rawData || '')}</pre>
@@ -2742,7 +2748,10 @@ function renderChartElement(element) {
         const classAttr = className ? `class="${className}"` : '';
 
         // 应用图表子元素样式到SVG内容
-        const styledSvgContent = applyChartStyles(svgContent, element);
+        let styledSvgContent = applyChartStyles(svgContent, element);
+        if (chartAspectRatio) {
+            styledSvgContent = makeChartSvgFillContainer(styledSvgContent);
+        }
 
         // 🆕 检查是否有图表切换事件
         const hasChartChangedEvent = element.events && element.events.some(event => 
@@ -2750,19 +2759,23 @@ function renderChartElement(element) {
         );
 
         // 🆕 如果有图表切换事件，添加点击样式和事件属性
-        const clickStyle = hasChartChangedEvent ? 'cursor: pointer;' : '';
+        if (hasChartChangedEvent) {
+            containerStyle.cursor = 'pointer';
+        }
+        const containerStyleAttr = generateStyleAttribute(containerStyle);
         const clickAttr = hasChartChangedEvent ? 'data-chart-clickable="true"' : '';
         const chartTypes = element.events.find(e => e.runtimeEventKey === 'chart_changed')?.parameters?.chartTypes || [];
         const chartTypesAttr = hasChartChangedEvent ? 
             `data-chart-types="${chartTypes.join(',')}"` : '';
 
         return `
-      <div id="${element.id || ''}" ${classAttr} data-element-type="chart" data-chart-type="${element.chartType || ''}" ${containerStyleAttr} style="${clickStyle}" ${clickAttr} ${chartTypesAttr}>
+      <div id="${element.id || ''}" ${classAttr} data-element-type="chart" data-chart-type="${element.chartType || ''}" ${containerStyleAttr} ${clickAttr} ${chartTypesAttr}>
         ${styledSvgContent}
       </div>
     `;
     } catch (error) {
         console.error('图表渲染出错:', error);
+        const containerStyleAttr = generateStyleAttribute(containerStyle);
         return `
       <div id="${element.id || ''}" data-element-type="chart" ${containerStyleAttr}>
         <p>图表渲染错误: ${error.message}</p>
@@ -2770,6 +2783,51 @@ function renderChartElement(element) {
       </div>
     `;
     }
+}
+
+function getChartAspectRatioStyle(element) {
+    const aspectRatio =
+        element?.layout?.aspectRatio ||
+        element?.computedStyle?.aspectRatio ||
+        element?.computedStyle?.['aspect-ratio'];
+
+    if (typeof aspectRatio === 'string' && aspectRatio.trim()) {
+        return aspectRatio.trim();
+    }
+
+    const rate = Number(element?.layout?.rate ?? element?._metadata?.rate);
+    if (Number.isFinite(rate) && rate > 0) {
+        return `${rate}`;
+    }
+
+    return null;
+}
+
+function makeChartSvgFillContainer(svgContent) {
+    if (!svgContent) return svgContent;
+
+    return svgContent.replace(/<svg\b([^>]*)>/i, (match, attrs) => {
+        let updatedAttrs = attrs;
+
+        if (/preserveAspectRatio\s*=/i.test(updatedAttrs)) {
+            updatedAttrs = updatedAttrs.replace(
+                /preserveAspectRatio\s*=\s*"[^"]*"/i,
+                'preserveAspectRatio="xMidYMid meet"'
+            );
+        } else {
+            updatedAttrs += ' preserveAspectRatio="xMidYMid meet"';
+        }
+
+        if (/style\s*=/i.test(updatedAttrs)) {
+            updatedAttrs = updatedAttrs.replace(/style\s*=\s*"([^"]*)"/i, (styleMatch, styleValue) => {
+                const mergedStyle = `${styleValue}; width: 100%; height: 100%; min-height: 0; display: block;`;
+                return `style="${mergedStyle}"`;
+            });
+            return `<svg${updatedAttrs}>`;
+        }
+
+        return `<svg${updatedAttrs} style="width: 100%; height: 100%; min-height: 0; display: block;">`;
+    });
 }
 
 /**

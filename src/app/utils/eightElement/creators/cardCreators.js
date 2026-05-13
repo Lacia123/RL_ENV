@@ -1996,7 +1996,8 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                     chartResult.tableContent,
                                     chartVariant,
                                     chartResult.chartTitle,
-                                    chartEvents
+                                    chartEvents,
+                                    chartResult.chartRate
                                 );
 
                                 // 🆕 生成按钮元素（如果需要）
@@ -2145,7 +2146,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                                 // 🆕 使用辅助函数获取 variant
                                 const chartVariant = getChartVariantFromConfig(markdownResult.templatePath, cardStyleConfig);
 
-                                const errorChartElement = createChartElement(markdownResult.chartType, errorSvg, [], completeChartContent, chartVariant);
+                                const errorChartElement = createChartElement(markdownResult.chartType, errorSvg, [], completeChartContent, chartVariant, null, [], markdownResult.chartRate);
                                 const templateElement = createOrMergeTemplateElement(
                                     markdownResult.templatePath,
                                     completeChartContent,
@@ -2165,7 +2166,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                         // 🆕 使用辅助函数获取 variant
                         const chartVariant = getChartVariantFromConfig(markdownResult.templatePath, cardStyleConfig);
 
-                        const emptyChartElement = createChartElement(markdownResult.chartType, '', [], chartHeaderLine, chartVariant);
+                        const emptyChartElement = createChartElement(markdownResult.chartType, '', [], chartHeaderLine, chartVariant, null, [], markdownResult.chartRate);
                         const templateElement = createOrMergeTemplateElement(
                             markdownResult.templatePath,
                             chartHeaderLine,

@@ -1,12 +1,45 @@
 /**
  * 解析 [chart:...] 标签中竖线分隔的片段。
  * 兼容旧格式：[chart:type|标题|asc|desc]
- * 新格式从第 3 段起支持 key=value（如蜡烛图 scheme=cn_a、time=日期）。
+ * 新格式从第 3 段起支持 key=value（如蜡烛图 scheme=cn_a、time=日期、rate=16/9）。
  */
+
+function parseChartRate(rateValue) {
+  if (rateValue == null) return null;
+
+  const raw = String(rateValue).trim();
+  if (!raw) return null;
+
+  let numerator;
+  let denominator;
+
+  const ratioMatch = raw.match(/^(\d+(?:\.\d+)?)\s*[/:]\s*(\d+(?:\.\d+)?)$/);
+  if (ratioMatch) {
+    numerator = Number(ratioMatch[1]);
+    denominator = Number(ratioMatch[2]);
+  } else {
+    numerator = Number(raw);
+    denominator = 1;
+  }
+
+  if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || numerator <= 0 || denominator <= 0) {
+    return null;
+  }
+
+  const value = numerator / denominator;
+  if (!Number.isFinite(value) || value <= 0) {
+    return null;
+  }
+
+  return {
+    value,
+    cssValue: ratioMatch ? `${numerator} / ${denominator}` : `${value}`
+  };
+}
 
 /**
  * @param {string} fullChartSpec - [chart: 与 ] 之间的内容
- * @returns {{ chartType: string|null, chartTitle: string|null, sortOrder: string|null, options: Record<string, string> }}
+ * @returns {{ chartType: string|null, chartTitle: string|null, sortOrder: string|null, chartRate: null|{value: number, cssValue: string}, options: Record<string, string> }}
  */
 export function parseChartTagSpec(fullChartSpec) {
   const parts = (fullChartSpec || '').split('|').map(s => s.trim());
@@ -39,7 +72,7 @@ export function parseChartTagSpec(fullChartSpec) {
   };
 
   if (parts.length < 2) {
-    return { chartType, chartTitle, sortOrder, options };
+    return { chartType, chartTitle, sortOrder, chartRate: null, options };
   }
 
   const second = parts[1];
@@ -62,5 +95,5 @@ export function parseChartTagSpec(fullChartSpec) {
     }
   }
 
-  return { chartType, chartTitle, sortOrder, options };
+  return { chartType, chartTitle, sortOrder, chartRate: parseChartRate(options.rate), options };
 }

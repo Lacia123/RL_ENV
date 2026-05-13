@@ -16,7 +16,7 @@ import CrepeMarkdownEditor from '../components/CrepeMarkdownEditor';
 // 格式：templateId: { name: '显示名称', description: '描述', markdown: '模板内容' }
 // 支持的特殊语法：
 // - <layout:row> 水平布局
-// - [chart:type] 图表（支持 line, bar, pie, grouped_line, barh 等）
+// - [chart:type] 图表（支持 line, bar, pie, grouped_line, barh, funnel 等）
 // - **粗体** ~~删除线~~ 等 markdown 格式
 // - 数学公式 $inline$ 和 $$block$$
 // - 表格、代码块、引用等标准 markdown 语法
@@ -95,6 +95,8 @@ const MARKDOWN_TEMPLATES = {
 ## 四、市场图表示例
 为了更直观地展示不同图表类型，这里提供柱状图、面积图和环状图的对比示例。
 
+<layout:row>
+
 [chart:bar|季度销售额（万元）]
 | 季度 | 销售额 |
 |------|--------|
@@ -113,6 +115,19 @@ const MARKDOWN_TEMPLATES = {
 | IL | 1630000 | 1730000 | 1800000 | 1740000 |
 | PA | 1470000 | 1620000 | 1720000 | 1530000 |
 
+[chart:funnel|转化漏斗分析]
+| 阶段名称   | 数量值  |
+|------------|---------|
+| 访问网站   | 10000   |
+| 加入购物车 | 6500    |
+| 提交订单   | 3800    |
+| 支付成功   | 2200    |
+| 完成交易   | 1800    |
+
+</layout:row>
+
+<layout:row>
+
 [chart:area_chart|AI-PC 趋势]
 | 时间 | 出货量 | 渗透率 |
 |------|--------|--------|
@@ -126,6 +141,8 @@ const MARKDOWN_TEMPLATES = {
 | 轻薄本 | 45 |
 | 游戏本 | 35 |
 | 工作站 | 20 |
+
+</layout:row>
 </card:headerCard>
 
       <card:headerCard background={color.primarycontainer.brand0}>
@@ -1515,14 +1532,16 @@ const userRoles = {
     ### 头部品牌分析
     联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
 
-    [chart:barh|AI-PC 市场份额][event:chart_changed(barh,bar,pie)|style:button]
+    <layout:row>
+
+    [chart:barh|AI-PC 市场份额|rate=16/9][event:chart_changed(barh,bar,pie)|style:button]
     | 品牌 | 市场份额 |
     |------|----------|
     | 联想 | 35% |
     | 苹果 | 28% |
     | 荣耀 | 18% |
 
-    [chart:grouped_line|心流指标趋势]
+    [chart:grouped_line|心流指标趋势|rate=16/9]
     | 日期 | 心流满意度FSV | 心流专注值FFV | 心流效能值FEV |
     | --- | --- | --- | --- |
     | 2025-03-10 | 0.0 | 0.36 | 2.55 |
@@ -1530,7 +1549,7 @@ const userRoles = {
     | 2025-03-12 | 0.0 | 0.36 | 2.64 |
     | 2025-03-13 | 0.0 | 0.32 | 2.94 |
 
-    [chart:candlestick|心流模拟K线|scheme=cn_a|time=日期|open=开盘|high=最高|low=最低|close=收盘]
+    [chart:candlestick|心流模拟K线|scheme=cn_a|time=日期|open=开盘|high=最高|low=最低|close=收盘|rate=16/9]
     | 日期 | 开盘 | 最高 | 最低 | 收盘 |
     | --- | --- | --- | --- | --- |
     | 2025-03-10 | 2.4 | 2.7 | 2.3 | 2.55 |
@@ -1538,12 +1557,27 @@ const userRoles = {
     | 2025-03-12 | 2.22 | 2.75 | 2.2 | 2.64 |
     | 2025-03-13 | 2.64 | 3.0 | 2.5 | 2.94 |
 
-    [chart:pie|笔记本市场占比]
+    </layout:row>
+
+    <layout:row>
+
+    [chart:funnel|转化漏斗分析|rate=16/9]
+    | 阶段名称   | 数量值  |
+    |------------|---------|
+    | 支付成功   | 2200    |
+    | 完成交易   | 1800    |
+    | 访问网站   | 10000   |
+    | 加入购物车 | 6500    |
+    | 提交订单   | 3800    |
+
+    [chart:pie|笔记本市场占比|rate=16/9]
     | 类型 | 占比 |
     |------|------|
     | 游戏本 | 40% |
     | 轻薄本 | 35% |
     | 工作站 | 25% |
+
+    </layout:row>
 
     </card:minimalistChartCard>
 
@@ -3406,6 +3440,7 @@ const EightElementAnalyzer = () => {
     resizeStartPos: { x: 0, y: 0 },
     resizeStartSize: { leftWidth: 0, topHeight: 0 }
   });
+  const iframeResizeHandlersRef = useRef(null);
 
   // 处理拖拽调整面板大小的函数
   const handleResizeStart = useCallback((direction, e) => {
@@ -3439,8 +3474,31 @@ const EightElementAnalyzer = () => {
     };
 
     // 添加全局鼠标事件监听器
-    document.addEventListener('mousemove', handleResizeMove);
-    document.addEventListener('mouseup', handleResizeEnd);
+    window.addEventListener('mousemove', handleResizeMove);
+    window.addEventListener('mouseup', handleResizeEnd);
+
+    const iframeWindow = iframeRef.current?.contentWindow;
+    if (iframeWindow) {
+      const iframeMouseMoveHandler = (iframeEvent) => {
+        const iframeRect = iframeRef.current?.getBoundingClientRect();
+        if (!iframeRect) return;
+
+        handleResizeMove({
+          clientX: iframeRect.left + iframeEvent.clientX,
+          clientY: iframeRect.top + iframeEvent.clientY
+        });
+      };
+      const iframeMouseUpHandler = () => handleResizeEnd();
+
+      iframeResizeHandlersRef.current = {
+        iframeWindow,
+        iframeMouseMoveHandler,
+        iframeMouseUpHandler
+      };
+
+      iframeWindow.addEventListener('mousemove', iframeMouseMoveHandler);
+      iframeWindow.addEventListener('mouseup', iframeMouseUpHandler);
+    }
   }, [panelSizes.leftWidth, panelSizes.topHeight]);
 
   const handleResizeMove = useCallback((e) => {
@@ -3488,15 +3546,29 @@ const EightElementAnalyzer = () => {
     dragStateRef.current.isResizing = false;
 
     // 移除全局事件监听器
-    document.removeEventListener('mousemove', handleResizeMove);
-    document.removeEventListener('mouseup', handleResizeEnd);
+    window.removeEventListener('mousemove', handleResizeMove);
+    window.removeEventListener('mouseup', handleResizeEnd);
+
+    if (iframeResizeHandlersRef.current) {
+      const { iframeWindow, iframeMouseMoveHandler, iframeMouseUpHandler } = iframeResizeHandlersRef.current;
+      iframeWindow.removeEventListener('mousemove', iframeMouseMoveHandler);
+      iframeWindow.removeEventListener('mouseup', iframeMouseUpHandler);
+      iframeResizeHandlersRef.current = null;
+    }
   }, []);
 
   // 清理事件监听器
   useEffect(() => {
     return () => {
-      document.removeEventListener('mousemove', handleResizeMove);
-      document.removeEventListener('mouseup', handleResizeEnd);
+      window.removeEventListener('mousemove', handleResizeMove);
+      window.removeEventListener('mouseup', handleResizeEnd);
+
+      if (iframeResizeHandlersRef.current) {
+        const { iframeWindow, iframeMouseMoveHandler, iframeMouseUpHandler } = iframeResizeHandlersRef.current;
+        iframeWindow.removeEventListener('mousemove', iframeMouseMoveHandler);
+        iframeWindow.removeEventListener('mouseup', iframeMouseUpHandler);
+        iframeResizeHandlersRef.current = null;
+      }
     };
   }, [handleResizeMove, handleResizeEnd]);
 

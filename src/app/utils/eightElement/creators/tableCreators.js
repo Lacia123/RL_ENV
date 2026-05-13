@@ -220,6 +220,7 @@ function extractTableOrChartData(lines, startIndex) {
     let chartTitle = null;
     let sortOrder = null;
     let candlestickSpec = null;
+    let chartRate = null;
 
     if (isChart) {
         const fullChartSpec = chartMatch[1];
@@ -227,6 +228,7 @@ function extractTableOrChartData(lines, startIndex) {
         chartType = parsed.chartType;
         chartTitle = parsed.chartTitle;
         sortOrder = parsed.sortOrder;
+        chartRate = parsed.chartRate || null;
         if (chartType === 'candlestick') {
             candlestickSpec = parsed.options || {};
         }
@@ -269,6 +271,7 @@ function extractTableOrChartData(lines, startIndex) {
         chartType: chartType,
         chartTitle: chartTitle, // 🆕 添加图表标题
         sortOrder: sortOrder, // 🆕 添加排序参数
+        chartRate,
         candlestickSpec,
         tableContent: originalContent, // 🔧 修复：返回原始内容（包含样式语法），让 createTableElement 来解析和清理
         tableData: tableData,
@@ -458,9 +461,10 @@ function addChartEventButton(chartElement, originalFirstLine) {
 }
 
 // 创建图表元素
-function createChartElement(chartType, svgContent, tableData, rawData, variant = 'normal', chartTitle = null, events = []) {
+function createChartElement(chartType, svgContent, tableData, rawData, variant = 'normal', chartTitle = null, events = [], chartRate = null) {
     const id = generateUUID();
     const layoutStyleConfig = getElementStyleConfig('layout', 'column');
+    const hasChartRate = chartRate && Number.isFinite(chartRate.value) && chartRate.value > 0;
 
     // 🆕 根据 variant 获取对应的图表样式配置
     const chartContainerStyleConfig = getElementStyleConfig('chart', variant, 'container');
@@ -566,6 +570,13 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
         events: events.length > 0 ? events : [{}]
     };
 
+    if (hasChartRate) {
+        chartElement._metadata.rate = chartRate.value;
+        chartElement.layout.rate = chartRate.value;
+        chartElement.layout.aspectRatio = chartRate.cssValue;
+        chartElement.layout.style.aspectRatio = chartRate.cssValue;
+    }
+
     return chartElement;
 }
 
@@ -587,7 +598,7 @@ function generateChartSvg(chartType, data, chartStyleConfig = null, chartTitle =
 
 // 处理表格数据 - 决定创建普通表格还是图表元素
 function processTableOrChartData(result, stack) {
-    const { isChart, chartType, chartTitle, sortOrder, candlestickSpec, tableContent, tableData, endIndex, originalFirstLine } = result;
+    const { isChart, chartType, chartTitle, sortOrder, chartRate, candlestickSpec, tableContent, tableData, endIndex, originalFirstLine } = result;
 
     if (isChart) {
         // 处理为图表
@@ -598,7 +609,7 @@ function processTableOrChartData(result, stack) {
                     : sortTableData(tableData, sortOrder);
             
             // 先创建基础图表元素（无事件），以便拿到图表 id 作为事件载体
-            const tempChartElement = createChartElement(chartType, '', sortedTableData, tableContent, 'normal', chartTitle, []);
+            const tempChartElement = createChartElement(chartType, '', sortedTableData, tableContent, 'normal', chartTitle, [], chartRate);
 
             // 解析图表行中的事件，EventTargetId 设为图表 id
             const chartEvents = [];
@@ -608,7 +619,7 @@ function processTableOrChartData(result, stack) {
             }
 
             // 重新创建最终图表元素，带事件
-            const chartElement = createChartElement(chartType, '', sortedTableData, tableContent, 'normal', chartTitle, chartEvents);
+            const chartElement = createChartElement(chartType, '', sortedTableData, tableContent, 'normal', chartTitle, chartEvents, chartRate);
 
             // 🆕 生成按钮元素（如果需要）
             const buttonElement = addChartEventButton(chartElement, originalFirstLine);
@@ -689,7 +700,7 @@ function processTableOrChartData(result, stack) {
             ${error.message || '未知错误'}
           </text>
         </svg>`;
-            const chartElement = createChartElement(chartType, errorSvg, tableData, tableContent, 'normal');
+            const chartElement = createChartElement(chartType, errorSvg, tableData, tableContent, 'normal', null, [], chartRate);
             stack[stack.length - 1].elements.push(chartElement);
         }
     } else {
