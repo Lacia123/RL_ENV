@@ -137,7 +137,7 @@ function createJsdomEnv(width = 800, height = 500) {
     .attr('width', '100%')
     .attr('height', '100%')
     .attr('viewBox', `0 0 ${width} ${height}`)
-    .attr('preserveAspectRatio', 'none')
+    .attr('preserveAspectRatio', 'xMidYMid meet')
     .attr('xmlns', 'http://www.w3.org/2000/svg')
     .style('width', '100%')
     .style('height', '100%')
