@@ -1,4 +1,5 @@
 import { EVENT_NAME, EVENT_CONFIG, NATIVE_EVENT_KEY } from './eventConfig.js';
+import { createNativeEventConfig } from './eventUtils.js';
 import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig } from './styles';
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance, generateUUID } from './util.js';  // 🆕 添加 generateUUID
@@ -167,18 +168,15 @@ function parseEventSyntax(text, elementId, currentMarkdown = '') {
     }
 
     // 🆕 解析 nativeEvent
+    const fullNativeEventMatch = text.match(/^\[nativeEvent:\w+;data:\w+\]\s*\[([^\]]+)\]\([^)]*\)$/);
+    const nativeEventRaw = fullNativeEventMatch ? fullNativeEventMatch[1].trim() : removeEventSyntax(text);
+
     while ((match = nativeEventPattern.exec(text)) !== null) {
         const nativeKey = match[1];
         const dataKey = match[2];
-        const validNativeKeys = Object.values(NATIVE_EVENT_KEY);
-
-        if (validNativeKeys.includes(nativeKey)) {
-            events.push({
-                nativeEventKey: nativeKey,
-                dataEventKey: dataKey
-            });
-        } else {
-            console.warn(`⚠️ 无效的 nativeEventKey: ${nativeKey}`);
+        const eventConfig = createNativeEventConfig(nativeKey, dataKey, nativeEventRaw);
+        if (eventConfig) {
+            events.push(eventConfig);
         }
     }
 

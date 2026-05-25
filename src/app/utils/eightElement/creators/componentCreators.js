@@ -912,7 +912,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             
             // 🆕 处理 nativeEvent 和 data 属性
             if (attributes && attributes.nativeEvent && attributes.data) {
-                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data, slotContent);
                 if (nativeEventConfig && textElement) {
                     if (textElement.events.length === 1 && Object.keys(textElement.events[0]).length === 0) {
                         textElement.events[0] = nativeEventConfig;
@@ -977,7 +977,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             
             // 🆕 处理 nativeEvent 和 data 属性
             if (attributes && attributes.nativeEvent && attributes.data) {
-                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data, slotContent);
                 if (nativeEventConfig && imageElement) {
                     if (imageElement.events.length === 1 && Object.keys(imageElement.events[0]).length === 0) {
                         imageElement.events[0] = nativeEventConfig;
@@ -1111,7 +1111,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             
             // 🆕 处理 nativeEvent 和 data 属性
             if (attributes && attributes.nativeEvent && attributes.data) {
-                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data, slotContent);
                 if (nativeEventConfig && element) {
                     if (element.events.length === 1 && Object.keys(element.events[0]).length === 0) {
                         element.events[0] = nativeEventConfig;
@@ -1139,7 +1139,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             
             // 🆕 处理 nativeEvent 和 data 属性
             if (attributes && attributes.nativeEvent && attributes.data) {
-                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data, buttonText);
                 if (nativeEventConfig && element) {
                     if (element.events.length === 1 && Object.keys(element.events[0]).length === 0) {
                         element.events[0] = nativeEventConfig;
@@ -1190,7 +1190,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             
             // 🆕 处理 nativeEvent 和 data 属性
             if (attributes && attributes.nativeEvent && attributes.data) {
-                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
+                const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data, slotContent);
                 if (nativeEventConfig && element) {
                     if (element.events.length === 1 && Object.keys(element.events[0]).length === 0) {
                         element.events[0] = nativeEventConfig;
@@ -1338,7 +1338,7 @@ function buildButtonElementFromDefinition(slotConfig, buttonText, buttonAttribut
     const data = buttonAttributes.data || outerAttributes.data;
     
     if (nativeEvent && data) {
-        const nativeEventConfig = createNativeEventConfig(nativeEvent, data);
+        const nativeEventConfig = createNativeEventConfig(nativeEvent, data, finalText);
         if (nativeEventConfig && buttonElement) {
             if (buttonElement.events.length === 1 && Object.keys(buttonElement.events[0]).length === 0) {
                 buttonElement.events[0] = nativeEventConfig;
@@ -2257,7 +2257,7 @@ function createMetaTypeComponent(content, variant, componentConfig, markdownData
         
         // 🆕 处理 nativeEvent 和 data 属性 (针对 containerElement)
         if (externalParameters && externalParameters.nativeEvent && externalParameters.data) {
-            const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data);
+            const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data, content);
             if (nativeEventConfig) {
                 if (containerElement.events.length === 1 && Object.keys(containerElement.events[0]).length === 0) {
                     containerElement.events[0] = nativeEventConfig;
@@ -2272,7 +2272,7 @@ function createMetaTypeComponent(content, variant, componentConfig, markdownData
     
     // 🆕 处理 nativeEvent 和 data 属性 (针对 elementInstance，当没有容器时)
     if (elementInstance && externalParameters && externalParameters.nativeEvent && externalParameters.data) {
-        const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data);
+        const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data, content);
         if (nativeEventConfig) {
             // elementInstance 应该也有 events 数组
             if (!elementInstance.events) {
@@ -2692,7 +2692,7 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
     
     // 🆕 处理 nativeEvent 和 data 属性 (针对 createTemplateComponent)
     if (externalParameters && externalParameters.nativeEvent && externalParameters.data) {
-        const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data);
+        const nativeEventConfig = createNativeEventConfig(externalParameters.nativeEvent, externalParameters.data, content);
         if (nativeEventConfig) {
             if (!componentElement.events) {
                 componentElement.events = [];
