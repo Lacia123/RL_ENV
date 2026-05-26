@@ -121,12 +121,12 @@ function isIconTag(line) {
     return { isIconTag: false };
 }
 
-// 解析事件语法 [event:eventName] 或 [nativeEvent:nativeKey;data:dataKey] 并返回事件配置
+// 解析事件语法 [event:eventName] 或 [nativeEvent:nativeKey][;data:dataKey] 并返回事件配置
 function parseEventSyntax(text, elementId, currentMarkdown = '') {
     // 🆕 更新事件模式以支持带参数的事件：[event:eventName(param1,param2)]
     const eventPattern = /\[event:(\w+)(?:\(([^)]*)\))?\]/g;
-    // 🆕 支持 nativeEvent 语法：[nativeEvent:key;data:key]
-    const nativeEventPattern = /\[nativeEvent:(\w+);data:(\w+)\]/g;
+    // 🆕 支持 nativeEvent 语法：[nativeEvent:key] 或 [nativeEvent:key;data:key]
+    const nativeEventPattern = /\[nativeEvent:(\w+)(?:;data:(\w+))?\]/g;
 
     const events = [];
     let match;
@@ -168,12 +168,12 @@ function parseEventSyntax(text, elementId, currentMarkdown = '') {
     }
 
     // 🆕 解析 nativeEvent
-    const fullNativeEventMatch = text.match(/^\[nativeEvent:\w+;data:\w+\]\s*\[([^\]]+)\]\([^)]*\)$/);
+    const fullNativeEventMatch = text.match(/^\[nativeEvent:\w+(?:;data:\w+)?\]\s*\[([^\]]+)\]\([^)]*\)$/);
     const nativeEventRaw = fullNativeEventMatch ? fullNativeEventMatch[1].trim() : removeEventSyntax(text);
 
     while ((match = nativeEventPattern.exec(text)) !== null) {
         const nativeKey = match[1];
-        const dataKey = match[2];
+        const dataKey = match[2] || '';
         const eventConfig = createNativeEventConfig(nativeKey, dataKey, nativeEventRaw);
         if (eventConfig) {
             events.push(eventConfig);
@@ -193,7 +193,7 @@ function removeEventSyntax(text) {
     }
 
     // 🆕 检查完整的 nativeEvent 按钮语法
-    const fullNativeEventMatch = text.match(/^\[nativeEvent:\w+;data:\w+\]\s*\[([^\]]+)\]\(([^)]*)\)$/);
+    const fullNativeEventMatch = text.match(/^\[nativeEvent:\w+(?:;data:\w+)?\]\s*\[([^\]]+)\]\(([^)]*)\)$/);
     if (fullNativeEventMatch) {
         return fullNativeEventMatch[1].trim();
     }
@@ -202,7 +202,7 @@ function removeEventSyntax(text) {
     let cleanedText = text.replace(/\[event:\w+(?:\([^)]*\))?\]/g, '').trim();
 
     // 🆕 清理 nativeEvent 标记
-    cleanedText = cleanedText.replace(/\[nativeEvent:\w+;data:\w+\]/g, '').trim();
+    cleanedText = cleanedText.replace(/\[nativeEvent:\w+(?:;data:\w+)?\]/g, '').trim();
 
     return cleanedText;
 }
@@ -603,8 +603,8 @@ function parseMarkdownToTemplate(line, markdownMapping, listItemCounter = 0) {
         }
     }
 
-    // 🆕 检查原生事件语法格式 [nativeEvent:nativeKey;data:dataKey][text](url)
-    const nativeEventLinkMatch = line.match(/^\[nativeEvent:\w+;data:\w+\]\s*\[([^\]]+)\]\(([^)]*)\)$/);
+    // 🆕 检查原生事件语法格式 [nativeEvent:nativeKey][;data:dataKey][text](url)
+    const nativeEventLinkMatch = line.match(/^\[nativeEvent:\w+(?:;data:\w+)?\]\s*\[([^\]]+)\]\(([^)]*)\)$/);
     if (nativeEventLinkMatch) {
         const primaryButtonMapping = markdownMapping['button:primary'];
         if (primaryButtonMapping) {

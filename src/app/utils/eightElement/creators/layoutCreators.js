@@ -353,7 +353,7 @@ function createLayoutElement(direction, children = [], options = {}) {
     }
 
     // 🆕 处理 nativeEvent 和 data 属性
-    if (attributes.nativeEvent && attributes.data) {
+    if (attributes.nativeEvent) {
         const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
         if (nativeEventConfig) {
             // 如果 events 第一个元素是空对象，则替换它，否则追加

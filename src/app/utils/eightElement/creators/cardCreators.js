@@ -743,7 +743,7 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
     const cardEvents = cardUpdateEvent ? [cardUpdateEvent] : [{}];
 
     // 🆕 处理 nativeEvent 和 data 属性
-    if (attributes.nativeEvent && attributes.data) {
+    if (attributes.nativeEvent) {
         const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
         if (nativeEventConfig) {
             // 如果 cardEvents 第一个元素是空对象，则替换它，否则追加
@@ -1649,7 +1649,7 @@ function parseTemplateCardContent(content, cardStyleConfig, returnElements = fal
                 }
 
                 // 🆕 处理 nativeEvent 和 data 属性
-                if (attributes && attributes.nativeEvent && attributes.data) {
+                if (attributes && attributes.nativeEvent) {
                     const nativeEventConfig = createNativeEventConfig(attributes.nativeEvent, attributes.data);
                     if (nativeEventConfig) {
                         if (!componentElement.events) {

@@ -49,8 +49,8 @@ function parseButtonVariant(text) {
         };
     }
 
-    // 🆕 检查原生事件语法格式：[nativeEvent:nativeKey;data:dataKey][文本](链接)
-    const nativeEventPattern = /^\[nativeEvent:\w+;data:\w+\]\s*\[([^\]]+)\]\(([^)]*)\)$/;
+    // 🆕 检查原生事件语法格式：[nativeEvent:nativeKey][;data:dataKey][文本](链接)
+    const nativeEventPattern = /^\[nativeEvent:\w+(?:;data:\w+)?\]\s*\[([^\]]+)\]\(([^)]*)\)$/;
     const nativeEventMatch = text.match(nativeEventPattern);
     
     if (nativeEventMatch) {
