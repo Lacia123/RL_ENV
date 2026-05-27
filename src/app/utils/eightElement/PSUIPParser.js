@@ -1,8 +1,9 @@
 import { EVENT_NAME, EVENT_CONFIG, NATIVE_EVENT_KEY } from './eventConfig.js';
 import { createNativeEventConfig } from './eventUtils.js';
-import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig } from './styles';
+import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig, getElementStyleConfig } from './styles';
 import { getIcon } from '../icons/index.js';
 import { escapeHtml, getMarkedInstance, generateUUID } from './util.js';  // 🆕 添加 generateUUID
+import resolveToken from '../tokens/resolveToken.js';
 import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './creators/tableCreators.js';
 import { parseChartTagSpec } from './chartSpecParse.js';
 import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './creators/codeCreators.js';
@@ -232,6 +233,39 @@ function processInlineIconText(text) {
         // 如果没有找到图标，返回占位符
         return `<span style="display: inline-flex; align-items: center; color: #6b7280; font-size: 12px; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; margin-right: 4px;">🔲 ${iconPath}</span>`;
     });
+
+    return processedText;
+}
+
+// 处理行内链接 <link [attrs]>text</link> 语法，样式从 textStyle.js 的 inlineLink 配置读取
+function processInlineLinkText(text) {
+    if (!text || typeof text !== 'string') return text;
+
+    // 从 textStyle.js 读取 inlineLink 样式配置
+    const inlineLinkStyle = getElementStyleConfig('text', 'inlineLink');
+    if (!inlineLinkStyle || Object.keys(inlineLinkStyle).length === 0) {
+        return text;
+    }
+
+    // 解析 token，生成内联样式字符串
+    const styleEntries = Object.entries(inlineLinkStyle);
+    const resolvedStyles = styleEntries
+        .filter(([key, value]) => typeof value === 'string' && !key.startsWith('&'))
+        .map(([key, value]) => {
+            const cssProperty = key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+            const resolvedValue = resolveToken(value) || value;
+            return `${cssProperty}: ${resolvedValue}`;
+        })
+        .join(';');
+
+    // 将 <link [attrs]>text</link> 替换为带样式的行内标签，支持属性透传
+    const processedText = text.replace(
+        /<link\b([^>]*)>(.*?)<\/link>/g,
+        (match, attrs, linkText) => {
+            const extraAttrs = attrs.trim();
+            return `<a class="inline-link" style="${resolvedStyles}"${extraAttrs ? ' ' + extraAttrs : ''}>${linkText}</a>`;
+        }
+    );
 
     return processedText;
 }
@@ -943,8 +977,11 @@ function processText(text) {
         // 🆕 处理内联图标语法 [icon:path]，将其转换为SVG
         const textWithIcons = processInlineIconText(cleanedText);
 
+        // 🆕 处理行内链接语法 <link>text</link>
+        const textWithLinks = processInlineLinkText(textWithIcons);
+
         // 预处理文本，优化KaTeX解析
-        const preparedText = prepareMarkdownForKatex(textWithIcons);
+        const preparedText = prepareMarkdownForKatex(textWithLinks);
 
         // 使用markedInstance处理Markdown和KaTeX
         const parseResult = getMarkedInstance().parse(preparedText);

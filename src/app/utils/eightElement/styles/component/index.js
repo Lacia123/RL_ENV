@@ -12,6 +12,7 @@ import HIRING_CARD_STYLE from './hiringCard';
 import SIMPLE_CARD_STYLE from './simpleCard';
 import SUMMARY_CARD_STYLE from './summaryCard';
 import SUMMARY_TRANSPARENT_CARD_STYLE from './summaryTransparentCard';
+import CONTENT_SUMMARY_CARD_STYLE from './contentSummaryCard';
 import HISTORY_CARD_STYLE from './historyCard';
 import FEED_LIST_CHART_TRAN_CARD_STYLE from './feedListChartTranCard';
 import REGULAR_LIST_TABLE_STYLE from './regularListTable';
@@ -36,6 +37,7 @@ const COMPONENT_STYLE = {
         ...SIMPLE_CARD_STYLE,
         ...SUMMARY_CARD_STYLE,
         ...SUMMARY_TRANSPARENT_CARD_STYLE,
+        ...CONTENT_SUMMARY_CARD_STYLE,
         ...HISTORY_CARD_STYLE,
         ...FEED_LIST_CHART_TRAN_CARD_STYLE,
         ...REGULAR_LIST_TABLE_STYLE,

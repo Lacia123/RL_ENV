@@ -221,6 +221,20 @@ const TEXT_STYLE = {
             }
         },
 
+        // 行内链接文本 - 支持 <link>text</link> 语法，浅灰底深色文字标签
+        inlineLink: {
+            display: "inline-block",
+            fontSize: "inherit",
+            fontWeight: "{font.fontweight.medium}",
+            lineHeight: "inherit",
+            color: "{color.basic.opacity.black.64}",
+            backgroundColor: "{color.basic.opacity.black.7}",
+            padding: "2px 6px",
+            borderRadius: "8px",
+            textDecoration: "none",
+            cursor: "pointer",
+        },
+
         // 超链接文本 TODO: 超链接样式暂不支持，因为超链接会被解析成按钮
         hyperlink: {
             fontSize: "inherit",

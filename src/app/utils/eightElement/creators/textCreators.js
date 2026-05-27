@@ -9,6 +9,36 @@ import {
 
 import { processText } from '../PSUIPParser.js';
 import resolveToken from '../../tokens/resolveToken.js'
+import { createNativeEventConfig } from '../eventUtils.js';
+
+function parseInlineLinkNativeEvents(text) {
+    if (!text || typeof text !== 'string') return [];
+
+    const events = [];
+    const linkPattern = /<link\b([^>]*)>([\s\S]*?)<\/link>/g;
+    let linkMatch;
+
+    while ((linkMatch = linkPattern.exec(text)) !== null) {
+        const attrs = linkMatch[1] || '';
+        const linkText = (linkMatch[2] || '').replace(/<[^>]*>/g, '').trim();
+        const nativeEventMatch = attrs.match(/\bnativeEvent\s*=\s*["']([^"']+)["']/);
+
+        if (!nativeEventMatch) continue;
+
+        const dataMatch = attrs.match(/\b(?:data|dataKey|dataEventKey)\s*=\s*["']([^"']+)["']/);
+        const nativeEventConfig = createNativeEventConfig(
+            nativeEventMatch[1],
+            dataMatch ? dataMatch[1] : '',
+            linkText
+        );
+
+        if (nativeEventConfig) {
+            events.push(nativeEventConfig);
+        }
+    }
+
+    return events;
+}
 
 // 新增函数：处理文本中的加粗部分
 function processBoldText(text) {
@@ -108,6 +138,7 @@ function processListItemAndRichText(line) {
 // 创建文本元素 - 修改以支持富文本和KaTeX
 function createTextElement(text, variant = 'p', richTextOptions = {}, customStyles = null) {
     const id = generateUUID();
+    const inlineLinkEvents = parseInlineLinkNativeEvents(text);
     // 获取文本元素的样式配置
     let textStyleConfig = getElementStyleConfig('text', variant);
 
@@ -384,7 +415,7 @@ function createTextElement(text, variant = 'p', richTextOptions = {}, customStyl
         },
         type: "text_body",
         state: "default",
-        events: [{}]
+        events: inlineLinkEvents.length > 0 ? inlineLinkEvents : [{}]
     };
 
     return textElement;

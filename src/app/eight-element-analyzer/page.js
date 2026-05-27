@@ -1972,6 +1972,17 @@ wrapper: {
   <cta_secondary href="https://example.com/agenda">查看议程</cta_secondary>
 </heroCard>
 
+<featureHeroCard>
+  <coverImage src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900"></coverImage>
+  <badge>热门目的地</badge>
+  <title>发现你的下一站旅行</title>
+  <description>个性化行程推荐，AI 智能规划，帮你找到更合适的旅程节奏。</description>
+  <highlights>⭐ 4.9 · 128K 用户</highlights>
+  <highlights>🗺️ 320+ 城市灵感</highlights>
+  <primaryAction href="https://example.com/plan">开始计划</primaryAction>
+  <secondaryAction href="https://example.com/destinations">查看目的地</secondaryAction>
+</featureHeroCard>
+
 <contentDisplayCard>
   <image src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&h=900"></image>
   <title>东京塔夜景体验</title>

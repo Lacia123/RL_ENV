@@ -335,6 +335,371 @@ const MEDIA_CARD_SERIES_STYLE = {
         }
     },
 
+    // 🌄 语义化主视觉推荐卡
+    featureHeroCard: {
+        type: 'template',
+        hasUpdateEvent: true,
+        description: '用于展示产品、活动、会议、目的地、专题内容等重点推荐主视觉。适合首屏重点介绍、强视觉封面、亮点信息和一到两个行动按钮。',
+        usage: {
+            guidance: '优先使用 title + description 表达主标题和说明；需要封面背景时使用 coverImage；需要短标签时使用 badge；需要展示评分、时间、地点、数量、卖点等信息时使用 highlights，可重复多个；主按钮使用 primaryAction，次按钮使用 secondaryAction；命令内容仍使用 command。',
+            psuip: `<featureHeroCard>
+  <coverImage src="https://example.com/cover.jpg"></coverImage>
+  <badge>推荐</badge>
+  <title>主视觉标题</title>
+  <description>用一句话说明推荐内容、活动价值或核心亮点。</description>
+  <highlights>⭐ 4.9 · 128K 用户</highlights>
+  <primaryAction href="https://example.com">立即查看</primaryAction>
+  <secondaryAction href="https://example.com/more">了解更多</secondaryAction>
+</featureHeroCard>`
+        },
+        layoutModes: [
+            {
+                name: 'withCover',
+                condition: 'has:coverImage',
+                style: {
+                    display: 'flex',
+                    flex: "1",
+                    flexDirection: 'column',
+                    borderRadius: '{dimension.borderradius.xxxxl}',
+                    padding: '{dimension.padding.extraloose}',
+                    color: '{color.onprimary.white100}',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    minHeight: '320px',
+                    height: 'auto',
+                    boxShadow: '{material.hierarchy.2f}'
+                },
+                structure: {
+                    groups: [
+                        {
+                            name: 'coverLayer',
+                            slots: ['coverImage'],
+                            type: 'template',
+                            style: {
+                                position: 'absolute',
+                                inset: '0',
+                                zIndex: '0',
+                                overflow: 'hidden',
+                                borderRadius: '{dimension.borderradius.xxxl}',
+                                padding: '0'
+                            }
+                        },
+                        {
+                            name: 'contentLayer',
+                            type: 'template',
+                            style: {
+                                position: 'relative',
+                                zIndex: '1',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.superloose}'
+                            },
+                            groups: [
+                                {
+                                    name: 'badgeRow',
+                                    condition: 'has:badge',
+                                    slots: ['badge'],
+                                    type: 'template',
+                                    style: {
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        gap: '{dimension.gap.tight}',
+                                        flexWrap: 'wrap'
+                                    }
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    slotConsumeBefore: 'title',
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
+                                },
+                                {
+                                    name: 'titleBlock',
+                                    slots: ['title']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    slotConsumeBetween: ['title', 'description'],
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
+                                },
+                                {
+                                    name: 'descriptionBlock',
+                                    condition: 'has:description',
+                                    slots: ['description']
+                                },
+                                {
+                                    name: 'commandBlock',
+                                    condition: 'has:command',
+                                    slots: ['command*'],
+                                    slotConsumeAfter: 'description',
+                                    type: 'template',
+                                    style: {
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
+                                },
+                                {
+                                    name: 'highlightsRow',
+                                    condition: 'has:highlights',
+                                    slots: ['highlights*'],
+                                    type: 'template',
+                                    style: {
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '{dimension.gap.tight}'
+                                    }
+                                },
+                                {
+                                    name: 'actionRow',
+                                    condition: 'has:primaryAction || has:secondaryAction',
+                                    slots: ['primaryAction', 'secondaryAction'],
+                                    type: 'template',
+                                    style: {
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        justifyContent: 'flex-end',
+                                        gap: '{dimension.gap.tight}',
+                                        flexWrap: 'wrap'
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                name: 'default',
+                condition: 'default',
+                style: {
+                    display: 'flex',
+                    flex: '1',
+                    gap: '{dimension.gap.superloose}',
+                    flexDirection: 'column',
+                    borderRadius: '{dimension.borderradius.xxxxl}',
+                    padding: '{dimension.padding.extraloose}',
+                    background: 'linear-gradient(135deg, {color.primary.brand6} 0%, {color.secondary.violet5} 60%, {color.surfacecontainer.black12} 100%)',
+                    color: '{color.onprimary.white100}',
+                    position: 'relative',
+                    minHeight: '280px',
+                    height: 'auto',
+                    boxShadow: '{material.hierarchy.2f}'
+                },
+                structure: {
+                    groups: [
+                        {
+                            name: 'badgeRow',
+                            condition: 'has:badge',
+                            slots: ['badge'],
+                            type: 'template',
+                            style: {
+                                display: 'flex',
+                                flexDirection: 'row',
+                                gap: '{dimension.gap.tight}',
+                                flexWrap: 'wrap'
+                            }
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            slotConsumeBefore: 'title',
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
+                            name: 'titleBlock',
+                            slots: ['title']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            slotConsumeBetween: ['title', 'description'],
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
+                            name: 'descriptionBlock',
+                            condition: 'has:description',
+                            slots: ['description']
+                        },
+                        {
+                            name: 'commandBlock',
+                            condition: 'has:command',
+                            slots: ['command*'],
+                            slotConsumeAfter: 'description',
+                            type: 'template',
+                            style: {
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
+                            name: 'highlightsRow',
+                            condition: 'has:highlights',
+                            slots: ['highlights*'],
+                            type: 'template',
+                            style: {
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '{dimension.gap.tight}'
+                            }
+                        },
+                        {
+                            name: 'actionRow',
+                            condition: 'has:primaryAction || has:secondaryAction',
+                            slots: ['primaryAction', 'secondaryAction'],
+                            type: 'template',
+                            style: {
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'flex-end',
+                                gap: '{dimension.gap.tight}',
+                                flexWrap: 'wrap'
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        style: {
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: '{dimension.borderradius.xxxxl}',
+            padding: '{dimension.padding.extraloose}',
+            background: 'linear-gradient(135deg, {color.primary.brand6} 0%, {color.secondary.violet5} 60%, {color.surfacecontainer.black12} 100%)',
+            color: '{color.onprimary.white100}',
+            position: 'relative',
+            overflow: 'hidden',
+            minHeight: '280px',
+            boxShadow: '{material.hierarchy.2f}'
+        },
+        slotConfigs: {
+            coverImage: {
+                optional: true,
+                description: '主视觉背景封面图。适合产品图、活动海报、目的地图片或会议封面。',
+                type: 'template',
+                style: {
+                    position: 'absolute',
+                    inset: '0',
+                    zIndex: '0',
+                    overflow: 'hidden',
+                    padding: '0',
+                    margin: '0'
+                },
+                metaType: 'image',
+                variant: 'background',
+                variantStyle: {
+                    padding: '0',
+                    margin: '0'
+                }
+            },
+            badge: {
+                optional: true,
+                description: '短标签，例如“热门目的地”“最新活动”“会议邀请”。',
+                metaType: 'text',
+                variant: 'p',
+                variantStyle: {
+                    display: 'inline-block',
+                    fontSize: '{font.size.tiny}',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: '{color.basic.opacity.white.88}',
+                    padding: '{dimension.padding.semitight} {dimension.padding.base}',
+                    borderRadius: '{dimension.borderradius.full}',
+                    backdropFilter: 'blur(10px)',
+                    background: '{color.basic.opacity.white.16}',
+                    margin: '0'
+                }
+            },
+            title: {
+                optional: false,
+                description: '主视觉标题，必须提供。用于表达推荐对象、活动名称、专题名称或核心主张。',
+                metaType: 'text',
+                variant: 'heroTitle'
+            },
+            command: COMMAND_SLOT_CONFIG,
+            'command*': COMMAND_SLOT_CONFIG,
+            description: {
+                optional: true,
+                description: '主标题下方的说明文本，用于说明价值、推荐理由、活动简介或内容摘要。',
+                metaType: 'text',
+                variant: 'heroSubtitle'
+            },
+            highlights: {
+                optional: true,
+                description: '可重复的亮点信息，例如评分、时间、地点、人数、数量、卖点等。',
+                metaType: 'text',
+                variant: 'heroMetric'
+            },
+            primaryAction: {
+                optional: true,
+                description: '主要行动按钮，例如“开始计划”“立即注册”“查看详情”。',
+                metaType: 'button',
+                variant: 'primary',
+                variantStyle: {
+                    minWidth: '160px',
+                    boxShadow: '{material.hierarchy.1f}'
+                }
+            },
+            secondaryAction: {
+                optional: true,
+                description: '次要行动按钮，例如“查看目的地”“查看议程”“了解更多”。',
+                metaType: 'button',
+                variant: 'secondary',
+                variantStyle: {
+                    minWidth: '160px',
+                    background: 'transparent',
+                    color: '{color.onprimary.white100}',
+                    border: '1px solid rgba(255,255,255,0.5)'
+                }
+            }
+        },
+        slots: {
+            coverImage: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
+            badge: { required: false, optional: true },
+            title: { required: true, optional: false },
+            command: { required: false, optional: true },
+            description: { required: false, optional: true },
+            highlights: { required: false, optional: true },
+            primaryAction: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
+            secondaryAction: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
+        },
+        example: {
+            title: '主视觉推荐标题',
+            description: '用一句话说明推荐内容、活动价值或核心亮点。'
+        }
+    },
+
     // 🖼️ 内容展示卡（可视媒体信息卡片）
     contentDisplayCard: {
         type: 'template',

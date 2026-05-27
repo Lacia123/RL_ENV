@@ -208,6 +208,7 @@ export const COLOR_CONSTANTS = {
             },
             BLACK: {
                 100: "{color.basic.opacity.black.100}",
+                64: "{color.basic.opacity.black.64}",
                 20: "{color.basic.opacity.black.20}"
             }
         },

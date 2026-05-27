@@ -1,0 +1,120 @@
+首字悬垂的组
+<card:minimalistChartCard>
+    ## 03
+    ### 头部品牌分析
+    联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
+</card:minimalistChartCard>
+
+链接
+<link>普通链接</link>
+<link nativeEvent="click">可点击链接</link>
+<link data-id="123" nativeEvent="click">带多个属性</link>
+
+
+总结卡片
+contentSummaryCard
+
+
+herocard
+featureHeroCard
+
+
+列表
+feedListCard
+
+<feedListCard>
+  <title>项目动态</title>
+  <subtitle>最新 3 条更新 · 自动排列列表项</subtitle>
+
+  <items>
+    <avatar src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200"></avatar>
+    <icon>🆕</icon>
+    <text>产品团队发布了新的 <strong>AI 摘要</strong> 模块，正在灰度测试。</text>
+    <timestamp>1 小时前</timestamp>
+    <cta_inline href="https://example.com/feedback">回复</cta_inline>
+  </items>
+
+  <items>
+    <avatar src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200"></avatar>
+    <icon>✅</icon>
+    <text>数据组完成了日志清洗，指标可视化延迟降至 <strong>320ms</strong>。</text>
+    <timestamp>2 小时前</timestamp>
+    <cta_inline href="https://example.com/thanks">点赞</cta_inline>
+  </items>
+
+  <items>
+    <icon>📝</icon>
+    <text>市场同学提交了 4 条客户反馈，需要设计 review。</text>
+    <timestamp>昨天</timestamp>
+    <cta_inline href="https://example.com/tasks">查看任务</cta_inline>
+  </items>
+</feedListCard>
+
+
+表格
+tableCard
+
+<tableCard>
+  <icon>📊</icon>
+  <badge>年度报告</badge>
+  <title>2024 年度销售数据</title>
+  <subtitle>季度业绩对比分析</subtitle>
+  <description>本报告展示了全年四个季度的销售表现，包括销售额、增长率和目标完成情况。</description>
+  <table>
+| 季度 | 销售额(万) | 增长率 | 目标完成度 |
+|------|-----------|--------|-----------|
+| Q1 | 1250 | +12% | 104% |
+| Q2 | 1680 | +18% | 112% |
+| Q3 | 1920 | +15% | 108% |
+| Q4 | 2150 | +20% | 115% |
+  </table>
+  <footer>数据更新时间：2024-12-31 | 数据来源：财务系统</footer>
+</tableCard>
+
+
+数学公式
+支持 LaTeX 语法，基于 KaTeX 渲染。系统自动检测公式并应用专门的样式。
+
+行内公式（用单个 $ 包裹）：
+示例：物理学中的质能方程 $E = mc^2$ 揭示了质量与能量的等价关系。
+
+块级公式（用两个 $$ 包裹，独占一行）：
+示例：
+$$
+\oint \mathbf{B} \cdot d\mathbf{l} = \frac{Q_{enc}}{\varepsilon_0}
+$$
+
+常用 LaTeX 写法 （注意反斜线需要双写转义，即 \\ 表示 \）：
+
+分数：$\frac{a}{b}$        → 例如 $\frac{1}{2}$
+上标：$x^2$、$x^{n+1}$
+下标：$a_1$、$a_{ij}$
+平方根：$\sqrt{x}$、$\sqrt[3]{x}$
+求和：$\sum_{i=1}^{n} x_i$
+积分：$\int_{a}^{b} f(x) \, dx$
+极限：$\lim_{x \to 0} \frac{\sin x}{x}$
+矩阵：
+$$
+\begin{matrix}
+a & b \\
+c & d
+\end{matrix}
+$$
+希腊字母：$\alpha$ $\beta$ $\gamma$ $\theta$ $\mu$ $\pi$ $\sigma$ $\Omega$
+运算符：$\times$ $\div$ $\pm$ $\cdot$ $\nabla$ $\partial$ $\infty$
+关系符：$\leq$ $\geq$ $\approx$ $\neq$ $\equiv$ $\propto$
+箭头：$\to$ $\rightarrow$ $\Rightarrow$ $\Leftrightarrow$
+集合：$\in$ $\notin$ $\subset$ $\subseteq$ $\cup$ $\cap$
+三角函数：$\sin x$ $\cos\theta$ $\tan\alpha$
+对数：$\log x$ $\ln y$
+矢量：$\mathbf{v}$ $\vec{F}$
+
+多行公式（使用 aligned 环境）：
+$$
+\begin{aligned}
+E &= mc^2 \\
+F &= ma
+\end{aligned}
+$$
+
+注：行内公式会保持与文字同行，字号与正文一致；块级公式会居中显示，带有浅灰背景和左侧品牌色边框。系统会智能识别数学公式，自动从 text 类型转换为 math 类型，并使用专门样式渲染。
