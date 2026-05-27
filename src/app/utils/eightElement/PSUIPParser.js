@@ -1,4 +1,5 @@
 import { EVENT_NAME, EVENT_CONFIG, NATIVE_EVENT_KEY } from './eventConfig.js';
+import katex from 'katex';
 import { createNativeEventConfig } from './eventUtils.js';
 import { LAYOUT_CONSTANTS, DEFAULT_STYLE_CONFIG, setStyleConfig, resetStyleConfig, getElementStyleConfig } from './styles';
 import { getIcon } from '../icons/index.js';
@@ -274,13 +275,59 @@ function processInlineLinkText(text) {
 function prepareMarkdownForKatex(text) {
     if (!text || typeof text !== 'string') return '';
 
-    let preppedMarkdown = text;
+    let preppedMarkdown = renderInlineMathSpans(renderDisplayMathBlocks(normalizeSingleDollarDisplayMath(text)));
 
     // 确保换行在marked中被正确处理
     preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
 
 
     return preppedMarkdown;
+}
+
+function normalizeSingleDollarDisplayMath(text) {
+    const lines = (text || '').split('\n');
+
+    return lines.map(line => {
+        if (line.trim() === '$') {
+            return '$$';
+        }
+        return line;
+    }).join('\n');
+}
+
+function hasDisplayMathFence(text) {
+    return /(^|\n)\s*\$\$?\s*(\n|$)/.test(text || '');
+}
+
+function renderDisplayMathBlocks(text) {
+    return (text || '').replace(
+        /(^|\n)\s*\$\$\s*\n?([\s\S]*?)\n?\s*\$\$\s*(?=\n|$)/g,
+        (match, prefix, formula) => {
+            const math = formula.trim();
+            if (!math) return match;
+
+            const rendered = katex.renderToString(math, {
+                displayMode: true,
+                throwOnError: false,
+                strict: false
+            });
+
+            return `${prefix}<p><span class="katex-display">${rendered}</span></p>`;
+        }
+    );
+}
+
+function renderInlineMathSpans(text) {
+    return (text || '').replace(/\$([^$\n]+?)\$/g, (match, formula) => {
+        const math = formula.trim();
+        if (!math) return match;
+
+        return katex.renderToString(math, {
+            displayMode: false,
+            throwOnError: false,
+            strict: false
+        });
+    });
 }
 
 // 🆕 为包含SVG的段落标签添加flexbox样式
@@ -1006,18 +1053,19 @@ function processMarkdownWithMathProtection(markdown) {
     // 第一步：提取并保护数学公式
     const mathBlocks = [];
     let mathIndex = 0;
+    const normalizedMathMarkdown = normalizeSingleDollarDisplayMath(markdown);
 
-    // 提取行内数学公式 $...$（非贪婪匹配，避免跨行）
-    let processedMarkdown = markdown.replace(/\$([^$\n]+?)\$/g, (match) => {
-        const placeholder = `§MATH_INLINE_${mathIndex}§`;
+    // 先提取块级数学公式 $$...$$（可以跨行），避免被行内公式规则拆开
+    let processedMarkdown = normalizedMathMarkdown.replace(/\$\$([\s\S]*?)\$\$/g, (match) => {
+        const placeholder = `§MATH_BLOCK_${mathIndex}§`;
         mathBlocks[mathIndex] = match;
         mathIndex++;
         return placeholder;
     });
 
-    // 提取块级数学公式 $$...$$（可以跨行）
-    processedMarkdown = processedMarkdown.replace(/\$\$([\s\S]*?)\$\$/g, (match) => {
-        const placeholder = `§MATH_BLOCK_${mathIndex}§`;
+    // 再提取行内数学公式 $...$（非贪婪匹配，避免跨行）
+    processedMarkdown = processedMarkdown.replace(/\$([^$\n]+?)\$/g, (match) => {
+        const placeholder = `§MATH_INLINE_${mathIndex}§`;
         mathBlocks[mathIndex] = match;
         mathIndex++;
         return placeholder;
@@ -2375,6 +2423,13 @@ function parseMarkdown(markdown, options = {}) {
             if (cleanedTextBlock) { // 确保清理后仍有内容
                 // 检查文本块是否包含富文本或列表项
                 const lines = cleanedTextBlock.split('\n');
+
+                if (hasDisplayMathFence(cleanedTextBlock)) {
+                    const textElement = createTextElement(cleanedTextBlock);
+                    stack[stack.length - 1].elements.push(textElement);
+                    currentTextBlock = '';
+                    return;
+                }
 
                 // 如果只有一行，尝试处理富文本
                 if (lines.length === 1) {

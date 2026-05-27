@@ -6,7 +6,7 @@
  */
 
 import resolveToken from '../tokens/resolveToken.js';
-import { Marked, marked } from 'marked';
+import { Marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
 import markedKatex from 'marked-katex-extension';
@@ -34,6 +34,21 @@ const markedInstance = new Marked(
 );
 markedInstance.use(markedKatex(katexOptions));
 // Use markedInstance.parse(markdownString) instead of marked.parse() later
+
+function dedentMarkdownBlock(content) {
+    const lines = (content || '').replace(/\r\n/g, '\n').split('\n');
+    const nonEmptyLines = lines.filter(line => line.trim().length > 0);
+    if (nonEmptyLines.length === 0) return '';
+
+    const minIndent = Math.min(
+        ...nonEmptyLines.map(line => line.match(/^\s*/)?.[0]?.length || 0)
+    );
+
+    return lines
+        .map(line => line.length > 0 ? line.slice(minIndent) : line)
+        .join('\n')
+        .trim();
+}
 
 /**
  * 渲染八要素结构为HTML字符串，并返回预处理后的八要素结构
@@ -2466,7 +2481,7 @@ function renderTableElement(element) {
     const containerStyleAttr = generateStyleAttribute(element.computedStyle || {});
 
     // 获取Markdown表格内容
-    const rawMarkdown = element.rawData || '';
+    const rawMarkdown = dedentMarkdownBlock(element.rawData || '');
 
     if (!rawMarkdown.trim()) {
         return `<div id="${element.id || ''}" data-element-type="table" ${containerStyleAttr}>
@@ -2483,11 +2498,11 @@ function renderTableElement(element) {
             mangle: false        // 不转义HTML
         };
 
-        // 使用marked解析markdown（rawData已经是清理后的内容）
-        let html = marked(rawMarkdown, markedOptions);
+        // 使用带 KaTeX 扩展的 marked 解析表格，保证单元格内 $...$ 公式也能渲染
+        let html = markedInstance.parse(rawMarkdown, markedOptions);
 
         // 从HTML中提取表格
-        const tableMatch = html.match(/<table>[\s\S]*?<\/table>/);
+        const tableMatch = html.match(/<table(?:\s[^>]*)?>[\s\S]*?<\/table>/);
         if (!tableMatch) {
             throw new Error('无法从marked输出中提取表格HTML');
         }

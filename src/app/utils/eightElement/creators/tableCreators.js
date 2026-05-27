@@ -15,6 +15,50 @@ import { TABLE_TAG_VARIANT_MAP } from '../styles/tableCommonStyle.js';
 
 // 注意：parseHeaderBackgroundSyntax 和相关函数已移至 styleParser.js 作为通用工具
 
+function dedentMarkdownBlock(content) {
+    const lines = (content || '').replace(/\r\n/g, '\n').split('\n');
+    const nonEmptyLines = lines.filter(line => line.trim().length > 0);
+    if (nonEmptyLines.length === 0) return '';
+
+    const minIndent = Math.min(
+        ...nonEmptyLines.map(line => line.match(/^\s*/)?.[0]?.length || 0)
+    );
+
+    return lines
+        .map(line => line.length > 0 ? line.slice(minIndent) : line)
+        .join('\n')
+        .trim();
+}
+
+function splitUnescapedPipes(line) {
+    return (line || '')
+        .split(/(?<!\\)\|/)
+        .map(cell => cell.trim())
+        .filter(cell => cell.length > 0);
+}
+
+function hasUnescapedPipe(line) {
+    return /(?<!\\)\|/.test(line || '');
+}
+
+function isMarkdownTableSeparatorLine(line) {
+    const cells = splitUnescapedPipes(line);
+    return cells.length >= 2 && cells.every(cell => /^:?-{3,}:?$/.test(cell));
+}
+
+function isMarkdownTableRow(line) {
+    return hasUnescapedPipe(line) && splitUnescapedPipes(line).length >= 2;
+}
+
+function hasMarkdownTableBlock(lines) {
+    for (let i = 0; i < lines.length - 1; i++) {
+        if (isMarkdownTableRow(lines[i]) && isMarkdownTableSeparatorLine(lines[i + 1])) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // 解析表格数据为二维数组
 function parseTableData(tableContent) {
     // 分割表格内容为行
@@ -162,8 +206,9 @@ function isTableOrChartData(lineOrLines) {
 
     const firstLine = validLines[0].trim();
     
-    // 🔧 核心优化：收集后的第一行必须是表格格式（含 |）、图表或表格标记
-    if (!firstLine.match(/^\[chart:/) && !firstLine.match(/^\[table:/) && !firstLine.includes('|')) {
+    // 🔧 核心优化：收集后的第一行必须是表格格式（含 unescaped |）、图表或表格标记。
+    // 使用 hasUnescapedPipe 避免把数学公式中的 \|...\| 误判为表格。
+    if (!firstLine.match(/^\[chart:/) && !firstLine.match(/^\[table:/) && !hasUnescapedPipe(firstLine)) {
         return { isData: false, isChart: false, chartType: null, tableVariant: null };
     }
 
@@ -175,15 +220,12 @@ function isTableOrChartData(lineOrLines) {
         const afterChartTag = firstLine.replace(/^\[chart:[^\]]+\]/, '').trim();
         
         // 检查图表标记后是否在同一行有表格数据
-        const hasTableInSameLine = afterChartTag.includes('|') && 
-            afterChartTag.split('|').filter(c => c.trim().length > 0).length >= 2;
+        const hasTableInSameLine = isMarkdownTableRow(afterChartTag);
         
         // 检查后续行是否有表格数据
         const hasTableInNextLines = validLines.slice(1).some(l => {
             const trimmed = l.trim();
-            if (!trimmed.includes('|')) return false;
-            const cols = trimmed.split('|').filter(c => c.trim().length > 0);
-            return cols.length >= 2;
+            return isMarkdownTableRow(trimmed);
         });
 
         // 🔧 修复：只要同一行或后续行有表格数据，就认为是有效的图表数据
@@ -214,15 +256,9 @@ function isTableOrChartData(lineOrLines) {
         return { isData: true, isChart: false, chartType: null, tableVariant };
     }
 
-    // 检查是否是普通表格：任意一行包含 | 且至少两列
-    const hasTable = validLines.some(l => {
-        const trimmed = l.trim();
-        if (!trimmed.includes('|')) return false;
-        const cols = trimmed.split('|').filter(c => c.trim().length > 0);
-        return cols.length >= 2;
-    });
-
-    if (hasTable) {
+    // 检查是否是普通 Markdown 表格：必须包含表头行 + 分隔行。
+    // 使用 hasMarkdownTableBlock 避免把数学公式中的 \|...\| 误判为表格。
+    if (hasMarkdownTableBlock(validLines)) {
         return { isData: true, isChart: false, chartType: null, tableVariant: null };
     }
 
@@ -279,7 +315,7 @@ function extractTableOrChartData(lines, startIndex) {
         const line = remainingLines[i].trim();
 
         // 如果行为空或不再包含表格分隔符，认为表格结束
-        if (line === '' || !line.includes('|')) {
+        if (line === '' || !hasUnescapedPipe(line)) {
             break;
         }
 
@@ -359,7 +395,7 @@ function createTableElement(markdownTableContent, options = {}) {
     const { classStyle: trClassStyle } = splitTablePartConfig(tableRowStyleConfig);
 
     // 🔧 修复：移除可能残留的图表标记（防御性编程）
-    let cleanedContent = markdownTableContent || '';
+    let cleanedContent = dedentMarkdownBlock(markdownTableContent || '');
     cleanedContent = cleanedContent.replace(/^\[chart:[^\]]+\]\s*/gm, '');
     
     // 🆕 使用通用工具解析表头样式
