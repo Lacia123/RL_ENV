@@ -327,7 +327,7 @@ function createTabElement(content, attributes = {}, currentMarkdown = '') {
         },
         layout: {
             style: {
-                display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+                // display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
                 layoutMode: LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL,
                 layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
                 layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
@@ -335,7 +335,7 @@ function createTabElement(content, attributes = {}, currentMarkdown = '') {
                 height: "auto",
                 width: "100%",
                 position: "relative",
-                ...tabStyleConfig.tabList?.style
+                // ...tabStyleConfig.tabList?.style
             },
             classStyle: tabStyleConfig.tabList?.style || {},
             className: `tab-list-${tabListId}`,
@@ -372,7 +372,7 @@ function createTabElement(content, attributes = {}, currentMarkdown = '') {
                     height: "auto",
                     width: "100%",
                     position: "relative",
-                    ...tabStyleConfig.tabPanel?.style
+                    // ...tabStyleConfig.tabPanel?.style
                 },
                 classStyle: tabStyleConfig.tabPanel?.style || {},
                 className: `tab-panel-${panelId}`,
@@ -410,7 +410,7 @@ function createTabElement(content, attributes = {}, currentMarkdown = '') {
                 height: "auto",
                 width: "100%",
                 position: "relative",
-                ...tabStyleConfig.tabContainer?.style
+                // ...tabStyleConfig.tabContainer?.style
             },
             classStyle: tabStyleConfig.tabContainer?.style || {},
             className: `tab-container-${tabId}`,

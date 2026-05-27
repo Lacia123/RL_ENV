@@ -35,10 +35,10 @@ function createBackgroundElement(imageUrl, variant = 'normal', dataKey = '', has
             },
             className: uniqueClassName,
             style: {
-                backgroundColor: [],
-                font: [],
-                border: [],
-                scale: [],
+                // backgroundColor: [],
+                // font: [],
+                // border: [],
+                // scale: [],
                 overflow: "hidden",
                 boxSizing: "border-box",
                 // primaryAxisSizingMode: "fixed",
@@ -117,64 +117,64 @@ function createBackgroundElement(imageUrl, variant = 'normal', dataKey = '', has
                     },
                     resource: imageUrl
                 }
-            },
-            elevation: {
-                default: {
-                    "data-key": dataKey,
-                    style: {
-                        elevation: {
-                            value: imageStyleConfig.boxShadow || "none",
-                            type: "boxShadow",
-                            key: "material-elevation"
-                        }
-                    },
-                    resource: imageStyleConfig.boxShadow || "none"
-                }
             }
+            // elevation: {
+            //     default: {
+            //         "data-key": dataKey,
+            //         style: {
+            //             elevation: {
+            //                 value: imageStyleConfig.boxShadow || "none",
+            //                 type: "boxShadow",
+            //                 key: "material-elevation"
+            //             }
+            //         },
+            //         resource: imageStyleConfig.boxShadow || "none"
+            //     }
+            // }
         },
-        shape: {
-            borderradius: {
-                default: {
-                    "data-key": "",
-                    style: {
-                        borderradius: {
-                            value: imageStyleConfig.borderRadius || DIMENSION_CONSTANTS.BORDER_RADIUS.none,
-                            type: "borderRadius",
-                            key: "shape-borderradius"
-                        }
-                    },
-                    resource: imageStyleConfig.borderRadius || DIMENSION_CONSTANTS.BORDER_RADIUS.none
-                }
-            },
-            borderwidth: {
-                default: {
-                    "data-key": "",
-                    style: {
-                        borderwidth: {
-                            value: imageStyleConfig.borderWidth || DIMENSION_CONSTANTS.BORDER_WIDTH.none,
-                            type: "borderWidth",
-                            key: "shape-borderwidth"
-                        }
-                    },
-                    resource: imageStyleConfig.borderWidth || DIMENSION_CONSTANTS.BORDER_WIDTH.none
-                }
-            }
-        },
-        color: {
-            border: {
-                default: {
-                    "data-key": "",
-                    style: {
-                        border: {
-                            value: imageStyleConfig.borderColor || COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
-                            type: "color",
-                            key: "color-border"
-                        }
-                    },
-                    resource: imageStyleConfig.borderColor || COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20]
-                }
-            }
-        },
+        // shape: {
+        //     borderradius: {
+        //         default: {
+        //             "data-key": "",
+        //             style: {
+        //                 borderradius: {
+        //                     value: imageStyleConfig.borderRadius || DIMENSION_CONSTANTS.BORDER_RADIUS.none,
+        //                     type: "borderRadius",
+        //                     key: "shape-borderradius"
+        //                 }
+        //             },
+        //             resource: imageStyleConfig.borderRadius || DIMENSION_CONSTANTS.BORDER_RADIUS.none
+        //         }
+        //     },
+        //     borderwidth: {
+        //         default: {
+        //             "data-key": "",
+        //             style: {
+        //                 borderwidth: {
+        //                     value: imageStyleConfig.borderWidth || DIMENSION_CONSTANTS.BORDER_WIDTH.none,
+        //                     type: "borderWidth",
+        //                     key: "shape-borderwidth"
+        //                 }
+        //             },
+        //             resource: imageStyleConfig.borderWidth || DIMENSION_CONSTANTS.BORDER_WIDTH.none
+        //         }
+        //     }
+        // },
+        // color: {
+        //     border: {
+        //         default: {
+        //             "data-key": "",
+        //             style: {
+        //                 border: {
+        //                     value: imageStyleConfig.borderColor || COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20],
+        //                     type: "color",
+        //                     key: "color-border"
+        //                 }
+        //             },
+        //             resource: imageStyleConfig.borderColor || COLOR_CONSTANTS.BASIC.OPACITY.BLACK[20]
+        //         }
+        //     }
+        // },
         type: "background",
         state: "default",
         events: [{

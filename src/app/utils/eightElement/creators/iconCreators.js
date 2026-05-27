@@ -33,10 +33,10 @@ function createIconElement(iconName, variant = 'medium') {
             },
             className: uniqueClassName,
             style: {
-                "background-color": [],
-                "font": [],
-                "border": [],
-                "scale": [],
+                // "background-color": [],
+                // "font": [],
+                // "border": [],
+                // "scale": [],
                 "box-sizing": "border-box"
             },
             icon_line: {
@@ -110,19 +110,19 @@ function createIconElement(iconName, variant = 'medium') {
             }
         },
         color: {
-            bg: {
-                default: {
-                    "data-key": "",
-                    style: {
-                        bg: {
-                            value: "{color.basic.brand.5}",
-                            type: "color",
-                            key: "color-bg"
-                        }
-                    },
-                    resource: "{color.basic.brand.5}"
-                }
-            },
+            // bg: {
+            //     default: {
+            //         "data-key": "",
+            //         style: {
+            //             bg: {
+            //                 value: "{color.basic.brand.5}",
+            //                 type: "color",
+            //                 key: "color-bg"
+            //             }
+            //         },
+            //         resource: "{color.basic.brand.5}"
+            //     }
+            // },
             border: {
                 default: {
                     "data-key": "",
@@ -311,21 +311,21 @@ function createIconElement(iconName, variant = 'medium') {
                 }
             }
         },
-        shape: {
-            borderwidth: {
-                default: {
-                    "data-key": "",
-                    style: {
-                        borderwidth: {
-                            value: "{dimension.borderwidth.4}",
-                            type: "borderWidth",
-                            key: "shape-borderwidth"
-                        }
-                    },
-                    resource: "{dimension.borderwidth.4}"
-                }
-            }
-        },
+        // shape: {
+        //     borderwidth: {
+        //         default: {
+        //             "data-key": "",
+        //             style: {
+        //                 borderwidth: {
+        //                     value: "{dimension.borderwidth.4}",
+        //                     type: "borderWidth",
+        //                     key: "shape-borderwidth"
+        //                 }
+        //             },
+        //             resource: "{dimension.borderwidth.4}"
+        //         }
+        //     }
+        // },
         type: "icon_line",
         state: "default",
         events: [{}]

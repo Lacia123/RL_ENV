@@ -250,45 +250,45 @@ function createTextElement(text, variant = 'p', richTextOptions = {}, customStyl
                 },
                 children: []
             },
-            text_hyperlink: {
-                type: "container",
-                content: [
-                    {
-                        element: "font",
-                        value: "fontsize",
-                        prop: "default",
-                        token: "fontsize"
-                    }
-                ],
-                resource: "",
-                data: [],
-                style: {
-                    layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
-                    layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
-                    textDecoration: "underline",
-                    // "word-break": "break-all",
-                    width: elementWidth, // 设置宽度
-                    textColor: {
-                        element: "color",
-                        value: "text",
-                        prop: "default",
-                        token: "hyperlinktext"
-                    },
-                    fill: {
-                        element: "color",
-                        value: "bg",
-                        prop: "default",
-                        token: "bg"
-                    },
-                    // fontSizes: {
-                    //   element: "font",
-                    //   value: "fontsize",
-                    //   prop: "default",
-                    //   token: "fontsize"
-                    // }
-                },
-                children: []
-            }
+            // text_hyperlink: {
+            //     type: "container",
+            //     content: [
+            //         {
+            //             element: "font",
+            //             value: "fontsize",
+            //             prop: "default",
+            //             token: "fontsize"
+            //         }
+            //     ],
+            //     resource: "",
+            //     data: [],
+            //     style: {
+            //         layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
+            //         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+            //         textDecoration: "underline",
+            //         // "word-break": "break-all",
+            //         width: elementWidth, // 设置宽度
+            //         textColor: {
+            //             element: "color",
+            //             value: "text",
+            //             prop: "default",
+            //             token: "hyperlinktext"
+            //         },
+            //         fill: {
+            //             element: "color",
+            //             value: "bg",
+            //             prop: "default",
+            //             token: "bg"
+            //         },
+            //         // fontSizes: {
+            //         //   element: "font",
+            //         //   value: "fontsize",
+            //         //   prop: "default",
+            //         //   token: "fontsize"
+            //         // }
+            //     },
+            //     children: []
+            // }
         },
         color: {
             text: {
@@ -325,34 +325,34 @@ function createTextElement(text, variant = 'p', richTextOptions = {}, customStyl
                 }
             }
         },
-        scale: {
-            min_height: {
-                default: {
-                    "data-key": "",
-                    style: {
-                        min_height: {
-                            value: DIMENSION_CONSTANTS.BASIC[72],
-                            type: "sizing",
-                            key: "scale-min_height"
-                        }
-                    },
-                    resource: DIMENSION_CONSTANTS.BASIC[72]
-                }
-            },
-            max_width: {
-                default: {
-                    "data-key": "",
-                    style: {
-                        max_width: {
-                            value: DIMENSION_CONSTANTS.BASIC[1200],
-                            type: "sizing",
-                            key: "scale-max_width"
-                        }
-                    },
-                    resource: DIMENSION_CONSTANTS.BASIC[1200]
-                }
-            }
-        },
+        // scale: {
+        //     min_height: {
+        //         default: {
+        //             "data-key": "",
+        //             style: {
+        //                 min_height: {
+        //                     value: DIMENSION_CONSTANTS.BASIC[72],
+        //                     type: "sizing",
+        //                     key: "scale-min_height"
+        //                 }
+        //             },
+        //             resource: DIMENSION_CONSTANTS.BASIC[72]
+        //         }
+        //     },
+        //     max_width: {
+        //         default: {
+        //             "data-key": "",
+        //             style: {
+        //                 max_width: {
+        //                     value: DIMENSION_CONSTANTS.BASIC[1200],
+        //                     type: "sizing",
+        //                     key: "scale-max_width"
+        //                 }
+        //             },
+        //             resource: DIMENSION_CONSTANTS.BASIC[1200]
+        //         }
+        //     }
+        // },
         font: {
             fontsize: {
                 default: {
@@ -408,7 +408,7 @@ function createHeadingBlockContainer(headingLayout) {
                 layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
                 alignSelf: "flex-start",
                 // layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
-                boxSizing: "border-box",
+                // boxSizing: "border-box",
                 borderStyle: "solid",
                 borderWidth: "0",
                 borderColor: "initial",

@@ -67,8 +67,8 @@ export function createAudioElement(src, attributes = {}) {
                 "display": "{layout.state.display.flex}",
                 "layoutMode": "{layout.direction.NONE}",
                 "layoutWrap": "{layout.wrap.NO_WRAP}",
-                "primaryAxisSizingMode": "{layout.sizing.AUTO}",
-                "counterAxisSizingMode": "{layout.sizing.FIXED}",
+                // "primaryAxisSizingMode": "{layout.sizing.AUTO}",
+                // "counterAxisSizingMode": "{layout.sizing.FIXED}",
                 "primaryAxisAlignItems": "{layout.align.x.MIN}",
                 "counterAxisAlignItems": "{layout.align.y.items.MIN}",
                 "layoutAlign": "{layout.align.y.self.INHERIT}",
@@ -76,36 +76,36 @@ export function createAudioElement(src, attributes = {}) {
                 "overflow": "hidden",
                 "height": "auto",
                 "width": "100%",
-                "borderColor": {
-                    "element": "color",
-                    "value": "border",
-                    "prop": "default",
-                    "token": "border"
-                },
-                "borderRadius": {
-                    "element": "shape",
-                    "value": "borderradius",
-                    "prop": "default",
-                    "token": "borderradius"
-                },
-                "borderWidth": {
-                    "element": "shape",
-                    "value": "borderwidth",
-                    "prop": "default",
-                    "token": "borderwidth"
-                },
-                "boxShadow": {
-                    "element": "material",
-                    "value": "elevation",
-                    "prop": "default",
-                    "token": "elevation"
-                },
-                "asset": {
-                    "element": "material",
-                    "value": "audio",
-                    "prop": "default",
-                    "token": "audio"
-                }
+                // "borderColor": {
+                //     "element": "color",
+                //     "value": "border",
+                //     "prop": "default",
+                //     "token": "border"
+                // },
+                // "borderRadius": {
+                //     "element": "shape",
+                //     "value": "borderradius",
+                //     "prop": "default",
+                //     "token": "borderradius"
+                // },
+                // "borderWidth": {
+                //     "element": "shape",
+                //     "value": "borderwidth",
+                //     "prop": "default",
+                //     "token": "borderwidth"
+                // },
+                // "boxShadow": {
+                //     "element": "material",
+                //     "value": "elevation",
+                //     "prop": "default",
+                //     "token": "elevation"
+                // },
+                // "asset": {
+                //     "element": "material",
+                //     "value": "audio",
+                //     "prop": "default",
+                //     "token": "audio"
+                // }
             },
             "normal": {
                 "type": "container",
@@ -123,8 +123,8 @@ export function createAudioElement(src, attributes = {}) {
                     "display": "{layout.state.display.flex}",
                     "layoutMode": "{layout.direction.NONE}",
                     "layoutWrap": "{layout.wrap.NO_WRAP}",
-                    "primaryAxisSizingMode": "{layout.sizing.AUTO}",
-                    "counterAxisSizingMode": "{layout.sizing.FIXED}",
+                    // "primaryAxisSizingMode": "{layout.sizing.AUTO}",
+                    // "counterAxisSizingMode": "{layout.sizing.FIXED}",
                     "primaryAxisAlignItems": "{layout.align.x.MIN}",
                     "counterAxisAlignItems": "{layout.align.y.items.MIN}",
                     "layoutAlign": "{layout.align.y.self.INHERIT}",
@@ -132,36 +132,36 @@ export function createAudioElement(src, attributes = {}) {
                     "overflow": "hidden",
                     "height": "auto",
                     "width": "100%",
-                    "borderColor": {
-                        "element": "color",
-                        "value": "border",
-                        "prop": "default",
-                        "token": "border"
-                    },
-                    "borderRadius": {
-                        "element": "shape",
-                        "value": "borderradius",
-                        "prop": "default",
-                        "token": "borderradius"
-                    },
-                    "borderWidth": {
-                        "element": "shape",
-                        "value": "borderwidth",
-                        "prop": "default",
-                        "token": "borderwidth"
-                    },
-                    "boxShadow": {
-                        "element": "material",
-                        "value": "elevation",
-                        "prop": "default",
-                        "token": "elevation"
-                    },
-                    "asset": {
-                        "element": "material",
-                        "value": "audio",
-                        "prop": "default",
-                        "token": "audio"
-                    }
+                    // "borderColor": {
+                    //     "element": "color",
+                    //     "value": "border",
+                    //     "prop": "default",
+                    //     "token": "border"
+                    // },
+                    // "borderRadius": {
+                    //     "element": "shape",
+                    //     "value": "borderradius",
+                    //     "prop": "default",
+                    //     "token": "borderradius"
+                    // },
+                    // "borderWidth": {
+                    //     "element": "shape",
+                    //     "value": "borderwidth",
+                    //     "prop": "default",
+                    //     "token": "borderwidth"
+                    // },
+                    // "boxShadow": {
+                    //     "element": "material",
+                    //     "value": "elevation",
+                    //     "prop": "default",
+                    //     "token": "elevation"
+                    // },
+                    // "asset": {
+                    //     "element": "material",
+                    //     "value": "audio",
+                    //     "prop": "default",
+                    //     "token": "audio"
+                    // }
                 },
                 "children": []
             }

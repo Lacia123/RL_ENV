@@ -425,10 +425,10 @@ function createTableElement(markdownTableContent, options = {}) {
         layout: {
             style: {
                 // 基础样式
-                "background-color": [],
-                font: [],
-                border: [],
-                scale: [],
+                // "background-color": [],
+                // font: [],
+                // border: [],
+                // scale: [],
                 "box-sizing": "border-box",
                 position: "relative",
                 width: "100%",
@@ -580,10 +580,10 @@ function createChartElement(chartType, svgContent, tableData, rawData, variant =
             className: uniqueClassName,
             style: {
                 // 基础样式
-                backgroundColor: [],
-                font: [],
-                border: [],
-                scale: [],
+                // backgroundColor: [],
+                // font: [],
+                // border: [],
+                // scale: [],
                 boxSizing: "border-box",
                 overflow: "hidden",
                 // primaryAxisSizingMode: "fixed",

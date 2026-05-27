@@ -673,8 +673,8 @@ function createEightElementRoot(markdownElements, rootAttributes = {}) {
             },
             className: uniqueClassName,
             style: {
-                display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
-                layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                // display: LAYOUT_CONSTANTS.DISPLAY.FLEX,
+                // layoutMode: LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
                 layoutWrap: LAYOUT_CONSTANTS.WRAP.NO_WRAP,
                 layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
                 layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,

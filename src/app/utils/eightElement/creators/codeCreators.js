@@ -87,13 +87,13 @@ function createCodeElement(codeContent, language = '') {
             className: uniqueClassName,
             style: {
                 // 基础样式
-                "background-color": [],
-                font: [],
-                border: [],
-                scale: [],
+                // "background-color": [],
+                // font: [],
+                // border: [],
+                // scale: [],
                 "box-sizing": "border-box",
                 fontSize: FONT_CONSTANTS.SIZE.SMALL,
-                lineHeight: "1.5",
+                // lineHeight: "1.5",
                 whiteSpace: "pre",
                 width: "100%",
             }
