@@ -10,7 +10,7 @@
 
 ### 重要设计决策
 
-1. **组件布局是灵活的** — 每个组件有多个 layoutMode，由填充的不同 slot 组合自动触发。比如 `contentSummaryCard` 只填 `title + description` 是默认纵向布局；加 `thumbnail` 自动变为左文右图。PSUIP 作者不需要指定 layoutMode，只需选择合适的 slot 填充，系统自动匹配。
+1. **主体布局必须纵向，局部布局可以灵活** — 页面根路径应使用 `layout:root` + 主 `layout:column` 承载全部内容，避免首层/主体结构出现左右分栏。组件内部的 layoutMode 仍可由 slot 组合自动触发，例如 `contentSummaryCard` 加 `thumbnail` 可变为左文右图。
 2. **slot 命名需严格匹配源码** — 组件支持的 slot 名（如 `cover_image` vs `coverImage`）有精确区分，不可混用。
 3. **降级路径** — 任何不确定的内容都降为 `layout:column` + Markdown，保证稳定输出。
 
@@ -52,20 +52,24 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 - 组件标签（非 `<card:...>`）必须被 `layout:*` 包裹
 - 多个组件可共用同一个布局容器
 - 未知尺寸场景默认 `layout:column`
-- layout 可嵌套，例如 `layout:row` 内含多个 `layout:column`
+- 根路径/主体布局必须是纵向结构：`<layout:root>` 下优先放一个主 `<layout:column alignItems="stretch">`，主要内容按顺序自上而下排列，并让子内容默认左右撑满
+- 不要在 `<layout:root>` 的第一层直接使用 `<layout:row>` 或 `<layout:gallery>` 作为主体布局，避免页面整体变成横向分栏或双列瀑布流
+- layout 可嵌套，例如在某个局部区块内使用 `layout:row` 排列表单项、按钮组或短信息；但嵌套横向布局只能服务局部内容，不应承载页面主干
+- 通常情况下，纵向 `layout:column` 应使用 `alignItems="stretch"`，尤其是根布局下的主内容列、承载多个卡片/表格/Markdown 区块的页面级容器，避免内容只按自身宽度显示；只有确实需要内容居中或左对齐收缩时，才使用 `column-center` 或默认左对齐。
 
 ### 布局示例
 
 ```text
 <layout:root>
-  <layout:row>
-    <layout:column flex="1">左列内容</layout:column>
-    <layout:column flex="1">右列内容</layout:column>
-  </layout:row>
-  <layout:gallery>
+  <layout:column alignItems="stretch">
     <组件1/>
     <组件2/>
-  </layout:gallery>
+    <layout:row>
+      <组件内的局部内容1/>
+      <组件内的局部内容2/>
+    </layout:row>
+    <组件3/>
+  </layout:column>
 </layout:root>
 ```
 
@@ -99,7 +103,49 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 
 除此以外，`[text](url)` 语法也会渲染为带下划线的超链接样式，同样可在任何文本内容中使用。
 
-## 三、组件
+## 三、展示方式选择策略
+
+当前主要输入是学习相关内容，但不要因为内容都属于学习场景，就统一使用同一种组件。组件选择必须基于内容的**信息结构和表达目的**，而不是基于业务分类、关键词或固定模板。
+
+### 选择原则
+
+1. **先判断内容结构，再选择组件**  
+   先判断这段内容是在做总览、摘要、并列条目、过程说明、对比关系、数据呈现，还是长文本讲解；再选择最能表达该结构的组件。
+
+2. **学习场景不是单一展示形态**  
+   学习内容可能是一个主题入口、一段概念解释、一组学习步骤、一组易错点、一个概念对比表、一段推导过程、一道题的解析，或这些结构的组合。不要把所有学习内容都默认做成 `contentSummaryCard`。
+
+3. **示例是判断方式，不是封闭分类**  
+   下方映射描述的是信息形态，不是固定场景清单。后续即使扩展新的学习分类或其他业务分类，也仍然按信息结构判断。
+
+4. **组件服务表达，不服务凑样式**  
+   使用组件应让信息更清楚、更易扫读。如果组件会造成内容缺失、顺序混乱、表达变浅，优先使用 `layout:column` 包裹 Markdown。
+
+5. **混合内容应拆分展示**  
+   一份内容里如果同时包含主题总览、概念讲解、步骤列表、对比表和推导说明，应拆成多个区块分别展示，而不是强行塞进一个组件。
+
+### 信息结构到组件的倾向
+
+| 信息结构 | 更适合的展示方式 |
+|----------|------------------|
+| 一个重点主题/章节/任务入口，需要作为页面开头强调 | `heroCard` 或 `featureHeroCard` |
+| 单个知识点、材料、结论、学习建议的简短摘要 | `contentSummaryCard` |
+| 多条并列信息，且每条结构相似，如步骤、清单、记录、反馈 | `feedListCard` 或 Markdown 列表 |
+| 多维度对比、属性表、参数表、概念差异、评分/结果矩阵 | `tableCard` |
+| 表格单元格中包含数学公式、数学符号、变量记号（如 `$x_i$`、`$f(x_i)$`、`$L_i(x)$`） | 必须使用 `tableCard`，不要放在普通 Markdown 表格中 |
+| 连续讲解、推导过程、例题解析、长段说明、公式展开 | Markdown + `layout:column` |
+| 多种结构混合出现 | 拆成多个布局区块，各自选择合适组件 |
+
+### 避免误用
+
+- 不要只因为文本里出现“学习、知识点、课程、题目、解析”等词，就固定选择某个组件。
+- 不要为了视觉多样性编造图片、指标、时间、头像、按钮或不存在的字段。
+- 不要把长推导、长解析硬塞进摘要卡；摘要卡只适合短信息。
+- 不要把无明显同构条目的内容硬塞进 `feedListCard`；没有行列关系的内容不要硬塞进 `tableCard`。
+- 不要在普通 Markdown 区块中输出包含数学公式或数学符号的表格；这类表格必须放入 `tableCard` 的 `<table>` slot。
+- 不确定时，以内容完整、层级清晰为优先，使用 Markdown 降级。
+
+## 四、组件
 
 ### `<contentSummaryCard>` 总结卡片
 
@@ -246,6 +292,12 @@ items 内部子 slot：
 
 以表格为主体的数据卡。表格须为 Markdown 格式。
 
+**强制规则：**
+- `tableCard` 中的 Markdown 表格必须完整放在 `<table>...</table>` slot 内。
+- `<table>` 开始标签必须出现在表格第一行之前，`</table>` 结束标签必须出现在表格最后一行之后。
+- 禁止出现孤立的 `</table>`，禁止把 Markdown 表格直接写在 `tableCard` 根级。
+- 只要表格内容包含数学公式、数学符号或变量记号（例如 `$x_i$`、`$f(x_i)$`、`$L_i(x)$`、`$S(x)$`），必须使用 `tableCard` 包裹，不要使用普通 Markdown 表格。
+
 | slot | 必填 | 说明 |
 |------|------|------|
 | `table` | 是 | Markdown 表格 |
@@ -275,6 +327,21 @@ items 内部子 slot：
 </tableCard>
 ```
 
+示例——含数学符号的表格必须使用 tableCard：
+```text
+<tableCard>
+  <title>符号说明</title>
+  <table>
+| 符号 | 含义 |
+|------|------|
+| $x_i$ | 第 i 个插值节点 |
+| $f(x_i)$ | 节点处函数值 |
+| $L_i(x)$ | 拉格朗日基函数 |
+| $S(x)$ | 样条函数 |
+  </table>
+</tableCard>
+```
+
 ### 数学公式
 
 行内公式 `$...$`：
@@ -289,10 +356,13 @@ $$
 $$
 ```
 
-## 四、约束规则
+## 五、约束规则
 
 1. **仅输出代码** — 只输出 PSUIP 代码，不加解释或代码块包裹。
 2. **标签闭合** — 所有标签必须成对闭合。
 3. **降级策略** — 超出已列组件范围的内容，全部使用 `layout:column` 包裹纯 Markdown。
 4. **组件必被 layout 包裹** — 组件标签（非 `<card:...>`）必须被 `layout:*` 包裹。
 5. **slot 命名严格** — 使用上表中列出的精确 slot 名，如 heroCard 的 `cover_image` 不能写成 `coverImage`，featureHeroCard 的 `coverImage` 不能写成 `cover_image`。
+6. **主体不横向且默认拉伸** — 根路径不要使用横向主体布局。`<layout:root>` 下应以主 `<layout:column alignItems="stretch">` 组织内容；`layout:row`、`layout:gallery` 只允许作为局部辅助布局使用。
+7. **按信息结构选组件** — 不要按关键词或固定学习分类机械套用组件；必须根据内容的实际结构和表达目的选择展示方式。
+8. **公式表格必须使用 tableCard** — 包含 `$...$` 公式、数学符号或变量记号的表格，必须写入 `tableCard` 的 `<table>...</table>` slot，不能作为普通 Markdown 表格直接放在 `layout:*` 中。
