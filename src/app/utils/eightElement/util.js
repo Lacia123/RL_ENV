@@ -8,6 +8,7 @@ class MarkedSingleton {
     if (!MarkedSingleton.instance) {
       const katexOptions = {
         throwOnError: false,
+        nonStandard: true,
       };
 
       const markedInstance = new Marked(

@@ -276,14 +276,6 @@ function prepareMarkdownForKatex(text) {
 
     let preppedMarkdown = text;
 
-    // 确保在单美元符号前有空格，避免误识别
-    preppedMarkdown = preppedMarkdown.replace(/(\S)(\$)(?!\$)/g, (match, charBefore, dollarSign) => {
-        if (charBefore === '$') { // 避免修改$$对
-            return match;
-        }
-        return charBefore + ' ' + dollarSign; // 添加空格: "word$" -> "word $"
-    });
-
     // 确保换行在marked中被正确处理
     preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
 
