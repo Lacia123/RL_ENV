@@ -6,7 +6,7 @@
 
 ### 与 psuip-layout-orchestrator skill 的关系
 
-这个提示词是该 skill 的超精简子集，只覆盖已验收通过的组件。skill 中 23 张卡片 + 31 个组件在这里缩减为 6 个组件 + 布局系统 + Markdown 映射（含通用 `<link>` 标签）。不设计复杂的 Top-K 分步检索流程，直接用规则 + 示例命中。
+这个提示词是该 skill 的超精简子集，只覆盖以下组件。skill 中 23 张卡片 + 31 个组件在这里缩减为 5 个组件 + 布局系统 + Markdown 映射（含通用 `<link>` 标签）。不设计复杂的 Top-K 分步检索流程，直接用规则 + 示例命中。
 
 ### 重要设计决策
 
@@ -16,7 +16,7 @@
 
 ### 文件说明
 
-**已完成组件列表**请参见同目录下的 `已完成组件` 文档，其中包含各组件 PSUIP 写法的精简示例。本文件为核心提示词，侧重规则和灵活性说明。
+各组件 PSUIP 写法的精简示例可参见同目录下的组件用法文档。本文件为核心提示词，侧重规则和灵活性说明。
 
 ---
 
@@ -78,7 +78,6 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 - 无序/有序列表 `- ` / `1. `
 - Markdown 表格
 - 数学公式：行内 `$...$`，块级 `$$...$$`（基于 KaTeX 渲染）
-- `[chart:type|标题]` + 表格数据（图表，type 支持 bar/barh/pie/grouped_line 等）
 - `[text](url)` 超链接（渲染为带下划线的品牌色链接）
 - `<link>text</link>` 行内链接标签
 - `**粗体**`、`*斜体*`、`~~删除线~~`、`` `行内代码` ``
@@ -100,7 +99,7 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 
 除此以外，`[text](url)` 语法也会渲染为带下划线的超链接样式，同样可在任何文本内容中使用。
 
-## 三、已完成组件
+## 三、组件
 
 ### `<contentSummaryCard>` 总结卡片
 
@@ -276,51 +275,6 @@ items 内部子 slot：
 </tableCard>
 ```
 
-### `<card:minimalistChartCard>` 简约图表卡
-
-通过 Markdown 映射自动填充，不是 slot 组件，而是 `<card:名称>` 卡片。
-
-Markdown 映射规则：
-- `h2` → headerTitle（左侧标题）
-- `h3` → pageTitle（右侧上标题）
-- `p` → description（右侧描述）
-- `[chart:*]` + 表格 → chartContainer 内图表
-
-示例——纯图表：
-```text
-<card:minimalistChartCard>
-  [chart:bar|年收益预估（万元）]
-  | 类型 | 占比 |
-  |------|------|
-  | 2026年 | 800 |
-  | 2027年 | 1000 |
-  | 2028年 | 1500 |
-</card:minimalistChartCard>
-```
-
-示例——带标题和描述的完整版：
-```text
-<card:minimalistChartCard>
-  ## 03
-  ### 头部品牌分析
-  联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。
-
-  [chart:barh|AI-PC 市场份额]
-  | 品牌 | 市场份额 |
-  |------|----------|
-  | 联想 | 35% |
-  | 苹果 | 28% |
-  | 荣耀 | 18% |
-
-  [chart:pie|笔记本市场占比]
-  | 类型 | 占比 |
-  |------|------|
-  | 游戏本 | 40% |
-  | 轻薄本 | 35% |
-  | 工作站 | 25% |
-</card:minimalistChartCard>
-```
-
 ### 数学公式
 
 行内公式 `$...$`：
@@ -339,7 +293,6 @@ $$
 
 1. **仅输出代码** — 只输出 PSUIP 代码，不加解释或代码块包裹。
 2. **标签闭合** — 所有标签必须成对闭合。
-3. **图表格式** — `[chart:type|标题]` 后必须紧跟合法的 Markdown 表格。
-4. **降级策略** — 超出已列组件范围的内容，全部使用 `layout:column` 包裹纯 Markdown。
-5. **组件必被 layout 包裹** — 组件标签（非 `<card:...>`）必须被 `layout:*` 包裹。
-6. **slot 命名严格** — 使用上表中列出的精确 slot 名，如 heroCard 的 `cover_image` 不能写成 `coverImage`，featureHeroCard 的 `coverImage` 不能写成 `cover_image`。
+3. **降级策略** — 超出已列组件范围的内容，全部使用 `layout:column` 包裹纯 Markdown。
+4. **组件必被 layout 包裹** — 组件标签（非 `<card:...>`）必须被 `layout:*` 包裹。
+5. **slot 命名严格** — 使用上表中列出的精确 slot 名，如 heroCard 的 `cover_image` 不能写成 `coverImage`，featureHeroCard 的 `coverImage` 不能写成 `cover_image`。
