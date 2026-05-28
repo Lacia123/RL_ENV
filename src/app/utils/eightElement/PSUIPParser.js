@@ -275,13 +275,54 @@ function processInlineLinkText(text) {
 function prepareMarkdownForKatex(text) {
     if (!text || typeof text !== 'string') return '';
 
-    let preppedMarkdown = renderInlineMathSpans(renderDisplayMathBlocks(normalizeSingleDollarDisplayMath(text)));
+    let preppedMarkdown = text;
+
+    // 第1层：处理 \(...\) 行内公式（LaTeX 标准语法，AI 可能输出的格式）
+    preppedMarkdown = renderInlineParenMath(preppedMarkdown);
+    // 第1.5层：处理 \[...\] 块级公式（LaTeX 标准语法）
+    preppedMarkdown = renderDisplayBracketMath(preppedMarkdown);
+    // 第2层：处理 $...$ 和 $$...$$ 格式（系统标准格式）
+    preppedMarkdown = renderInlineMathSpans(renderDisplayMathBlocks(normalizeSingleDollarDisplayMath(preppedMarkdown)));
 
     // 确保换行在marked中被正确处理
     preppedMarkdown = preppedMarkdown.replace(/\\n/g, '  \\n');
 
-
     return preppedMarkdown;
+}
+
+// 处理 \(...\) 格式的行内公式（LaTeX 标准）
+function renderInlineParenMath(text) {
+    return (text || '').replace(/\\\(([\s\S]*?)\\\)/g, (match, formula) => {
+        const math = formula.trim();
+        if (!math) return match;
+        try {
+            return katex.renderToString(math, {
+                displayMode: false,
+                throwOnError: false,
+                strict: false
+            });
+        } catch (e) {
+            return match;
+        }
+    });
+}
+
+// 处理 \[...\] 格式的块级公式（LaTeX 标准）
+function renderDisplayBracketMath(text) {
+    return (text || '').replace(/\\\[([\s\S]*?)\\\]/g, (match, formula) => {
+        const math = formula.trim();
+        if (!math) return match;
+        try {
+            const rendered = katex.renderToString(math, {
+                displayMode: true,
+                throwOnError: false,
+                strict: false
+            });
+            return `<p><span class="katex-display">${rendered}</span></p>`;
+        } catch (e) {
+            return match;
+        }
+    });
 }
 
 function normalizeSingleDollarDisplayMath(text) {

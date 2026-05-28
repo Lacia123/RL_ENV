@@ -6,7 +6,7 @@
 
 ### 与 psuip-layout-orchestrator skill 的关系
 
-这个提示词是该 skill 的超精简子集，只覆盖以下组件。skill 中 23 张卡片 + 31 个组件在这里缩减为 5 个组件 + 布局系统 + Markdown 映射（含通用 `<link>` 标签）。不设计复杂的 Top-K 分步检索流程，直接用规则 + 示例命中。
+这个提示词是该 skill 的超精简子集，只覆盖以下组件。skill 中 23 张卡片 + 31 个组件在这里缩减为核心组件 + 布局系统 + Markdown 映射（含通用 `<link>` 标签）。不设计复杂的 Top-K 分步检索流程，直接用规则 + 示例命中。
 
 ### 重要设计决策
 
@@ -130,19 +130,28 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 |----------|------------------|
 | 一个重点主题/章节/任务入口，需要作为页面开头强调 | `heroCard` 或 `featureHeroCard` |
 | 单个知识点、材料、结论、学习建议的简短摘要 | `contentSummaryCard` |
-| 多条并列信息，且每条结构相似，如步骤、清单、记录、反馈 | `feedListCard` 或 Markdown 列表 |
-| 多维度对比、属性表、参数表、概念差异、评分/结果矩阵 | `tableCard` |
-| 表格单元格中包含数学公式、数学符号、变量记号（如 `$x_i$`、`$f(x_i)$`、`$L_i(x)$`） | 必须使用 `tableCard`，不要放在普通 Markdown 表格中 |
+| 多条并列信息，且每条结构相似，如步骤、清单、记录、反馈 | Markdown 列表或 `commonStyleList` |
+| 多维度对比、属性表、参数表、概念差异、评分/结果矩阵 | `regularListTable` / `[table:commonStyle]` |
+| 表格单元格中包含数学公式、数学符号、变量记号 | 必须使用 `regularListTable`，不要放在普通 Markdown 表格中 |
+| 需要首字悬挂/图表+说明混合的摘要 | `minimalistChartCard`（`<card:minimalistChartCard>`） |
+| 两个并列图文内容，如"关于企业/关于团队""产品能力/服务优势" | `pairedImageTextCard` |
+| 一段说明下提供多个操作入口（加入我们、申请方式、联系方式） | `multiActionCard` |
+| 紫色背景行动卡，需要层叠浅色面板和一个/两个操作按钮 | `layeredActionCard` |
+| 带确认/操作语义的内容卡（品牌标识、标签、图标、操作） | `confirmableCard` |
+| 纯展示标签/可点击标签/横幅图片面板/居中/标题居中文字卡片 | `textDisplay` 系列（label/labelLink/bannerImagePanel/textCard/textCenterCard/titleCenterCard） |
 | 连续讲解、推导过程、例题解析、长段说明、公式展开 | Markdown + `layout:column` |
 | 多种结构混合出现 | 拆成多个布局区块，各自选择合适组件 |
 
 ### 避免误用
 
-- 不要只因为文本里出现“学习、知识点、课程、题目、解析”等词，就固定选择某个组件。
+- 不要只因为文本里出现"学习、知识点、课程、题目、解析"等词，就固定选择某个组件。
 - 不要为了视觉多样性编造图片、指标、时间、头像、按钮或不存在的字段。
 - 不要把长推导、长解析硬塞进摘要卡；摘要卡只适合短信息。
-- 不要把无明显同构条目的内容硬塞进 `feedListCard`；没有行列关系的内容不要硬塞进 `tableCard`。
-- 不要在普通 Markdown 区块中输出包含数学公式或数学符号的表格；这类表格必须放入 `tableCard` 的 `<table>` slot。
+- 不要把无明显同构条目的内容硬塞进列表容器。
+- 不要在普通 Markdown 区块中输出包含数学公式或数学符号的表格；这类表格必须放入 `regularListTable` 的 `<table>` slot。
+- **列表类组件至少 2 条才使用** — 当列表类组件（如 `commonStyleList` 系列各变体）的条目数不足 2 条时，不要使用列表组件，降级为其他形式。
+- **内容包含 3 项及以上优先使用列表组件** — 如果某段内容由 3 个或更多并列同构条目组成（如功能列表、服务项、步骤、对比条目），应优先使用 `commonStyleList` 系列组件展示，而不是用多个独立的卡片或纯 Markdown 列表。
+- **尽量不要使用 `<br>` 等换行符** — 如果内容是结构化的多条并列信息，应使用列表组件或 Markdown 列表来表达，而不是在段落中用 `<br>` 手动换行。只有在确实非列表场景（如诗歌、地址换行）才可使用 `<br>`。
 - 不确定时，以内容完整、层级清晰为优先，使用 Markdown 降级。
 
 ## 四、组件
@@ -248,88 +257,334 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 </heroCard>
 ```
 
-### `<feedListCard>` 列表卡片
+### `<card:minimalistChartCard>` 简约图表卡片
 
-信息流列表，适合动态更新、固定条目结构。
+使用 `<card:minimalistChartCard>` 标签包裹 Markdown 内容，由 Markdown 映射自动生成。适合首字悬挂的数字/标题/说明 + 图表组合场景。
 
-| slot | 必填 | 说明 |
-|------|------|------|
-| `title` | 否 | 列表标题 |
-| `subtitle` | 否 | 列表副标题 |
-| `command*` | 否 | 命令代码，可多个 |
-| `items` | 是 | 列表项，可重复多条 |
+**Markdown 映射**：
+| Markdown | 映射 slot | 说明 |
+|----------|-----------|------|
+| `##` (h2) | `headerContainer.headerTitle` | 左侧头部编号/主标题 |
+| `###` (h3) | `headerContainer.right.pageTitle` | 右侧头部标题 |
+| 段落 (p) | `headerContainer.right.description` | 右侧头部说明 |
+| `chart:*` | `chartContainer.chart*` | 图表内容 |
 
-items 内部子 slot：
-| 子 slot | 必填 | 说明 |
-|---------|------|------|
-| `avatar` | 否 | 头像图片 |
-| `icon` | 否 | 图标 |
-| `text` | 是 | 文案内容，可内嵌 `<link>` 标签 |
-| `timestamp` | 否 | 时间戳 |
-
-每条 items 的子 slot 可独立选配（例如有的 item 有头像有的没有，text 中可嵌入链接）。
+**布局模式**：
+- 默认模式：标题行（左编号 + 右标题/描述）+ 下方图表行
+- 图表内容使用 `chart:*` 声明
 
 示例：
 ```text
-<feedListCard>
-  <title>项目动态</title>
-  <subtitle>最新更新</subtitle>
-  <items>
-    <avatar src="https://example.com/avatar.jpg"></avatar>
-    <icon>🆕</icon>
-    <text>发布了新的 <strong>AI 摘要</strong> 模块，<link href="https://example.com" nativeEvent="click">查看详情</link></text>
-    <timestamp>1 小时前</timestamp>
-  </items>
-  <items>
-    <icon>✅</icon>
-    <text>数据组完成了日志清洗</text>
-    <timestamp>2 小时前</timestamp>
-  </items>
-</feedListCard>
+<card:minimalistChartCard>
+  ## 03
+  ### 头部品牌分析
+  联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。
+</card:minimalistChartCard>
 ```
 
-### `<tableCard>` 表格卡片
+### `<pairedImageTextCard>` 双子图文卡片
 
-以表格为主体的数据卡。表格须为 Markdown 格式。
-
-**强制规则：**
-- `tableCard` 中的 Markdown 表格必须完整放在 `<table>...</table>` slot 内。
-- `<table>` 开始标签必须出现在表格第一行之前，`</table>` 结束标签必须出现在表格最后一行之后。
-- 禁止出现孤立的 `</table>`，禁止把 Markdown 表格直接写在 `tableCard` 根级。
-- 只要表格内容包含数学公式、数学符号或变量记号（例如 `$x_i$`、`$f(x_i)$`、`$L_i(x)$`、`$S(x)$`），必须使用 `tableCard` 包裹，不要使用普通 Markdown 表格。
+固定包含两个子模块的图文卡片。外层用于主题标题，内部必须有 `primaryItem` 和 `secondaryItem` 两个子内容；每个子内容都由图片、标题、正文组成。
 
 | slot | 必填 | 说明 |
 |------|------|------|
-| `table` | 是 | Markdown 表格 |
-| `title` | 否 | 标题 |
-| `icon` | 否 | 头部图标 |
-| `badge` | 否 | 徽章 |
-| `subtitle` | 否 | 副标题 |
-| `description` | 否 | 描述文本 |
-| `command*` | 否 | 命令代码，可多个 |
-| `footer` | 否 | 底部脚注 |
+| `label` | 否 | 紫色分组标题 |
+| `title` | 是 | 外层黑色主题标题 |
+| `content` | 是 | 外层内容说明 |
+| `primaryItem` | 是 | 第一个子内容 |
+| `secondaryItem` | 是 | 第二个子内容 |
 
-示例——完整版：
+`primaryItem` / `secondaryItem` 内部子 slot：
+| 子 slot | 必填 | 说明 |
+|---------|------|------|
+| `image` | 是 | 子内容图片（`src`/`alt` 属性），宽高比 4:3 |
+| `title` | 是 | 子内容标题 |
+| `body` | 是 | 子内容正文 |
+
+**布局模式**（由 slot 组合自动触发）：
+- `default`（无 label）：标题 + 内容 + 双列 grid（primaryItem / secondaryItem）
+- `withLabel`（有 label）：label + 标题 + 内容 + 双列 grid
+
+**适用场景**：一个主题下并列展示两个图文说明，例如"关于企业/关于团队""产品能力/服务优势"等场景。不要用于单个内容或三个及以上内容。
+
+示例：
 ```text
-<tableCard>
-  <icon>📊</icon>
-  <badge>年度报告</badge>
-  <title>2024 年度销售数据</title>
-  <subtitle>季度业绩对比</subtitle>
-  <description>全年四个季度的销售表现。</description>
-  <table>
-| 季度 | 销售额(万) | 增长率 |
-|------|-----------|--------|
-| Q1 | 1250 | +12% |
-| Q2 | 1680 | +18% |
-  </table>
-  <footer>数据来源：财务系统</footer>
-</tableCard>
+<pairedImageTextCard>
+  <label>公司简介</label>
+  <title>致力于提供最先进的数字化解决方案</title>
+  <content>我们围绕技术、团队与服务能力，为客户提供可持续的数字化支持。</content>
+  <primaryItem>
+    <image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论" />
+    <title>关于企业</title>
+    <body>我们是一家专注于人工智能和大数据领域的创新科技公司。</body>
+  </primaryItem>
+  <secondaryItem>
+    <image src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=800" alt="团队协作会议" />
+    <title>关于团队</title>
+    <body>我们拥有一支充满活力和创新精神的技术团队。</body>
+  </secondaryItem>
+</pairedImageTextCard>
 ```
 
-示例——含数学符号的表格必须使用 tableCard：
+### `<multiActionCard>` 多按钮操作卡片
+
+用于一段说明内容下提供多个操作入口的场景，例如加入我们、申请方式、联系方式、下载入口或多个跳转按钮。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `label` | 否 | 顶部紫色标题 |
+| `title` | 否 | 可选主标题 |
+| `description` | 是 | 主要说明文字 |
+| `actionLabel` | 否 | 按钮组标题 |
+| `primaryAction` | 是 | 主操作项（支持 `nativeEvent`/`data` 属性） |
+| `secondaryAction` | 否 | 次操作项，可重复（支持 `nativeEvent`/`data` 属性） |
+
+**布局模式**：
+- `default`：label/title/description 头部 + 按钮组标题 + 三列 grid 按钮区
+
+**适用场景**：多个并列按钮操作入口，如"加入我们""联系方式""申请方式"。不要用于只有一个按钮的普通摘要卡。
+
+**注意**：按钮视觉上呈现为按钮，但底层是普通文本容器，通过 `nativeEvent`/`data` 响应事件，不使用 button 默认跳转行为。
+
+示例：
 ```text
-<tableCard>
+<multiActionCard>
+  <label>加入我们</label>
+  <description>成为我们团队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长。</description>
+  <actionLabel>应聘方式</actionLabel>
+  <primaryAction nativeEvent="click" data="officialApply">官网在线申请</primaryAction>
+  <secondaryAction nativeEvent="click" data="wechatApply">公众号后台申请</secondaryAction>
+  <secondaryAction nativeEvent="click" data="emailApply">发送邮件申请</secondaryAction>
+</multiActionCard>
+```
+
+### `<layeredActionCard>` 层叠式行动卡片
+
+紫色主视觉背景上叠加浅色信息面板，并提供一个或两个操作入口的卡片。适合订阅通讯、开启助手、加入计划或领取权益等场景。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `icon` | 否 | 左上角图标（与 badge 二选一） |
+| `badge` | 否 | 左上角小标签（与 icon 二选一） |
+| `title` | 是 | 主标题第一行 |
+| `titleAccent` | 否 | 主标题第二行强调文字（颜色不同） |
+| `description` | 是 | 底部浅色面板说明文字 |
+| `primaryAction` | 是 | 主操作项（支持 `nativeEvent`/`data`） |
+| `secondaryAction` | 否 | 次操作项，双按钮场景使用（支持 `nativeEvent`/`data`） |
+
+**布局模式**（由 slot 组合自动触发）：
+| 模式 | 触发条件 | 说明 |
+|------|----------|------|
+| `withIconAndActions` | 有 icon + 有 secondaryAction | 左上 icon + 标题 + 层叠面板（描述 + 双按钮） |
+| `withBadgeAndActions` | 有 badge + 有 secondaryAction | 左上 badge + 标题 + 层叠面板（描述 + 双按钮） |
+| `withActions` | 有 secondaryAction（无 icon/badge） | 纯标题 + 层叠面板（描述 + 双按钮） |
+| `withIcon` | 有 icon（单按钮） | 左上 icon + 标题 + 层叠面板（描述 + 单按钮） |
+| `withBadge` | 有 badge（单按钮） | 左上 badge + 标题 + 层叠面板（描述 + 单按钮） |
+| `default` | 默认（单按钮） | 纯标题 + 层叠面板（描述 + 单按钮） |
+
+**适用场景**：需要强调一个行动入口，并带有层叠浅色说明区域的卡片。标题单行时只使用 title；需要两行且第二行不同颜色时使用 title + titleAccent。
+
+示例——双按钮带 icon：
+```text
+<layeredActionCard>
+  <icon>✦</icon>
+  <title>订阅我们的</title>
+  <titleAccent>新闻通讯</titleAccent>
+  <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>
+  <primaryAction nativeEvent="click" data="subscribe">订阅</primaryAction>
+  <secondaryAction nativeEvent="click" data="later">稍后再说</secondaryAction>
+</layeredActionCard>
+```
+
+示例——单按钮带 badge：
+```text
+<layeredActionCard>
+  <badge>官方</badge>
+  <title>开始使用AI助手</title>
+  <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>
+  <primaryAction nativeEvent="click" data="startAssistant">开始使用</primaryAction>
+</layeredActionCard>
+```
+
+### `<confirmableCard>` 可确认内容卡片
+
+用于带确认/操作语义的内容卡。适合品牌/人物/任务/活动/提示类卡片，卡片本身可承载确认、刷新、查看详情等操作。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `visual` | 否 | 左上角主视觉图片（`src`/`alt` 属性），贴紧卡片左上角 |
+| `tag` | 否 | 左上角小文字（visual 与 tag 通常二选一） |
+| `cornerIcon` | 否 | 右上角静态图标，只展示不点击 |
+| `cornerIconAction` | 否 | 右上角图标按钮，可点击（支持 `nativeEvent`/`data`） |
+| `title` | 否 | 卡片主标题 |
+| `body` | 否 | 卡片正文说明 |
+| `primaryAction` | 否 | 底部主操作项（支持 `nativeEvent`/`data`） |
+
+**布局模式**（由 slot 组合自动触发）：
+| 模式 | 触发条件 | 说明 |
+|------|----------|------|
+| `withVisual` | 有 visual | 左上视觉图占 59.17% 宽度 + 右上角图标 + 标题/正文 + 底部操作 |
+| `default` | 默认（无 visual） | 左上 tag/空 + 右上角图标 + 标题/正文 + 底部操作 |
+
+**适用场景**：品牌标识卡片、人物介绍卡片、带确认操作的任务卡片。visual（图片）与 tag（文字）通常二选一；cornerIcon（静态）与 cornerIconAction（可点击）按需选择。cornerIcon / cornerIconAction 只能放图标符号，不放普通文字。
+
+示例——带 visual 和 cornerIcon：
+```text
+<confirmableCard>
+  <visual src="https://example.com/logo.png" alt="品牌图形" />
+  <cornerIcon>↻</cornerIcon>
+  <title>鼎道智联</title>
+  <body>正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字</body>
+</confirmableCard>
+```
+
+示例——带 tag、cornerIconAction 和 primaryAction：
+```text
+<confirmableCard>
+  <tag>标签文字</tag>
+  <cornerIconAction nativeEvent="click" data="open">↗</cornerIconAction>
+  <title>打破常规、说到做到，年终给满！</title>
+  <primaryAction nativeEvent="click" data="confirm">按钮</primaryAction>
+</confirmableCard>
+```
+
+### textDisplay 文字展示系列
+
+textDisplay 包含 6 种子组件，用于纯文字展示场景。
+
+#### `<label>` 纯展示标签
+
+纯展示标签，背景色可配置。内联显示，圆角胶囊样式。
+
+| 属性 | 必填 | 说明 |
+|------|------|------|
+| 内容 | 是 | 标签文字 |
+
+```text
+<label>标签文字</label>
+```
+
+#### `<label>`（可点击标签 / labelLink）
+
+带右箭头的可点击标签。使用 `nativeEvent` 属性变为可点击，视觉上有右箭头指示。
+
+| 属性 | 必填 | 说明 |
+|------|------|------|
+| 内容 | 是 | 标签文字 |
+| `nativeEvent` | 是（可点击时） | 点击事件名 |
+
+```text
+<label nativeEvent="click">查看更多</label>
+```
+
+#### `<bannerImagePanel>` 横幅图片面板
+
+横幅图片面板，内部 Markdown 映射：`##` → 标题、`###` → 副标题。自带背景图，白字展示。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `title` | 否 | 主标题（由 `##` 映射） |
+| `subtitle` | 否 | 副标题（由 `###` 映射） |
+
+```text
+<bannerImagePanel>
+  <title>活动推广标题</title>
+  <subtitle>副标题说明文字</subtitle>
+</bannerImagePanel>
+```
+
+#### `<textCard>` 文字卡片
+
+通用文字卡片，支持标题 + 副标题 + 正文 + CTA 按钮。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `text_title` | 是 | 标题（渐变品牌色） |
+| `text_subtitle` | 否 | 副标题（有副标题时标题样式切换为品牌色） |
+| `text_text` | 否 | 正文内容 |
+| `cta` | 否 | 底部按钮（支持 `href`/`target` 属性） |
+
+**布局模式**：
+- `full`（有 text_subtitle）：副标题 + 标题 + 正文 + CTA
+- `default`（无 text_subtitle）：标题 + 正文 + CTA
+
+```text
+<textCard>
+  <text_title>标题文字</text_title>
+  <text_subtitle>副标题文字</text_subtitle>
+  <text_text>正文内容说明文字。</text_text>
+  <cta href="https://example.com">了解更多</cta>
+</textCard>
+```
+
+#### `<textCenterCard>` 居中文字卡片
+
+文字卡片居中版，内容水平居中。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `text_subtitle` | 否 | 副标题（品牌色，有副标题时标题样式改变） |
+| `text_title` | 是 | 主标题（黑色） |
+| `text_text` | 否 | 正文内容（居中） |
+
+**布局模式**：
+- `full`（有 text_subtitle）：副标题 + 标题 + 正文（垂直排列居中）
+- `default`（无 text_subtitle）：标题 + 正文（居中）
+
+```text
+<textCenterCard>
+  <text_subtitle>副标题</text_subtitle>
+  <text_title>居中标题</text_title>
+  <text_text>居中说明文字。</text_text>
+</textCenterCard>
+```
+
+#### `<titleCenterCard>` 标题居中卡片
+
+标题居中卡片，副标题作为超大背景文字居中叠加，主标题覆盖其上。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `text_subtitle` | 否 | 超大背景文字（`position: absolute` 居中） |
+| `text_title` | 是 | 主标题（叠加在上方） |
+
+```text
+<titleCenterCard>
+  <text_subtitle>大号背景</text_subtitle>
+  <text_title>前景标题文字</text_title>
+</titleCenterCard>
+```
+
+### `regularListTable` / `[table:commonStyle]` 常规列表表格
+
+淡紫表头、行 hover、左侧首尾圆角的常规列表表格。使用 `[table:commonStyle]` 标签声明，或使用 `<card:regularListTable>` 包裹。
+
+**两种使用方式**：
+1. 表格标签（推荐）：使用 `[table:commonStyle]` 标签直接声明
+2. 卡片包裹：使用 `<card:regularListTable>` 包裹 Markdown 表格
+
+**强制规则**：
+- Markdown 表格必须完整放在 `<table>...</table>` slot 内（使用卡片包裹模式时）。
+- 只要表格内容包含数学公式、数学符号或变量记号，必须使用 `regularListTable`，不要放在普通 Markdown 表格中。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `title` | 否 | 表格标题 |
+| `table` | 是 | Markdown 表格内容（Markdown 映射由 `##`/`###` 自动识别 title，`table` 自动识别表格） |
+
+示例——表格标签模式：
+```text
+## 常规列表
+[table:commonStyle]
+| DingOS版本号 | 设备数量 | 操作 |
+|------|------|------|
+| AWS | 美国、亚洲、亚太 | ⟳ ⋮ |
+| Azure | 全球20+区域 | ⟳ ⋮ |
+```
+
+示例——卡片包裹模式：
+```text
+<card:regularListTable>
   <title>符号说明</title>
   <table>
 | 符号 | 含义 |
@@ -337,9 +592,139 @@ items 内部子 slot：
 | $x_i$ | 第 i 个插值节点 |
 | $f(x_i)$ | 节点处函数值 |
 | $L_i(x)$ | 拉格朗日基函数 |
-| $S(x)$ | 样条函数 |
   </table>
-</tableCard>
+</card:regularListTable>
+```
+
+### commonStyleList 通用列表系列
+
+5 种通用网格/列表组件，用于并列条目、功能列表、服务项等场景。所有变体均支持通过 CSS 变量自定义颜色（`headerTint`、`accentColor`、`titleColor`、`iconColor`、`contentTint`）。
+
+#### 图1：`<commonStyleListItemRow>` 叠层双块行卡
+
+平铺 icon / title / content，icon 块与文字块上下叠层错位。适合网格展示。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `icon` | 否 | 图标 |
+| `title` | 是 | 标题 |
+| `content` | 否 | 内容 |
+
+```text
+<commonStyleListItemRow>
+  <icon>🔧</icon>
+  <title>功能名称</title>
+  <content>功能描述文字</content>
+</commonStyleListItemRow>
+```
+
+#### 图2：`<commonStyleList>` + `<card:commonStyleListItem>` 网格列表容器
+
+容器 + 列表项（含 `layout:column`），icon 在上、文案在下。适合卡片网格。
+
+```text
+<commonStyleList>
+  <card:commonStyleListItem>
+    <layout:column>
+      <icon>🔧</icon>
+      <title>功能名称</title>
+      <content>功能描述文字</content>
+    </layout:column>
+  </card:commonStyleListItem>
+</commonStyleList>
+```
+
+#### 图3：`<commonStyleServiceList>` 行列表（带分隔线）
+
+单行布局：icon + title + content + 操作按钮（sync/more），每行底部带分隔线。支持 loop 平铺或 item 列表两种模式。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `icon` | 否 | 图标（24×24） |
+| `title` | 是 | 标题 |
+| `content` | 否 | 内容文字 |
+| `description` | 否 | 描述（与 content 同区域） |
+| `sync` | 否 | 同步/刷新操作 |
+| `more` | 否 | 更多操作 |
+
+**布局模式**：
+- `itemList`（有 item）：用 `item*` 列表承载多条数据
+- `flatRowLoop`（有 title）：平铺单行布局
+
+```text
+<commonStyleServiceList>
+  <icon>🔧</icon>
+  <title>服务名称</title>
+  <content>服务描述</content>
+  <more>⋮</more>
+</commonStyleServiceList>
+```
+
+#### 图4：`<commonStyleServiceListDesc>` 行列表 + 描述列
+
+与图3类似，但 icon + title + desc 垂直排列。适合需要展示更多细节的场景。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `icon` | 否 | 图标（24×24） |
+| `title` | 是 | 标题 |
+| `desc` | 否 | 描述文字（垂直位于 title 下方） |
+| `sync` | 否 | 同步操作 |
+| `more` | 否 | 更多操作 |
+
+**布局模式**：
+- `itemList`（有 item）：列表模式
+- `flatRowDesc`（有 textCol）：平铺模式
+
+```text
+<commonStyleServiceListDesc>
+  <icon>🔧</icon>
+  <layout:column>
+    <title>服务名称</title>
+    <desc>服务详细描述文字</desc>
+  </layout:column>
+</commonStyleServiceListDesc>
+```
+
+#### 图5：`<commonStyleServiceListCompact>` 堆叠卡（≤3 条）
+
+小尺寸堆叠卡片，适合紧凑布局。最多支持 3 条数据，以层叠效果展示。第一张卡紫色背景、第二张灰色、第三张浅蓝色。
+
+| slot | 必填 | 说明 |
+|------|------|------|
+| `icon` | 否 | 图标（48×48 大图标） |
+| `title` | 是 | 标题 |
+| `desc` | 否 | 描述（垂直位于 title 下方） |
+| `link` | 否 | 右侧操作链接 |
+
+**布局模式**：
+- `flatRowDesc`（有 textCol）：单张平铺模式
+- `stackDeck`（有 item）：堆叠模式（≤3 条自动层叠）
+
+```text
+<commonStyleServiceListCompact>
+  <icon>🔧</icon>
+  <layout:column>
+    <title>功能一</title>
+    <desc>功能描述</desc>
+  </layout:column>
+</commonStyleServiceListCompact>
+```
+
+带堆叠 item 的模式：
+```text
+<commonStyleServiceListCompact>
+  <item>
+    <icon>🔧</icon>
+    <title>功能一</title>
+    <desc>描述文字</desc>
+  </item>
+  <item>
+    <icon>⚙️</icon>
+    <title>功能二</title>
+    <desc>描述文字</desc>
+  </item>
+</commonStyleServiceListCompact>
 ```
 
 ### 数学公式
@@ -365,4 +750,9 @@ $$
 5. **slot 命名严格** — 使用上表中列出的精确 slot 名，如 heroCard 的 `cover_image` 不能写成 `coverImage`，featureHeroCard 的 `coverImage` 不能写成 `cover_image`。
 6. **主体不横向且默认拉伸** — 根路径不要使用横向主体布局。`<layout:root>` 下应以主 `<layout:column alignItems="stretch">` 组织内容；`layout:row`、`layout:gallery` 只允许作为局部辅助布局使用。
 7. **按信息结构选组件** — 不要按关键词或固定学习分类机械套用组件；必须根据内容的实际结构和表达目的选择展示方式。
-8. **公式表格必须使用 tableCard** — 包含 `$...$` 公式、数学符号或变量记号的表格，必须写入 `tableCard` 的 `<table>...</table>` slot，不能作为普通 Markdown 表格直接放在 `layout:*` 中。
+8. **公式表格必须使用 regularListTable** — 包含 `$...$` 公式、数学符号或变量记号的表格，必须写入 `regularListTable` 的 `<table>` slot 或使用 `[table:commonStyle]` 标签，不能作为普通 Markdown 表格直接放在 `layout:*` 中。
+9. **按钮类 slot 使用 nativeEvent/data 响应** — `multiActionCard` 的 `primaryAction`/`secondaryAction`、`layeredActionCard` 的 `primaryAction`/`secondaryAction`、`confirmableCard` 的 `primaryAction`/`cornerIconAction` 等操作类 slot，视觉上呈现为按钮但底层是文本容器，通过 `nativeEvent`/`data` 属性响应事件，不使用 button 默认跳转行为。
+10. **双子图文卡必须同时提供 primaryItem 和 secondaryItem** — `pairedImageTextCard` 必须同时提供两个子内容，不可只用其一；每个子内容必须包含 `image`、`title`、`body` 三个子 slot。
+11. **禁止使用 `{{}}` 模板占位符** — 所有 `title`、`description`、`text`、`body` 等 slot 内容必须由 AI 直接填入真实文本，不允许出现 `{{标题内容}}`、`{{SUMMARY_CARD_COMMIT_LABEL}}` 等模板变量或占位符。输出即为最终内容，无需二次替换。
+12. **数学公式必须使用 `$...$` 格式，禁止 `\(...\)`** — 所有行内公式必须用 `$...$` 包裹（如 `$x$`、`$\varepsilon$`），块级公式用 `$$...$$`。禁止使用 `\(x\)`、`\[...\]` 等 LaTeX 标准格式，这些格式虽然系统有兼容处理但不保证正确渲染。
+13. **禁止在组件 slot 内容中使用 `<br/>`** — `contentSummaryCard` 的 `description`、`heroCard` 的 `subtitle`、`featureHeroCard` 的 `description` 等文本 slot 内禁止使用 `<br/>` 换行。多段内容应拆分为多个独立组件展示，或使用 Markdown 列表/空行（空行在 Markdown 中自动形成段落）。

@@ -31,61 +31,7 @@ confirmableCard
 用于带确认/操作语义的内容卡。左上可以是贴边图片 visual 或小文字 tag，右上可以是静态 cornerIcon 或可点击 cornerIconAction；正文区域支持 title/body，底部可选 primaryAction。
 
 
-herocard
 featureHeroCard
-
-
-列表
-feedListCard
-
-<feedListCard>
-  <title>项目动态</title>
-  <subtitle>最新 3 条更新 · 自动排列列表项</subtitle>
-
-  <items>
-    <avatar src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200"></avatar>
-    <icon>🆕</icon>
-    <text>产品团队发布了新的 <strong>AI 摘要</strong> 模块，正在灰度测试。</text>
-    <timestamp>1 小时前</timestamp>
-    <cta_inline href="https://example.com/feedback">回复</cta_inline>
-  </items>
-
-  <items>
-    <avatar src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200"></avatar>
-    <icon>✅</icon>
-    <text>数据组完成了日志清洗，指标可视化延迟降至 <strong>320ms</strong>。</text>
-    <timestamp>2 小时前</timestamp>
-    <cta_inline href="https://example.com/thanks">点赞</cta_inline>
-  </items>
-
-  <items>
-    <icon>📝</icon>
-    <text>市场同学提交了 4 条客户反馈，需要设计 review。</text>
-    <timestamp>昨天</timestamp>
-    <cta_inline href="https://example.com/tasks">查看任务</cta_inline>
-  </items>
-</feedListCard>
-
-
-表格
-tableCard
-
-<tableCard>
-  <icon>📊</icon>
-  <badge>年度报告</badge>
-  <title>2024 年度销售数据</title>
-  <subtitle>季度业绩对比分析</subtitle>
-  <description>本报告展示了全年四个季度的销售表现，包括销售额、增长率和目标完成情况。</description>
-  <table>
-| 季度 | 销售额(万) | 增长率 | 目标完成度 |
-|------|-----------|--------|-----------|
-| Q1 | 1250 | +12% | 104% |
-| Q2 | 1680 | +18% | 112% |
-| Q3 | 1920 | +15% | 108% |
-| Q4 | 2150 | +20% | 115% |
-  </table>
-  <footer>数据更新时间：2024-12-31 | 数据来源：财务系统</footer>
-</tableCard>
 
 
 数学公式
@@ -134,3 +80,26 @@ F &= ma
 $$
 
 注：行内公式会保持与文字同行，字号与正文一致；块级公式会居中显示，带有浅灰背景和左侧品牌色边框。系统会智能识别数学公式，自动从 text 类型转换为 math 类型，并使用专门样式渲染。
+
+文字展示
+textDisplay
+包含 label / labelLink（标签）、bannerImagePanel（横幅图片面板）、textCard / textCenterCard / titleCenterCard（文字卡片系列）。
+- label：纯展示标签，背景可配置
+- labelLink：可点击标签（带右箭头），支持 nativeEvent
+- bannerImagePanel：横幅图片面板，内部 markdown 映射 h2→title、h3→subtitle
+- textCard：文字卡片，插槽：text_title、text_subtitle（可选）、text_text、cta（可选）
+- textCenterCard：居中文字卡片，插槽：text_subtitle、text_title、text_text
+- titleCenterCard：标题居中卡片，插槽：text_subtitle、text_title
+
+常规列表表格
+tableCommonStyle / [table:commonStyle]
+淡紫表头、行 hover、左侧首尾圆角的常规列表表格。使用 `[table:commonStyle]` 标签声明，表头品牌色填充、白字，行带 hover 效果。
+
+通用 List
+commonStyleList
+5 种通用网格/列表组件：
+- 图1 commonStyleListItemRow：叠层双块行卡（平铺 icon / title / content）
+- 图2 commonStyleList + card:commonStyleListItem：网格列表容器和列表项（含 layout:column）
+- 图3 commonStyleServiceList：行列表（带分隔线，loop 平铺 icon / title / content）
+- 图4 commonStyleServiceListDesc：行列表+描述列（icon + title + desc 垂直排列）
+- 图5 commonStyleServiceListCompact：堆叠卡（≤3 条，小尺寸，适合紧凑布局）
