@@ -384,9 +384,9 @@ const TEXT_STYLE = {
             color: "{color.onsurfacecontainer.grey9}",
         },
         precentItemLabel: {
-            fontSize: "{font.size.small}",
-            fontWeight: "bold",
-            color: "{color.onprimary.white100}",
+            fontSize: "{font.size.medium}",
+            fontWeight: "700",
+            color: "{color.surfacecontainer.white100}",
         },
         percentValue: {
             fontSize: "{font.size.xxl}",
@@ -454,19 +454,20 @@ const TEXT_STYLE = {
 
         minimalistChartCardHeaderTitle: {
             fontSize: "{dimension.basic.dimension.80}",
-            fontWeight: "{font.fontweight.bold}",
+            fontWeight: "700",
             color: "{color.basic.brand.1}"
         },
 
         minimalistChartCardPageTitle: {
-            fontSize: "{font.size.large}",
-            fontWeight: "{font.fontweight.bold}",
+            fontSize: "{font.size.xl}",
+            fontWeight: "700",
             color: "{color.onsurface.black88}",
         },
 
         minimalistChartCardDescription: {
             lineHeight: "1.4",
             fontSize: "{font.size.small}",
+            fontWeight: "350",
             color: "{color.onsurface.black64}",
         },
 

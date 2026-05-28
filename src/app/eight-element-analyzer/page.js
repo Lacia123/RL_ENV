@@ -2795,6 +2795,50 @@ style: {
 </layout:row>
 `
   },
+  textDisplay: {
+    name: '文字展示',
+    description: 'textCard / textCenterCard / titleCenterCard 示例',
+    markdown: `
+<label>中国市场</label>
+<labelLink nativeEvent="click">中国市场</labelLink>
+
+
+<bannerImagePanel>
+  ## 智能云平台竞对动态分析
+  ### 数据反馈
+</bannerImagePanel>
+
+<textCard>
+  <text_title>限时</text_title>
+  <text_text> 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。</text_text>
+</textCard>
+
+<textCard>
+  <text_title>限时</text_title>
+  <text_text> 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。</text_text>
+  <cta href="https://example.com/promo">按钮</cta>
+</textCard>
+
+<textCard>
+  <text_title>限时</text_title>
+  <text_subtitle>年终大促活动</text_subtitle>
+  <text_text> 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。</text_text>
+  <cta href="https://example.com/promo">按钮</cta>
+</textCard>
+
+<textCenterCard>
+  <text_subtitle>Section 1</text_subtitle>
+  <text_title>特大标题居中</text_title>
+  <text_text> 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。</text_text>
+</textCenterCard>
+
+<titleCenterCard>
+  <text_subtitle>Job Detial</text_subtitle>
+  <text_title>岗位详情</text_title>
+</titleCenterCard>
+
+`
+  },
   customFeature: {
     name: '自定义样式',
     description: '用于展示自定义样式',
