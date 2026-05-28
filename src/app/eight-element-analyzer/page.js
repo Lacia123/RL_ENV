@@ -2866,6 +2866,200 @@ style: {
 
 </layout:row>
     `
+  },
+  pairedImageTextCardDemo: {
+    name: '🖼 双子模块图文卡片',
+    description: 'pairedImageTextCard 固定包含两个子模块的卡片。外层用于主题标题，内部有 primaryItem 和 secondaryItem 两个子内容；每个子内容都由图片、标题、正文组成。',
+    markdown: `# 双子模块图文卡片展示
+
+## pairedImageTextCard
+
+固定包含两个子模块的卡片。外层用于主题标题，内部必须有 primaryItem 和 secondaryItem 两个子内容；每个子内容都由图片、标题、正文组成。
+
+<pairedImageTextCard>
+  <label>公司简介</label>
+  <title>致力于提供最先进的数字化解决方案</title>
+  <content>我们围绕技术、团队与服务能力，为客户提供可持续的数字化支持。</content>
+  <primaryItem>
+    <image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论" />
+    <title>关于企业</title>
+    <body>我们是一家专注于人工智能和大数据领域的创新科技公司，围绕数据治理、智能分析、业务自动化与系统集成，为客户提供从方案规划到落地交付的完整支持。</body>
+  </primaryItem>
+  <secondaryItem>
+    <image src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=800" alt="团队协作会议" />
+    <title>关于团队</title>
+    <body>我们拥有一支充满活力和创新精神的技术团队，汇聚了来自不同领域的优秀人才。</body>
+  </secondaryItem>
+</pairedImageTextCard>
+
+## 不带 label 的 pairedImageTextCard
+
+当不需要顶部紫色标签名时，直接提供 title 和 content 即可。
+
+<pairedImageTextCard>
+  <title>产品能力与服务优势</title>
+  <content>我们围绕技术、团队与服务能力，为客户提供可持续的数字化支持。</content>
+  <primaryItem>
+    <image src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=800" alt="产品能力展示" />
+    <title>产品能力</title>
+    <body>提供端到端的 AI 解决方案，涵盖智能分析、自动化流程、数据可视化等核心能力，帮助企业实现智能决策。</body>
+  </primaryItem>
+  <secondaryItem>
+    <image src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=800" alt="服务优势" />
+    <title>服务优势</title>
+    <body>7×24 小时技术支持、专属客户经理、敏捷响应团队，确保每一位客户都能获得及时专业的服务体验。</body>
+  </secondaryItem>
+</pairedImageTextCard>
+    `
+  },
+  multiActionCardDemo: {
+    name: '🔘 多按钮操作卡片',
+    description: 'multiActionCard 用于一段说明内容下提供多个操作入口。包含顶部标题、说明文本、按钮组标题、主操作项和可重复次操作项；操作项使用 nativeEvent/data 响应。',
+    markdown: `# 多按钮操作卡片展示
+
+## multiActionCard
+
+用于一段说明内容下提供多个操作入口。包含顶部标题、说明文本、按钮组标题、主操作项和可重复次操作项；操作项使用 nativeEvent/data 响应，不使用 button 默认跳转行为。
+
+<multiActionCard>
+  <label>加入我们</label>
+  <description>成为我们团队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长，共同打造行业领先的解决方案。</description>
+  <actionLabel>应聘方式</actionLabel>
+  <primaryAction nativeEvent="click" data="officialApply">官网在线申请</primaryAction>
+  <secondaryAction nativeEvent="click" data="wechatApply">公众号后台申请</secondaryAction>
+  <secondaryAction nativeEvent="click" data="emailApply">发送邮件申请</secondaryAction>
+</multiActionCard>
+
+## 带标题的多按钮操作卡片
+
+使用 title 插槽补充一个更加明确的行动主张。
+
+<multiActionCard>
+  <title>加入我们，共创未来</title>
+  <description>我们正在寻找充满激情的技术人才，如果你对 AI 和大数据充满热情，欢迎加入我们。</description>
+  <actionLabel>联系方式</actionLabel>
+  <primaryAction nativeEvent="click" data="contactHR">联系HR</primaryAction>
+  <secondaryAction nativeEvent="click" data="viewJobs">查看职位</secondaryAction>
+  <secondaryAction nativeEvent="click" data="visitOffice">预约参观</secondaryAction>
+</multiActionCard>
+
+## 简洁多按钮卡片
+
+只有说明文字和操作按钮。
+
+<multiActionCard>
+  <description>立即下载我们的产品手册，了解更多产品功能与解决方案。</description>
+  <actionLabel>下载方式</actionLabel>
+  <primaryAction nativeEvent="click" data="downloadPDF">下载 PDF 手册</primaryAction>
+  <secondaryAction nativeEvent="click" data="downloadPPT">下载 PPT 介绍</secondaryAction>
+</multiActionCard>
+    `
+  },
+  layeredActionCardDemo: {
+    name: '🎨 层叠式行动卡片',
+    description: 'layeredActionCard 用于紫色背景加底部浅色信息面板的行动卡。左上可以是 icon 或 badge，标题可用 title + titleAccent 表达上下两行不同权重；按钮支持单按钮或 primaryAction + secondaryAction 双按钮。',
+    markdown: `# 层叠式行动卡片展示
+
+## layeredActionCard
+
+用于紫色背景加底部浅色信息面板的行动卡。左上可以是 icon 或 badge，标题可用 title + titleAccent 表达上下两行不同权重；按钮支持单按钮或 primaryAction + secondaryAction 双按钮。
+
+### 图标 + 双按钮模式
+
+<layeredActionCard>
+  <icon>✦</icon>
+  <title>订阅我们的</title>
+  <titleAccent>新闻通讯</titleAccent>
+  <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>
+  <primaryAction nativeEvent="click" data="subscribe">订阅</primaryAction>
+  <secondaryAction nativeEvent="click" data="later">稍后再说</secondaryAction>
+</layeredActionCard>
+
+### 标签 + 单按钮模式
+
+<layeredActionCard>
+  <badge>官方</badge>
+  <title>开始使用AI助手</title>
+  <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>
+  <primaryAction nativeEvent="click" data="startAssistant">开启助手</primaryAction>
+</layeredActionCard>
+
+### 纯标题 + 单按钮模式
+
+<layeredActionCard>
+  <title>加入会员计划</title>
+  <description>成为我们的会员，享受专属优惠、优先体验新功能以及更多增值服务。</description>
+  <primaryAction nativeEvent="click" data="joinNow">立即加入</primaryAction>
+</layeredActionCard>
+
+### 图标 + 单按钮模式
+
+<layeredActionCard>
+  <icon>💡</icon>
+  <title>产品更新</title>
+  <titleAccent>v3.0 已发布</titleAccent>
+  <description>新版本带来了更强大的 AI 分析能力、更流畅的交互体验，以及更多实用功能。</description>
+  <primaryAction nativeEvent="click" data="upgrade">升级体验</primaryAction>
+</layeredActionCard>
+
+### 标签 + 双按钮模式
+
+<layeredActionCard>
+  <badge>限时活动</badge>
+  <title>年终特惠</title>
+  <titleAccent>全场 8 折起</titleAccent>
+  <description>即日起至年底，购买年度会员享受超值折扣，错过再等一年。</description>
+  <primaryAction nativeEvent="click" data="buyNow">立即购买</primaryAction>
+  <secondaryAction nativeEvent="click" data="learnMore">了解更多</secondaryAction>
+</layeredActionCard>
+    `
+  },
+  confirmableCardDemo: {
+    name: '✅ 可确认内容卡片',
+    description: 'confirmableCard 用于带确认/操作语义的内容卡。左上可以是贴边图片 visual 或小文字 tag，右上可以是静态 cornerIcon 或可点击 cornerIconAction；正文区域支持 title/body，底部可选 primaryAction。',
+    markdown: `# 可确认内容卡片展示
+
+## confirmableCard
+
+用于带确认/操作语义的内容卡。左上可以是贴边图片 visual 或小文字 tag，右上可以是静态 cornerIcon 或可点击 cornerIconAction；正文区域支持 title/body，底部可选 primaryAction。
+
+### 带左上图片 + 右上静态图标
+
+<confirmableCard>
+  <visual src="https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png" alt="品牌图形" />
+  <cornerIcon>↻</cornerIcon>
+  <title>鼎道智联</title>
+  <body>正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字</body>
+</confirmableCard>
+
+### 左上标签 + 右上可点击图标 + 底部按钮
+
+<confirmableCard>
+  <tag>标签文字</tag>
+  <cornerIconAction nativeEvent="click" data="open">↗</cornerIconAction>
+  <title>打破常规、说到做到，年终给满！</title>
+  <primaryAction nativeEvent="click" data="confirm">确认</primaryAction>
+</confirmableCard>
+
+### 带左上图片 + 正文 + 底部按钮
+
+<confirmableCard>
+  <visual src="https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png" alt="品牌图形" />
+  <title>企业品牌展示</title>
+  <body>我们致力于为企业提供全方位的数字化解决方案，帮助客户实现业务增长与智能化转型。</body>
+  <primaryAction nativeEvent="click" data="viewDetails">查看详情</primaryAction>
+</confirmableCard>
+
+### 纯文字标签模式
+
+<confirmableCard>
+  <tag>推荐</tag>
+  <cornerIcon>★</cornerIcon>
+  <title>精选内容推荐</title>
+  <body>基于你的阅读偏好，我们推荐以下精选内容。内容涵盖行业趋势、技术干货和最佳实践。</body>
+  <primaryAction nativeEvent="click" data="readMore">阅读更多</primaryAction>
+</confirmableCard>
+    `
   }
 };
 
