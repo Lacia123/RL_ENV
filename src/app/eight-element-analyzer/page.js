@@ -17,6 +17,8 @@ import CrepeMarkdownEditor from '../components/CrepeMarkdownEditor';
 // 支持的特殊语法：
 // - <layout:row> 水平布局
 // - [chart:type] 图表（支持 line, bar, pie, grouped_line, barh, funnel 等）
+// - [table:commonStyle] 常规列表表格（淡紫表头、行 hover）
+// - <commonStyleListItemRow> 图 1 叠层卡；<commonStyleList> + <commonStyleListItem> 图 2
 // - **粗体** ~~删除线~~ 等 markdown 格式
 // - 数学公式 $inline$ 和 $$block$$
 // - 表格、代码块、引用等标准 markdown 语法
@@ -2647,6 +2649,114 @@ style: {
         </loop>
       </layout:row>
     `
+  },
+  tableCommonStyle: {
+    name: '📋 常规列表表格',
+    description: '使用 [table:commonStyle] 展示淡紫表头常规列表',
+    markdown: `# 常规列表表格
+
+## 常规列表
+
+[table:commonStyle]
+| DingOS版本号 | 设备数量 | 操作 |
+|------|------|------|
+| AWS | 美国、亚洲、亚太 | ⟳  ⋮ |
+| Azure | 全球20+区域 | ⟳  ⋮ |
+| 阿里云 | 中国大陆主要城市 | ⟳  ⋮ |
+| 私有云 | 定制化部署 | ⟳  ⋮ |
+| AWS | 美国、亚洲、亚太 | ⟳  ⋮ |
+`
+  },
+  commonStyleList: {
+    name: '📋 通用 List',
+    description: '图 1/2 网格卡 + 图 3/4/5 列表（List / ListDesc / ListCompact ≤3）',
+    markdown: `# 通用 List
+
+## 图 1 · 叠层网格卡（loop，默认品牌色）
+
+<layout:row flexWrap="wrap">
+<loop data="commonStyleServiceGridData" nativeEvent="click">
+<commonStyleListItemRow>
+<icon key="icon"></icon>
+<title key="title"></title>
+<content key="content"></content>
+</commonStyleListItemRow>
+</loop>
+</layout:row>
+
+## 图 2 · 整块 item + layout:column
+
+<commonStyleList>
+<card:commonStyleListItem>
+<icon>[icon:Travel/flag]</icon>
+<layout:column>
+<title>AWS</title>
+<content>美国、亚洲、亚太</content>
+</layout:column>
+</card:commonStyleListItem>
+<card:commonStyleListItem>
+<icon>[icon:Travel/flag]</icon>
+<layout:column>
+<title>AWS</title>
+<content>美国、亚洲、亚太</content>
+</layout:column>
+</card:commonStyleListItem>
+<card:commonStyleListItem>
+<icon>[icon:Travel/flag]</icon>
+<layout:column>
+<title>AWS</title>
+<content>美国、亚洲、亚太</content>
+</layout:column>
+</card:commonStyleListItem>
+<card:commonStyleListItem>
+<icon>[icon:Travel/flag]</icon>
+<layout:column>
+<title>AWS</title>
+<content>美国、亚洲、亚太</content>
+</layout:column>
+</card:commonStyleListItem>
+</commonStyleList>
+
+## 图 3 · 行列表（loop 平铺插槽）
+
+<layout:row flexWrap="wrap">
+<loop data="commonStyleServiceGridData" nativeEvent="click">
+<commonStyleServiceList>
+<icon key="icon"></icon>
+<title key="title"></title>
+<content key="content"></content>
+</commonStyleServiceList>
+</loop>
+</layout:row>
+
+## 图 4 · 行列表 + 描述列（desc = 图 3 content token）
+
+<layout:row flexWrap="wrap">
+<loop data="commonStyleServiceGridData" nativeEvent="click">
+<commonStyleServiceListDesc>
+<icon key="icon"></icon>
+<layout:column>
+<title key="title"></title>
+<desc key="content"></desc>
+</layout:column>
+</commonStyleServiceListDesc>
+</loop>
+</layout:row>
+
+## 图 5 · 堆叠卡（≤3 条，token 同图 4）
+
+<layout:row flexWrap="wrap">
+<loop data="commonStyleServiceGridDataCompact" nativeEvent="click">
+<commonStyleServiceListCompact>
+<icon key="icon"></icon>
+<layout:column>
+<title key="title"></title>
+<desc key="content"></desc>
+</layout:column>
+</commonStyleServiceListCompact>
+</loop>
+</layout:row>
+`
   },
   customFeature: {
     name: '自定义样式',

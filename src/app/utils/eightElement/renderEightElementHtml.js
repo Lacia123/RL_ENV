@@ -1205,9 +1205,11 @@ function generateCSSFromClassStyles(classStyles) {
         const { mainStyles, nestedStyles } = separateStyles(styleObj);
 
         // 生成主选择器的CSS
+        const fillAsText = className.startsWith('td-');
+
         if (Object.keys(mainStyles).length > 0) {
             css += `.${className} {\n`;
-            css += generateStyleProperties(mainStyles);
+            css += generateStyleProperties(mainStyles, { fillAsText });
             css += '}\n\n';
         }
 
@@ -1216,7 +1218,7 @@ function generateCSSFromClassStyles(classStyles) {
             Object.entries(nestedStyles).forEach(([selector, nestedStyleObj]) => {
                 const fullSelector = selector.replace('&', `.${className}`);
                 css += `${fullSelector} {\n`;
-                css += generateStyleProperties(nestedStyleObj);
+                css += generateStyleProperties(nestedStyleObj, { fillAsText });
                 css += '}\n\n';
             });
         }
@@ -1225,7 +1227,8 @@ function generateCSSFromClassStyles(classStyles) {
     return css;
 }
 
-function generateStyleProperties(styleObj) {
+function generateStyleProperties(styleObj, options = {}) {
+    const fillAsText = options.fillAsText === true;
     let css = '';
     Object.entries(styleObj).forEach(([property, value]) => {
         if (value === null || value === undefined) return;
@@ -1248,10 +1251,14 @@ function generateStyleProperties(styleObj) {
         }
         
         // 转换属性名为CSS格式
-        const cssProperty = convertToCSSProperty(property);
+        const cssProperty = convertToCSSProperty(property, { fillAsText });
         
         // 处理数值类型，为需要单位的属性添加px
         if (typeof resolvedValue === 'number' && shouldAddPixelUnit(cssProperty)) {
+            resolvedValue = `${resolvedValue}px`;
+        }
+        const isRadiusProperty = /^(borderRadius|borderTopLeftRadius|borderTopRightRadius|borderBottomLeftRadius|borderBottomRightRadius)$/i.test(property);
+        if (isRadiusProperty && typeof resolvedValue === 'string' && /^\d+$/.test(resolvedValue)) {
             resolvedValue = `${resolvedValue}px`;
         }
         
@@ -1261,7 +1268,18 @@ function generateStyleProperties(styleObj) {
     return css;
 }
 
-function convertToCSSProperty(property) {
+function convertToCSSProperty(property, options = {}) {
+    // 设计 token 属性名（classStyle / 表格 hover 等）
+    if (property === 'fill') {
+        return options.fillAsText ? 'color' : 'background-color';
+    }
+    if (property === 'fontWeights') {
+        return 'font-weight';
+    }
+    if (property === 'fontSizes') {
+        return 'font-size';
+    }
+
     // 处理特殊的CSS属性名
     const specialProperties = {
         'WebkitBackgroundClip': '-webkit-background-clip',
@@ -2508,6 +2526,74 @@ function renderTableElement(element) {
     }
 }
 
+/** 设计 token 属性名 → CSS（表格内联样式） */
+const TABLE_DESIGN_PROP_TO_CSS = {
+    fill: 'backgroundColor',
+    fontWeights: 'fontWeight',
+    fontSizes: 'fontSize',
+};
+
+/**
+ * 将 tableCommonStyle 设计属性转为可渲染的 CSS 样式（并解析 token）
+ * @param {Object} styleObj
+ * @param {'table'|'th'|'td'|'tr'} role
+ */
+function normalizeTableInlineStyle(styleObj, role = 'td') {
+    if (!styleObj || typeof styleObj !== 'object') return {};
+
+    const css = {};
+    Object.entries(styleObj).forEach(([key, value]) => {
+        if (key === 'className' || key === 'classStyle' || key.startsWith('&')) {
+            return;
+        }
+        if (value === null || value === undefined || typeof value === 'object') {
+            return;
+        }
+
+        let resolved = typeof value === 'string' ? resolveInlineTokens(value) : value;
+
+        if (key === 'fill') {
+            const cssKey = role === 'td' ? 'color' : 'backgroundColor';
+            css[cssKey] = resolved;
+            return;
+        }
+        if (key === 'color') {
+            css.color = resolved;
+            return;
+        }
+        if (key === 'fontWeights') {
+            css.fontWeight = resolved;
+            return;
+        }
+        if (key === 'fontSizes') {
+            css.fontSize = resolved;
+            return;
+        }
+        const isRadiusKey = /^border(Radius|TopLeftRadius|TopRightRadius|BottomLeftRadius|BottomRightRadius)$/i.test(key);
+        if (isRadiusKey && typeof resolved === 'string' && /^\d+$/.test(resolved)) {
+            css[key] = `${resolved}px`;
+            return;
+        }
+        if (isRadiusKey) {
+            css[key] = resolved;
+            return;
+        }
+        css[key] = resolved;
+    });
+
+    return css;
+}
+
+/** layout.table / th / td 可能是 { style, className } 结构 */
+function pickTablePartStyle(part) {
+    if (!part) return {};
+    if (part.style && typeof part.style === 'object') {
+        return { ...part.style };
+    }
+    const { className, classStyle, ...rest } = part;
+    return rest;
+}
+
 /**
  * 生成内联样式字符串
  * @param {Object} styleObj - 样式对象
@@ -2536,14 +2622,13 @@ function generateInlineStyle(styleObj) {
             return true;
         })
         .map(([key, value]) => {
-            // 转换驼峰式为连字符式
-            const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+            const mappedKey = TABLE_DESIGN_PROP_TO_CSS[key] || key;
+            const cssKey = mappedKey.replace(/([A-Z])/g, '-$1').toLowerCase();
             
-            // 如果值是数字但不是特定属性，添加px
-            let cssValue = value;
-            if (typeof value === 'number' &&
-                !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
-                cssValue = `${value}px`;
+            let cssValue = typeof value === 'string' ? resolveInlineTokens(value) : value;
+            if (typeof cssValue === 'number' &&
+                !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(mappedKey)) {
+                cssValue = `${cssValue}px`;
             }
             
             return `${cssKey}: ${cssValue}`;
@@ -2568,17 +2653,20 @@ function applyTableStyles(tableHtml, tableStyleConfig, thStyleConfig, trStyleCon
         return style.endsWith(';') ? style : `${style};`;
     };
 
-    // 获取各元素的样式字符串和className
-    const tableStyleStr = generateInlineStyle(tableStyleConfig);
+    const tableRaw = pickTablePartStyle(tableStyleConfig);
+    const thRaw = pickTablePartStyle(thStyleConfig);
+    const tdRaw = pickTablePartStyle(tdStyleConfig);
+    const trClassName = trStyleConfig?.className || '';
+
+    const tableStyleStr = generateInlineStyle(normalizeTableInlineStyle(tableRaw, 'table'));
     const tableClassName = tableStyleConfig?.className || '';
     
-    const thStyleStr = generateInlineStyle(thStyleConfig);
+    const thStyleStr = generateInlineStyle(normalizeTableInlineStyle(thRaw, 'th'));
     const thClassName = thStyleConfig?.className || '';
     
-    const trStyleStr = generateInlineStyle(trStyleConfig);
-    const trClassName = trStyleConfig?.className || '';
+    const trStyleStr = generateInlineStyle(normalizeTableInlineStyle(pickTablePartStyle(trStyleConfig), 'tr'));
     
-    const tdStyleStr = generateInlineStyle(tdStyleConfig);
+    const tdStyleStr = generateInlineStyle(normalizeTableInlineStyle(tdRaw, 'td'));
     const tdClassName = tdStyleConfig?.className || '';
 
     // 替换表格标签，应用样式和className

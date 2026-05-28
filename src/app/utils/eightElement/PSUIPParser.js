@@ -18,6 +18,7 @@ import { createIconElement } from './creators/iconCreators.js';
 import { isTabTag, extractTabBlock, createTabElement } from './creators/tabCreators.js';
 import { isVideoTag, createVideoElement } from './creators/videoCreators.js';
 import { isAudioTag, createAudioElement } from './creators/audioCreators.js';
+import { COMMON_STYLE_LIST_COMPACT_LOOP_STACK_CLASS_STYLE } from './styles/component/commonStyleServiceListCompact.js';
 
 // 🆕 检测是否为 loop 标签（卡片级循环）
 function isLoopTag(line) {
@@ -1605,25 +1606,39 @@ function parseMarkdown(markdown, options = {}) {
                                     currentMarkdown
                                 );
 
+                                const isCompactStackLoop =
+                                    componentName === 'commonStyleServiceListCompact';
+                                const loopContainerId = generateUUID();
+
                                 // 🔧 创建 loop 容器元素
                                 const loopContainerElement = {
-                                    id: generateUUID(),
+                                    id: loopContainerId,
                                     name: 'layout',
                                     'name-zh': '循环容器',
                                     'file-type': 'template',
                                     _metadata: {
                                         isCardLevelLoop: true,  // 🆕 标记为卡片级循环
                                         loopDataKey: dataKey,
-                                        templateComponentName: componentName
+                                        templateComponentName: componentName,
+                                        isCompactStackLoop,
                                     },
                                     layout: {
-                                        style: {
-                                            display: 'flex',
-                                            flexDirection: 'row',
-                                            flexWrap: 'wrap',
-                                            gap: '{dimension.gap.base}',
-                                        },
-                                        classStyle: {},
+                                        className: `loop-container-${loopContainerId}`,
+                                        style: isCompactStackLoop
+                                            ? {
+                                                display: 'block',
+                                                width: '100%',
+                                                boxSizing: 'border-box',
+                                            }
+                                            : {
+                                                display: 'flex',
+                                                flexDirection: 'row',
+                                                flexWrap: 'wrap',
+                                                gap: '{dimension.gap.base}',
+                                            },
+                                        classStyle: isCompactStackLoop
+                                            ? { ...COMMON_STYLE_LIST_COMPACT_LOOP_STACK_CLASS_STYLE }
+                                            : {},
                                         children: [templateElement]  // 组件作为模板
                                     },
                                     "data-key": dataKey,  // 🆕 循环数据键

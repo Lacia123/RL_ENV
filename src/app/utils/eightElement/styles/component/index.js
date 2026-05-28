@@ -13,6 +13,11 @@ import SIMPLE_CARD_STYLE from './simpleCard';
 import SUMMARY_CARD_STYLE from './summaryCard';
 import HISTORY_CARD_STYLE from './historyCard';
 import FEED_LIST_CHART_TRAN_CARD_STYLE from './feedListChartTranCard';
+import REGULAR_LIST_TABLE_STYLE from './regularListTable';
+import COMMON_STYLE_SERVICE_STYLE from './commonStyleService';
+import COMMON_STYLE_SERVICE_LIST_STYLE from './commonStyleServiceList';
+import COMMON_STYLE_SERVICE_LIST_DESC_STYLE from './commonStyleServiceListDesc';
+import COMMON_STYLE_SERVICE_LIST_COMPACT_STYLE from './commonStyleServiceListCompact';
 
 const COMPONENT_STYLE = {
     component: {
@@ -31,6 +36,11 @@ const COMPONENT_STYLE = {
         ...SUMMARY_CARD_STYLE,
         ...HISTORY_CARD_STYLE,
         ...FEED_LIST_CHART_TRAN_CARD_STYLE,
+        ...REGULAR_LIST_TABLE_STYLE,
+        ...COMMON_STYLE_SERVICE_STYLE,
+        ...COMMON_STYLE_SERVICE_LIST_STYLE,
+        ...COMMON_STYLE_SERVICE_LIST_DESC_STYLE,
+        ...COMMON_STYLE_SERVICE_LIST_COMPACT_STYLE,
     }
 }
 

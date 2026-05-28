@@ -603,11 +603,44 @@ function createCardElement(content, variant = 'standard', attributes = {}, curre
     let cardStyleConfig = null;
     
     // 优先检查 component 配置
-    if (DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[variant]) {
+    const isRegisteredComponent =
+        !!(DEFAULT_STYLE_CONFIG.component && DEFAULT_STYLE_CONFIG.component[variant]);
+    if (isRegisteredComponent) {
         cardStyleConfig = DEFAULT_STYLE_CONFIG.component[variant];
     } else {
         // 回退到 card 配置
         cardStyleConfig = getElementStyleConfig('card', variant);
+    }
+
+    // 业务组件（slotConfigs + layoutModes）须走 createComponentElement，不能用 parseTemplateCardContent
+    if (
+        isRegisteredComponent &&
+        cardStyleConfig?.type === 'template' &&
+        (cardStyleConfig.slotConfigs || cardStyleConfig.layoutModes)
+    ) {
+        const componentElement = createComponentElement(
+            content,
+            variant,
+            null,
+            null,
+            attributes,
+            currentMarkdown
+        );
+        if (componentElement) {
+            if (options.nestedContainerStyle && typeof options.nestedContainerStyle === 'object') {
+                componentElement.layout.classStyle = {
+                    ...(componentElement.layout.classStyle || {}),
+                    ...options.nestedContainerStyle,
+                };
+                if (componentElement.layout.style) {
+                    componentElement.layout.style = {
+                        ...componentElement.layout.style,
+                        ...options.nestedContainerStyle,
+                    };
+                }
+            }
+            return componentElement;
+        }
     }
 
     // 🆕 处理 classList 和 defaultClass

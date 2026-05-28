@@ -11,6 +11,7 @@ import { createLayoutElement } from './layoutCreators.js';
 import { EVENT_NAME } from '../eventConfig.js';
 import { parseHeaderBackgroundSyntax, parseTableHeaderStyles, removeInlineStyles } from '../styleParser.js';
 import { parseChartTagSpec } from '../chartSpecParse.js';
+import { TABLE_TAG_VARIANT_MAP } from '../styles/tableCommonStyle.js';
 
 // 注意：parseHeaderBackgroundSyntax 和相关函数已移至 styleParser.js 作为通用工具
 
@@ -122,11 +123,12 @@ function isTableOrChartData(lineOrLines) {
     }
     
     if (!firstNonEmptyLine) {
-        return { isData: false, isChart: false, chartType: null };
+        return { isData: false, isChart: false, chartType: null, tableVariant: null };
     }
     
-    // 检查第一行是否是图表标记
+    // 检查第一行是否是图表 / 表格标记
     const isChartLine = firstNonEmptyLine.match(/^\[chart:(.+?)\]/);
+    const isTableTagLine = firstNonEmptyLine.match(/^\[table:(.+?)\]/);
     
     // 🔧 收集有效行：遇到代码块标记或空行时停止（图表标记例外）
     const validLines = [];
@@ -142,8 +144,8 @@ function isTableOrChartData(lineOrLines) {
         
         // 遇到空行
         if (trimmed.length === 0) {
-            // 如果是图表标记，允许跳过一个空行继续找表格
-            if (isChartLine && validLines.length === 1 && !hasEmptyLine) {
+            // 图表/表格标记行后允许跳过一个空行继续找表格数据
+            if ((isChartLine || isTableTagLine) && validLines.length === 1 && !hasEmptyLine) {
                 hasEmptyLine = true;
                 continue;
             }
@@ -155,15 +157,14 @@ function isTableOrChartData(lineOrLines) {
     }
 
     if (validLines.length === 0) {
-        return { isData: false, isChart: false, chartType: null };
+        return { isData: false, isChart: false, chartType: null, tableVariant: null };
     }
 
     const firstLine = validLines[0].trim();
     
-    // 🔧 核心优化：收集后的第一行必须是表格格式（含 |）或图表标记
-    // 这样可以过滤掉前面有空行、但实际第一个有效行不是表格的情况
-    if (!firstLine.match(/^\[chart:/) && !firstLine.includes('|')) {
-        return { isData: false, isChart: false, chartType: null };
+    // 🔧 核心优化：收集后的第一行必须是表格格式（含 |）、图表或表格标记
+    if (!firstLine.match(/^\[chart:/) && !firstLine.match(/^\[table:/) && !firstLine.includes('|')) {
+        return { isData: false, isChart: false, chartType: null, tableVariant: null };
     }
 
     // 首先检查是否是图表数据标记
@@ -187,10 +188,30 @@ function isTableOrChartData(lineOrLines) {
 
         // 🔧 修复：只要同一行或后续行有表格数据，就认为是有效的图表数据
         if (!hasTableInSameLine && !hasTableInNextLines) {
-            return { isData: false, isChart: true, chartType: chartMatch[1] };
+            return { isData: false, isChart: true, chartType: chartMatch[1], tableVariant: null };
         }
 
-        return { isData: true, isChart: true, chartType: chartMatch[1] };
+        return { isData: true, isChart: true, chartType: chartMatch[1], tableVariant: null };
+    }
+
+    const tableTagMatch = firstLine.match(/^\[table:(.+?)\]/);
+    if (tableTagMatch) {
+        const tableVariant = tableTagMatch[1].split('|')[0].trim();
+        const afterTableTag = firstLine.replace(/^\[table:[^\]]+\]/, '').trim();
+        const hasTableInSameLine = afterTableTag.includes('|') &&
+            afterTableTag.split('|').filter(c => c.trim().length > 0).length >= 2;
+        const hasTableInNextLines = validLines.slice(1).some(l => {
+            const trimmed = l.trim();
+            if (!trimmed.includes('|')) return false;
+            const cols = trimmed.split('|').filter(c => c.trim().length > 0);
+            return cols.length >= 2;
+        });
+
+        if (!hasTableInSameLine && !hasTableInNextLines) {
+            return { isData: false, isChart: false, chartType: null, tableVariant };
+        }
+
+        return { isData: true, isChart: false, chartType: null, tableVariant };
     }
 
     // 检查是否是普通表格：任意一行包含 | 且至少两列
@@ -202,10 +223,10 @@ function isTableOrChartData(lineOrLines) {
     });
 
     if (hasTable) {
-        return { isData: true, isChart: false, chartType: null };
+        return { isData: true, isChart: false, chartType: null, tableVariant: null };
     }
 
-    return { isData: false, isChart: false, chartType: null };
+    return { isData: false, isChart: false, chartType: null, tableVariant: null };
 }
 
 // 提取完整的表格或图表数据（统一提取）
@@ -214,9 +235,12 @@ function extractTableOrChartData(lines, startIndex) {
     // 获取第一行，检查是否包含图表标记
     const firstLine = lines[startIndex].trim();
     const chartMatch = firstLine.match(/^\[chart:(.+?)\]/);
+    const tableTagMatch = firstLine.match(/^\[table:(.+?)\]/);
     const isChart = !!chartMatch;
+    const isTableTag = !!tableTagMatch;
 
     let chartType = null;
+    let tableVariant = null;
     let chartTitle = null;
     let sortOrder = null;
     let candlestickSpec = null;
@@ -234,10 +258,16 @@ function extractTableOrChartData(lines, startIndex) {
         }
     }
 
-    // 处理第一行 - 如果是图表，移除图表标记和事件语法
+    if (isTableTag) {
+        tableVariant = tableTagMatch[1].split('|')[0].trim();
+    }
+
+    // 处理第一行 - 移除图表/表格标记和事件语法
     const processedFirstLine = isChart
         ? firstLine.replace(/^\[chart:[^\]]+\]/, '').replace(/\[event:[^\]]+\]/, '').trim()
-        : firstLine;
+        : isTableTag
+            ? firstLine.replace(/^\[table:[^\]]+\]/, '').replace(/\[event:[^\]]+\]/, '').trim()
+            : firstLine;
 
     // 🆕 如果处理后的第一行为空，则跳过它
     const tableLines = processedFirstLine ? [processedFirstLine] : [];
@@ -275,20 +305,58 @@ function extractTableOrChartData(lines, startIndex) {
         candlestickSpec,
         tableContent: originalContent, // 🔧 修复：返回原始内容（包含样式语法），让 createTableElement 来解析和清理
         tableData: tableData,
+        tableVariant,
         endIndex: startIndex + i,
         originalFirstLine: firstLine // 🆕 保存原始的第一行用于事件解析
     };
 }
 
+/** 解析 [table:commonStyle] 等标签名为内部样式变体 */
+function resolveTableVariant(variant) {
+    if (!variant) {
+        return null;
+    }
+    return TABLE_TAG_VARIANT_MAP[variant] || variant;
+}
+
+/** 从 table 部件配置中拆出内联 style 与 classStyle */
+function splitTablePartConfig(partConfig) {
+    if (!partConfig || typeof partConfig !== 'object') {
+        return { style: {}, classStyle: null };
+    }
+    const { classStyle, ...style } = partConfig;
+    return { style, classStyle: classStyle || null };
+}
+
+/** 按变体从 table（默认）或 tableCommonStyle（commonStyle）读取样式 */
+function getTableElementStyleConfigs(variant) {
+    const resolved = resolveTableVariant(variant);
+    const elementType = resolved === 'commonStyle' ? 'tableCommonStyle' : 'table';
+    return {
+        elementType,
+        container: getElementStyleConfig(elementType, 'container'),
+        th: getElementStyleConfig(elementType, 'th'),
+        tr: getElementStyleConfig(elementType, 'tr'),
+        td: getElementStyleConfig(elementType, 'td'),
+    };
+}
+
 // 创建表格元素
-function createTableElement(markdownTableContent) {
+function createTableElement(markdownTableContent, options = {}) {
     const id = generateUUID();
     const layoutStyleConfig = getElementStyleConfig('layout', 'column');
+    const resolvedVariant = resolveTableVariant(options.variant);
+    const tableVariant = resolvedVariant === 'commonStyle' ? 'commonStyle' : 'container';
+    const {
+        container: tableContainerStyleConfig,
+        th: tableHeaderStyleConfig,
+        tr: tableRowStyleConfig,
+        td: tableCellStyleConfig,
+    } = getTableElementStyleConfigs(options.variant);
 
-    const tableContainerStyleConfig = getElementStyleConfig('table', 'container');
-    const tableHeaderStyleConfig = getElementStyleConfig('table', 'th');
-    const tableRowStyleConfig = getElementStyleConfig('table', 'tr');
-    const tableCellStyleConfig = getElementStyleConfig('table', 'td');
+    const { style: thInlineBase, classStyle: thClassStyle } = splitTablePartConfig(tableHeaderStyleConfig);
+    const { style: tdInlineBase, classStyle: tdClassStyle } = splitTablePartConfig(tableCellStyleConfig);
+    const { classStyle: trClassStyle } = splitTablePartConfig(tableRowStyleConfig);
 
     // 🔧 修复：移除可能残留的图表标记（防御性编程）
     let cleanedContent = markdownTableContent || '';
@@ -308,10 +376,12 @@ function createTableElement(markdownTableContent) {
 
     // 生成唯一的className
     const uniqueClassName = `table-${id}`;
+    const uniqueThClassName = `th-${id}`;
+    const uniqueTdClassName = `td-${id}`;
     const uniqueTrClassName = `tr-${id}`;
 
     // 🆕 构建th样式配置，应用所有自定义样式
-    let finalThStyleConfig = { ...tableHeaderStyleConfig };
+    let finalThStyleConfig = { ...thInlineBase };
     if (Object.keys(headerStyles).length > 0) {
         // 应用所有解析出的样式，保持 token 格式
         Object.entries(headerStyles).forEach(([key, value]) => {
@@ -332,7 +402,7 @@ function createTableElement(markdownTableContent) {
     }
     
     // 🆕 构建td样式配置，应用单元格对齐设置
-    let finalTdStyleConfig = { ...tableCellStyleConfig };
+    let finalTdStyleConfig = { ...tdInlineBase };
     if (cellAlign) {
         finalTdStyleConfig.textAlign = cellAlign;
     }
@@ -347,7 +417,8 @@ function createTableElement(markdownTableContent) {
         // 🔍 保存元数据用于分析
         _metadata: {
             actualType: 'table',
-            variant: 'container',
+            variant: options.variant || tableVariant,
+            tableStyleVariant: tableVariant,
             isTable: true
         },
         rawData: cleanedTableContent, // 🆕 使用清理后的内容
@@ -370,16 +441,18 @@ function createTableElement(markdownTableContent) {
                 },
             },
             th: {
-                style: finalThStyleConfig
+                style: finalThStyleConfig,
+                className: uniqueThClassName,
+                ...(thClassStyle ? { classStyle: thClassStyle } : {}),
             },
             tr: {
                 className: uniqueTrClassName,
-                classStyle: {
-                    ...tableRowStyleConfig
-                }
+                classStyle: trClassStyle || { ...tableRowStyleConfig },
             },
             td: {
-                style: finalTdStyleConfig
+                style: finalTdStyleConfig,
+                className: uniqueTdClassName,
+                ...(tdClassStyle ? { classStyle: tdClassStyle } : {}),
             }
         },
         events: [{}]
@@ -598,7 +671,7 @@ function generateChartSvg(chartType, data, chartStyleConfig = null, chartTitle =
 
 // 处理表格数据 - 决定创建普通表格还是图表元素
 function processTableOrChartData(result, stack) {
-    const { isChart, chartType, chartTitle, sortOrder, chartRate, candlestickSpec, tableContent, tableData, endIndex, originalFirstLine } = result;
+    const { isChart, chartType, chartTitle, sortOrder, chartRate, candlestickSpec, tableContent, tableData, tableVariant, endIndex, originalFirstLine } = result;
 
     if (isChart) {
         // 处理为图表
@@ -705,7 +778,7 @@ function processTableOrChartData(result, stack) {
         }
     } else {
         // 处理为普通表格
-        const tableElement = createTableElement(tableContent);
+        const tableElement = createTableElement(tableContent, { variant: tableVariant });
         stack[stack.length - 1].elements.push(tableElement);
     }
 

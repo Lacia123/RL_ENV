@@ -8,6 +8,7 @@ import TEXT_STYLE from './textStyle.js';
 import MATH_STYLE from './mathStyle.js';
 import CHART_STYLE from './chartStyle.js';
 import TABLE_STYLE from './tableStyle.js';
+import TABLE_COMMON_STYLE from './tableCommonStyle.js';
 import BUTTON_STYLE from './buttonStyle.js';
 import LIST_STYLE from './listStyle.js';
 import ALERT_STYLE from './alertStyle.js';
@@ -31,6 +32,7 @@ export const DEFAULT_STYLE_CONFIG = {
     ...MATH_STYLE,
     ...CHART_STYLE,
     ...TABLE_STYLE,
+    ...TABLE_COMMON_STYLE,
     ...BUTTON_STYLE,
     ...LIST_STYLE,
     ...ALERT_STYLE,

@@ -18,9 +18,59 @@ import { stripMarkdownFormatting, processExpression, extractMarkdownValue, extra
 
 // 🔧 直接导入以避免动态 import（ES6 模块系统会处理循环依赖）
 import { parseTemplateCardContent, createOrMergeTemplateElement, processRequiredContainers } from './cardCreators.js';
+import { isLayoutTag, extractLayoutBlock, createLayoutElement } from './layoutCreators.js';
+import { LAYOUT_CONSTANTS } from '../styles/constant.js';
 
 // 🆕 导入插槽管理器
 import { generateSlotDataAttributes, separateConditionalStyles, validateSlotsConfig, checkRequiredSlots } from './slotManager.js';
+
+/**
+ * 识别 loop 内的循环组标签（避免误匹配 <icon> 等内层子标签）
+ * @returns {{ loopGroupName: string, groupContent: string } | null}
+ */
+function resolveLoopGroupFromContent(loopContent, availableSlotConfigs) {
+    if (!loopContent?.trim()) {
+        return null;
+    }
+
+    for (const [slotName, slotConfig] of Object.entries(availableSlotConfigs || {})) {
+        if (slotName.endsWith('*') || slotConfig?.metaType !== 'feedItem') {
+            continue;
+        }
+        const re = new RegExp(`<${slotName}(\\s[^>]*)?>([\\s\\S]*?)<\\/${slotName}>`, 'i');
+        const match = loopContent.match(re);
+        if (match) {
+            return { loopGroupName: slotName, groupContent: match[2] };
+        }
+    }
+
+    const firstLine = loopContent.trim().split('\n').find((line) => line.trim())?.trim() || '';
+    const openMatch = firstLine.match(/^<([a-zA-Z][a-zA-Z0-9]*)(?:\s[^>]*)?>/);
+    if (openMatch) {
+        const slotName = openMatch[1];
+        const re = new RegExp(`<${slotName}(\\s[^>]*)?>([\\s\\S]*?)<\\/${slotName}>`, 'i');
+        const match = loopContent.match(re);
+        if (match) {
+            return { loopGroupName: slotName, groupContent: match[2] };
+        }
+    }
+
+    return null;
+}
+
+/** 将 &:hover 等伪类留在 classStyle，其余进内联 style */
+function splitPseudoClassStyles(styleObj = {}) {
+    const inlineStyles = {};
+    const pseudoClassStyle = {};
+    Object.entries(styleObj || {}).forEach(([key, value]) => {
+        if (key.startsWith('&')) {
+            pseudoClassStyle[key] = value;
+        } else {
+            inlineStyles[key] = value;
+        }
+    });
+    return { inlineStyles, pseudoClassStyle };
+}
 
 // ==================== 🆕 Layout Modes 系统 ====================
 
@@ -177,6 +227,27 @@ function evaluateLayoutCondition(condition, actualSlots) {
     
     console.warn(`⚠️ 无法解析条件: ${condition}`);
     return false;
+}
+
+/** 将 styleReference 样式合并到插槽元素及其 layout 子树（含 layout:column 内的 title/description） */
+function applyStyleReferenceToSlotTree(element, refStyles) {
+    if (!element?.layout || !refStyles || Object.keys(refStyles).length === 0) {
+        return;
+    }
+    if (element._metadata?.slotName) {
+        element.layout.classStyle = {
+            ...(element.layout.classStyle || {}),
+            ...refStyles,
+        };
+        element.layout.style = {
+            ...(element.layout.style || {}),
+            ...refStyles,
+        };
+    }
+    const children = element.layout.children;
+    if (Array.isArray(children)) {
+        children.forEach((child) => applyStyleReferenceToSlotTree(child, refStyles));
+    }
 }
 
 /**
@@ -400,21 +471,7 @@ function buildGroups(groups, slotElementsMap, actualSlots, modeName, componentNa
                 if (refSlotConfig) {
                     const refStyles = refSlotConfig.variantStyle || {};
                     if (Object.keys(refStyles).length > 0) {
-                        groupElements.forEach(el => {
-                            if (!el || !el.layout) return;
-                            // 只对有 slot 元数据的元素应用（避免误伤其他容器）
-                            if (!el._metadata || !el._metadata.slotName) return;
-                            
-                            // 将引用样式合并到 classStyle 和 style，保证覆盖生效
-                            el.layout.classStyle = {
-                                ...(el.layout.classStyle || {}),
-                                ...refStyles
-                            };
-                            el.layout.style = {
-                                ...(el.layout.style || {}),
-                                ...refStyles
-                            };
-                        });
+                        groupElements.forEach((el) => applyStyleReferenceToSlotTree(el, refStyles));
                     }
                 } else {
                     console.warn(`${indent}  ⚠️ styleReference "${group.styleReference}" 未在 slotConfigs 中找到`);
@@ -807,6 +864,120 @@ export function parseSlotTags(content) {
     return slots;
 }
 
+/**
+ * 解析组件内容中的插槽与 layout 标签（支持 <layout:column> 等包裹子插槽）
+ * @returns {Map<string, Object>}
+ */
+export function parseComponentSlotContent(content, availableSlotConfigs, currentMarkdown = '', loopDataKey = '') {
+    const lines = content.split('\n');
+    const slotElementsMap = new Map();
+    const slotNameCounts = {};
+    let i = 0;
+
+    while (i < lines.length) {
+        const line = lines[i];
+        const trimmedLine = line.trim();
+
+        if (!trimmedLine) {
+            i++;
+            continue;
+        }
+
+        const layoutTagInfo = isLayoutTag(trimmedLine);
+        if (layoutTagInfo.isLayoutTag && !layoutTagInfo.isClosing) {
+            const { layoutContent, variant, attributes, endIndex } = extractLayoutBlock(lines, i);
+            const innerSlots = parseSlotTags(layoutContent);
+            const innerElements = [];
+
+            innerSlots.forEach((slotData) => {
+                const { slotName } = slotData;
+                const baseSlotName = slotData.baseSlotName || slotName;
+                const slotConfig = resolveSlotConfig(baseSlotName, availableSlotConfigs);
+                if (!slotConfig) {
+                    console.warn(`  ⚠️ layout 内未找到插槽 "${baseSlotName}" 的配置`);
+                    return;
+                }
+                const element = createElementFromSlotConfig(
+                    slotName,
+                    slotConfig,
+                    slotData,
+                    currentMarkdown,
+                    loopDataKey
+                );
+                if (element) {
+                    innerElements.push(element);
+                }
+            });
+
+            // 与项目约定一致：垂直布局用 layout:column（简写 <layout> 默认也是 column）
+            const isColumn = variant === 'column' || variant === 'col';
+            const direction = isColumn
+                ? LAYOUT_CONSTANTS.DIRECTION.VERTICAL
+                : LAYOUT_CONSTANTS.DIRECTION.HORIZONTAL;
+            const layoutSlotName = isColumn ? 'textCol' : `layout-${variant}`;
+
+            const layoutElement = createLayoutElement(direction, innerElements, {
+                variant: isColumn ? 'column' : variant,
+                attributes,
+                alignItems: 'flex-start',
+                gap: '{dimension.gap.supertight}',
+                width: '100%',
+            });
+
+            annotateElementSlotMetadata(layoutElement, layoutSlotName, layoutSlotName);
+            slotElementsMap.set(layoutSlotName, layoutElement);
+            i = endIndex + 1;
+            continue;
+        }
+
+        const singleLineSlot = parseSingleLineSlot(line);
+        if (singleLineSlot) {
+            enrichSlotName(singleLineSlot, slotNameCounts);
+            const baseSlotName = singleLineSlot.baseSlotName || singleLineSlot.slotName;
+            const slotConfig = resolveSlotConfig(baseSlotName, availableSlotConfigs);
+            if (slotConfig) {
+                const element = createElementFromSlotConfig(
+                    singleLineSlot.slotName,
+                    slotConfig,
+                    singleLineSlot,
+                    currentMarkdown,
+                    loopDataKey
+                );
+                if (element) {
+                    slotElementsMap.set(singleLineSlot.slotName, element);
+                }
+            }
+            i++;
+            continue;
+        }
+
+        const tagInfo = isSlotTag(line);
+        if (tagInfo.isSlotTag && !tagInfo.isClosing) {
+            const slotData = extractSlotContent(lines, i);
+            enrichSlotName(slotData, slotNameCounts);
+            const baseSlotName = slotData.baseSlotName || slotData.slotName;
+            const slotConfig = resolveSlotConfig(baseSlotName, availableSlotConfigs);
+            if (slotConfig) {
+                const element = createElementFromSlotConfig(
+                    slotData.slotName,
+                    slotConfig,
+                    slotData,
+                    currentMarkdown,
+                    loopDataKey
+                );
+                if (element) {
+                    slotElementsMap.set(slotData.slotName, element);
+                }
+            }
+            i = slotData.endIndex + 1;
+        } else {
+            i++;
+        }
+    }
+
+    return slotElementsMap;
+}
+
 function enrichSlotName(slotData, slotNameCounts) {
     const baseName = slotData.slotName;
     slotNameCounts[baseName] = (slotNameCounts[baseName] || 0) + 1;
@@ -1027,13 +1198,16 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                 slotConfig,
                 slotContent,
                 attributes,
-                currentMarkdown
+                currentMarkdown,
+                loopDataKey
             );
             if (feedItemElement) {
                 innerElements.push(feedItemElement);
             }
         } else if (slotConfig.metaType === 'table') {
-            const tableElement = createTableElement(slotContent || '');
+            const tableElement = createTableElement(slotContent || '', {
+                variant: slotConfig.variant,
+            });
             if (tableElement) {
                 innerElements.push(tableElement);
             }
@@ -1221,9 +1395,9 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                 attributes
             );
         } else if (slotConfig.metaType === 'table') {
-
-            // 使用 createTableElement 创建表格元素
-            element = createTableElement(slotContent || '');
+            element = createTableElement(slotContent || '', {
+                variant: slotConfig.variant,
+            });
         }
         
         if (element) {
@@ -1504,7 +1678,7 @@ function buildChartElementFromContent(slotName, slotConfig, slotContent, attribu
     }
 }
 
-function buildFeedItemLayout(slotName, slotConfig, slotContent = '', attributes = {}, currentMarkdown = '') {
+function buildFeedItemLayout(slotName, slotConfig, slotContent = '', attributes = {}, currentMarkdown = '', loopDataKey = '') {
     const itemStyles = slotConfig.itemStyles || {};
     const subSlots = slotConfig.subSlots || {};
     const parsed = parseFeedItemSlotContent(slotContent || '', subSlots);
@@ -1519,7 +1693,8 @@ function buildFeedItemLayout(slotName, slotConfig, slotContent = '', attributes 
             subSlots[subSlotName],
             parsed.fallbackText,
             attributes,
-            currentMarkdown
+            currentMarkdown,
+            loopDataKey
         );
 
         if (element) {
@@ -1535,7 +1710,8 @@ function buildFeedItemLayout(slotName, slotConfig, slotContent = '', attributes 
             subSlots.text,
             parsed.fallbackText,
             attributes,
-            currentMarkdown
+            currentMarkdown,
+            loopDataKey
         );
 
         if (fallbackElement) {
@@ -1570,7 +1746,8 @@ function buildFeedItemLayout(slotName, slotConfig, slotContent = '', attributes 
 
 function createFeedLayoutNode(style = {}, label = '信息列表布局', children = []) {
     const id = generateUUID();
-    const computedStyle = { ...(style || {}) };
+    const { inlineStyles, pseudoClassStyle } = splitPseudoClassStyles(style || {});
+    const classStyle = { ...inlineStyles, ...pseudoClassStyle };
     return {
         dataKeys: [],
         name: "layout",
@@ -1578,8 +1755,8 @@ function createFeedLayoutNode(style = {}, label = '信息列表布局', children
         "file-type": "template",
         theme: "default",
         layout: {
-            style: computedStyle,
-            classStyle: {},
+            style: inlineStyles,
+            classStyle,
             className: `feed-${id}`,
             children: children ? [...children] : []
         },
@@ -1727,7 +1904,15 @@ function getFeedItemLayoutDefinition(slotConfig = {}) {
     ];
 }
 
-function createElementForSubSlot(subSlotName, slotData, subSlotConfig, fallbackText = '', parentAttributes = {}, currentMarkdown = '') {
+function createElementForSubSlot(
+    subSlotName,
+    slotData,
+    subSlotConfig,
+    fallbackText = '',
+    parentAttributes = {},
+    currentMarkdown = '',
+    loopDataKey = ''
+) {
     if (!subSlotConfig) {
         return null;
     }
@@ -1741,13 +1926,36 @@ function createElementForSubSlot(subSlotName, slotData, subSlotConfig, fallbackT
     }
 
     if (metaType === 'text') {
-        if (!content) return null;
-        return createTextElement(
-            content,
+        if (!content && !slotAttributes.key) {
+            return null;
+        }
+        const textElement = createTextElement(
+            content || '',
             subSlotConfig.variant || 'p',
             {},
             subSlotConfig.variantStyle || null
         );
+        if (textElement && slotAttributes.key) {
+            textElement['data-key'] = slotAttributes.key;
+        }
+        if (textElement && slotAttributes.nativeEvent && loopDataKey) {
+            const validNativeKeys = Object.values(NATIVE_EVENT_KEY);
+            if (validNativeKeys.includes(slotAttributes.nativeEvent)) {
+                const eventConfig = {
+                    nativeEventKey: slotAttributes.nativeEvent,
+                    dataEventKey: loopDataKey,
+                };
+                if (!textElement.events) {
+                    textElement.events = [{}];
+                }
+                if (textElement.events.length === 1 && Object.keys(textElement.events[0]).length === 0) {
+                    textElement.events[0] = eventConfig;
+                } else {
+                    textElement.events.push(eventConfig);
+                }
+            }
+        }
+        return textElement;
     }
 
     if (metaType === 'image') {
@@ -2385,25 +2593,27 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                 }
             }
             
-            // 🆕 检查 loop 内部是否有 group 标签（如 <itemContent>）
-            // 匹配 <groupName>...</groupName>
-            const groupTagMatch = loopContent.match(/<([a-zA-Z][a-zA-Z0-9]*)\s*>([\s\S]*?)<\/\1>/);
+            // 🆕 检查 loop 内部的循环组（优先 feedItem 如 <item>，避免误匹配 <icon>）
+            const loopGroupInfo = resolveLoopGroupFromContent(loopContent, availableSlotConfigs);
             
-            if (groupTagMatch) {
-                loopGroupName = groupTagMatch[1];
-                const groupContent = groupTagMatch[2];
-                
-                
-                // 🔧 重要：将整个 loop 标签替换为 group 内部的 slot 标签
-                // 这样可以同时解析 loop 外部的 slots（如 title, subtitle）和 loop 内部的 slots（如 text）
-                // 例如：<title>...</title><subtitle>...</subtitle><loop><itemContent><text>...</text></itemContent></loop>
-                // 替换后：<title>...</title><subtitle>...</subtitle><text>...</text>
+            if (loopGroupInfo) {
+                loopGroupName = loopGroupInfo.loopGroupName;
+                const groupContent = loopGroupInfo.groupContent;
+                const loopGroupSlotConfig = resolveSlotConfig(loopGroupName, availableSlotConfigs);
+
+                // feedItem 列表（如 <loop><item>...</item></loop>）须保留 item 外壳，供 has:item + item* 收集
+                const loopReplacement =
+                    loopGroupSlotConfig?.metaType === 'feedItem'
+                        ? `<${loopGroupName}>${groupContent}</${loopGroupName}>`
+                        : groupContent;
+
+                // 🔧 非 feedItem：展开 group 内层插槽（如 itemContent 内的 text）
+                // 例如：<title>...</title><loop><itemContent><text>...</text></itemContent></loop>
                 contentToParse = content.replace(
                     /<loop\s+data=["'][^"']+["'][^>]*>[\s\S]*?<\/loop>/,
-                    groupContent
+                    loopReplacement
                 );
-                
-                // 记录循环 group 的元数据到组件元素（用于传递给 buildGroups）
+
                 componentElement._loopGroup = loopGroupName;
                 componentElement._loopDataKey = loopDataKey;
             } else {
@@ -2415,41 +2625,17 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
             }
         }
         
-        // 解析内容中的所有插槽标签
-        const slots = parseSlotTags(contentToParse);
-        
-        // 🆕 创建插槽元素并存储到 Map 中（用于后续重新组织）
-        const slotElementsMap = new Map();
-        
-        // 为每个插槽创建对应的元素
+        const slotElementsMap = parseComponentSlotContent(
+            contentToParse,
+            availableSlotConfigs,
+            currentMarkdown,
+            loopDataKey
+        );
+
         let abortForInvalidChart = false;
-        slots.forEach(slotData => {
-            const { slotName } = slotData;
-            const baseSlotName = slotData.baseSlotName || slotName;
-            const slotConfig = resolveSlotConfig(baseSlotName, availableSlotConfigs);
-            
-            if (!slotConfig) {
-                console.warn(`  ⚠️ 未找到插槽 "${baseSlotName}" 的配置`);
-                return;
-            }
-            
-            const element = createElementFromSlotConfig(
-                slotName,
-                slotConfig,
-                slotData,
-                currentMarkdown,
-                loopDataKey
-            );
-            
-            if (element) {
-                slotElementsMap.set(slotName, element);
-            } else {
+        slotElementsMap.forEach((element, slotName) => {
+            if (!element) {
                 console.warn(`  ❌ 创建插槽元素失败: ${slotName}`);
-                
-                // 🆕 如果是图表插槽且内容不合法，终止整个组件生成
-                if (slotConfig.metaType === 'chart') {
-                    abortForInvalidChart = true;
-                }
             }
         });
 
@@ -2675,17 +2861,22 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
                     }
                 });
                 
-                // 🆕 将最终样式应用到 style 中（不是 classStyle）
-                // 这样 renderEightElementHtml.js 可以直接从 style 渲染
-                componentElement.layout.style = finalStyles;
-                
-                // 清空 classStyle，避免混淆
-                componentElement.layout.classStyle = {};
+                const { inlineStyles, pseudoClassStyle } = splitPseudoClassStyles(finalStyles);
+                componentElement.layout.style = {
+                    ...(componentElement.layout.style || {}),
+                    ...inlineStyles,
+                };
+                componentElement.layout.classStyle = pseudoClassStyle;
                 
             } else {
-                // 没有条件样式，直接将 classStyle 移到 style
-                componentElement.layout.style = componentElement.layout.classStyle;
-                componentElement.layout.classStyle = {};
+                const { inlineStyles, pseudoClassStyle } = splitPseudoClassStyles(
+                    componentElement.layout.classStyle
+                );
+                componentElement.layout.style = {
+                    ...(componentElement.layout.style || {}),
+                    ...inlineStyles,
+                };
+                componentElement.layout.classStyle = pseudoClassStyle;
             }
         }
     }
