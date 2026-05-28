@@ -13,6 +13,10 @@ import SIMPLE_CARD_STYLE from './simpleCard';
 import SUMMARY_CARD_STYLE from './summaryCard';
 import SUMMARY_TRANSPARENT_CARD_STYLE from './summaryTransparentCard';
 import CONTENT_SUMMARY_CARD_STYLE from './contentSummaryCard';
+import PAIRED_IMAGE_TEXT_CARD_STYLE from './pairedImageTextCard';
+import MULTI_ACTION_CARD_STYLE from './multiActionCard';
+import LAYERED_ACTION_CARD_STYLE from './layeredActionCard';
+import CONFIRMABLE_CARD_STYLE from './confirmableCard';
 import HISTORY_CARD_STYLE from './historyCard';
 import FEED_LIST_CHART_TRAN_CARD_STYLE from './feedListChartTranCard';
 import REGULAR_LIST_TABLE_STYLE from './regularListTable';
@@ -38,6 +42,10 @@ const COMPONENT_STYLE = {
         ...SUMMARY_CARD_STYLE,
         ...SUMMARY_TRANSPARENT_CARD_STYLE,
         ...CONTENT_SUMMARY_CARD_STYLE,
+        ...PAIRED_IMAGE_TEXT_CARD_STYLE,
+        ...MULTI_ACTION_CARD_STYLE,
+        ...LAYERED_ACTION_CARD_STYLE,
+        ...CONFIRMABLE_CARD_STYLE,
         ...HISTORY_CARD_STYLE,
         ...FEED_LIST_CHART_TRAN_CARD_STYLE,
         ...REGULAR_LIST_TABLE_STYLE,

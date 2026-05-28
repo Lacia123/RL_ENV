@@ -14,6 +14,22 @@
 总结卡片
 contentSummaryCard
 
+双子模块图文卡片
+pairedImageTextCard
+这是一个固定包含两个子模块的卡片。外层用于主题标题，内部必须有 primaryItem 和 secondaryItem 两个子内容；每个子内容都由图片、标题、正文组成。
+
+多按钮操作卡片
+multiActionCard
+用于一段说明内容下提供多个操作入口。包含顶部标题、说明文本、按钮组标题、主操作项和可重复次操作项；操作项使用 nativeEvent/data 响应，不使用 button 默认跳转行为。
+
+层叠式行动卡片
+layeredActionCard
+用于紫色背景加底部浅色信息面板的行动卡。左上可以是 icon 或 badge，标题可用 title + titleAccent 表达上下两行不同权重；按钮支持单按钮或 primaryAction + secondaryAction 双按钮。
+
+可确认内容卡片
+confirmableCard
+用于带确认/操作语义的内容卡。左上可以是贴边图片 visual 或小文字 tag，右上可以是静态 cornerIcon 或可点击 cornerIconAction；正文区域支持 title/body，底部可选 primaryAction。
+
 
 herocard
 featureHeroCard
