@@ -240,13 +240,10 @@ function isTableOrChartData(lineOrLines) {
     if (tableTagMatch) {
         const tableVariant = tableTagMatch[1].split('|')[0].trim();
         const afterTableTag = firstLine.replace(/^\[table:[^\]]+\]/, '').trim();
-        const hasTableInSameLine = afterTableTag.includes('|') &&
-            afterTableTag.split('|').filter(c => c.trim().length > 0).length >= 2;
+        const hasTableInSameLine = isMarkdownTableRow(afterTableTag);
         const hasTableInNextLines = validLines.slice(1).some(l => {
             const trimmed = l.trim();
-            if (!trimmed.includes('|')) return false;
-            const cols = trimmed.split('|').filter(c => c.trim().length > 0);
-            return cols.length >= 2;
+            return isMarkdownTableRow(trimmed);
         });
 
         if (!hasTableInSameLine && !hasTableInNextLines) {
