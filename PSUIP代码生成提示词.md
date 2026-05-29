@@ -92,13 +92,13 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 
 `<link>` 是通用内联元素，可以嵌入在任何组件的文本 slot 中，或直接放在 `layout:*` 包裹的 Markdown 段落中。样式为浅灰底深色字标签。
 
-**注意：`<link>` 必须加上 `nativeEvent="click"` 属性才能点击。**
+**注意：`<link>` 必须加上 `nativeEvent="click"` 和 `data="bindData"` 属性才能点击。**
 
 ```text
-普通文本中嵌入 <link nativeEvent="click">链接</link> 的示例。
-在 description 中：<link href="https://example.com" nativeEvent="click">带链接的链接</link>
-在 text 中：<link nativeEvent="click">可点击的链接</link>
-<link data-id="123" nativeEvent="click">带多个属性</link>
+普通文本中嵌入 <link nativeEvent="click" data="bindData">链接</link> 的示例。
+在 description 中：<link href="https://example.com" nativeEvent="click" data="bindData">带链接的链接</link>
+在 text 中：<link nativeEvent="click" data="bindData">可点击的链接</link>
+<link nativeEvent="click" data="bindData">链接</link>
 ```
 
 除此以外，`[text](url)` 语法也会渲染为带下划线的超链接样式，同样可在任何文本内容中使用。
@@ -176,7 +176,7 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 ```text
 <contentSummaryCard>
   <title>推荐内容标题</title>
-  <description>用一两句话说明摘要信息。可内嵌 <link href="https://example.com" nativeEvent="click">链接</link>。</description>
+  <description>用一两句话说明摘要信息。可内嵌 <link href="https://example.com" nativeEvent="click" data="bindData">链接</link>。</description>
 </contentSummaryCard>
 ```
 
@@ -185,7 +185,7 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 <contentSummaryCard>
   <icon></icon>
   <title>文章推荐</title>
-  <description>查看 <link href="https://example.com/article" nativeEvent="click">详细内容</link></description>
+  <description>查看 <link href="https://example.com/article" nativeEvent="click" data="bindData">详细内容</link></description>
 </contentSummaryCard>
 ```
 
@@ -216,7 +216,7 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 <featureHeroCard>
   <badge>热门活动</badge>
   <title>AI 峰会 2024</title>
-  <description>探索人工智能的未来。详情见 <link href="https://example.com" nativeEvent="click">活动页面</link>。</description>
+  <description>探索人工智能的未来。详情见 <link href="https://example.com" nativeEvent="click" data="bindData">活动页面</link>。</description>
   <highlights>📅 2024年10月26日</highlights>
   <highlights>📍 线上/线下同步</highlights>
 </featureHeroCard>
@@ -251,7 +251,7 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 <heroCard>
   <badge>热门目的地</badge>
   <title>发现你的下一站旅行</title>
-  <subtitle>AI 智能规划，找到更适合的旅程节奏。更多信息见 <link href="https://example.com" nativeEvent="click">官方网站</link>。</subtitle>
+  <subtitle>AI 智能规划，找到更适合的旅程节奏。更多信息见 <link href="https://example.com" nativeEvent="click" data="bindData">官方网站</link>。</subtitle>
   <metrics>⭐ 4.9 · 128K 用户</metrics>
   <metrics>🗺️ 320+ 城市灵感</metrics>
 </heroCard>
@@ -336,8 +336,8 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 | `title` | 否 | 可选主标题 |
 | `description` | 是 | 主要说明文字 |
 | `actionLabel` | 否 | 按钮组标题 |
-| `primaryAction` | 是 | 主操作项（支持 `nativeEvent`/`data` 属性） |
-| `secondaryAction` | 否 | 次操作项，可重复（支持 `nativeEvent`/`data` 属性） |
+| `primaryAction` | 是 | 主操作项（必须带 `nativeEvent="click"` 和 `data="bindData"`） |
+| `secondaryAction` | 否 | 次操作项，可重复（必须带 `nativeEvent="click"` 和 `data="bindData"`） |
 
 **布局模式**：
 - `default`：label/title/description 头部 + 按钮组标题 + 三列 grid 按钮区
@@ -352,9 +352,9 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
   <label>加入我们</label>
   <description>成为我们团队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长。</description>
   <actionLabel>应聘方式</actionLabel>
-  <primaryAction nativeEvent="click" data="officialApply">官网在线申请</primaryAction>
-  <secondaryAction nativeEvent="click" data="wechatApply">公众号后台申请</secondaryAction>
-  <secondaryAction nativeEvent="click" data="emailApply">发送邮件申请</secondaryAction>
+  <primaryAction nativeEvent="click" data="bindData">官网在线申请</primaryAction>
+  <secondaryAction nativeEvent="click" data="bindData">公众号后台申请</secondaryAction>
+  <secondaryAction nativeEvent="click" data="bindData">发送邮件申请</secondaryAction>
 </multiActionCard>
 ```
 
@@ -369,8 +369,8 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 | `title` | 是 | 主标题第一行 |
 | `titleAccent` | 否 | 主标题第二行强调文字（颜色不同） |
 | `description` | 是 | 底部浅色面板说明文字 |
-| `primaryAction` | 是 | 主操作项（支持 `nativeEvent`/`data`） |
-| `secondaryAction` | 否 | 次操作项，双按钮场景使用（支持 `nativeEvent`/`data`） |
+| `primaryAction` | 是 | 主操作项（必须带 `nativeEvent="click"` 和 `data="bindData"`） |
+| `secondaryAction` | 否 | 次操作项，双按钮场景使用（必须带 `nativeEvent="click"` 和 `data="bindData"`） |
 
 **布局模式**（由 slot 组合自动触发）：
 | 模式 | 触发条件 | 说明 |
@@ -391,8 +391,8 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
   <title>订阅我们的</title>
   <titleAccent>新闻通讯</titleAccent>
   <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>
-  <primaryAction nativeEvent="click" data="subscribe">订阅</primaryAction>
-  <secondaryAction nativeEvent="click" data="later">稍后再说</secondaryAction>
+  <primaryAction nativeEvent="click" data="bindData">订阅</primaryAction>
+  <secondaryAction nativeEvent="click" data="bindData">稍后再说</secondaryAction>
 </layeredActionCard>
 ```
 
@@ -402,7 +402,7 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
   <badge>官方</badge>
   <title>开始使用AI助手</title>
   <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>
-  <primaryAction nativeEvent="click" data="startAssistant">开始使用</primaryAction>
+  <primaryAction nativeEvent="click" data="bindData">开始使用</primaryAction>
 </layeredActionCard>
 ```
 
@@ -415,10 +415,10 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 | `visual` | 否 | 左上角主视觉图片（`src`/`alt` 属性），贴紧卡片左上角 |
 | `tag` | 否 | 左上角小文字（visual 与 tag 通常二选一） |
 | `cornerIcon` | 否 | 右上角静态图标，只展示不点击 |
-| `cornerIconAction` | 否 | 右上角图标按钮，可点击（支持 `nativeEvent`/`data`） |
+| `cornerIconAction` | 否 | 右上角图标按钮，可点击（必须带 `nativeEvent="click"` 和 `data="bindData"`） |
 | `title` | 否 | 卡片主标题 |
 | `body` | 否 | 卡片正文说明 |
-| `primaryAction` | 否 | 底部主操作项（支持 `nativeEvent`/`data`） |
+| `primaryAction` | 否 | 底部主操作项（必须带 `nativeEvent="click"` 和 `data="bindData"`） |
 
 **布局模式**（由 slot 组合自动触发）：
 | 模式 | 触发条件 | 说明 |
@@ -442,9 +442,9 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 ```text
 <confirmableCard>
   <tag>标签文字</tag>
-  <cornerIconAction nativeEvent="click" data="open">↗</cornerIconAction>
+  <cornerIconAction nativeEvent="click" data="bindData">↗</cornerIconAction>
   <title>打破常规、说到做到，年终给满！</title>
-  <primaryAction nativeEvent="click" data="confirm">按钮</primaryAction>
+  <primaryAction nativeEvent="click" data="bindData">按钮</primaryAction>
 </confirmableCard>
 ```
 
@@ -466,15 +466,15 @@ textDisplay 包含 6 种子组件，用于纯文字展示场景。
 
 #### `<label>`（可点击标签 / labelLink）
 
-带右箭头的可点击标签。使用 `nativeEvent` 属性变为可点击，视觉上有右箭头指示。
+带右箭头的可点击标签。使用 `nativeEvent="click"` 和 `data="bindData"` 实现点击响应，视觉上有右箭头指示。
 
 | 属性 | 必填 | 说明 |
 |------|------|------|
 | 内容 | 是 | 标签文字 |
-| `nativeEvent` | 是（可点击时） | 点击事件名 |
+| `nativeEvent`/`data` | 是 | 必须为 `nativeEvent="click" data="bindData"` |
 
 ```text
-<label nativeEvent="click">查看更多</label>
+<label nativeEvent="click" data="bindData">查看更多</label>
 ```
 
 #### `<bannerImagePanel>` 横幅图片面板
@@ -751,8 +751,9 @@ $$
 6. **主体不横向且默认拉伸** — 根路径不要使用横向主体布局。`<layout:root>` 下应以主 `<layout:column alignItems="stretch">` 组织内容；`layout:row`、`layout:gallery` 只允许作为局部辅助布局使用。
 7. **按信息结构选组件** — 不要按关键词或固定学习分类机械套用组件；必须根据内容的实际结构和表达目的选择展示方式。
 8. **公式表格必须使用 regularListTable** — 包含 `$...$` 公式、数学符号或变量记号的表格，必须写入 `regularListTable` 的 `<table>` slot 或使用 `[table:commonStyle]` 标签，不能作为普通 Markdown 表格直接放在 `layout:*` 中。
-9. **按钮类 slot 使用 nativeEvent/data 响应** — `multiActionCard` 的 `primaryAction`/`secondaryAction`、`layeredActionCard` 的 `primaryAction`/`secondaryAction`、`confirmableCard` 的 `primaryAction`/`cornerIconAction` 等操作类 slot，视觉上呈现为按钮但底层是文本容器，通过 `nativeEvent`/`data` 属性响应事件，不使用 button 默认跳转行为。
+9. **按钮类 slot 使用 nativeEvent/data 响应** — `multiActionCard` 的 `primaryAction`/`secondaryAction`、`layeredActionCard` 的 `primaryAction`/`secondaryAction`、`confirmableCard` 的 `primaryAction`/`cornerIconAction` 等操作类 slot，视觉上呈现为按钮但底层是文本容器，通过 `nativeEvent`/`data` 属性响应事件，不使用 button 默认跳转行为。`nativeEvent` 值必须用双引号包裹（`nativeEvent="click"`），且每个 `nativeEvent` 必须配套 `data="bindData"`。
 10. **双子图文卡必须同时提供 primaryItem 和 secondaryItem** — `pairedImageTextCard` 必须同时提供两个子内容，不可只用其一；每个子内容必须包含 `image`、`title`、`body` 三个子 slot。
 11. **禁止使用 `{{}}` 模板占位符** — 所有 `title`、`description`、`text`、`body` 等 slot 内容必须由 AI 直接填入真实文本，不允许出现 `{{标题内容}}`、`{{SUMMARY_CARD_COMMIT_LABEL}}` 等模板变量或占位符。输出即为最终内容，无需二次替换。
 12. **数学公式必须使用 `$...$` 格式，禁止 `\(...\)`** — 所有行内公式必须用 `$...$` 包裹（如 `$x$`、`$\varepsilon$`），块级公式用 `$$...$$`。禁止使用 `\(x\)`、`\[...\]` 等 LaTeX 标准格式，这些格式虽然系统有兼容处理但不保证正确渲染。
 13. **禁止在组件 slot 内容中使用 `<br/>`** — `contentSummaryCard` 的 `description`、`heroCard` 的 `subtitle`、`featureHeroCard` 的 `description` 等文本 slot 内禁止使用 `<br/>` 换行。多段内容应拆分为多个独立组件展示，或使用 Markdown 列表/空行（空行在 Markdown 中自动形成段落）。
+14. **`nativeEvent` 属性格式要求** — 所有 `nativeEvent` 的值必须用双引号包裹，禁止出现 `nativeEvent=click` 这种无引号写法。正确写法：`nativeEvent="click"`。
