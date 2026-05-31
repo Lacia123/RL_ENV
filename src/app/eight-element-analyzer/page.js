@@ -2223,6 +2223,31 @@ wrapper: {
   <commitWide>查看过程</commitWide>
 </summaryCard>
 
+<!-- ========== summaryTransparentCard：无卡片底色 / 外边框 / 外阴影 ========== -->
+<!-- 透明示例1: 默认纵向 -->
+<summaryTransparentCard>
+  <title title="透明卡片标题">生成岗位JD完成（透明底）</title>
+  <commit>查看过程</commit>
+  <text key="summary">已生成完整岗位说明，无磨砂底与描边。</text>
+</summaryTransparentCard>
+
+<!-- 透明示例2: 带图标 -->
+<summaryTransparentCard>
+  <icon></icon>
+  <title title="查看详情" key="title">算法工程师岗位</title>
+  <commit>查看过程</commit>
+  <text key="summary">结构与 summaryCard 一致，仅去掉外层玻璃态样式。</text>
+</summaryTransparentCard>
+
+<!-- 透明示例3: 横向布局 + 预览图 -->
+<summaryTransparentCard>
+  <icon></icon>
+  <title title="卡片标题提示" key="title">透明横向摘要</title>
+  <commit>查看过程</commit>
+  <text key="summary">适合叠在渐变或图片背景上。</text>
+  <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+</summaryTransparentCard>
+
 <!-- ========== historyCard 示例：仅 标题 内容 时间；3 种卡片 大(紫最深) / 中(紫第二深) / 小(浅色) ========== -->
 <!-- 大的 - 紫色最深 -->
 <historyCard>
