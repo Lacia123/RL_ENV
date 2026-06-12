@@ -5,6 +5,7 @@ import { convertEightElementToLayout } from '../utils/layoutAnalysis/eightElemen
 import { markdownToEightElement, applyLayoutControlsToEightElement, analyzeElementsInEightElement, applyActionsToEightElement } from '../utils/eightElement/index';
 import { RL_ACTIONS, createActionSystemManager } from '../utils/seeds/rl_action_engines';
 import { DEFAULT_STYLE_CONFIG } from '../utils/eightElement/styles';
+import { setDynamicTokenSystem, clearDynamicTokenSystem } from '../utils/tokens/resolveToken';
 
 import VisualSpaceEvaluator from '../components/VisualSpaceEvaluator';
 import collectEightElementMeasurements from '../utils/eightElement/collectElementMeasurements.js';
@@ -2890,6 +2891,10 @@ const EightElementAnalyzer = () => {
   const [layout, setLayout] = useState(null);
   const [iframeKey, setIframeKey] = useState(0);  // 添加 iframe key 状态
   const [copySuccess, setCopySuccess] = useState(false); // 复制成功状态
+  const [themeJson, setThemeJson] = useState('');
+  const [themeJsonError, setThemeJsonError] = useState('');
+  const [themeApplied, setThemeApplied] = useState(false);
+  const [isThemeCollapsed, setIsThemeCollapsed] = useState(true);
 
   // 🆕 编辑器相关状态
   const [isEditMode, setIsEditMode] = useState(false); // 是否处于编辑模式
@@ -3171,9 +3176,55 @@ const EightElementAnalyzer = () => {
     }));
   };
 
+  const applyThemeTokens = useCallback(() => {
+    const trimmed = themeJson.trim();
+    if (!trimmed) {
+      clearDynamicTokenSystem();
+      setThemeJsonError('');
+      setThemeApplied(false);
+      return { applied: false };
+    }
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('主题 JSON 必须是一个对象');
+      }
+      setDynamicTokenSystem(parsed);
+      setThemeJsonError('');
+      setThemeApplied(true);
+      return { applied: true };
+    } catch (error) {
+      clearDynamicTokenSystem();
+      setThemeJsonError(error.message);
+      setThemeApplied(false);
+      return { applied: false, error: error.message };
+    }
+  }, [themeJson]);
+
+  const clearThemeJson = () => {
+    setThemeJson('');
+    setThemeJsonError('');
+    setThemeApplied(false);
+    clearDynamicTokenSystem();
+  };
+
+  useEffect(() => {
+    return () => {
+      clearDynamicTokenSystem();
+    };
+  }, []);
+
   // 处理Markdown转换为八要素结构
   const processMarkdown = (customDimensions = null, forceLayoutControls = null) => {
     try {
+      const themeResult = applyThemeTokens();
+      if (themeResult.error) {
+        console.warn('主题 JSON 解析失败，将使用默认 token:', themeResult.error);
+      } else if (themeResult.applied) {
+        console.log('已应用自定义主题 token');
+      }
+
       // 使用传入的自定义尺寸或当前状态中的尺寸
       const currentDimensions = customDimensions || dimensions;
       console.log('处理Markdown使用尺寸:', currentDimensions);
@@ -3329,6 +3380,11 @@ const EightElementAnalyzer = () => {
       console.error('   错误详情:', error.message);
       return null;
     }
+  };
+
+  const applyThemeAndReprocess = () => {
+    applyThemeTokens();
+    processMarkdown(null, layoutControls);
   };
 
   // 当动作选择变化时，重新计算影响范围
@@ -3775,6 +3831,77 @@ const EightElementAnalyzer = () => {
               <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
                 <strong>当前模板:</strong> {MARKDOWN_TEMPLATES[currentTemplate].description}
               </div>
+            </div>
+
+            {/* 主题 JSON */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-700">主题 JSON</h3>
+                <button
+                  onClick={() => setIsThemeCollapsed(!isThemeCollapsed)}
+                  className="text-gray-500 hover:text-gray-700 transition-colors text-xs"
+                  title={isThemeCollapsed ? '展开' : '折叠'}
+                >
+                  {isThemeCollapsed ? '展开' : '折叠'}
+                </button>
+              </div>
+
+              {!isThemeCollapsed && (
+                <div className="space-y-2">
+                  <textarea
+                    className="w-full h-48 border border-gray-300 rounded p-2 font-mono text-xs"
+                    value={themeJson}
+                    onChange={(e) => {
+                      setThemeJson(e.target.value);
+                      setThemeJsonError('');
+                      setThemeApplied(false);
+                    }}
+                    placeholder='粘贴设计主题 JSON，例如 {"color": {...}, "dimension": {...}, "font": {...}}'
+                  />
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-xs">
+                      {themeJsonError ? (
+                        <span className="text-red-600">JSON 格式错误: {themeJsonError}</span>
+                      ) : themeApplied ? (
+                        <span className="text-green-600">已应用自定义主题 token</span>
+                      ) : themeJson.trim() ? (
+                        <span className="text-amber-600">已输入主题，点击「应用主题」或「重新解析 Markdown」生效</span>
+                      ) : (
+                        <span className="text-gray-500">未设置主题，使用默认 token</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={clearThemeJson}
+                        className="px-2 py-1 text-xs rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+                      >
+                        清空
+                      </button>
+                      <button
+                        type="button"
+                        onClick={applyThemeAndReprocess}
+                        className="px-2 py-1 text-xs rounded bg-purple-500 text-white hover:bg-purple-600"
+                      >
+                        应用主题
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    解析 Markdown 时会优先使用此主题中的 token 值（color、dimension、font 等）
+                  </p>
+                </div>
+              )}
+
+              {isThemeCollapsed && (
+                <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded border border-dashed border-gray-200">
+                  {themeApplied
+                    ? '已启用自定义主题 token'
+                    : themeJson.trim()
+                      ? '已输入主题 JSON（展开后可编辑）'
+                      : '未设置主题，使用默认 token'}
+                </div>
+              )}
             </div>
 
             {/* Markdown编辑器 */}
