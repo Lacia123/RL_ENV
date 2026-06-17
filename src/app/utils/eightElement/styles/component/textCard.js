@@ -303,6 +303,7 @@ const TEXT_CARD_STYLE = {
                     borderRadius: '{dimension.borderradius.xl}',
                     padding: '{dimension.padding.loose}',
                     background: '{color.surfacecontainer.white100}',
+                    width: '100%'
                 },
                 structure: {
                     groups: [
