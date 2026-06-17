@@ -3104,6 +3104,385 @@ style: {
   <primaryAction nativeEvent="click" data="readMore">阅读更多</primaryAction>
 </confirmableCard>
     `
+  },
+  slabComponents: {
+    name: '🧱 Slab 组件',
+    description: 'Slab 设计系统全部组件：summaryCard、pairedImageTextCard、multiActionCard、layeredActionCard、confirmableCard、heroCard、titleCenterCard、label、bannerImagePanel、textCard、commonStyle 系列与 tableCommonStyle',
+    markdown: `# Slab 组件展示
+
+## summaryCard
+
+<!-- 示例1: 默认纵向 -->
+<summaryCard>
+  <title title="鼠标悬停可看完整标题">生成岗位JD完成（悬停看 tooltip）</title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+</summaryCard>
+
+<!-- 示例2: 带图标 -->
+<summaryCard>
+  <icon></icon>
+  <title title="查看详情" key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+</summaryCard>
+
+<!-- 示例3: 横向布局 + 预览 -->
+<summaryCard>
+  <title title="卡片标题提示" key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+  <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+</summaryCard>
+
+<!-- 示例4: 图标 + 预览 -->
+<summaryCard>
+  <icon></icon>
+  <title title="悬停显示此标题" key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+  <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+</summaryCard>
+
+<!-- 示例5: 上图 + 小按钮 -->
+<summaryCard>
+  <topImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></topImage>
+  <icon></icon>
+  <title title="标题提示" key="title"></title>
+  <commit>查看过程</commit>
+  <text key="summary"></text>
+</summaryCard>
+
+<!-- 示例6: 上图 + 宽按钮 -->
+<summaryCard>
+  <topImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></topImage>
+  <icon></icon>
+  <title title="完整标题说明" key="title"></title>
+  <text key="summary"></text>
+  <commitWide>查看过程</commitWide>
+</summaryCard>
+
+<!-- 示例7: 背景图 + 宽按钮 -->
+<summaryCard>
+  <backgroundImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=400&h=400"></backgroundImage>
+  <title title="背景卡片标题" key="title"></title>
+  <text key="summary"></text>
+  <commitWide>查看过程</commitWide>
+</summaryCard>
+
+## pairedImageTextCard
+
+<!-- 示例1: 带 label -->
+<pairedImageTextCard>
+  <label>公司简介</label>
+  <title>致力于提供最先进的数字化解决方案</title>
+  <content>我们围绕技术、团队与服务能力，为客户提供可持续的数字化支持。</content>
+  <primaryItem>
+    <image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论" />
+    <title>关于企业</title>
+    <body>我们是一家专注于人工智能和大数据领域的创新科技公司，围绕数据治理、智能分析、业务自动化与系统集成，为客户提供从方案规划到落地交付的完整支持。</body>
+  </primaryItem>
+  <secondaryItem>
+    <image src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=800" alt="团队协作会议" />
+    <title>关于团队</title>
+    <body>我们拥有一支充满活力和创新精神的技术团队，汇聚了来自不同领域的优秀人才。</body>
+  </secondaryItem>
+</pairedImageTextCard>
+
+<!-- 示例2: 不带 label -->
+<pairedImageTextCard>
+  <title>产品能力与服务优势</title>
+  <content>我们围绕技术、团队与服务能力，为客户提供可持续的数字化支持。</content>
+  <primaryItem>
+    <image src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=800" alt="产品能力展示" />
+    <title>产品能力</title>
+    <body>提供端到端的 AI 解决方案，涵盖智能分析、自动化流程、数据可视化等核心能力，帮助企业实现智能决策。</body>
+  </primaryItem>
+  <secondaryItem>
+    <image src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=800" alt="服务优势" />
+    <title>服务优势</title>
+    <body>7×24 小时技术支持、专属客户经理、敏捷响应团队，确保每一位客户都能获得及时专业的服务体验。</body>
+  </secondaryItem>
+</pairedImageTextCard>
+
+## multiActionCard
+
+<!-- 示例1: 标准 -->
+<multiActionCard>
+  <label>加入我们</label>
+  <description>成为我们团队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长，共同打造行业领先的解决方案。</description>
+  <actionLabel>应聘方式</actionLabel>
+  <primaryAction nativeEvent="click" data="officialApply">官网在线申请</primaryAction>
+  <secondaryAction nativeEvent="click" data="wechatApply">公众号后台申请</secondaryAction>
+  <secondaryAction nativeEvent="click" data="emailApply">发送邮件申请</secondaryAction>
+</multiActionCard>
+
+<!-- 示例2: 带标题 -->
+<multiActionCard>
+  <title>加入我们，共创未来</title>
+  <description>我们正在寻找充满激情的技术人才，如果你对 AI 和大数据充满热情，欢迎加入我们。</description>
+  <actionLabel>联系方式</actionLabel>
+  <primaryAction nativeEvent="click" data="contactHR">联系HR</primaryAction>
+  <secondaryAction nativeEvent="click" data="viewJobs">查看职位</secondaryAction>
+  <secondaryAction nativeEvent="click" data="visitOffice">预约参观</secondaryAction>
+</multiActionCard>
+
+<!-- 示例3: 简洁 -->
+<multiActionCard>
+  <description>立即下载我们的产品手册，了解更多产品功能与解决方案。</description>
+  <actionLabel>下载方式</actionLabel>
+  <primaryAction nativeEvent="click" data="downloadPDF">下载 PDF 手册</primaryAction>
+  <secondaryAction nativeEvent="click" data="downloadPPT">下载 PPT 介绍</secondaryAction>
+</multiActionCard>
+
+## layeredActionCard
+
+<!-- 示例1: 图标 + 双按钮 -->
+<layeredActionCard>
+  <icon>✦</icon>
+  <title>订阅我们的</title>
+  <titleAccent>新闻通讯</titleAccent>
+  <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>
+  <primaryAction nativeEvent="click" data="subscribe">订阅</primaryAction>
+  <secondaryAction nativeEvent="click" data="later">稍后再说</secondaryAction>
+</layeredActionCard>
+
+<!-- 示例2: 标签 + 单按钮 -->
+<layeredActionCard>
+  <badge>官方</badge>
+  <title>开始使用AI助手</title>
+  <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>
+  <primaryAction nativeEvent="click" data="startAssistant">开启助手</primaryAction>
+</layeredActionCard>
+
+<!-- 示例3: 纯标题 + 单按钮 -->
+<layeredActionCard>
+  <title>加入会员计划</title>
+  <description>成为我们的会员，享受专属优惠、优先体验新功能以及更多增值服务。</description>
+  <primaryAction nativeEvent="click" data="joinNow">立即加入</primaryAction>
+</layeredActionCard>
+
+<!-- 示例4: 图标 + titleAccent + 单按钮 -->
+<layeredActionCard>
+  <icon>💡</icon>
+  <title>产品更新</title>
+  <titleAccent>v3.0 已发布</titleAccent>
+  <description>新版本带来了更强大的 AI 分析能力、更流畅的交互体验，以及更多实用功能。</description>
+  <primaryAction nativeEvent="click" data="upgrade">升级体验</primaryAction>
+</layeredActionCard>
+
+<!-- 示例5: 标签 + titleAccent + 双按钮 -->
+<layeredActionCard>
+  <badge>限时活动</badge>
+  <title>年终特惠</title>
+  <titleAccent>全场 8 折起</titleAccent>
+  <description>即日起至年底，购买年度会员享受超值折扣，错过再等一年。</description>
+  <primaryAction nativeEvent="click" data="buyNow">立即购买</primaryAction>
+  <secondaryAction nativeEvent="click" data="learnMore">了解更多</secondaryAction>
+</layeredActionCard>
+
+## confirmableCard
+
+<!-- 示例1: 左上图片 + 右上静态图标 -->
+<confirmableCard>
+  <visual src="https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png" alt="品牌图形" />
+  <cornerIcon>↻</cornerIcon>
+  <title>鼎道智联</title>
+  <body>正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字</body>
+</confirmableCard>
+
+<!-- 示例2: 左上 tag + 右上可点击图标 + 底部按钮 -->
+<confirmableCard>
+  <tag>标签文字</tag>
+  <cornerIconAction nativeEvent="click" data="open">↗</cornerIconAction>
+  <title>打破常规、说到做到，年终给满！</title>
+  <primaryAction nativeEvent="click" data="confirm">确认</primaryAction>
+</confirmableCard>
+
+<!-- 示例3: 左上图片 + 正文 + 底部按钮 -->
+<confirmableCard>
+  <visual src="https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png" alt="品牌图形" />
+  <title>企业品牌展示</title>
+  <body>我们致力于为企业提供全方位的数字化解决方案，帮助客户实现业务增长与智能化转型。</body>
+  <primaryAction nativeEvent="click" data="viewDetails">查看详情</primaryAction>
+</confirmableCard>
+
+<!-- 示例4: 左上 tag + 右上静态图标 + 底部按钮 -->
+<confirmableCard>
+  <tag>推荐</tag>
+  <cornerIcon>★</cornerIcon>
+  <title>精选内容推荐</title>
+  <body>基于你的阅读偏好，我们推荐以下精选内容。内容涵盖行业趋势、技术干货和最佳实践。</body>
+  <primaryAction nativeEvent="click" data="readMore">阅读更多</primaryAction>
+</confirmableCard>
+
+## heroCard
+
+<!-- 示例1: 带封面图片 + 双 CTA -->
+<heroCard>
+  <cover_image src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900"></cover_image>
+  <badge>热门目的地</badge>
+  <title>发现你的下一站旅行</title>
+  <subtitle>个性化行程推荐，AI 智能规划，帮你找到更合适的旅程节奏。</subtitle>
+  <metrics>⭐ 4.9 · 128K 用户</metrics>
+  <metrics>🗺️ 320+ 城市灵感</metrics>
+  <cta_primary href="https://example.com/plan">开始计划</cta_primary>
+  <cta_secondary href="https://example.com/destinations">查看目的地</cta_secondary>
+</heroCard>
+
+<!-- 示例2: 无封面（渐变背景） + 双 CTA -->
+<heroCard>
+  <badge>最新活动</badge>
+  <title>AI 峰会 2024</title>
+  <subtitle>探索人工智能的未来，与行业领袖共同探讨前沿技术与应用。</subtitle>
+  <metrics>📅 2024年10月26日</metrics>
+  <metrics>📍 线上/线下同步</metrics>
+  <cta_primary href="https://example.com/register">立即注册</cta_primary>
+  <cta_secondary href="https://example.com/agenda">查看议程</cta_secondary>
+</heroCard>
+
+<!-- 示例3: 带 command 行（代码块） -->
+<heroCard>
+  <badge>技术活动</badge>
+  <title>AI 开发工作坊</title>
+  <command>pip install transformers torch</command>
+  <subtitle>从零开始构建大模型应用，动手实践 RAG 与 Agent 开发。</subtitle>
+  <command>git clone https://github.com/example/ai-workshop.git</command>
+  <metrics>📅 2024年11月15日</metrics>
+  <metrics>📍 北京 · 中关村</metrics>
+  <cta_primary href="https://example.com/workshop">报名参加</cta_primary>
+  <cta_secondary href="https://example.com/slides">查看讲义</cta_secondary>
+</heroCard>
+
+<!-- 示例4: 封面 + 仅 metrics（无 CTA） -->
+<heroCard>
+  <cover_image src="https://sop-cdn.dingcloud.com/aigui/file/ag4baygrjj38y128iauxh0yy7isdpcj820260311162754792.png"></cover_image>
+  <badge>会议邀请</badge>
+  <title>AIGUI 产品讨论</title>
+  <subtitle>以下为会议时间及会议地点</subtitle>
+  <metrics>🕙 时间：2024年11月15日  10:00-12:00 </metrics>
+  <metrics>🏘 地点：神盾局</metrics>
+</heroCard>
+
+## titleCenterCard
+
+<titleCenterCard>
+  <text_subtitle>Job Detial</text_subtitle>
+  <text_title>岗位详情</text_title>
+</titleCenterCard>
+
+## label
+
+<!-- 示例1 -->
+<label>中国市场</label>
+
+<!-- 示例2: 带事件绑定，有跳转箭头 -->
+<labelLink nativeEvent="click" data="bindData">中国市场</labelLink>
+
+## bannerImagePanel
+
+<bannerImagePanel>
+  ## 智能云平台竞对动态分析
+  ### 数据反馈
+</bannerImagePanel>
+
+## textCard / textCenterCard
+
+<!-- 示例1: 文本靠左，无副标题 -->
+<textCard>
+  <text_title>限时</text_title>
+  <text_text> 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。</text_text>
+  <cta href="https://example.com/promo">按钮</cta>
+</textCard>
+
+<!-- 示例2: 文本靠左，有副标题 -->
+<textCard>
+  <text_title>限时</text_title>
+  <text_subtitle>年终大促活动</text_subtitle>
+  <text_text> 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。</text_text>
+  <cta href="https://example.com/promo">按钮</cta>
+</textCard>
+
+<!-- 示例3: 文本居中展示 -->
+<textCenterCard>
+  <text_subtitle>Section 1</text_subtitle>
+  <text_title>特大标题居中</text_title>
+  <text_text> 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。</text_text>
+</textCenterCard>
+
+## commonStyleListItemRow
+
+<layout:row flexWrap="wrap">
+<loop data="commonStyleServiceGridData" nativeEvent="click">
+<commonStyleListItemRow>
+<icon key="icon"></icon>
+<title key="title"></title>
+<content key="content"></content>
+</commonStyleListItemRow>
+</loop>
+</layout:row>
+
+## commonStyleList + commonStyleListItem
+
+<commonStyleList>
+<card:commonStyleListItem>
+<icon>[icon:Travel/flag]</icon>
+<layout:column>
+<title>AWS</title>
+<content>美国、亚洲、亚太</content>
+</layout:column>
+</card:commonStyleListItem>
+</commonStyleList>
+
+## commonStyleServiceList
+
+<layout:row flexWrap="wrap">
+<loop data="commonStyleServiceGridData" nativeEvent="click">
+<commonStyleServiceList>
+<icon key="icon"></icon>
+<title key="title"></title>
+<content key="content"></content>
+</commonStyleServiceList>
+</loop>
+</layout:row>
+
+## commonStyleServiceListDesc
+
+<layout:row flexWrap="wrap">
+<loop data="commonStyleServiceGridData" nativeEvent="click">
+<commonStyleServiceListDesc>
+<icon key="icon"></icon>
+<layout:column>
+<title key="title"></title>
+<desc key="content"></desc>
+</layout:column>
+</commonStyleServiceListDesc>
+</loop>
+</layout:row>
+
+## commonStyleServiceListCompact
+
+<layout:row flexWrap="wrap">
+<loop data="commonStyleServiceGridDataCompact" nativeEvent="click">
+<commonStyleServiceListCompact>
+<icon key="icon"></icon>
+<layout:column>
+<title key="title"></title>
+<desc key="content"></desc>
+</layout:column>
+</commonStyleServiceListCompact>
+</loop>
+</layout:row>
+
+## tableCommonStyle
+
+[table:commonStyle]
+| DingOS版本号 | 设备数量 | 操作 |
+|------|------|------|
+| AWS | 美国、亚洲、亚太 | ⟳  ⋮ |
+| Azure | 全球20+区域 | ⟳  ⋮ |
+| 阿里云 | 中国大陆主要城市 | ⟳  ⋮ |
+`
   }
 };
 
