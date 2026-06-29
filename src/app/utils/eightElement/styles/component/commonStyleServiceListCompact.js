@@ -28,10 +28,10 @@ import {
 
 /** 堆叠步进：每层向下/向右偏移，露出下层标题与描述 */
 const COMMON_STYLE_LIST_COMPACT_STACK_OFFSET = {
-    stepY: '56px',
-    stepX: '24px',
-    stepY2: '112px',
-    stepX2: '48px',
+    stepY: '69px',
+    stepX: '40px',
+    stepY2: '138px',
+    stepX2: '76px',
     reserveRight: '56px',
     reserveBottom: '188px',
     minHeight: '260px',

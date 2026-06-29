@@ -16,7 +16,7 @@ const SUMMARY_TRANSPARENT_CARD_STYLE = {
                   gap: '{dimension.gap.semiloose}',
                   flexDirection: 'column',
                   padding: '{dimension.padding.semiloose}',
-                  borderRadius: '{dimension.borderradius.xxxxl}',
+                  borderRadius: '{dimension.borderradius.xxl}',
                   position: 'relative',
                   overflow: 'hidden',
               },
@@ -120,7 +120,7 @@ const SUMMARY_TRANSPARENT_CARD_STYLE = {
                   flexDirection: 'column',
                   justifyContent: 'flex-end',
                   padding: '{dimension.padding.semiloose}',
-                  borderRadius: '{dimension.borderradius.xxxxl}',
+                  borderRadius: '{dimension.borderradius.xxl}',
                   position: 'relative',
                   overflow: 'hidden',
                   width: '100%',
@@ -212,7 +212,7 @@ const SUMMARY_TRANSPARENT_CARD_STYLE = {
                   gap: '{dimension.gap.loose}',
                   flexDirection: 'column',
                   padding: '{dimension.padding.semiloose}',
-                  borderRadius: '{dimension.borderradius.xxxxl}',
+                  borderRadius: '{dimension.borderradius.xxl}',
                   overflow: 'hidden',
               },
               structure: {
@@ -289,7 +289,7 @@ const SUMMARY_TRANSPARENT_CARD_STYLE = {
                   gap: '{dimension.gap.loose}',
                   flexDirection: 'column',
                   padding: '{dimension.padding.semiloose}',
-                  borderRadius: '{dimension.borderradius.xxxxl}',
+                  borderRadius: '{dimension.borderradius.xxl}',
                   overflow: 'hidden',
               },
               structure: {
@@ -374,7 +374,7 @@ const SUMMARY_TRANSPARENT_CARD_STYLE = {
                   gap: '{dimension.gap.semiloose}',
                   flexDirection: 'row',
                   padding: '{dimension.padding.semiloose}',
-                  borderRadius: '{dimension.borderradius.xxxxl}',
+                  borderRadius: '{dimension.borderradius.xxl}',
               },
               structure: {
                   groups: [{
@@ -451,7 +451,7 @@ const SUMMARY_TRANSPARENT_CARD_STYLE = {
                   gap: '{dimension.gap.semiloose}',
                   flexDirection: 'column',
                   padding: '{dimension.padding.semiloose}',
-                  borderRadius: '{dimension.borderradius.xxxxl}',
+                  borderRadius: '{dimension.borderradius.xxl}',
               },
               structure: {
                   groups: [{
@@ -501,7 +501,7 @@ const SUMMARY_TRANSPARENT_CARD_STYLE = {
                   gap: '{dimension.gap.semiloose}',
                   flexDirection: 'column',
                   padding: '{dimension.padding.semiloose}',
-                  borderRadius: '{dimension.borderradius.xxxxl}',
+                  borderRadius: '{dimension.borderradius.xxl}',
               },
               structure: {
                   groups: [{
@@ -559,7 +559,7 @@ const SUMMARY_TRANSPARENT_CARD_STYLE = {
                   gap: '{dimension.gap.semiloose}',
                   flexDirection: 'column',
                   padding: '{dimension.padding.semiloose}',
-                  borderRadius: '{dimension.borderradius.xxxxl}',
+                  borderRadius: '{dimension.borderradius.xxl}',
               },
               structure: {
                   groups: [{

@@ -65,6 +65,9 @@ const TABLE_COMMON_STYLE = {
                     fontWeights: '{font.fontweight.semibold}',
                     fontSizes: '{font.size.medium}',
                 },
+                '&:nth-child(3)': {
+                    fontSizes: '{font.size.large}',
+                },
             },
         },
         tr: {

@@ -76,8 +76,7 @@ const CONFIRMABLE_CARD_STYLE = {
                 variantStyle: {
                     margin: '0',
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'end',
                     width: '{dimension.basic.dimension.64}',
                     height: '{dimension.basic.dimension.64}',
                     color: '{color.basic.brand.6}',

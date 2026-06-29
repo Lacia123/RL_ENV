@@ -318,8 +318,14 @@ const MEDIA_CARD_SERIES_STYLE = {
                 variantStyle: {
                     minWidth: '160px',
                     background: 'transparent',
-                    color: '{color.onprimary.white100}',
-                    border: '1px solid rgba(255,255,255,0.5)'
+                    color: '{color.onprimary.white75}',
+                    border: '1px solid rgba(255,255,255,0.5)',
+                    '&:hover': {
+                        backgroundColor: '{color.basic.opacity.white.32}',
+                        color: '{color.onprimary.white75}',
+                        transform: 'translateY(-1px)',
+                        boxShadow: "{material.hierarchy.2f}"
+                    }
                 }
             }
         },
@@ -680,7 +686,13 @@ const MEDIA_CARD_SERIES_STYLE = {
                     minWidth: '160px',
                     background: 'transparent',
                     color: '{color.onprimary.white100}',
-                    border: '1px solid rgba(255,255,255,0.5)'
+                    border: '1px solid rgba(255,255,255,0.5)',
+                    '&:hover': {
+                        backgroundColor: '{color.basic.opacity.white.32}',
+                        color: '{color.onprimary.white100}',
+                        transform: 'translateY(-1px)',
+                        boxShadow: "{material.hierarchy.2f}"
+                    }
                 }
             }
         },
@@ -1326,7 +1338,14 @@ const MEDIA_CARD_SERIES_STYLE = {
                     minWidth: '140px',
                     padding: '{dimension.padding.base} {dimension.padding.loose}',
                     borderRadius: '{dimension.borderradius.large}',
-                    fontWeight: '{font.fontweight.semibold}'
+                    fontWeight: '{font.fontweight.semibold}',
+                    background: 'none',
+                    backgroundColor: 'transparent',
+                    borderColor: '{color.basic.opacity.black.32}',
+                    color: '{color.basic.opacity.black.32}',
+                    '&:hover': {
+                        background: '{color.basic.opacity.black.12}',
+                    }
                 }
             }
         },

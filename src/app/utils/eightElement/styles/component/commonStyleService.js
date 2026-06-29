@@ -87,6 +87,7 @@ const COMMON_STYLE_LIST_CONTAINER = {
             condition: 'default',
             style: {
                 display: 'flex',
+                flexDirection: 'row',
                 flexWrap: 'wrap',
                 gap: '{dimension.gap.base}',
                 width: '100%',
@@ -103,6 +104,7 @@ const COMMON_STYLE_LIST_CONTAINER = {
         type: 'template',
         style: {
             display: 'flex',
+            flexDirection: 'row',
             flexWrap: 'wrap',
             gap: '{dimension.gap.base}',
             width: '100%',
