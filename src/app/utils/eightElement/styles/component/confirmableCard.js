@@ -1,18 +1,12 @@
+const FEIJI_SVG_DATA_URI = `url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTcyIiBoZWlnaHQ9IjE0MiIgdmlld0JveD0iMCAwIDE3MiAxNDIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xNzAuNjkzIDUwLjU4NzNDMTcyLjQ4IDU3LjI1NTcgMTY4LjUyMyA2NC4xMDk4IDE2MS44NTUgNjUuODk2NUwzMS4yOTk4IDEwMC44NzhDMjcuNjA2MiAxMDEuODY4IDIzLjcxMyAxMDAuMjE3IDIxLjg1NyA5Ni44NzRMMCA1Ny41MDE1TDEyLjA3NDEgNTQuMjY2NUwzMi42MzkgNzQuNjM4Mkw3NS4wOTk4IDYzLjI2MDdMMzcuNTEyMiA0LjMxMzY3TDUzLjYxMDkgMEwxMTEuNTM5IDUzLjQ5NjVMMTU1LjM4NCA0MS43NDg0QzE2Mi4wNTIgMzkuOTYxNiAxNjguOTA2IDQzLjkxODkgMTcwLjY5MyA1MC41ODczWk0yMS4xMTkzIDEyNC42NTZIMTU0LjQ1MlYxNDEuMzIySDIxLjExOTNWMTI0LjY1NloiIGZpbGw9IiM2MTVFRUMiLz4KPC9zdmc+Cg==')`;
+
 const CONFIRMABLE_CARD_STYLE = {
-    // confirmableCard 数据绑定示例
     confirmableCard: {
         type: 'template',
-        description: '可确认内容卡片。用于一张卡片中展示可选左上图片或左上小文字、可选右上图标、可选标题、正文和底部操作入口的场景。适合品牌/人物/任务/活动/提示类卡片，卡片本身可承载确认、刷新、查看详情等操作。',
+        description: '可确认内容卡片。无标签时左上角展示品牌飞机图标，有标签时隐藏飞机。可选右上图标、可选标题、正文和底部操作入口。',
         usage: {
-            guidance: '根据内容选择槽位：visual 用于左上角主视觉图片或图形，贴紧卡片左上角；tag 用于左上角小文字，visual 与 tag 通常二选一；cornerIcon 用于右上角静态图标展示，没有按钮边框和背景；cornerIconAction 用于右上角图标按钮，需要点击响应时才使用。cornerIcon 和 cornerIconAction 都只能放图标符号，不放普通文字。title 用于主标题；body 用于正文说明；primaryAction 用于底部确认按钮。底部按钮和可点击图标都用普通文本容器承载，不使用 button 默认行为。',
+            guidance: 'tag 用于左上角标签文字，提供后飞机图标自动隐藏；cornerIcon 用于右上角静态图标；cornerIconAction 用于右上角可点击图标。title 用于主标题；body 用于正文说明；primaryAction 用于底部确认按钮。',
             psuip: `<confirmableCard>
-  <visual src="https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png" alt="品牌图形" />
-  <cornerIcon>↻</cornerIcon>
-  <title>鼎道智联</title>
-  <body>正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字</body>
-</confirmableCard>
-
-<confirmableCard>
   <tag>标签文字</tag>
   <cornerIconAction nativeEvent="click" data="open">↗</cornerIconAction>
   <title>打破常规、说到做到，年终给满！</title>
@@ -21,44 +15,16 @@ const CONFIRMABLE_CARD_STYLE = {
         },
         layoutModes: [
             {
-                name: 'withVisual',
-                condition: 'has:visual',
-                style: createConfirmableRootStyle(),
-                structure: createConfirmableStructure(true)
-            },
-            {
                 name: 'default',
                 condition: 'default',
                 style: createConfirmableRootStyle(),
-                structure: createConfirmableStructure(false)
+                structure: createConfirmableStructure(),
             }
         ],
         slotConfigs: {
-            visual: {
-                optional: true,
-                description: '左上角主视觉图片或图形，贴紧卡片左上角，图片自身不需要 margin。用于品牌标识、插画、产品图或装饰图形。没有主视觉时不要提供本槽。',
-                metaType: 'image',
-                variant: 'minimalist',
-                variantStyle: {
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    objectPosition: 'left top',
-                    display: 'block',
-                    margin: '0',
-                    padding: '0',
-                    borderRadius: '0',
-                    borderWidth: '0',
-                    borderColor: 'transparent',
-                    borderStyle: 'none',
-                    boxShadow: 'none',
-                    outline: 'none'
-                },
-                supportedAttributes: ['src', 'alt']
-            },
             tag: {
                 optional: true,
-                description: '左上角小文字。用于短标签、分类、状态或补充说明，例如“标签文字”“官方”“推荐”。如果已经使用 visual，通常不再使用 tag。',
+                description: '左上角标签文字。提供后飞机图标自动隐藏。',
                 metaType: 'text',
                 variant: 'p',
                 variantStyle: {
@@ -163,7 +129,6 @@ const CONFIRMABLE_CARD_STYLE = {
             }
         },
         slots: {
-            visual: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
             tag: { required: false, optional: true },
             cornerIcon: { required: false, optional: true },
             cornerIconAction: { required: false, optional: true, supportedAttributes: ['nativeEvent', 'data'] },
@@ -172,10 +137,10 @@ const CONFIRMABLE_CARD_STYLE = {
             primaryAction: { required: false, optional: true, supportedAttributes: ['nativeEvent', 'data'] }
         },
         example: {
-            visual: 'https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png',
-            cornerIcon: '↻',
-            title: '鼎道智联',
-            body: '正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字'
+            tag: '标签文字',
+            cornerIconAction: '↗',
+            title: '打破常规、说到做到，年终给满！',
+            primaryAction: '确认'
         }
     }
 };
@@ -191,44 +156,36 @@ function createConfirmableRootStyle() {
         gap: '{dimension.gap.base}',
         padding: '{dimension.padding.extraloose}',
         borderRadius: '{dimension.borderradius.xxxxl}',
-        background: '{color.basic.brand.0}',
-        overflow: 'hidden'
+        background: 'var(--cc-bg)',
+        overflow: 'hidden',
+        '&': { 
+            '--cc-bg': `${FEIJI_SVG_DATA_URI} no-repeat 14px 29px / 171px, #f3f3fd`,
+        },
+        '&:has([class*="-tagBlock-"])': {
+            '--cc-bg': '#f3f3fd',
+            paddingTop: '{dimension.padding.extraloose}'
+        },
+        '&:has([class*="-tagBlock-"]) [class*="-contentBlock-"]': {
+            marginTop: '0'
+        }
     };
 }
 
-function createConfirmableStructure(hasVisual) {
+function createConfirmableStructure() {
     return {
         groups: [
             {
                 name: 'topBlock',
-                condition: 'has:visual || has:tag || has:cornerIcon || has:cornerIconAction',
+                condition: 'has:tag || has:cornerIcon || has:cornerIconAction',
                 type: 'template',
                 style: {
                     display: 'grid',
-                    gridTemplateColumns: hasVisual ? '59.17% 1fr' : '1fr auto',
+                    gridTemplateColumns: '1fr auto',
                     gap: '{dimension.gap.base}',
                     alignItems: 'start',
-                    minHeight: hasVisual ? '{dimension.basic.dimension.160}' : '0'
+                    minHeight: '0'
                 },
                 groups: [
-                    {
-                        name: 'visualBlock',
-                        condition: 'has:visual',
-                        slots: ['visual'],
-                        type: 'template',
-                        style: {
-                            width: '100%',
-                            overflow: 'hidden',
-                            minWidth: '0',
-                            marginTop: '-{dimension.padding.extraloose}',
-                            marginLeft: '-{dimension.padding.extraloose}',
-                            borderWidth: '0',
-                            borderStyle: 'none',
-                            borderColor: 'transparent',
-                            boxShadow: 'none',
-                            outline: 'none'
-                        }
-                    },
                     {
                         name: 'tagBlock',
                         condition: 'has:tag',
@@ -266,7 +223,8 @@ function createConfirmableStructure(hasVisual) {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '{dimension.gap.base}',
-                    minWidth: '0'
+                    minWidth: '0',
+                    marginTop: '{dimension.basic.dimension.160}'
                 },
                 groups: [
                     {

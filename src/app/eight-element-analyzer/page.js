@@ -3060,17 +3060,16 @@ style: {
   },
   confirmableCardDemo: {
     name: '✅ 可确认内容卡片',
-    description: 'confirmableCard 用于带确认/操作语义的内容卡。左上可以是贴边图片 visual 或小文字 tag，右上可以是静态 cornerIcon 或可点击 cornerIconAction；正文区域支持 title/body，底部可选 primaryAction。',
+    description: 'confirmableCard 用于带确认/操作语义的内容卡。左上固定展示品牌飞机图标，可选小文字 tag，右上可以是静态 cornerIcon 或可点击 cornerIconAction；正文区域支持 title/body，底部可选 primaryAction。',
     markdown: `# 可确认内容卡片展示
 
 ## confirmableCard
 
-用于带确认/操作语义的内容卡。左上可以是贴边图片 visual 或小文字 tag，右上可以是静态 cornerIcon 或可点击 cornerIconAction；正文区域支持 title/body，底部可选 primaryAction。
+用于带确认/操作语义的内容卡。左上固定展示品牌飞机图标，可选小文字 tag，右上可以是静态 cornerIcon 或可点击 cornerIconAction；正文区域支持 title/body，底部可选 primaryAction。
 
-### 带左上图片 + 右上静态图标
+### 带右上静态图标
 
 <confirmableCard>
-  <visual src="https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png" alt="品牌图形" />
   <cornerIcon>↻</cornerIcon>
   <title>鼎道智联</title>
   <body>正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字</body>
@@ -3085,10 +3084,9 @@ style: {
   <primaryAction nativeEvent="click" data="confirm">确认</primaryAction>
 </confirmableCard>
 
-### 带左上图片 + 正文 + 底部按钮
+### 带正文 + 底部按钮
 
 <confirmableCard>
-  <visual src="https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png" alt="品牌图形" />
   <title>企业品牌展示</title>
   <body>我们致力于为企业提供全方位的数字化解决方案，帮助客户实现业务增长与智能化转型。</body>
   <primaryAction nativeEvent="click" data="viewDetails">查看详情</primaryAction>
@@ -3283,9 +3281,8 @@ style: {
 
 ## confirmableCard
 
-<!-- 示例1: 左上图片 + 右上静态图标 -->
+<!-- 示例1: 右上静态图标 -->
 <confirmableCard>
-  <visual src="https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png" alt="品牌图形" />
   <cornerIcon>↻</cornerIcon>
   <title>鼎道智联</title>
   <body>正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字</body>
@@ -3299,9 +3296,8 @@ style: {
   <primaryAction nativeEvent="click" data="confirm">确认</primaryAction>
 </confirmableCard>
 
-<!-- 示例3: 左上图片 + 正文 + 底部按钮 -->
+<!-- 示例3: 正文 + 底部按钮 -->
 <confirmableCard>
-  <visual src="https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png" alt="品牌图形" />
   <title>企业品牌展示</title>
   <body>我们致力于为企业提供全方位的数字化解决方案，帮助客户实现业务增长与智能化转型。</body>
   <primaryAction nativeEvent="click" data="viewDetails">查看详情</primaryAction>
