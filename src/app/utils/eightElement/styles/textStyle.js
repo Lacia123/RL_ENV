@@ -491,6 +491,11 @@ const TEXT_STYLE = {
             fontWeight: "{font.fontweight.bold}",
             color: "{color.onprimary.white100}",
         },
+        bannerSubtitle: {
+            fontSize: "{font.size.large}",
+            fontWeight: "{font.fontweight.medium}",
+            color: "{color.onprimary.white88}",
+        },
     },
 };
 

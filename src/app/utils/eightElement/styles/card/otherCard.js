@@ -2,7 +2,8 @@ const OTHER_CARD_STYLE = {
     bannerPanel: {
         type: 'template',
         markdownMapping: {
-            h2: 'title'
+            h2: 'title',
+            p: 'subtitle'
         },
         classList: {
             crossLines: {
@@ -163,6 +164,10 @@ const OTHER_CARD_STYLE = {
         title: {
             metaType: 'text',
             variant: 'bannerTitle',
+        },
+        subtitle: {
+            metaType: 'text',
+            variant: 'bannerSubtitle',
         }
     },
 }
