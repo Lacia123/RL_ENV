@@ -58,10 +58,11 @@ function dedentMarkdownBlock(content) {
  * @param {number} options.height - 视口高度
  * @param {Object} options.data - 数据上下文
  * @param {boolean} options.includeInteractive - 是否包含交互式编辑器和脚本（默认 true）
+ * @param {boolean} options.useExampleData - 是否从组件 styleConfig 中提取 example 数据作为回退（默认 true）
  * @returns {Object} - 包含HTML字符串和预处理后的八要素结构
  */
 export function renderEightElementToHtml(eightElement, options = {}) {
-    const { width = 1024, height = 768, data = null, includeInteractive = true } = options;
+    const { width = 1024, height = 768, data = null, includeInteractive = true, useExampleData = true } = options;
 
     // 🆕 提取所有组件的 example data 并合并到 data 上下文中
     // 数据优先级: 传入的 data > styleConfig example > sampleData
@@ -146,8 +147,11 @@ export function renderEightElementToHtml(eightElement, options = {}) {
         }
     };
     
-    extractExampleData(eightElement);
-    
+    // 🆕 仅当 useExampleData 为 true 时才提取 example 数据
+    if (useExampleData) {
+        extractExampleData(eightElement);
+    }
+
     // 合并提取的数据，传入的数据优先级最高
     combinedData = { ...combinedData, ...extractedData, ...(data || {}) };
 

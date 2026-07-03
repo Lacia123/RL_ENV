@@ -3520,6 +3520,11 @@ const EightElementAnalyzer = () => {
   const [themeApplied, setThemeApplied] = useState(false);
   const [isThemeCollapsed, setIsThemeCollapsed] = useState(true);
 
+  // 🆕 控制是否加载组件示例数据（关闭则只使用 psuip 传入的真实数据）
+  const [useExampleData, setUseExampleData] = useState(true);
+  const useExampleDataRef = useRef(useExampleData); // 🆕 用 ref 避免 onClick 闭包陈旧值
+  useExampleDataRef.current = useExampleData;
+
   // 🆕 编辑器相关状态
   const [isEditMode, setIsEditMode] = useState(false); // 是否处于编辑模式
   const [editingMarkdown, setEditingMarkdown] = useState(''); // 正在编辑的markdown
@@ -3757,7 +3762,8 @@ const EightElementAnalyzer = () => {
           // 重新渲染HTML
           const newHtml = renderEightElementToHtml(updatedEightElement, {
             width: dimensions.width,
-            height: dimensions.height
+            height: dimensions.height,
+            useExampleData: useExampleDataRef.current
           });
           setRenderedHtml(newHtml.html);
 
@@ -3770,7 +3776,7 @@ const EightElementAnalyzer = () => {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [eightElement, dimensions]);
+  }, [eightElement, dimensions, useExampleData]);  // useExampleData 放在依赖里以便 state 变化时重新绑定事件
 
   // 处理动作选择
   const handleActionToggle = (actionName) => {
@@ -3969,7 +3975,8 @@ const EightElementAnalyzer = () => {
       // 5. 渲染HTML（使用应用了动作的八要素结构）
       const { html, processedEightElement } = renderEightElementToHtml(eightElementObj, {
         width: currentDimensions.width,
-        height: currentDimensions.height
+        height: currentDimensions.height,
+        useExampleData: useExampleDataRef.current
       });
 
       setRenderedHtml(html);
@@ -4933,6 +4940,41 @@ const EightElementAnalyzer = () => {
                 </p>
               </div>
             </div>
+            {/* 🆕 示例数据开关 */}
+            <div className="mb-6">
+              <h3 className="font-medium text-gray-700 mb-2">数据模式</h3>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded border">
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-700">加载示例数据</div>
+                  <div className="text-xs text-gray-500 mt-0.5">
+                    {useExampleData
+                      ? '开启：组件使用 styleConfig 中的 example 数据作为回退'
+                      : '关闭：仅渲染 psuip 传入的真实数据，不使用示例数据'
+                    }
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={useExampleData}
+                  onClick={() => {
+                    setUseExampleData(!useExampleData);
+                    // 切换后自动重新渲染
+                    setTimeout(() => {
+                      processMarkdown(null, layoutControls);
+                    }, 50);
+                  }}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex-shrink-0 ${
+                    useExampleData ? 'bg-blue-500' : 'bg-gray-300'
+                  }`}
+                >
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    useExampleData ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
+                </button>
+              </div>
+            </div>
+
             <div className="mb-6">
               <h3 className="font-medium text-gray-700 mb-2">预览尺寸设置</h3>
               <div className="grid grid-cols-2 gap-2">
