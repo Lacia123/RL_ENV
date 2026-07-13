@@ -171,8 +171,13 @@ function createTextElement(text, variant = 'p', richTextOptions = {}, customStyl
 
     // commandBlock：跳过 Markdown 解析，按纯文本展示
     // 原因：多行内容若含 XML 缩进，marked 会把 4+ 空格行解析为代码块，导致首行 <p> 其余 <pre><code> 样式不一致
+    /**
+     * rawContent：组件通过 richTextOptions.rawContent 声明内容为纯文本，跳过 marked 解析。
+     * 这是组件级别的选择——组件（如 label）可以决定自己的内容不被当作 markdown 处理，
+     * 避免 "1. 时态" 等格式被误转为有序列表 <ol>。渲染层提供此能力但不替组件做决定。
+     */
     let htmlContent;
-    if (variant === 'commandBlock') {
+    if (variant === 'commandBlock' || richTextOptions.rawContent) {
         const lines = (processedContent || '').split('\n').map((l) => l.trimEnd());
         const nonEmptyLines = lines.filter((l) => l.length > 0);
         const minIndent = nonEmptyLines.length > 0

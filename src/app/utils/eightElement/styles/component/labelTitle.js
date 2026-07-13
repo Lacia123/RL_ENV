@@ -20,6 +20,12 @@ const LABEL_TITLE_STYLE = {
     // 纯展示 label（无箭头）
     // <label>text</label>
     label: {
+        /**
+         * rawContent: true 表示内容为纯文本，跳过 marked 解析。
+         * label 的内容（如 "1. 时态"）若经过 marked 解析会被误转为有序列表 <ol>，
+         * 因为 "1. " 匹配 markdown 有序列表语法。该标记确保内容原样输出。
+         */
+        rawContent: true,
         parameters: {
             labelBgColor: {
                 source: 'outer',

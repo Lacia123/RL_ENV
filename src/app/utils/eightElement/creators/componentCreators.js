@@ -2417,7 +2417,15 @@ function createMetaTypeComponent(content, variant, componentConfig, markdownData
     
     // 根据 metaType 创建对应的元件（不传递样式，样式由容器承载）
     if (componentConfig.metaType === 'text') {
-        elementInstance = createTextElement(content, componentConfig.variant, {}, null);
+        /**
+         * 传递 rawContent 标记给 createTextElement。
+         * 当组件配置中声明 rawContent: true 时（如 label 组件），
+         * 内容应作为纯文本展示，不经过 marked 解析。
+         * 这避免 "1. 文本" 等格式被 markdown 解析器误转为有序列表。
+         */
+        elementInstance = createTextElement(content, componentConfig.variant, {
+            rawContent: componentConfig.rawContent
+        }, null);
     } else if (componentConfig.metaType === 'button') {
         const buttonUrl = markdownData?.url || '#';
         const buttonVariant = componentConfig.variant;
