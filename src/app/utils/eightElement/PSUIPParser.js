@@ -20,6 +20,7 @@ import { createIconElement } from './creators/iconCreators.js';
 import { isTabTag, extractTabBlock, createTabElement } from './creators/tabCreators.js';
 import { isVideoTag, createVideoElement } from './creators/videoCreators.js';
 import { isAudioTag, createAudioElement } from './creators/audioCreators.js';
+
 import { COMMON_STYLE_LIST_COMPACT_LOOP_STACK_CLASS_STYLE } from './styles/component/commonStyleServiceListCompact.js';
 
 // 🆕 检测是否为 loop 标签（卡片级循环）
@@ -122,6 +123,30 @@ function isIconTag(line) {
     }
 
     return { isIconTag: false };
+}
+
+// 🆕 处理行内倒计时语法 <countdown target="..." format="...">text</countdown>
+// 将其替换为带 data 属性的 span，由渲染器端的共享脚本驱动更新
+function processInlineCountdownText(text) {
+    if (!text || typeof text !== 'string') return text;
+
+    return text.replace(
+        /<countdown\s+([^>]+)>(.*?)<\/countdown>/g,
+        (match, attrs, innerText) => {
+            const attrMatch = attrs.match(/target=["']([^"']*)["']/);
+            const fmtMatch = attrs.match(/format=["']([^"']*)["']/);
+            const target = attrMatch ? attrMatch[1] : '';
+            const fmt = fmtMatch ? fmtMatch[1] : '';
+            const label = innerText.trim();
+
+            if (!target) return match;
+
+            let dataAttrs = `data-countdown-target="${target}"`;
+            if (fmt) dataAttrs += ` data-countdown-format="${fmt}"`;
+
+            return `<span ${dataAttrs}>${label}</span>`;
+        }
+    );
 }
 
 // 解析事件语法 [event:eventName] 或 [nativeEvent:nativeKey][;data:dataKey] 并返回事件配置
@@ -1060,8 +1085,11 @@ function processText(text) {
         // 🆕 处理行内链接语法 <link>text</link>
         const textWithLinks = processInlineLinkText(textWithIcons);
 
+        // 🆕 处理行内倒计时语法 <countdown target="...">text</countdown>
+        const textWithCountdown = processInlineCountdownText(textWithLinks);
+
         // 预处理文本，优化KaTeX解析
-        const preparedText = prepareMarkdownForKatex(textWithLinks);
+        const preparedText = prepareMarkdownForKatex(textWithCountdown);
 
         // 使用markedInstance处理Markdown和KaTeX
         const parseResult = getMarkedInstance().parse(preparedText);

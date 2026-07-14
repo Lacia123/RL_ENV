@@ -3510,7 +3510,19 @@ style: {
 <message_button></message_button>
 </messageReminderProgress>
 `
-  }
+    },
+
+    countdown: {
+        name: '⏱ 倒计时',
+        description: '倒计时组件 — 支持 target 和 format 参数',
+        markdown: `<countdown target="2026-12-31T00:00:00">
+  距2026年结束还有
+</countdown>
+
+<countdown target="2026-07-20T00:00:00" format="{dd}天{hh}时{mm}分{ss}秒">
+  距下周截止还有
+</countdown>`
+    }
 };
 
 

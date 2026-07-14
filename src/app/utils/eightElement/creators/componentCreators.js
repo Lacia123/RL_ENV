@@ -2394,7 +2394,53 @@ export function createComponentElement(content, variant, markdownData = null, st
 }
 
 /**
- * 创建 metaType 类型的组件（text, button, image 等）
+ * 构建倒计时 cell-element 结构
+ */
+function buildCountdownElement(target, format, content, style, externalParameters) {
+    const id = generateUUID();
+
+    const countdownConfig = {
+        "data-key": externalParameters['data-key'] || '',
+        "type": "countdown",
+        "target": target,
+        "content": content
+    };
+
+    if (format) {
+        countdownConfig.format = format;
+    }
+
+    return {
+        "id": id,
+        "name": "countdown",
+        "name-zh": "倒计时",
+        "file-type": "cell-element",
+        "layout": {
+            "style": { ...style },
+            "normal": {
+                "type": "container",
+                "content": [
+                    {
+                        "element": "material",
+                        "value": "countdown",
+                        "prop": "default",
+                        "token": "countdown"
+                    }
+                ],
+                "style": {},
+                "children": []
+            }
+        },
+        "material": {
+            "countdown": {
+                "default": countdownConfig
+            }
+        }
+    };
+}
+
+/**
+ * 创建 metaType 类型的组件（text, button, image, countdown 等）
  */
 function createMetaTypeComponent(content, variant, componentConfig, markdownData, styleOverride, externalParameters, currentMarkdown) {
     // 提取参数（如果有 parameters 配置）
@@ -2440,6 +2486,12 @@ function createMetaTypeComponent(content, variant, componentConfig, markdownData
     } else if (componentConfig.metaType === 'image') {
         const imageUrl = markdownData?.url || '';
         elementInstance = createBackgroundElement(imageUrl, componentConfig.variant, null);
+    } else if (componentConfig.metaType === 'countdown') {
+        const target = paramValues.target || externalParameters?.target || '';
+        const format = paramValues.format || externalParameters?.format || '';
+
+        // 倒计时直接返回 cell-element 结构，不走下面的容器包装
+        return buildCountdownElement(target, format, content, finalStyle, externalParameters || {});
     }
     
     // 如果有样式配置，创建容器来包装元件

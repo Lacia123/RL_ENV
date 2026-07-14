@@ -1056,6 +1056,39 @@ export function renderEightElementToHtml(eightElement, options = {}) {
           return searchElement(eightElementData);
         }
       </script>
+
+      <script>
+        // 🆕 倒计时驱动脚本：扫描所有 data-countdown-target 元素并每秒更新
+        (function(){
+          var items = document.querySelectorAll('[data-countdown-target]');
+          function pad(n){ return String(n).padStart(2, '0'); }
+          function updateAll(){
+            var now = Date.now();
+            items.forEach(function(el){
+              var target = new Date(el.getAttribute('data-countdown-target')).getTime();
+              var fmt = el.getAttribute('data-countdown-format') || '';
+              var diff = Math.max(0, target - now);
+              if (diff <= 0) { el.textContent = '00:00:00'; return; }
+              var d = Math.floor(diff / 86400000); diff -= d * 86400000;
+              var h = Math.floor(diff / 3600000); diff -= h * 3600000;
+              var m = Math.floor(diff / 60000); diff -= m * 60000;
+              var s = Math.floor(diff / 1000);
+              if (fmt) {
+                el.textContent = fmt
+                  .replace(/\{dd\}/g, pad(d)).replace(/\{d\}/g, d)
+                  .replace(/\{hh\}/g, pad(h)).replace(/\{h\}/g, h)
+                  .replace(/\{mm\}/g, pad(m)).replace(/\{m\}/g, m)
+                  .replace(/\{ss\}/g, pad(s)).replace(/\{s\}/g, s);
+              } else if (d > 0) {
+                el.textContent = d + '天 ' + h + '时 ' + m + '分 ' + s + '秒';
+              } else {
+                el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+              }
+            });
+          }
+          if (items.length) { updateAll(); setInterval(updateAll, 1000); }
+        })();
+      </script>
     </body>
     </html>
   `;
@@ -2155,6 +2188,8 @@ function renderElement(element, dataContext = null) {
             return renderVideoElement(element, dataContext);
         case 'audio':
             return renderAudioElement(element, dataContext);
+        case 'countdown':
+            return renderCountdownElement(element, dataContext);
         default:
             return renderGenericElement(element, dataContext);
     }
@@ -3064,6 +3099,39 @@ function renderAudioElement(element) {
           Your browser does not support the audio tag.
         </audio>
       </div>
+    `;
+}
+
+function renderCountdownElement(element) {
+    const styleAttr = generateStyleAttribute(element.computedStyle);
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
+
+    let target = '';
+    let fmt = '';
+    let label = '';
+
+    if (element.material && element.material.countdown && element.material.countdown.default) {
+        target = element.material.countdown.default.target || '';
+        fmt = element.material.countdown.default.format || '';
+        label = element.material.countdown.default.content || '';
+    }
+
+    if (!target) {
+        return `<div ${classAttr} data-element-type="countdown" ${styleAttr}>--:--:--</div>`;
+    }
+
+    const id = element.id || 'cd-' + Math.random().toString(36).slice(2, 10);
+
+    // 渲染带 data 属性的容器，由底部共享脚本驱动倒计时更新
+    return `
+      <span id="${id}" ${classAttr}
+        data-element-type="countdown"
+        data-countdown-target="${target}"
+        data-countdown-format="${fmt}"
+        ${styleAttr}>
+        ${label}
+      </span>
     `;
 }
 
