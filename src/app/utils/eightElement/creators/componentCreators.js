@@ -1231,7 +1231,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             },
             layout: {
                 style: slotConfig.style || {},
-                classStyle: {},
+                classStyle: slotConfig.classStyle ? JSON.parse(JSON.stringify(slotConfig.classStyle)) : {},
                 className: `slot-${slotName}`,
                 children: innerElements
             },
@@ -1401,6 +1401,13 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
         }
         
         if (element) {
+            if (slotConfig.classStyle && element.layout) {
+                element.layout.classStyle = {
+                    ...(element.layout.classStyle || {}),
+                    ...JSON.parse(JSON.stringify(slotConfig.classStyle))
+                };
+            }
+
             // 为直接元素添加 slotName 元数据
             annotateElementSlotMetadata(element, slotName, baseSlotName);
             

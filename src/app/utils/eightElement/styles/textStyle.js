@@ -496,6 +496,54 @@ const TEXT_STYLE = {
             fontWeight: "{font.fontweight.medium}",
             color: "{color.onprimary.white88}",
         },
+
+        // messageReminder 组件文本变体
+        statusIcon: {
+            fontSize: "12px",
+            fontWeight: "600",
+            lineHeight: 1,
+            color: "{color.basic.opacity.white.100}",
+        },
+        messageStatus: {
+            fontSize: "14px",
+            fontWeight: "600",
+            lineHeight: 1.4,
+            color: "{color.onsurface.black88}",
+        },
+        time: {
+            fontSize: "12px",
+            lineHeight: 1.4,
+            color: "{color.onsurface.black48}",
+        },
+        messageContent: {
+            fontSize: "14px",
+            lineHeight: 1.5,
+            color: "{color.onsurface.black64}",
+        },
+        messageButton: {
+            fontSize: "16px",
+            fontWeight: "600",
+            lineHeight: 1,
+            color: "{color.onsurface.black48}",
+        },
+        completedTime: {
+            fontSize: "{font.size.xxl}",
+            fontWeight: "{font.fontweight.bold}",
+            lineHeight: 1,
+            color: "{color.basic.brand.5}",
+        },
+        timeUnit: {
+            fontSize: "{font.size.medium}",
+            fontWeight: "{font.fontweight.bold}",
+            lineHeight: 1,
+            color: "{color.basic.opacity.black.100}",
+        },
+        progressBar: {
+            margin: "0",
+            display: "block",
+            height: "100%",
+            borderRadius: "inherit",
+        },
     },
 };
 

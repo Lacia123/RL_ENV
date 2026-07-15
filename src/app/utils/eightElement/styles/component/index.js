@@ -26,6 +26,7 @@ import COMMON_STYLE_SERVICE_LIST_DESC_STYLE from './commonStyleServiceListDesc';
 import COMMON_STYLE_SERVICE_LIST_COMPACT_STYLE from './commonStyleServiceListCompact';
 import TEXT_CARD_STYLE from './textCard';
 import BANNER_IMAGE_PANEL_STYLE from './bannerImagePanel';
+import MESSAGE_REMINDER_STYLE from './messageReminder';
 
 const COMPONENT_STYLE = {
     component: {
@@ -57,6 +58,7 @@ const COMPONENT_STYLE = {
         ...COMMON_STYLE_SERVICE_LIST_COMPACT_STYLE,
         ...TEXT_CARD_STYLE,
         ...BANNER_IMAGE_PANEL_STYLE,
+        ...MESSAGE_REMINDER_STYLE,
     }
 }
 

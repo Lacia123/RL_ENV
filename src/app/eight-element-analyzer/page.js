@@ -3479,6 +3479,37 @@ style: {
 | Azure | 全球20+区域 | ⟳  ⋮ |
 | 阿里云 | 中国大陆主要城市 | ⟳  ⋮ |
 `
+  },
+  messageReminderProgress: {
+    name: '💬 消息提示',
+    description: 'messageReminderProgress 消息提醒进度组件，支持有/无进度条两种布局模式',
+    markdown: `# 消息提示组件
+
+## messageReminderProgress
+
+### 无进度条
+
+<messageReminderProgress>
+<status_icon>⬆︎</status_icon>
+<message_status>进行中</message_status>
+<message>正在部署新版本，预计完成时间</message>
+<time>刚刚</time>
+<message_button></message_button>
+</messageReminderProgress>
+
+### 有进度条
+
+<messageReminderProgress>
+<status_icon>⬆︎</status_icon>
+<message_status>进行中</message_status>
+<message>正在部署新版本，预计完成时间</message>
+<completed_time>5</completed_time>
+<time_unit>min</time_unit>
+<time>刚刚</time>
+<message_progress></message_progress>
+<message_button></message_button>
+</messageReminderProgress>
+`
   }
 };
 
