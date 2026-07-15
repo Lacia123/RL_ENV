@@ -3,7 +3,8 @@ const MESSAGE_REMINDER_PROGRESS_STYLE = {
         type: 'template',
         parameters: {
             progressValue: {
-                source: 'progress',
+                source: 'message_progress',
+                expression: "replace('%', '')",
                 default: 65
             }
         },
@@ -338,6 +339,7 @@ const MESSAGE_REMINDER_PROGRESS_STYLE = {
                 },
                 metaType: 'text',
                 variant: 'progressBar',
+                rawContent: true,
                 variantStyle: {
                     margin: '0',
                     display: 'block',
@@ -346,37 +348,25 @@ const MESSAGE_REMINDER_PROGRESS_STYLE = {
                     borderRadius: '200px',
                     transition: 'width 0.3s ease',
                     width: 'calc(var(--progress-value, 0) * 1%)',
+                    fontSize: '0',
+                    lineHeight: '0',
                 }
             },
             message_button: {
                 metaType: 'text',
                 variant: 'messageButton',
-                defaultText: '',
                 rawContent: true,
                 classStyle: {
-                    position: 'relative',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     width: '24px',
                     height: '24px',
                     flexShrink: 0,
                     cursor: 'pointer',
-                    '&::after': {
-                        content: '""',
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: '24px',
-                        height: '24px',
-                        maskImage: `url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10.9764 10.0006L6.85156 5.87577L8.03008 4.69727L13.3334 10.0006L8.03008 15.3038L6.85156 14.1253L10.9764 10.0006Z' fill='black'/%3E%3C/svg%3E")`,
-                        maskSize: 'contain',
-                        maskRepeat: 'no-repeat',
-                        maskPosition: 'center',
-                        WebkitMaskImage: `url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10.9764 10.0006L6.85156 5.87577L8.03008 4.69727L13.3334 10.0006L8.03008 15.3038L6.85156 14.1253L10.9764 10.0006Z' fill='black'/%3E%3C/svg%3E")`,
-                        WebkitMaskSize: 'contain',
-                        WebkitMaskRepeat: 'no-repeat',
-                        WebkitMaskPosition: 'center',
-                        backgroundColor: '{color.basic.opacity.black.100}',
-                    }
+                    fontSize: '{font.size.large}',
+                    fontWeight: '{font.fontweight.semibold}',
+                    color: '{color.basic.opacity.black.100}',
                 },
                 variantStyle: {}
             },

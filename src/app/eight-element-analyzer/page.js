@@ -3494,7 +3494,7 @@ style: {
 <message_status>进行中</message_status>
 <message>正在部署新版本，预计完成时间</message>
 <time>刚刚</time>
-<message_button></message_button>
+<message_button>></message_button>
 </messageReminderProgress>
 
 ### 有进度条
@@ -3506,8 +3506,8 @@ style: {
 <completed_time>5</completed_time>
 <time_unit>min</time_unit>
 <time>刚刚</time>
-<message_progress></message_progress>
-<message_button></message_button>
+<message_progress>30%</message_progress>
+<message_button>></message_button>
 </messageReminderProgress>
 `
     },

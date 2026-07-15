@@ -1077,7 +1077,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             const textElement = createTextElement(
                 slotContent || '',
                 slotConfig.variant || 'p',
-                {},  // richTextOptions
+                { rawContent: slotConfig.rawContent },  // richTextOptions
                 slotConfig.variantStyle || null  // customStyles
             );
             
@@ -1279,7 +1279,7 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             element = createTextElement(
                 slotContent || '',
                 slotConfig.variant || 'p',
-                {},  // richTextOptions
+                { rawContent: slotConfig.rawContent },  // richTextOptions
                 slotConfig.variantStyle || null  // customStyles
             );
             
