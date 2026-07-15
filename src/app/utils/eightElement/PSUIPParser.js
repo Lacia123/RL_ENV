@@ -20,6 +20,7 @@ import { createIconElement } from './creators/iconCreators.js';
 import { isTabTag, extractTabBlock, createTabElement } from './creators/tabCreators.js';
 import { isVideoTag, createVideoElement } from './creators/videoCreators.js';
 import { isAudioTag, createAudioElement } from './creators/audioCreators.js';
+import { isCountdownTag, createCountdownElement } from './creators/countdownCreators.js';
 
 import { COMMON_STYLE_LIST_COMPACT_LOOP_STACK_CLASS_STYLE } from './styles/component/commonStyleServiceListCompact.js';
 
@@ -1493,6 +1494,39 @@ function parseMarkdown(markdown, options = {}) {
             // 创建音频元素
             const audioElement = createAudioElement(audioTagInfo.src, audioTagInfo.attributes);
             stack[stack.length - 1].elements.push(audioElement);
+
+            continue;
+        }
+
+        // 🆕 处理 Countdown 标签
+        const countdownTagInfo = isCountdownTag(trimmedLine);
+        if (countdownTagInfo.isCountdownTag) {
+
+            // 处理之前累积的内容
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            // 如果正在处理列表，先结束列表
+            if (inList && listItems.length > 0) {
+                const listLayout = createLayoutElement(
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                    listItems,
+                    {
+                        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                    }
+                );
+                stack[stack.length - 1].elements.push(listLayout);
+                inList = false;
+                listItems = [];
+            }
+
+            // 创建倒计时元素
+            const countdownElement = createCountdownElement(countdownTagInfo.target, {
+                format: countdownTagInfo.format,
+                content: countdownTagInfo.content
+            });
+            stack[stack.length - 1].elements.push(countdownElement);
 
             continue;
         }
