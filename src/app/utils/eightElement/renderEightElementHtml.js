@@ -1060,10 +1060,13 @@ export function renderEightElementToHtml(eightElement, options = {}) {
       <script>
         // 🆕 倒计时驱动脚本：扫描所有 data-countdown-target 元素并每秒更新
         (function(){
-          var items = document.querySelectorAll('[data-countdown-target]');
           function pad(n){ return String(n).padStart(2, '0'); }
+          function getItems(){
+            return document.querySelectorAll('[data-countdown-target]');
+          }
           function updateAll(){
             var now = Date.now();
+            var items = getItems();
             items.forEach(function(el){
               var target = new Date(el.getAttribute('data-countdown-target')).getTime();
               var fmt = el.getAttribute('data-countdown-format') || '';
@@ -1086,6 +1089,7 @@ export function renderEightElementToHtml(eightElement, options = {}) {
               }
             });
           }
+          var items = getItems();
           if (items.length) { updateAll(); setInterval(updateAll, 1000); }
         })();
       </script>
@@ -1582,6 +1586,23 @@ function processTextElement(processedElement, originalElement) {
         // 🔧 修复：清理段落符号
         rawTextContent = rawTextContent.replace(/§PARAGRAPH§/g, '');
         
+        // 🆕 处理行内倒计时语法 <countdown target="...">text</countdown>
+        // 将其替换为带 data 属性的 span，由底部共享脚本驱动更新
+        rawTextContent = rawTextContent.replace(
+            /<countdown\s+([^>]+)>(.*?)<\/countdown>/g,
+            (match, attrs, innerText) => {
+                const attrMatch = attrs.match(/target=["']([^"']*)["']/);
+                const fmtMatch = attrs.match(/format=["']([^"']*)["']/);
+                const target = attrMatch ? attrMatch[1] : '';
+                const fmt = fmtMatch ? fmtMatch[1] : '';
+                const label = innerText.trim();
+                if (!target) return match;
+                let dataAttrs = 'data-countdown-target="' + target + '"';
+                if (fmt) dataAttrs += ' data-countdown-format="' + fmt + '"';
+                return '<span ' + dataAttrs + '>' + label + '</span>';
+            }
+        );
+
         // 如果内容已经包含HTML标签（如<p>, <math>, <span>, <a>等），说明已经被处理过了
         if (rawTextContent.includes('<') && (rawTextContent.includes('<p>') || rawTextContent.includes('<math') || rawTextContent.includes('<span') || rawTextContent.includes('<li>') || rawTextContent.includes('<a'))) {
             // 直接使用已处理的HTML内容

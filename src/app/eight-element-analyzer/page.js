@@ -3515,13 +3515,45 @@ style: {
     countdown: {
         name: '⏱ 倒计时',
         description: '倒计时组件 — 支持 target 和 format 参数',
-        markdown: `<countdown target="2026-12-31T00:00:00">
-  距2026年结束还有
-</countdown>
+        markdown: `# 倒计时功能测试
 
-<countdown target="2026-07-20T00:00:00" format="{dd}天{hh}时{mm}分{ss}秒">
-  距下周截止还有
-</countdown>`
+## 1. 单独一行（块级路径 - 回归验证）
+<countdown target="2026-12-31T00:00:00"></countdown>
+
+<countdown target="2026-07-20T00:00:00" format="{dd}天{hh}时{mm}分{ss}秒"></countdown>
+
+## 2. 和文字混在同一行（行内路径）
+## 111 <countdown target="2026-12-31T00:00:00"></countdown>
+
+## 距离截止还有 <countdown target="2026-12-31T00:00:00"></countdown>
+
+中间有一个倒计时：<countdown target="2026-12-31T00:00:00"></countdown> 看这里
+
+## 3. 在段落中
+距离年底还有 <countdown target="2026-12-31T00:00:00" format="{dd}天{hh}:{mm}:{ss}"></countdown>，请抓紧时间。
+
+## 4. 在 summaryCard 的 commit 插槽中
+<summaryCard>
+  <title title="任务状态">项目倒计时</title>
+  <commit><countdown target="2026-12-31T00:00:00" format="{dd}天{hh}时{mm}分{ss}秒"></countdown></commit>
+  <text key="summary">请确保在截止日期前完成任务。</text>
+  <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+</summaryCard>
+
+## 5. 多个倒计时在同一行
+倒计时A：<countdown target="2026-12-31T00:00:00"></countdown> 倒计时B：<countdown target="2027-01-01T00:00:00" format="{dd}天{hh}时"></countdown>
+
+## 6. 在布局标签中
+<layout:row>
+  剩余：<countdown target="2026-12-31T00:00:00"></countdown>
+  截止：<countdown target="2026-07-20T00:00:00" format="{dd}天"></countdown>
+</layout:row>
+
+## 7. 嵌套在卡片中
+<card:elegantStandard>
+## 倒计时卡片
+距离活动开始还有 <countdown target="2026-12-31T00:00:00" format="{dd}天{hh}时{mm}分{ss}秒"></countdown>
+</card:elegantStandard>`
     }
 };
 

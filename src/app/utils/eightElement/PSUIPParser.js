@@ -1184,6 +1184,12 @@ function preprocessComponentTags(markdown) {
     const regex = new RegExp(`<(${componentPattern})([^>]*)>([\\s\\S]*?)<\\/\\1>`, 'g');
 
     return markdown.replace(regex, (match, componentName, attributes, content) => {
+        // 🔧 跳过 countdown 标签：它是自包含的行内/块级标签，拆分后会导致
+        // 行内场景（如 ## 标题 <countdown ...></countdown>）匹配不到闭合标签。
+        if (componentName === 'countdown') {
+            return match;
+        }
+
         // 检查是否已经是多行格式（包含换行符）
         if (match.includes('\n')) {
             return match; // 已经是多行，不需要处理
