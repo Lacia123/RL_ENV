@@ -148,7 +148,7 @@ const PAIRED_IMAGE_TEXT_CARD_STYLE = {
                 variantStyle: {
                     margin: '0',
                     marginTop: '{dimension.margin.semitight}',
-                    marginLeft: '{dimension.margin.semiloose}',
+                    marginLeft: '{dimension.margin.superloose}',
                     fontSize: '{font.size.medium}',
                     fontWeight: '{font.fontweight.bold}',
                     color: '{color.basic.brand.6}',
@@ -163,7 +163,7 @@ const PAIRED_IMAGE_TEXT_CARD_STYLE = {
                 variantStyle: {
                     margin: '0',
                     marginTop: '{dimension.margin.semitight}',
-                    marginLeft: '{dimension.margin.semiloose}',
+                    marginLeft: '{dimension.margin.superloose}',
                     fontSize: '{font.size.xl}',
                     fontWeight: '{font.fontweight.bold}',
                     color: '{color.basic.opacity.black.48}',
@@ -180,7 +180,7 @@ const PAIRED_IMAGE_TEXT_CARD_STYLE = {
                 variantStyle: {
                     margin: '0',
                     marginTop: '{dimension.margin.semitight}',
-                    marginLeft: '{dimension.margin.semiloose}',
+                    marginLeft: '{dimension.margin.superloose}',
                     fontSize: '{font.size.medium}',
                     color: '{color.basic.opacity.black.48}',
                     lineHeight: '1.6',
@@ -306,7 +306,7 @@ function createPairedItemSlotConfig(description) {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '{dimension.gap.base}',
-                    padding: '{dimension.padding.extraloose} {dimension.padding.semiloose} {dimension.padding.semiloose} {dimension.padding.semiloose}',
+                    padding: '{dimension.padding.extraloose} {dimension.padding.superloose} {dimension.padding.superloose} {dimension.padding.superloose}',
                     minWidth: '0'
                 },
                 slotGroups: [

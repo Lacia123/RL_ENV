@@ -117,7 +117,7 @@ const CONFIRMABLE_CARD_STYLE = {
                     color: 'rgba(255, 255, 255, 0.72)',
                     fontSize: '{font.size.medium}',
                     fontWeight: '{font.fontweight.bold}',
-                    padding: '{dimension.padding.base} {dimension.padding.semiloose}',
+                    padding: '{dimension.padding.base} {dimension.padding.superloose}',
                     borderRadius: '20px',
                     background: `linear-gradient(135deg, {color.basic.pink.2} 0%, {color.basic.brand.4} 100%);`,
                     width: '100%',

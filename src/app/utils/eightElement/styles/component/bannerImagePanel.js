@@ -7,7 +7,7 @@ const BANNER_IMAGE_PANEL_STYLE = {
         },
         style: {
             width: '100%',
-            padding: '{dimension.padding.semiloose}',
+            padding: '{dimension.padding.superloose}',
             borderRadius: '{dimension.borderradius.xxxl}',
             backgroundImage: 'url("https://sop-cdn.dingcloud.com/aiguitoken/Frame 2087328132.png")',
             backgroundSize: 'cover',

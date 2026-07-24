@@ -27,7 +27,7 @@ const TABLE_COMMON_STYLE = {
             color: '{color.basic.brand.8}',
             fontWeights: '{font.fontweight.bold}',
             fontSizes: '{font.size.medium}',
-            padding: '{dimension.padding.base} {dimension.padding.semiloose}',
+            padding: '{dimension.padding.base} {dimension.padding.superloose}',
             textAlign: 'left',
             borderBottom: '{dimension.borderwidth.narrow} solid {color.basic.opacity.black.7}',
             borderTop: '{dimension.borderwidth.narrow} solid {color.basic.opacity.black.7}',
@@ -50,7 +50,7 @@ const TABLE_COMMON_STYLE = {
         td: {
             backgroundColor: 'transparent',
             textAlign: 'left',
-            padding: '{dimension.padding.base} {dimension.padding.semiloose}',
+            padding: '{dimension.padding.base} {dimension.padding.superloose}',
             verticalAlign: 'middle',
             borderBottom: '{dimension.borderwidth.narrow} solid {color.basic.opacity.black.7}',
             borderRight: 'none',
