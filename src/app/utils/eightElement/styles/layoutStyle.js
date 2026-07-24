@@ -243,6 +243,11 @@ const LAYOUT_STYLE = {
                 alignItems: 'flex-start',
                 gap: DIMENSION_CONSTANTS.GAP.base,
                 background: "{color.primary.brand3}",
+                /** 🆕 覆盖 createBaseLayout 的默认 width:100%
+                 *  让 bgColumn 在 flex row 中与兄弟元素并排，
+                 *  而非独占一行挤走其他元素 */
+                width: 'auto',
+                flex: '1',
             },
             supportedAttributes: ['background', 'backgroundColor', 'padding', 'margin', 'borderRadius', 'borderColor', 'borderWidth', 'boxShadow']
         },

@@ -130,7 +130,7 @@ const COMMON_STYLE_LIST_ITEM_ROW = {
             style: {
                 display: 'flex',
                 flexDirection: 'column',
-                flex: '0 0 48%',
+                flex: '1 1 48%',
                 minWidth: '200px',
                 position: 'relative',
                 overflow: 'visible',
@@ -250,7 +250,7 @@ const COMMON_STYLE_LIST_ITEM = {
             style: {
                 display: 'flex',
                 flexDirection: 'column',
-                flex: '0 0 48%',
+                flex: '1 1 48%',
                 minWidth: '200px',
                 position: 'relative',
                 overflow: 'visible',
