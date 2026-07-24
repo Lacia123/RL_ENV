@@ -1093,6 +1093,12 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                 }
             }
             
+            // 🆕 处理 href 属性 — 将文本元素转为超链接
+            if (textElement && attributes && attributes.href) {
+                textElement.type = 'text_hyperlink';
+                textElement.url = attributes.href;
+            }
+            
             if (textElement) {
                 innerElements.push(textElement);
             }
@@ -1144,6 +1150,11 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                     ...(imageElement.layout.style || {}),
                     ...slotConfig.variantStyle
                 };
+            }
+            
+            // 🆕 处理 href 属性 — 图片可点击跳转
+            if (imageElement && attributes && attributes.href) {
+                imageElement.url = attributes.href;
             }
             
             // 🆕 处理 nativeEvent 和 data 属性
@@ -1294,6 +1305,12 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                     }
                 }
             }
+            
+            // 🆕 处理 href 属性 — 将文本元素转为超链接
+            if (element && attributes && attributes.href) {
+                element.type = 'text_hyperlink';
+                element.url = attributes.href;
+            }
         } else if (slotConfig.metaType === 'button') {
             const buttonUrl = attributes.href || '#';
             const buttonText = slotContent || '';
@@ -1339,6 +1356,11 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
                     ...(element.layout.style || {}),
                     ...slotConfig.variantStyle
                 };
+            }
+            
+            // 🆕 处理 href 属性 — 图片可点击跳转
+            if (element && attributes && attributes.href) {
+                element.url = attributes.href;
             }
             
             // 🆕 处理 loop 中的 nativeEvent
@@ -1962,6 +1984,11 @@ function createElementForSubSlot(
                 }
             }
         }
+        // 🆕 处理 href 属性 — 将文本元素转为超链接
+        if (textElement && slotAttributes.href) {
+            textElement.type = 'text_hyperlink';
+            textElement.url = slotAttributes.href;
+        }
         return textElement;
     }
 
@@ -1982,6 +2009,10 @@ function createElementForSubSlot(
                 ...(imageElement.layout.style || {}),
                 ...subSlotConfig.variantStyle
             };
+        }
+        // 🆕 处理 href 属性 — 图片可点击跳转
+        if (slotAttributes.href) {
+            imageElement.url = slotAttributes.href;
         }
         return imageElement;
     }

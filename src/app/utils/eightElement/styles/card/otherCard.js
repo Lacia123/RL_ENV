@@ -164,10 +164,12 @@ const OTHER_CARD_STYLE = {
         title: {
             metaType: 'text',
             variant: 'bannerTitle',
+            supportedAttributes: ['href', 'target'],
         },
         subtitle: {
             metaType: 'text',
             variant: 'bannerSubtitle',
+            supportedAttributes: ['href', 'target'],
         }
     },
 }

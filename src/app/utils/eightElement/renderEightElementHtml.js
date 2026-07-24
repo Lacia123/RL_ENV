@@ -2327,7 +2327,7 @@ function renderTextElement(element, dataContext) {
         const url = element.url || '#';
         return `
       <div id="${element.id || ''}" ${classAttr} data-element-type="text" ${styleAttr}>
-        <a href="${url}" style="text-decoration:underline;color:inherit;">${contentHtml}</a>
+        <a href="${url}" style="text-decoration:none;color:inherit;">${contentHtml}</a>
       </div>
     `;
     } else {
@@ -2419,10 +2419,14 @@ function renderImageElement(element, dataContext) {
     console.log(`🖼️ 渲染图片元素: URL="${imageUrl}", Alt="${altText}"`);
 
     if (imageUrl) {
-        // 添加图片标签
+        const imgTag = `<img src="${imageUrl}" alt="${altText}" style="width:100%;height:100%;object-fit:cover;" referrerpolicy="no-referrer" loading="lazy">`;
+        // 🆕 如果有 url，用 <a> 包裹图片使其可点击
+        const innerHtml = element.url
+            ? `<a href="${element.url}" style="display:block;text-decoration:none;color:inherit;">${imgTag}</a>`
+            : imgTag;
         return `
       <div id="${element.id || ''}" ${classAttr} data-element-type="image" ${styleAttr}>
-        <img src="${imageUrl}" alt="${altText}" style="width:100%;height:100%;object-fit:cover;" referrerpolicy="no-referrer" loading="lazy">
+        ${innerHtml}
       </div>
     `;
     } else {

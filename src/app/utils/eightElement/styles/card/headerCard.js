@@ -30,6 +30,7 @@ const HEADER_CARD_STYLE = {
                 width: '100%',
             },
             metaType: 'text',
+            supportedAttributes: ['href', 'target'],
             variant: 'headerCardTitle',
         },
         text: {
@@ -38,6 +39,7 @@ const HEADER_CARD_STYLE = {
                 marginTop: "{dimension.margin.base}",
             },
             metaType: 'text',
+            supportedAttributes: ['href', 'target'],
             variant: 'headerCardText',
         },
         chartContainer: {
@@ -85,6 +87,7 @@ const HEADER_CARD_STYLE = {
 
             },
             metaType: 'text',
+            supportedAttributes: ['href', 'target'],
             variant: 'headerCardTitle',
         },
         text: {
@@ -93,6 +96,7 @@ const HEADER_CARD_STYLE = {
                 marginTop: "{dimension.margin.base}",
             },
             metaType: 'text',
+            supportedAttributes: ['href', 'target'],
             variant: 'headerCardText',
         },
         percentItems: {
@@ -126,6 +130,7 @@ const HEADER_CARD_STYLE = {
                         marginBottom: "{dimension.margin.tight}",
                     },
                     metaType: 'text',
+                    supportedAttributes: ['href', 'target'],
                     variant: 'percentItemTitle',
                 },
                 percentValue: {
@@ -133,10 +138,12 @@ const HEADER_CARD_STYLE = {
                         marginBottom: "{dimension.margin.tight}",
                     },
                     metaType: 'text',
+                    supportedAttributes: ['href', 'target'],
                     variant: 'percentValue',
                 },
                 itemDescription: {
                     metaType: 'text',
+                    supportedAttributes: ['href', 'target'],
                     variant: 'percentItemDescription',
                 }
             }
@@ -180,6 +187,7 @@ const HEADER_CARD_STYLE = {
                 borderLeftColor: "{color.primary.brand5}",
             },
             metaType: 'text',
+            supportedAttributes: ['href', 'target'],
             variant: 'headerCardTitle',
         },
         text: {
@@ -188,6 +196,7 @@ const HEADER_CARD_STYLE = {
                 marginTop: "{dimension.margin.base}",
             },
             metaType: 'text',
+            supportedAttributes: ['href', 'target'],
             variant: 'headerCardText',
         },
         percentItems: {

@@ -239,11 +239,13 @@ const METRIC_CARD_STYLE = {
         slotConfigs: {
             metric_value: {
                 metaType: 'text',
-                variant: 'metricCardValue'
+                variant: 'metricCardValue',
+                supportedAttributes: ['href', 'target']
             },
             metric_label: {
                 metaType: 'text',
                 variant: 'p',
+                supportedAttributes: ['href', 'target'],
                 variantStyle: {
                     fontSize: '{font.size.tiny}',
                     fontWeight: '{font.fontweight.medium}',
@@ -257,6 +259,7 @@ const METRIC_CARD_STYLE = {
             trend_value: {
                 metaType: 'text',
                 variant: 'p',
+                supportedAttributes: ['href', 'target'],
                 variantStyle: {
                     padding: '{dimension.padding.supertight} {dimension.padding.tight}',
                     background: '{color.success.green1}',
@@ -286,6 +289,7 @@ const METRIC_CARD_STYLE = {
             time_range: {
                 metaType: 'text',
                 variant: 'p',
+                supportedAttributes: ['href', 'target'],
                 variantStyle: {
                     fontSize: '{font.size.tiny}',
                     fontWeight: '{font.fontweight.medium}',
@@ -298,6 +302,7 @@ const METRIC_CARD_STYLE = {
             status: {
                 metaType: 'text',
                 variant: 'p',
+                supportedAttributes: ['href', 'target'],
                 variantStyle: {
                     fontSize: '{font.size.xl}',
                     fontWeight: '{font.fontweight.bold}',
@@ -321,13 +326,13 @@ const METRIC_CARD_STYLE = {
             'command*': COMMAND_SLOT_CONFIG
         },
         slots: {
-            metric_value: { required: true, optional: false },
-            metric_label: { required: true, optional: false },
+            metric_value: { required: true, optional: false, supportedAttributes: ['href', 'target'] },
+            metric_label: { required: true, optional: false, supportedAttributes: ['href', 'target'] },
             trend_icon: { required: false, optional: true },
-            trend_value: { required: false, optional: true },
+            trend_value: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
             chart_mini: { required: false, optional: true, supportedAttributes: ['chart', 'title', 'sort'] },
-            time_range: { required: false, optional: true },
-            status: { required: false, optional: true },
+            time_range: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
+            status: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
             command: { required: false, optional: true }
         }
     },

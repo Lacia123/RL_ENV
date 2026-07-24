@@ -286,45 +286,38 @@ function createTextElement(text, variant = 'p', richTextOptions = {}, customStyl
                 },
                 children: []
             },
-            // text_hyperlink: {
-            //     type: "container",
-            //     content: [
-            //         {
-            //             element: "font",
-            //             value: "fontsize",
-            //             prop: "default",
-            //             token: "fontsize"
-            //         }
-            //     ],
-            //     resource: "",
-            //     data: [],
-            //     style: {
-            //         layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
-            //         layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
-            //         textDecoration: "underline",
-            //         // "word-break": "break-all",
-            //         width: elementWidth, // 设置宽度
-            //         textColor: {
-            //             element: "color",
-            //             value: "text",
-            //             prop: "default",
-            //             token: "hyperlinktext"
-            //         },
-            //         fill: {
-            //             element: "color",
-            //             value: "bg",
-            //             prop: "default",
-            //             token: "bg"
-            //         },
-            //         // fontSizes: {
-            //         //   element: "font",
-            //         //   value: "fontsize",
-            //         //   prop: "default",
-            //         //   token: "fontsize"
-            //         // }
-            //     },
-            //     children: []
-            // }
+            text_hyperlink: {
+                type: "container",
+                content: [
+                    {
+                        element: "font",
+                        value: "fontsize",
+                        prop: "default",
+                        token: "fontsize"
+                    }
+                ],
+                resource: "",
+                data: [],
+                style: {
+                    layoutAlign: LAYOUT_CONSTANTS.ALIGN.Y.SELF.INHERIT,
+                    layoutGrow: LAYOUT_CONSTANTS.GROW.ZERO,
+                    textDecoration: "none",
+                    width: elementWidth,
+                    textColor: {
+                        element: "color",
+                        value: "text",
+                        prop: "default",
+                        token: "text"
+                    },
+                    fill: {
+                        element: "color",
+                        value: "bg",
+                        prop: "default",
+                        token: "bg"
+                    },
+                },
+                children: []
+            }
         },
         color: {
             text: {

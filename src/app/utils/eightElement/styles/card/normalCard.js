@@ -98,6 +98,7 @@ const NORMAL_CARD_STYLE = {
             },
             metaType: 'text',
             variant: 'cardTitle',
+            supportedAttributes: ['href', 'target'],
         },
         content: {
             style: {

@@ -145,6 +145,7 @@ const MINIMALIST_CARD_STYLE = {
                 paddingLeft: "{dimension.padding.base}",
             },
             variant: 'minimalistCardMainTitle',
+            supportedAttributes: ['href', 'target'],
         },
         pageTitle: {
             metaType: 'text',
@@ -153,6 +154,7 @@ const MINIMALIST_CARD_STYLE = {
                 paddingLeft: "{dimension.padding.base}",
             },
             variant: 'minimalistListCardTitle',
+            supportedAttributes: ['href', 'target'],
         },
         imageItems: {
             type: 'template',
@@ -191,6 +193,7 @@ const MINIMALIST_CARD_STYLE = {
 
                     },
                     variant: 'minimalistListCardItemTitle',
+                    supportedAttributes: ['href', 'target'],
                 },
                 itemDescription: {
                     metaType: 'text',
@@ -199,7 +202,8 @@ const MINIMALIST_CARD_STYLE = {
                         paddingRight: "{dimension.padding.base}",
                         marginBottom: "{dimension.margin.base}",
                     },
-                    variant: 'minimalistBorderLessCardContent'
+                    variant: 'minimalistBorderLessCardContent',
+                    supportedAttributes: ['href', 'target'],
                 }
             }
         }
@@ -292,6 +296,7 @@ const MINIMALIST_CARD_STYLE = {
                 },
                 metaType: 'text',
                 variant: 'minimalistChartCardHeaderTitle',
+                supportedAttributes: ['href', 'target'],
             },
 
             // 右侧区域
@@ -305,10 +310,12 @@ const MINIMALIST_CARD_STYLE = {
                 pageTitle: {
                     metaType: 'text',
                     variant: 'minimalistChartCardPageTitle',
+                    supportedAttributes: ['href', 'target'],
                 },
                 description: {
                     metaType: 'text',
                     variant: 'minimalistChartCardDescription',
+                    supportedAttributes: ['href', 'target'],
                 }
             }
         },

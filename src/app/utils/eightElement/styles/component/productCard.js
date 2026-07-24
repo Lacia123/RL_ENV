@@ -72,7 +72,7 @@ const PRODUCT_CARD_STYLE = {
             image: {
                 required: false,
                 optional: true,
-                supportedAttributes: ['src', 'alt']
+                supportedAttributes: ['src', 'alt', 'href', 'target']
             },
             title: {
                 required: true,
@@ -302,6 +302,7 @@ const PRODUCT_CARD_STYLE = {
             badge: {
                 metaType: 'text',
                 variant: 'p',
+                supportedAttributes: ['href', 'target'],
                 variantStyle: {
                     position: 'absolute',
                     top: '{dimension.padding.tight}',
@@ -335,6 +336,7 @@ const PRODUCT_CARD_STYLE = {
             title: {
                 metaType: 'text',
                 variant: 'h4',
+                supportedAttributes: ['href', 'target'],
                 variantStyle: {
                     margin: '{dimension.margin.base} {dimension.margin.base} {dimension.margin.tight} {dimension.margin.base}',
                     color: '{color.onsurface.black88}',
@@ -347,6 +349,7 @@ const PRODUCT_CARD_STYLE = {
             rating: {
                 metaType: 'text',
                 variant: 'p',
+                supportedAttributes: ['href', 'target'],
                 variantStyle: {
                     fontSize: '{font.size.small}',
                     color: '{color.warning.orange5}',
@@ -358,6 +361,7 @@ const PRODUCT_CARD_STYLE = {
             tags: {
                 metaType: 'text',
                 variant: 'p',
+                supportedAttributes: ['href', 'target'],
                 variantStyle: {
                     fontSize: '{font.size.small}',
                     color: '{color.onsurface.black64}',
@@ -373,6 +377,7 @@ const PRODUCT_CARD_STYLE = {
             description: {
                 metaType: 'text',
                 variant: 'p',
+                supportedAttributes: ['href', 'target'],
                 variantStyle: {
                     fontSize: '{font.size.small}',
                     color: '{color.onsurface.black64}',
@@ -390,6 +395,7 @@ const PRODUCT_CARD_STYLE = {
             price: {
                 metaType: 'text',
                 variant: 'p',
+                supportedAttributes: ['href', 'target'],
                 variantStyle: {
                     fontSize: '{font.size.xl}',
                     fontWeight: '{font.fontweight.bold}',
@@ -450,13 +456,13 @@ const PRODUCT_CARD_STYLE = {
         },
 
         slots: {
-            badge: { required: false, optional: true },
-            image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
-            title: { required: true, optional: false },
-            rating: { required: false, optional: true },
-            tags: { required: false, optional: true },
-            description: { required: false, optional: true },
-            price: { required: false, optional: true },
+            badge: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
+            image: { required: false, optional: true, supportedAttributes: ['src', 'alt', 'href', 'target'] },
+            title: { required: true, optional: false, supportedAttributes: ['href', 'target'] },
+            rating: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
+            tags: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
+            description: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
+            price: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
             actions: { required: false, optional: true, supportedAttributes: ['href', 'target'] },
             footer: { required: false, optional: true, supportedAttributes: ['href', 'target'] }
         }

@@ -104,6 +104,7 @@ const ELEGANT_CARD_STYLE = {
                 },
                 metaType: 'text',
                 variant: 'elegantCardTitle',
+                supportedAttributes: ['href', 'target'],
             },
             title: {
                 style: {
@@ -111,6 +112,7 @@ const ELEGANT_CARD_STYLE = {
                 },
                 metaType: 'text',
                 variant: 'elegantCardSubtitle',
+                supportedAttributes: ['href', 'target'],
             },
             segment: {
                 style: {
@@ -118,6 +120,7 @@ const ELEGANT_CARD_STYLE = {
                 },
                 metaType: 'text',
                 variant: 'elegantCardSegment',
+                supportedAttributes: ['href', 'target'],
             },
             buttonContainer: {
                 type: 'template',
@@ -152,11 +155,13 @@ const ELEGANT_CARD_STYLE = {
             },
             quote: {
                 metaType: 'text',
-                variant: 'quote'
+                variant: 'quote',
+                supportedAttributes: ['href', 'target'],
             },
             codeBlock: {
                 metaType: 'text',
-                variant: 'codeBlock'
+                variant: 'codeBlock',
+                supportedAttributes: ['href', 'target'],
             },
             audio: {
                 metaType: 'audio',
@@ -241,6 +246,7 @@ const ELEGANT_CARD_STYLE = {
             },
             metaType: 'text',
             variant: 'elegantCardTitle',
+            supportedAttributes: ['href', 'target'],
         },
         content: {
             type: 'template',
@@ -308,6 +314,7 @@ const ELEGANT_CARD_STYLE = {
                 },
                 metaType: 'text',
                 variant: 'elegantCardSubtitle',
+                supportedAttributes: ['href', 'target'],
             },
             segment: {
                 style: {
@@ -315,6 +322,7 @@ const ELEGANT_CARD_STYLE = {
                 },
                 metaType: 'text',
                 variant: 'elegantCardSegment',
+                supportedAttributes: ['href', 'target'],
             },
             buttonContainer: {
                 type: 'template',
@@ -355,11 +363,13 @@ const ELEGANT_CARD_STYLE = {
             },
             quote: {
                 metaType: 'text',
-                variant: 'quote'
+                variant: 'quote',
+                supportedAttributes: ['href', 'target'],
             },
             codeBlock: {
                 metaType: 'text',
-                variant: 'codeBlock'
+                variant: 'codeBlock',
+                supportedAttributes: ['href', 'target'],
             },
             audio: {
                 metaType: 'audio',
@@ -440,6 +450,7 @@ const ELEGANT_CARD_STYLE = {
             },
             metaType: 'text',
             variant: 'elegantCardTitle',
+            supportedAttributes: ['href', 'target'],
         },
         content: {
             type: 'template',
@@ -503,6 +514,7 @@ const ELEGANT_CARD_STYLE = {
             groupTitle: {
                 metaType: 'text',
                 variant: 'elegantCardSubtitle',
+                supportedAttributes: ['href', 'target'],
                 style: {
                     marginTop: "{dimension.margin.base}",
                     marginBottom: "{dimension.margin.tight}"
@@ -511,6 +523,7 @@ const ELEGANT_CARD_STYLE = {
             groupList: {
                 metaType: 'text',
                 variant: 'elegantCardSegment',
+                supportedAttributes: ['href', 'target'],
                 style: {
                     padding: "{dimension.padding.tight} {dimension.padding.base}",
                     background: "{color.secondarycontainer.violet0}",
@@ -535,6 +548,7 @@ const ELEGANT_CARD_STYLE = {
                 groupTitle: {
                     metaType: 'text',
                     variant: 'elegantCardSubtitle',
+                    supportedAttributes: ['href', 'target'],
                     style: {
                         margin: "{dimension.margin.base} 0",
                         fontWeight: "{font.fontweight.semibold}"
@@ -543,6 +557,7 @@ const ELEGANT_CARD_STYLE = {
                 groupList: {
                     metaType: 'text',
                     variant: 'elegantCardSegment',
+                    supportedAttributes: ['href', 'target'],
                     style: {
                         padding: "{dimension.padding.tight} {dimension.padding.base}",
                         background: "{color.secondarycontainer.violet0}",
@@ -564,7 +579,8 @@ const ELEGANT_CARD_STYLE = {
             },
             text: {
                 metaType: 'text',
-                variant: 'elegantCardSegment'
+                variant: 'elegantCardSegment',
+                supportedAttributes: ['href', 'target'],
             }
         }
     },
@@ -639,6 +655,7 @@ const ELEGANT_CARD_STYLE = {
             },
             metaType: 'text',
             variant: 'elegantCardTitle',
+            supportedAttributes: ['href', 'target'],
         },
         tableContainer: {
             type: 'template',
@@ -705,6 +722,7 @@ const ELEGANT_CARD_STYLE = {
                 },
                 metaType: 'text',
                 variant: 'elegantCardSubtitle',
+                supportedAttributes: ['href', 'target'],
             },
             dataTable: {
                 metaType: 'table',
@@ -726,7 +744,8 @@ const ELEGANT_CARD_STYLE = {
             },
             text: {
                 metaType: 'text',
-                variant: 'elegantCardSegment'
+                variant: 'elegantCardSegment',
+                supportedAttributes: ['href', 'target'],
             }
         }
     },

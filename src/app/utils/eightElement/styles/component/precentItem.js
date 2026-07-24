@@ -22,6 +22,7 @@ const PRECENT_ITEM_STYLE = {
             },
             metaType: 'text',
             variant: 'percentItemTitle',
+            supportedAttributes: ['href', 'target'],
         },
         percentValue: {
             style: {
@@ -29,10 +30,12 @@ const PRECENT_ITEM_STYLE = {
             },
             metaType: 'text',
             variant: 'percentValue',
+            supportedAttributes: ['href', 'target'],
         },
         itemDescription: {
             metaType: 'text',
             variant: 'percentItemDescription',
+            supportedAttributes: ['href', 'target'],
         }
     },
     newPrecentItem: {
@@ -69,7 +72,8 @@ const PRECENT_ITEM_STYLE = {
             },
             description: {
                 metaType: 'text',
-                variant: 'percentItemDescription'
+                variant: 'percentItemDescription',
+                supportedAttributes: ['href', 'target'],
             }
         },
         precentContainer: {

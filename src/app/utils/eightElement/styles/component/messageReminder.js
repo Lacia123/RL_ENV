@@ -261,6 +261,7 @@ const MESSAGE_REMINDER_PROGRESS_STYLE = {
         slots: {
             status_icon: {
                 metaType: 'text',
+                supportedAttributes: ['href', 'target'],
                 variant: 'statusIcon',
                 variantStyle: {
                     display: 'inline-flex',
@@ -279,6 +280,7 @@ const MESSAGE_REMINDER_PROGRESS_STYLE = {
             },
             message_status: {
                 metaType: 'text',
+                supportedAttributes: ['href', 'target'],
                 variant: 'messageStatus',
                 variantStyle: {
                     fontSize: '{font.size.medium}',
@@ -289,6 +291,7 @@ const MESSAGE_REMINDER_PROGRESS_STYLE = {
             },
             message: {
                 metaType: 'text',
+                supportedAttributes: ['href', 'target'],
                 variant: 'messageContent',
                 variantStyle: {
                     fontSize: '{font.size.large}',
@@ -299,6 +302,7 @@ const MESSAGE_REMINDER_PROGRESS_STYLE = {
             },
             time: {
                 metaType: 'text',
+                supportedAttributes: ['href', 'target'],
                 variant: 'time',
                 variantStyle: {
                     fontSize: '{font.size.medium}',
@@ -309,6 +313,7 @@ const MESSAGE_REMINDER_PROGRESS_STYLE = {
             },
             completed_time: {
                 metaType: 'text',
+                supportedAttributes: ['href', 'target'],
                 variant: 'completedTime',
                 variantStyle: {
                     fontSize: '{font.size.xxl}',
@@ -319,6 +324,7 @@ const MESSAGE_REMINDER_PROGRESS_STYLE = {
             },
             time_unit: {
                 metaType: 'text',
+                supportedAttributes: ['href', 'target'],
                 variant: 'timeUnit',
                 variantStyle: {
                     fontSize: '{font.size.medium}',
@@ -354,6 +360,7 @@ const MESSAGE_REMINDER_PROGRESS_STYLE = {
             },
             message_button: {
                 metaType: 'text',
+                supportedAttributes: ['href', 'target'],
                 variant: 'messageButton',
                 rawContent: true,
                 classStyle: {

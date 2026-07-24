@@ -288,21 +288,25 @@ const MEDIA_CARD_SERIES_STYLE = {
                     backdropFilter: 'blur(10px)',
                     background: '{color.basic.opacity.white.16}',
                     margin: '0'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             title: {
                 metaType: 'text',
-                variant: 'heroTitle'
+                variant: 'heroTitle',
+                supportedAttributes: ['href', 'target'],
             },
             command: COMMAND_SLOT_CONFIG,
             'command*': COMMAND_SLOT_CONFIG,
             subtitle: {
                 metaType: 'text',
-                variant: 'heroSubtitle'
+                variant: 'heroSubtitle',
+                supportedAttributes: ['href', 'target'],
             },
             metrics: {
                 metaType: 'text',
-                variant: 'heroMetric'
+                variant: 'heroMetric',
+                supportedAttributes: ['href', 'target'],
             },
             cta_primary: {
                 metaType: 'button',
@@ -330,7 +334,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             }
         },
         slots: {
-            cover_image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
+            cover_image: { required: false, optional: true, supportedAttributes: ['src', 'alt', 'href', 'target'] },
             badge: { required: false, optional: true },
             title: { required: true, optional: false },
             command: { required: false, optional: true },
@@ -631,7 +635,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             },
             badge: {
                 optional: true,
-                description: '短标签，例如“热门目的地”“最新活动”“会议邀请”。',
+                description: '短标签，例如"热门目的地""最新活动""会议邀请"。',
                 metaType: 'text',
                 variant: 'p',
                 variantStyle: {
@@ -645,13 +649,15 @@ const MEDIA_CARD_SERIES_STYLE = {
                     backdropFilter: 'blur(10px)',
                     background: '{color.basic.opacity.white.16}',
                     margin: '0'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             title: {
                 optional: false,
                 description: '主视觉标题，必须提供。用于表达推荐对象、活动名称、专题名称或核心主张。',
                 metaType: 'text',
-                variant: 'heroTitle'
+                variant: 'heroTitle',
+                supportedAttributes: ['href', 'target'],
             },
             command: COMMAND_SLOT_CONFIG,
             'command*': COMMAND_SLOT_CONFIG,
@@ -659,13 +665,15 @@ const MEDIA_CARD_SERIES_STYLE = {
                 optional: true,
                 description: '主标题下方的说明文本，用于说明价值、推荐理由、活动简介或内容摘要。',
                 metaType: 'text',
-                variant: 'heroSubtitle'
+                variant: 'heroSubtitle',
+                supportedAttributes: ['href', 'target'],
             },
             highlights: {
                 optional: true,
                 description: '可重复的亮点信息，例如评分、时间、地点、人数、数量、卖点等。',
                 metaType: 'text',
-                variant: 'heroMetric'
+                variant: 'heroMetric',
+                supportedAttributes: ['href', 'target'],
             },
             primaryAction: {
                 optional: true,
@@ -697,7 +705,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             }
         },
         slots: {
-            coverImage: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
+            coverImage: { required: false, optional: true, supportedAttributes: ['src', 'alt', 'href', 'target'] },
             badge: { required: false, optional: true },
             title: { required: true, optional: false },
             command: { required: false, optional: true },
@@ -975,7 +983,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     objectPosition: 'center top',
                     display: 'block'
                 },
-                supportedAttributes: ['src', 'alt']
+                supportedAttributes: ['src', 'alt', 'href', 'target']
             },
             command: COMMAND_SLOT_CONFIG,
             'command*': COMMAND_SLOT_CONFIG,
@@ -987,7 +995,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.xxl}',
                     fontWeight: '{font.fontweight.bold}',
                     color: '{color.basic.opacity.black.100}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             subtitle: {
                 metaType: 'text',
@@ -997,7 +1006,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.medium}',
                     color: '{color.basic.opacity.black.48}',
                     lineHeight: '1.5'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             tags: {
                 metaType: 'text',
@@ -1012,7 +1022,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     background: '{color.primarycontainer.brand0}',
                     padding: '{dimension.padding.supertight} {dimension.padding.tight}',
                     borderRadius: '{dimension.borderradius.large}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             rating: {
                 metaType: 'text',
@@ -1025,7 +1036,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.small}',
                     fontWeight: '{font.fontweight.semibold}',
                     color: '{color.onsurface.black88}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             price: {
                 metaType: 'text',
@@ -1035,7 +1047,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.xl}',
                     fontWeight: '{font.fontweight.bold}',
                     color: '{color.basic.brand.7}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             location: {
                 metaType: 'text',
@@ -1047,7 +1060,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     gap: '{dimension.gap.tight}',
                     fontSize: '{font.size.small}',
                     color: '{color.onsurface.black64}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             cta: {
                 metaType: 'button',
@@ -1062,7 +1076,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             }
         },
         slots: {
-            image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
+            image: { required: false, optional: true, supportedAttributes: ['src', 'alt', 'href', 'target'] },
             command: { required: false, optional: true },
             title: { required: true, optional: false },
             subtitle: { required: false, optional: true },
@@ -1280,7 +1294,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     borderRadius: '{dimension.borderradius.large}',
                     background: '{color.surfacecontainer.black4}',
                     flexShrink: '0'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             badge: {
                 metaType: 'text',
@@ -1295,7 +1310,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     background: '{color.surfacecontainer.black4}',
                     color: '{color.onsurface.black76}',
                     margin: '0'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             title: {
                 metaType: 'text',
@@ -1306,7 +1322,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontWeight: '{font.fontweight.bold}',
                     color: '{color.onsurface.black88}',
                     lineHeight: '1.3'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             command: COMMAND_SLOT_CONFIG,
             'command*': COMMAND_SLOT_CONFIG,
@@ -1318,7 +1335,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.medium}',
                     color: '{color.onsurface.black64}',
                     lineHeight: '1.6'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             cta_primary: {
                 metaType: 'button',
@@ -1539,7 +1557,7 @@ const MEDIA_CARD_SERIES_STYLE = {
                     padding: '0',
                     margin: '0'
                 },
-                supportedAttributes: ['src', 'alt']
+                supportedAttributes: ['src', 'alt', 'href', 'target']
             },
             tag: {
                 metaType: 'text',
@@ -1554,7 +1572,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     background: '{color.primary.brand1}',
                     color: '{color.primary.brand6}',
                     margin: '0'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             event_title: {
                 metaType: 'text',
@@ -1565,7 +1584,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontWeight: '{font.fontweight.bold}',
                     color: '{color.onsurface.black88}',
                     lineHeight: '1.3'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             command: COMMAND_SLOT_CONFIG,
             'command*': COMMAND_SLOT_CONFIG,
@@ -1579,7 +1599,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '{dimension.gap.supertight}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             cta: {
                 metaType: 'button',
@@ -1594,7 +1615,7 @@ const MEDIA_CARD_SERIES_STYLE = {
             }
         },
         slots: {
-            image: { required: false, optional: true, supportedAttributes: ['src', 'alt'] },
+            image: { required: false, optional: true, supportedAttributes: ['src', 'alt', 'href', 'target'] },
             tag: { required: false, optional: true },
             event_title: { required: true, optional: false },
             command: { required: false, optional: true },
@@ -1841,7 +1862,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontWeight: '{font.fontweight.bold}',
                     // 默认样式（成功）
                     color: '{color.basic.brand.6}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             message: {
                 metaType: 'text',
@@ -1851,7 +1873,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.large}',
                     color: '{color.onsurface.black88}',
                     lineHeight: '1.5'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             command: COMMAND_SLOT_CONFIG,
             'command*': COMMAND_SLOT_CONFIG,
@@ -1879,7 +1902,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     transition: 'width 0.3s ease',
                     // 使用 statusCard 根上的 --status-progress（0-100），映射到宽度百分比
                     width: 'calc(var(--status-progress, 0) * 1%)'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             timestamp: {
                 metaType: 'text',
@@ -1889,7 +1913,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.tiny}',
                     color: '{color.onsurface.black48}',
                     letterSpacing: '0.04em'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             cta: {
                 metaType: 'button',
@@ -2104,7 +2129,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     background: '{color.primary.brand1}',
                     color: '{color.primary.brand6}',
                     flexShrink: '0'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             badge: {
                 metaType: 'text',
@@ -2120,7 +2146,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     background: '{color.primary.brand1}',
                     color: '{color.primary.brand6}',
                     display: 'inline-block'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             title: {
                 metaType: 'text',
@@ -2131,7 +2158,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontWeight: '{font.fontweight.semibold}',
                     color: '{color.onsurface.black88}',
                     lineHeight: '1.3'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             subtitle: {
                 metaType: 'text',
@@ -2142,7 +2170,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     color: '{color.onsurface.black64}',
                     lineHeight: '1.5',
                     marginTop: '{dimension.margin.supertight}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             description: {
                 metaType: 'text',
@@ -2152,7 +2181,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.small}',
                     color: '{color.onsurface.black64}',
                     lineHeight: '1.6'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             command: COMMAND_SLOT_CONFIG,
             'command*': COMMAND_SLOT_CONFIG,
@@ -2173,7 +2203,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     fontSize: '{font.size.small}',
                     color: '{color.onsurface.black48}',
                     lineHeight: '1.5'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             }
         },
         slots: {
@@ -2267,7 +2298,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                 variantStyle: {
                     margin: '0',
                     color: '{color.onsurface.black88}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             subtitle: {
                 metaType: 'text',
@@ -2276,7 +2308,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     margin: '0',
                     color: '{color.onsurface.black64}',
                     fontSize: '{font.size.small}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             command: COMMAND_SLOT_CONFIG,
             'command*': COMMAND_SLOT_CONFIG,
@@ -2548,7 +2581,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     margin: '0',
                     color: '{color.onprimary.white100}',
                     borderBottom: '1px solid {color.basic.opacity.white.20}',
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             subtitle: {
                 metaType: 'text',
@@ -2557,7 +2591,8 @@ const MEDIA_CARD_SERIES_STYLE = {
                     margin: '0',
                     color: '{color.onprimary.white100}',
                     fontSize: '{font.size.small}'
-                }
+                },
+                supportedAttributes: ['href', 'target'],
             },
             command: COMMAND_SLOT_CONFIG,
             'command*': COMMAND_SLOT_CONFIG,
