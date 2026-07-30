@@ -1708,18 +1708,52 @@ function buildChartElementFromContent(slotName, slotConfig, slotContent, attribu
 }
 
 function buildFeedItemLayout(slotName, slotConfig, slotContent = '', attributes = {}, currentMarkdown = '', loopDataKey = '') {
-    const itemStyles = slotConfig.itemStyles || {};
+    const itemStyles = { ...slotConfig.itemStyles };
     const subSlots = slotConfig.subSlots || {};
     const parsed = parseFeedItemSlotContent(slotContent || '', subSlots);
+
+    // 🆕 可选：按 type 属性覆盖 feedItem 容器样式（itemStylesByType: { normal: {...}, warning: {...}, ... }）
+    const itemType = attributes?.type;
+    if (itemType && slotConfig.itemStylesByType && slotConfig.itemStylesByType[itemType]) {
+        itemStyles.row = {
+            ...(itemStyles.row || {}),
+            ...slotConfig.itemStylesByType[itemType],
+        };
+    }
 
     const subSlotElements = new Map();
     const subSlotPresence = new Set();
 
     Object.keys(subSlots).forEach(subSlotName => {
+        const subSlotConfig = subSlots[subSlotName];
+        const parsedItem = parsed[subSlotName];
+
+        // 🆕 支持可重复子插槽（subSlotConfig.repeat）：解析为数组，元素按出现顺序入图
+        if (subSlotConfig && subSlotConfig.repeat && Array.isArray(parsedItem)) {
+            parsedItem.forEach((item, idx) => {
+                const element = createElementForSubSlot(
+                    subSlotName,
+                    item,
+                    subSlotConfig,
+                    parsed.fallbackText,
+                    attributes,
+                    currentMarkdown,
+                    loopDataKey
+                );
+                if (element) {
+                    const key = parsedItem.length > 1 ? `${subSlotName}#${idx + 1}` : subSlotName;
+                    subSlotElements.set(key, element);
+                    subSlotPresence.add(key);
+                    subSlotPresence.add(subSlotName);
+                }
+            });
+            return;
+        }
+
         const element = createElementForSubSlot(
             subSlotName,
-            parsed[subSlotName],
-            subSlots[subSlotName],
+            parsedItem,
+            subSlotConfig,
             parsed.fallbackText,
             attributes,
             currentMarkdown,
@@ -1804,7 +1838,12 @@ function parseFeedItemSlotContent(rawContent = '', subSlotConfigs = {}) {
     }
 
     tagNames.forEach(tag => {
-        result[tag] = extractFeedSubTag(rawContent, tag);
+        const cfg = subSlotConfigs[tag] || {};
+        if (cfg.repeat) {
+            result[tag] = extractAllFeedSubTags(rawContent, tag);
+        } else {
+            result[tag] = extractFeedSubTag(rawContent, tag);
+        }
     });
 
     let cleaned = rawContent;
@@ -1845,6 +1884,25 @@ function extractFeedSubTag(rawContent = '', tagName = '') {
     }
 
     return null;
+}
+
+/**
+ * 提取可重复子插槽的全部匹配（按出现顺序）
+ * 用于同一 feedItem 内出现多个同名子标签的场景（如 doubleImageItem 内两张 <image>）
+ */
+function extractAllFeedSubTags(rawContent = '', tagName = '') {
+    if (!rawContent || !tagName) return [];
+    const results = [];
+    const openCloseRegex = new RegExp(`<${tagName}(\\s[^>]*)?>([\\s\\S]*?)<\/${tagName}>`, 'gi');
+    let m;
+    while ((m = openCloseRegex.exec(rawContent)) !== null) {
+        results.push({ content: (m[2] || '').trim(), attributes: parseAttributes(m[1] || '') });
+    }
+    const selfClosingRegex = new RegExp(`<${tagName}(\\s[^>]*)?\\/>`, 'gi');
+    while ((m = selfClosingRegex.exec(rawContent)) !== null) {
+        results.push({ content: '', attributes: parseAttributes(m[1] || '') });
+    }
+    return results;
 }
 
 function buildFeedItemSections(layoutDefinition = [], rowElement, slotElementsMap, slotPresenceSet) {
@@ -1958,11 +2016,20 @@ function createElementForSubSlot(
         if (!content && !slotAttributes.key) {
             return null;
         }
+        // 🆕 可选：按父级 type 属性覆盖文本颜色（subSlotConfig.colorByType: { normal: '...', warning: '...', ... }）
+        let textCustomStyles = subSlotConfig.variantStyle || null;
+        const parentType = parentAttributes?.type;
+        if (parentType && subSlotConfig.colorByType && subSlotConfig.colorByType[parentType]) {
+            textCustomStyles = {
+                ...(subSlotConfig.variantStyle || {}),
+                color: subSlotConfig.colorByType[parentType],
+            };
+        }
         const textElement = createTextElement(
             content || '',
             subSlotConfig.variant || 'p',
             {},
-            subSlotConfig.variantStyle || null
+            textCustomStyles
         );
         if (textElement && slotAttributes.key) {
             textElement['data-key'] = slotAttributes.key;

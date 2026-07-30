@@ -3511,7 +3511,108 @@ style: {
 </messageReminderProgress>
 `
     },
+  showcaseCardDemo: {
+    name: '🖼 展示型卡片',
+    description: '',
+    markdown: `# 展示型卡片
 
+## 1. 带开关滑块（提供 toggle 标签）
+
+<showcaseCard>
+<title>Related files</title>
+<subtitle>4 Related Files</subtitle>
+<toggle></toggle>
+<imageTextItem>
+<image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论"></image>
+    <title>Patent sharing collection</title>
+    <text>14MB Sent by Professor Zhang</text>
+</imageTextItem>
+<commonListItem>
+  <icon>📄</icon>
+  <layout:column>
+    <title>Patent collection</title>
+    <text>Sent by Rebecca an hour ago</text>
+  </layout:column>
+</commonListItem>
+<commonListItem>
+  <icon>📄</icon>
+  <layout:column>
+    <title>Patent collection</title>
+    <text>Sent by Rebecca an hour ago</text>
+  </layout:column>
+</commonListItem>
+<commonListItem>
+  <icon>📄</icon>
+  <layout:column>
+    <title>Patent collection</title>
+    <text>Sent by Rebecca an hour ago</text>
+  </layout:column>
+</commonListItem>
+<caption>4 Images</caption>
+</showcaseCard>
+
+## 2. 中间区域带两个图片
+<showcaseCard>
+<title>Related files</title>
+<doubleImageItem>
+<image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论"></image>
+<image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论"></image>
+</doubleImageItem>
+<caption>4 Images</caption>
+</showcaseCard>
+
+## 3. 右侧带图片的卡片
+<showcaseCard>
+<title>Related files</title>
+<preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+<caption>4 Images</caption>
+</showcaseCard>
+
+## 4. 带按钮和加载中
+<showcaseCard>
+<title>Related files</title>
+<toggle></toggle>
+<text>Lenovo Al Now is a cutting-edge personal Al assistant developed by Lenovo...</text>
+<loading></loading>
+<button>✦ View AI Summary</button>
+</showcaseCard>
+
+## mistakesCard 有title，展示在卡片容器里
+
+<mistakesCard>
+<title>Weak Spots</title>
+<mistakesCardItem type="normal">
+<title>Multivariable Calculus</title>
+<text>38% Mastery</text>
+<caption>12 Mistakes</caption>
+</mistakesCardItem>
+
+<mistakesCardItem type="warning">
+<title>Multivariable Calculus</title>
+<text>38% Mastery</text>
+<caption>12 Mistakes</caption>
+</mistakesCardItem>
+
+<mistakesCardItem type="error">
+<title>Multivariable Calculus</title>
+<text>38% Mastery</text>
+<caption>12 Mistakes</caption>
+</mistakesCardItem>
+</mistakesCard>
+
+
+## mistakesCard 无title，单独展示
+
+<mistakesCard>
+<mistakesCardItem type="normal">
+<title>Multivariable Calculus</title>
+<text>38% Mastery</text>
+<caption>12 Mistakes</caption>
+</mistakesCardItem>
+</mistakesCard>
+
+`
+  },
     countdown: {
         name: '⏱ 倒计时',
         description: '倒计时组件 — 支持 target 和 format 参数',

@@ -27,6 +27,8 @@ import COMMON_STYLE_SERVICE_LIST_COMPACT_STYLE from './commonStyleServiceListCom
 import TEXT_CARD_STYLE from './textCard';
 import BANNER_IMAGE_PANEL_STYLE from './bannerImagePanel';
 import MESSAGE_REMINDER_STYLE from './messageReminder';
+import SHOWCASE_CARD_STYLE from './showcaseCard';
+import MISTAKES_CARD_STYLE from './mistakesCard';
 import COUNTDOWN_STYLE from './countdown';
 
 const COMPONENT_STYLE = {
@@ -60,6 +62,8 @@ const COMPONENT_STYLE = {
         ...TEXT_CARD_STYLE,
         ...BANNER_IMAGE_PANEL_STYLE,
         ...MESSAGE_REMINDER_STYLE,
+        ...SHOWCASE_CARD_STYLE,
+        ...MISTAKES_CARD_STYLE,
         ...COUNTDOWN_STYLE,
     }
 }
