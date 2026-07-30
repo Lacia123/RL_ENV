@@ -3478,6 +3478,47 @@ style: {
 | AWS | 美国、亚洲、亚太 | ⟳  ⋮ |
 | Azure | 全球20+区域 | ⟳  ⋮ |
 | 阿里云 | 中国大陆主要城市 | ⟳  ⋮ |
+
+## targetStatCard
+
+<targetStatCard>
+  <subtitle>FOR MAGGIE</subtitle>
+  <title>Master Calculus in 14 Dyas.</title>
+  <text>240</text>
+  <caption>TOTAL PROBLEMS</caption>
+</targetStatCard>
+
+<targetStatCard>
+  <subtitle>WEEKLY REPORT</subtitle>
+  <title>Ship 5 launches this week.</title>
+  <text>128</text>
+  <caption>ACTIVE USERS</caption>
+  <button nativeEvent="click" data="viewReport">查看报告</button>
+</targetStatCard>
+
+### 横向排列
+
+<layout:row>
+<targetStatCard>
+  <subtitle>MASTER</subtitle>
+  <title>Calculus in 14 Days.</title>
+  <text>240</text>
+  <caption>PROBLEMS</caption>
+</targetStatCard>
+<targetStatCard>
+  <subtitle>WEEKLY</subtitle>
+  <title>Ship 5 launches.</title>
+  <text>128</text>
+  <caption>USERS</caption>
+  <button nativeEvent="click" data="viewReport">查看报告</button>
+</targetStatCard>
+<targetStatCard>
+  <subtitle>DAILY</subtitle>
+  <title>Tasks completed.</title>
+  <text>89</text>
+  <caption>ITEMS</caption>
+</targetStatCard>
+</layout:row>
 `
   },
   messageReminderProgress: {

@@ -30,6 +30,7 @@ import MESSAGE_REMINDER_STYLE from './messageReminder';
 import SHOWCASE_CARD_STYLE from './showcaseCard';
 import MISTAKES_CARD_STYLE from './mistakesCard';
 import COUNTDOWN_STYLE from './countdown';
+import TARGET_STAT_CARD_STYLE from './targetStatCard';
 
 const COMPONENT_STYLE = {
     component: {
@@ -65,6 +66,7 @@ const COMPONENT_STYLE = {
         ...SHOWCASE_CARD_STYLE,
         ...MISTAKES_CARD_STYLE,
         ...COUNTDOWN_STYLE,
+        ...TARGET_STAT_CARD_STYLE,
     }
 }
 
