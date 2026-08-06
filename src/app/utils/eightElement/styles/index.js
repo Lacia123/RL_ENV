@@ -7,6 +7,7 @@ import LAYOUT_STYLE from './layoutStyle.js';
 import TEXT_STYLE from './textStyle.js';
 import MATH_STYLE from './mathStyle.js';
 import CHART_STYLE from './chartStyle.js';
+import GRAPH_STYLE from './graphStyle.js';
 import TABLE_STYLE from './tableStyle.js';
 import TABLE_COMMON_STYLE from './tableCommonStyle.js';
 import BUTTON_STYLE from './buttonStyle.js';
@@ -31,6 +32,7 @@ export const DEFAULT_STYLE_CONFIG = {
     ...TEXT_STYLE,
     ...MATH_STYLE,
     ...CHART_STYLE,
+    ...GRAPH_STYLE,
     ...TABLE_STYLE,
     ...TABLE_COMMON_STYLE,
     ...BUTTON_STYLE,

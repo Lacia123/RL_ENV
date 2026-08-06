@@ -8,6 +8,7 @@ import resolveToken from '../tokens/resolveToken.js';
 import { isTableOrChartData, extractTableOrChartData, processTableOrChartData } from './creators/tableCreators.js';
 import { parseChartTagSpec } from './chartSpecParse.js';
 import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './creators/codeCreators.js';
+import { isTopologyTag, extractGraphBlock, processGraphBlock } from './creators/graphCreators.js';
 import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot, createFlexWrapLayout } from './creators/layoutCreators.js';
 
 import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch, processTemplatePathWithWildcard } from './creators/cardCreators.js';
@@ -1403,6 +1404,29 @@ function parseMarkdown(markdown, options = {}) {
             // 跳过已处理的代码块行
             i = endIndex;
             continue;
+        }
+
+        // 🆕 优先处理知识图谱（Topology + @@@ 块）
+        const topologyTagInfo = isTopologyTag(trimmedLine);
+        if (topologyTagInfo.isTopologyTag) {
+            // 处理之前累积的内容
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            // 提取图谱数据块
+            const graphResult = extractGraphBlock(
+                markedLines.map(item => item.line),
+                i
+            );
+
+            if (graphResult) {
+                // 创建图谱元素
+                const endIndex = processGraphBlock(graphResult, stack);
+
+                // 跳过已处理的图谱块行
+                i = endIndex;
+                continue;
+            }
         }
 
         // 检查是否为表格或图表数据

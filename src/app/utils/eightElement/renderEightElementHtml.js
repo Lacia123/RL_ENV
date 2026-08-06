@@ -168,6 +168,13 @@ export function renderEightElementToHtml(eightElement, options = {}) {
         'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css' :
         'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/github.min.css';
 
+    // 🆕 检查是否有图谱元素，若有则注入知识图谱渲染脚本
+    const hasGraphElement = checkForGraphElement(processedEightElement);
+    const graphScripts = hasGraphElement ? `
+      <script src="/vendor/g6.min.js"></script>
+      <script src="/graph-renderer.js"></script>
+    ` : '';
+
     // 🆕 编辑器样式（仅在 includeInteractive 为 true 时包含）
     const editorStyles = includeInteractive ? `
         /* 🆕 编辑器相关样式 */
@@ -267,6 +274,7 @@ export function renderEightElementToHtml(eightElement, options = {}) {
       <title>Eight Element Renderer</title>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
       <link rel="stylesheet" href="${highlightTheme}" crossorigin="anonymous"></link>
+      ${graphScripts}
        
       <style>
         body {
@@ -1113,6 +1121,23 @@ export function renderEightElementToHtml(eightElement, options = {}) {
 }
 
 /**
+ * 检查八要素结构中是否有图谱元素
+ * @param {Object} element - 八要素元素
+ * @returns {boolean} - 是否有图谱元素
+ */
+function checkForGraphElement(element) {
+    if (!element) return false;
+
+    if (element.name === 'graph' || element.type === 'graph') return true;
+
+    if (element.layout && element.layout.children && Array.isArray(element.layout.children)) {
+        return element.layout.children.some(child => checkForGraphElement(child));
+    }
+
+    return false;
+}
+
+/**
  * 检查八要素结构中是否有代码元素，并确定主题
  * @param {Object} element - 八要素元素
  * @returns {Object} - 包含是否有代码元素和主题信息的对象
@@ -1209,6 +1234,18 @@ function collectClassStyles(element, classStyles = {}) {
         // 收集axis的classStyle
         if (element.layout.axis && element.layout.axis.className && element.layout.axis.classStyle) {
             classStyles[element.layout.axis.className] = element.layout.axis.classStyle;
+        }
+    }
+
+    // 特殊处理图谱元素的classStyle（新结构：title在layout下）
+    if (element.name === 'graph' && element.layout) {
+        // 收集title的classStyle
+        if (element.layout.title && element.layout.title.className && element.layout.title.classStyle) {
+            classStyles[element.layout.title.className] = element.layout.title.classStyle;
+        }
+        // 收集G6渲染区域容器（graphArea）的classStyle
+        if (element.layout.graphArea && element.layout.graphArea.className && element.layout.graphArea.classStyle) {
+            classStyles[element.layout.graphArea.className] = element.layout.graphArea.classStyle;
         }
     }
 
@@ -1414,6 +1451,11 @@ function preProcessEightElement(element) {
     // 处理图表元素
     else if (element.name === 'chart') {
         processChartElement(processedElement, element);
+    }
+
+    // 处理图谱元素
+    else if (element.name === 'graph') {
+        processGraphElement(processedElement, element);
     }
 
     // 递归处理子元素
@@ -1951,6 +1993,32 @@ function processChartElement(processedElement, originalElement) {
     }
 }
 
+function processGraphElement(processedElement, originalElement) {
+    // 保留图谱数据和标题
+    processedElement.graphData = originalElement.graphData || null;
+    processedElement.jsonString = originalElement.jsonString || '';
+    processedElement.title = originalElement.title || null;
+
+    // 确保layout存在
+    if (!processedElement.layout) {
+        processedElement.layout = {};
+    }
+
+    // 处理图谱标题样式 - 保持classStyle格式，不转换为内联样式
+    if (originalElement.layout && originalElement.layout.title) {
+        const titleConfig = originalElement.layout.title;
+        if (!processedElement.layout.title) processedElement.layout.title = {};
+
+        // 保存className和classStyle信息
+        if (titleConfig.className) {
+            processedElement.layout.title.className = titleConfig.className;
+        }
+        if (titleConfig.classStyle) {
+            processedElement.layout.title.classStyle = titleConfig.classStyle;
+        }
+    }
+}
+
 /**
  * 计算元素的最终样式
  * @param {Object} element - 八要素元素
@@ -2205,6 +2273,8 @@ function renderElement(element, dataContext = null) {
             return renderCodeElement(element, dataContext);
         case 'chart':
             return renderChartElement(element, dataContext);
+        case 'graph':
+            return renderGraphElement(element, dataContext);
         case 'video':
             return renderVideoElement(element, dataContext);
         case 'audio':
@@ -2942,6 +3012,51 @@ function renderChartElement(element) {
       </div>
     `;
     }
+}
+
+/**
+ * 渲染图谱元素
+ * @param {Object} element - 图谱元素
+ * @returns {string} - 渲染的HTML字符串
+ */
+function renderGraphElement(element) {
+    if (!element) {
+        return '<div>图谱元素结构不完整</div>';
+    }
+
+    const containerStyle = { ...(element.computedStyle || {}) };
+    const className = element.layout && element.layout.className ? element.layout.className : '';
+    const classAttr = className ? `class="${className}"` : '';
+    const containerStyleAttr = generateStyleAttribute(containerStyle);
+
+    // 图谱数据（JSON字符串，浏览器端 graph-renderer.js 负责渲染）
+    const dataStr = element.jsonString || '';
+
+    // 标题
+    let titleHtml = '';
+    if (element.title) {
+        const titleClass = element.layout && element.layout.title && element.layout.title.className
+            ? element.layout.title.className
+            : '';
+        const titleClassAttr = titleClass ? `class="${titleClass}"` : '';
+        titleHtml = `<div ${titleClassAttr} data-element-type="graph-title">${escapeHtml(element.title)}</div>`;
+    }
+
+    // 图谱占位容器：自定义元素 kc-graph-g6 由 /graph-renderer.js 升级并渲染
+    const graphAreaClass = element.layout && element.layout.graphArea && element.layout.graphArea.className
+        ? element.layout.graphArea.className
+        : '';
+    const graphAreaClassAttr = graphAreaClass ? `class="${graphAreaClass}"` : '';
+    const graphCanvasHtml = dataStr
+        ? `<kc-graph-g6 ${graphAreaClassAttr} data-graph='${escapeHtml(dataStr)}' style="display:block;width:100%;height:560px;min-height:320px;"></kc-graph-g6>`
+        : '<div style="display:flex;align-items:center;justify-content:center;padding:32px;color:#999;">图谱数据为空</div>';
+
+    return `
+      <div id="${element.id || ''}" ${classAttr} data-element-type="graph" ${containerStyleAttr}>
+        ${titleHtml}
+        ${graphCanvasHtml}
+      </div>
+    `;
 }
 
 function getChartAspectRatioStyle(element) {
