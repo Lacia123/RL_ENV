@@ -38,6 +38,7 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
 | `<layout:gallery>` | 双列瀑布流，每项约半宽 |
 | `<layout:bgColumn>` | 带背景层的竖向分区，适合需要背景色的区块 |
 | `<layout:minimalContainer>` | 弱装饰、轻量容器 |
+| `<layout:grid>` | m×n 网格布局，子项用 `<grid:item>` 显式定位（详见下文「grid 网格布局」） |
 
 ### row 变体
 
@@ -71,6 +72,45 @@ PSUIP 使用 `layout:*` 标签定义页面骨架，组件和 Markdown 内容放�
     <组件3/>
   </layout:column>
 </layout:root>
+```
+
+### grid 网格布局（m×n 任意内容）
+
+适用于需要精确行列定位的场景（仪表盘、卡片拼版、图文混排）。
+
+容器定义网格尺寸，子项定义起始格与跨格：
+
+| 标签 | 属性 | 说明 |
+|------|------|------|
+| `<layout:grid>` | `columns` | 列数 m，生成等宽 m 列网格 |
+| | `rows` | 行数 n，行高随内容自适应 |
+| | `gap` | 单元格间距，例如 `gap="16"` |
+| | `fill` | 子项内容是否撑满所在格（默认 `true`，可填 `false` 关闭） |
+| `<grid:item>` | `x` / `y` | 起始格坐标（1 起始） |
+| | `width` / `height` | 占用的格子数（缺省为 1） |
+| | `fill` | 单格覆盖容器的 fill 设置（默认继承容器） |
+
+规则：
+
+- `width` / `height` 表示跨几个格子，`x` / `y` 表示从第几格开始（1 起始），写全称，不要简写为 `w`/`h`
+- `x` / `y` 均可省略：省略时按文档顺序自动填充位置，仅声明跨格；都省略则完全自动占位
+- `fill` 控制子项内容是否上下左右撑满所在格：默认 `true`，内容拉伸填满整格（适合卡片、指标卡等高块内容）；设 `fill="false"` 则内容保持自然尺寸
+- `<grid:item>` 内部可放**任意内容**：Markdown、卡片、组件、嵌套 layout，甚至嵌套 grid
+- 越界（`x + width - 1 > columns`）或相互重叠会打印警告，请核对坐标
+- `grid:item` 必须直接放在 `<layout:grid>` 容器内
+
+```text
+<layout:grid columns="4" rows="3" gap="16">
+  <grid:item x="1" y="1" width="3" height="1">顶部横跨前三列</grid:item>
+  <grid:item x="4" y="1" width="1" height="3">右侧竖栏，可放任意内容</grid:item>
+  <grid:item x="1" y="2" width="2" height="2">
+    <card:standard title="左下大卡片">
+      卡片内容
+    </card:standard>
+  </grid:item>
+  <grid:item x="3" y="2" width="1" height="1">自动缺省演示</grid:item>
+  <grid:item>完全自动占位（无 x/y）</grid:item>
+</layout:grid>
 ```
 
 ## 二、Markdown 映射（基础方式）

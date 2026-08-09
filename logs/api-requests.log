@@ -1,0 +1,1117 @@
+
+================================================================================
+[2026-08-09T03:37:00.789Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "<layout:root>\n<layout:grid columns=\"4\" rows=\"3\" gap=\"16\">\n  <grid:item x=\"1\" y=\"1\" width=\"3\" height=\"1\">\n    ## 顶部标题区\n    这是横跨前三列的一个区块，包含多段文字。\n  </grid:item>\n  <grid:item x=\"4\" y=\"1\" width=\"1\" height=\"3\">\n    右侧边栏，竖占三行。\n  </grid:item>\n  <grid:item x=\"1\" y=\"2\" width=\"2\" height=\"2\">左下大卡片区域。</grid:item>\n  <grid:item x=\"3\" y=\"2\" width=\"1\" height=\"1\">单个格子。</grid:item>\n  <grid:item>完全自动占位（无 x/y）</grid:item>\n</layout:grid>\n</layout:root>"
+}
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 30ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-075f35da-2ce8-4446-ba1f-1b694c6f5038",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-075f35da-2ce8-4446-ba1f-1b694c6f5038",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "grid",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {
+              "columns": "4",
+              "rows": "3",
+              "gap": "16"
+            },
+            "dataAction": "append",
+            "statusKey": "",
+            "originalVariant": "grid",
+   
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T03:37:58.736Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "<layout:root>\n<layout:grid columns=\"4\" rows=\"3\" gap=\"16\">\n  <grid:item x=\"1\" y=\"1\" width=\"3\" height=\"1\">\n    ## 顶部标题区\n    这是横跨前三列的一个区块，包含多段文字。\n  </grid:item>\n  <grid:item x=\"4\" y=\"1\" width=\"1\" height=\"3\">\n    右侧边栏，竖占三行。\n  </grid:item>\n  <grid:item x=\"1\" y=\"2\" width=\"2\" height=\"2\">左下大卡片区域。</grid:item>\n  <grid:item x=\"3\" y=\"2\" width=\"1\" height=\"1\">单个格子。</grid:item>\n  <grid:item>完全自动占位（无 x/y）</grid:item>\n</layout:grid>\n</layout:root>"
+}
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 20ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-c45beaca-7731-4b8d-8981-92cb0a952e1a",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-c45beaca-7731-4b8d-8981-92cb0a952e1a",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "grid",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {
+              "columns": "4",
+              "rows": "3",
+              "gap": "16"
+            },
+            "dataAction": "append",
+            "statusKey": "",
+            "originalVariant": "grid",
+   
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T03:40:44.470Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "<layout:root>\n<layout:grid columns=\"2\" rows=\"2\" gap=\"12\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">\n    ## 卡片区\n    <card:standard title=\"示例卡片\">\n      卡片内容\n    </card:standard>\n  </grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"2\">\n    <layout:grid columns=\"2\" rows=\"2\" gap=\"4\">\n      <grid:item>内层A</grid:item>\n      <grid:item>内层B</grid:item>\n      <grid:item>内层C</grid:item>\n      <grid:item>内层D</grid:item>\n    </layout:grid>\n  </grid:item>\n  <grid:item x=\"1\" y=\"2\" width=\"1\" height=\"1\">纯文本子项</grid:item>\n</layout:grid>\n</layout:root>"
+}
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 13ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-cf458aa1-ecc3-4f8a-9d46-596877371045",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [
+      "dd-24756d6f-e77c-48f3-b986-217b08f1f3b8"
+    ],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-cf458aa1-ecc3-4f8a-9d46-596877371045",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "grid",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {
+              "columns": "2",
+              "rows": "2",
+              "gap": "12"
+            },
+            "dataAction": "append",
+            "statu
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T03:41:25.880Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "<layout:root>\n<layout:grid columns=\"2\" rows=\"2\" gap=\"12\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">\n    ## 卡片区\n    <card:standard title=\"示例卡片\">\n      卡片内容\n    </card:standard>\n  </grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"2\">\n    <layout:grid columns=\"2\" rows=\"2\" gap=\"4\">\n      <grid:item>内层A</grid:item>\n      <grid:item>内层B</grid:item>\n      <grid:item>内层C</grid:item>\n      <grid:item>内层D</grid:item>\n    </layout:grid>\n  </grid:item>\n  <grid:item x=\"1\" y=\"2\" width=\"1\" height=\"1\">纯文本子项</grid:item>\n</layout:grid>\n</layout:root>"
+}
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 14ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-cbee7ef4-6a28-4166-a30e-4a8daca9c757",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [
+      "dd-1b7f83e6-7e11-4d84-9f91-dd8e124d05dc"
+    ],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-cbee7ef4-6a28-4166-a30e-4a8daca9c757",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "grid",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {
+              "columns": "2",
+              "rows": "2",
+              "gap": "12"
+            },
+            "dataAction": "append",
+            "statu
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T04:19:13.167Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "# 网格布局演示\n\n## 4×3 仪表盘\n<layout:grid columns=\"4\" rows=\"3\" gap=\"16\">\n  <grid:item x=\"1\" y=\"1\" width=\"3\" height=\"1\">\n    ## 顶部标题区\n    横跨前三列，展示网格横向合并能力。\n  </grid:item>\n  <grid:item x=\"4\" y=\"1\" width=\"1\" height=\"3\">\n    ## 右侧栏\n    竖占三行，可放任意内容：\n    - 要点一\n    - 要点二\n  </grid:item>\n  <grid:item x=\"1\" y=\"2\" width=\"2\" height=\"2\">\n    <card:standard title=\"大卡片\">\n      任意内容均可进行网格布局。\n    </card:standard>\n  </grid:item>\n  <grid:item x=\"3\" y=\"2\" width=\"1\" height=\"1\">单元格 A</grid:item>\n  <grid:item>完全自动占位</grid:item>\n</layout:grid>\n\n## 嵌套网格\n<layout:grid columns=\"2\" rows=\"2\" gap=\"12\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">\n    <layout:grid columns=\"2\" rows=\"2\" gap=\"8\">\n      <grid:item>内层 1</grid:item>\n      <grid:item>内层 2</grid:item>\n      <grid:item>内层 3</grid:item>\n      <grid:item>内层 4</grid:item>\n    </layout:grid>\n  </grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"2\">\n    ## 图文混排\n    右列合并两行，验证高度合并。\n  </grid:item>\n  <grid:item x=\"1\" y=\"2\" width=\"1\" height=\"1\">\n    > 引用内容也能放进网格子项\n  </grid:item>\n</layout:grid>"
+}
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 15ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-8bfbe01a-d909-4c6d-846f-0b9d09c130db",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [
+      "dd-0d31acb0-38e5-4d74-bbd4-88aa778f3806"
+    ],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-8bfbe01a-d909-4c6d-846f-0b9d09c130db",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "column",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {},
+            "dataAction": "append",
+            "statusKey": "",
+            "headingLevel": 1,
+            "isHeadingLayout": true
+          },
+   
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T04:21:59.746Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "# 网格布局演示：组件化仪表盘\n\n## 4×4 组件仪表盘\n<layout:grid columns=\"4\" rows=\"4\" gap=\"16\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">\n    <metricCard>\n      <status>正常</status>\n      <time_range>本月</time_range>\n      <metric_label>客服满意度</metric_label>\n      <metric_value>4.8 / 5</metric_value>\n      <trend_value>+0.1</trend_value>\n    </metricCard>\n  </grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"1\">\n    <metricCard>\n      <status>高优先级</status>\n      <time_range>过去7天</time_range>\n      <metric_label>准点率</metric_label>\n      <metric_value>92%</metric_value>\n      <trend_value>+12%</trend_value>\n      <chart_mini chart=\"pie\" title=\"笔记本市场占比\">\n        | 类型 | 占比 |\n        |------|------|\n        | 游戏本 | 40% |\n        | 轻薄本 | 35% |\n        | 工作站 | 25% |\n      </chart_mini>\n    </metricCard>\n  </grid:item>\n  <grid:item x=\"3\" y=\"1\" width=\"2\" height=\"2\">\n    <contentSummaryCard>\n      <title>推荐内容标题</title>\n      <description>用一到两句话说明这条内容的摘要、价值或状态。</description>\n      <primaryAction>查看详情</primaryAction>\n    </contentSummaryCard>\n  </grid:item>\n  <grid:item x=\"1\" y=\"2\" width=\"2\" height=\"2\">\n    [chart:bar|季度销售额（万元）]\n    | 季度 | 销售额 |\n    |------|--------|\n    | Q1 | 120 |\n    | Q2 | 180 |\n    | Q3 | 240 |\n    | Q4 | 320 |\n  </grid:item>\n  <grid:item x=\"3\" y=\"3\" width=\"1\" height=\"1\">\n    [chart:pie|笔记本市场占比]\n    | 类型 | 占比 |\n    |------|------|\n    | 游戏本 | 40% |\n    | 轻薄本 | 35% |\n    | 工作站 | 25% |\n  </grid:item>\n  <grid:item x=\"4\" y=\"3\" width=\"1\" height=\"1\">\n    <commonStyleList>\n      <card:commonStyleListItem>\n        <icon>[icon:Travel/flag]</icon>\n        <layout:column>\n          <title>AWS</title>\n          <content>美国、亚洲、亚太</content>\n        </layout:column>\n      </card:commonStyleListItem>\n    </commonStyleList>\n  </grid:item>\n  <grid:item x=\"1\" y=\"4\" width=\"2\" height=\"1\">\n    [table:commonStyle]\n    | 品牌 | 市场份额 | 增长率 |\n    |---
+  ... (truncated)
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 9890ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-a84d58ec-341f-4a5e-9f2c-e2f9ca94ffda",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [
+      "dd-d2b29cc8-6ecc-4001-a1f6-55e23be582a3",
+      "dd-718336b5-5949-42a2-a16d-ec9616bf5782",
+      "dd-d2a87ab2-a805-49b7-9d5e-15b392f01621",
+      "dd-b2db1b3c-7c85-4466-b7c2-701072b02d9a"
+    ],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-a84d58ec-341f-4a5e-9f2c-e2f9ca94ffda",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "column",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {},
+ 
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T04:29:44.303Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "# fill 测试\n<layout:grid columns=\"2\" rows=\"2\" gap=\"16\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"2\">\n    <metricCard>\n      <status>正常</status>\n      <metric_label>客服满意度</metric_label>\n      <metric_value>4.8 / 5</metric_value>\n    </metricCard>\n  </grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"1\">\n    <showcaseCard>\n      <title>Related files</title>\n      <text>短内容</text>\n    </showcaseCard>\n  </grid:item>\n  <grid:item x=\"2\" y=\"2\" width=\"1\" height=\"1\" fill=\"false\">\n    <contentSummaryCard>\n      <title>不撑满</title>\n      <description>此项 fill=false，保持自然尺寸。</description>\n    </contentSummaryCard>\n  </grid:item>\n</layout:grid>\n<layout:grid columns=\"2\" rows=\"1\" gap=\"12\" fill=\"false\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">容器级关闭撑满</grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"1\" fill=\"true\">此项单独开启</grid:item>\n</layout:grid>"
+}
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 17ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-838d220c-a3e4-4a95-ae3f-bef3cb87ff2f",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [
+      "dd-f7aac742-9c56-4c85-ab0e-9a051affed81"
+    ],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-838d220c-a3e4-4a95-ae3f-bef3cb87ff2f",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "column",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {},
+            "dataAction": "append",
+            "statusKey": "",
+            "headingLevel": 1,
+            "isHeadingLayout": true
+          },
+   
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T04:47:15.855Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "# 网格布局演示：数学期末复习仪表盘\n\n## 4×4 复习仪表盘\n<layout:grid columns=\"4\" rows=\"4\" gap=\"16\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">\n    <targetStatCard>\n      <title>Error Collection</title>\n      <preview src=\"file:///sdcard/Pictures/Camera/20260806/20260806201223.jpg\"></preview>\n      <text>32</text>\n      <caption>PRACTICE</caption>\n      <subtitle>Practice Questions</subtitle>\n    </targetStatCard>\n  </grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"1\">\n    <targetStatCard>\n      <title href=\"ding://router?start_time=1755000000000&end_time=1755007200000&type=pre_exam_mock_self_test\">Mock Self-test</title>\n      <preview src=\"file:///sdcard/Pictures/Camera/camera_1786008139046.jpg\"></preview>\n      <text>23</text>\n      <caption>QUESTIONS</caption>\n      <subtitle>Questions</subtitle>\n    </targetStatCard>\n  </grid:item>\n  <grid:item x=\"3\" y=\"1\" width=\"2\" height=\"2\">\n    <textCard>\n      <text_title>Prepare for Math Final Exams</text_title>\n      <text_subtitle>Today's Review Focus: Operations of Higher-order Function</text_subtitle>\n      <cta href=\"https://example.com/schedule/math-final\">✦ View Full Schedule</cta>\n    </textCard>\n  </grid:item>\n  <grid:item x=\"1\" y=\"2\" width=\"2\" height=\"2\">\n    [Topology|title=数列的极限知识图谱]\n    @@@\n    {\n    \"{\\\\\"nodes\\\\\":[{\\\\\"id\\\\\":\\\\\"Chapter:数列的极限\\\\\",\\\\\"labels\\\\\":[\\\\\"Chapter\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的极限\\\\\",\\\\\"ord\\\\\":1,\\\\\"chapter\\\\\":\\\\\"第一章\\\\\"}},{\\\\\"id\\\\\":\\\\\"Topic:数列的概念\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的概念\\\\\",\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"Topic:数列的性质\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的性质\\\\\",\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\
+  ... (truncated)
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 80ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-f9066c03-5097-4331-bd4c-46ec8f78bb27",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-f9066c03-5097-4331-bd4c-46ec8f78bb27",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "column",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {},
+            "dataAction": "append",
+            "statusKey": "",
+            "headingLevel": 1,
+            "isHeadingLayout": true
+          },
+          "layout": {
+            "style": {
+           
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T04:48:08.302Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+
+📤 RESPONSE:
+  - Status: 500
+  - Duration: 13ms
+  - Data: {
+  "success": false,
+  "error": "Markdown转八要素失败",
+  "message": "Unexpected end of JSON input"
+}
+
+❌ ERROR:
+  - Message: Unexpected end of JSON input
+  - Stack: SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at parseJSONFromBytes (node:internal/deps/undici/undici:4337:19)
+    at successSteps (node:internal/deps/undici/undici:6985:27)
+    at readAllBytes (node:internal/deps/undici/undici:5908:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+================================================================================
+
+================================================================================
+[2026-08-09T04:49:12.023Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "# 测试\n\n<layout:grid columns=\"2\" rows=\"1\" gap=\"12\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">\n[Topology|title=迷你图谱]\n@@@\n{\"nodes\":[{\"id\":\"A\",\"labels\":[\"Chapter\"],\"props\":{\"name\":\"A\"}}],\"edges\":[]}\n@@@\n  </grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"1\">普通文本</grid:item>\n</layout:grid>"
+}
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 3ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-f1181c32-066e-4bde-a277-cd32304b71cf",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-f1181c32-066e-4bde-a277-cd32304b71cf",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "column",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {},
+            "dataAction": "append",
+            "statusKey": "",
+            "headingLevel": 1,
+            "isHeadingLayout": true
+          },
+          "layout": {
+            "style": {
+           
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T04:49:43.721Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "# 测试\n\n<layout:grid columns=\"2\" rows=\"1\" gap=\"12\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">\n[Topology|title=字符串包裹格式]\n@@@\n{\n\"{\\\"nodes\\\":[{\\\"id\\\":\\\"A\\\",\\\"labels\\\":[\\\"Chapter\\\"],\\\"props\\\":{\\\"name\\\":\\\"A\\\"}}],\\\"edges\\\":[]}\"\n}\n@@@\n  </grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"1\">普通文本</grid:item>\n</layout:grid>"
+}
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 3ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-16d4f4ac-ee83-4999-b7d3-b22d483c4df4",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-16d4f4ac-ee83-4999-b7d3-b22d483c4df4",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "column",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {},
+            "dataAction": "append",
+            "statusKey": "",
+            "headingLevel": 1,
+            "isHeadingLayout": true
+          },
+          "layout": {
+            "style": {
+           
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T04:50:13.035Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "# 网格布局演示：数学期末复习仪表盘\n\n## 4×4 复习仪表盘\n<layout:grid columns=\"4\" rows=\"4\" gap=\"16\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">\n    <targetStatCard>\n      <title>Error Collection</title>\n      <preview src=\"file:///sdcard/Pictures/Camera/20260806/20260806201223.jpg\"></preview>\n      <text>32</text>\n      <caption>PRACTICE</caption>\n      <subtitle>Practice Questions</subtitle>\n    </targetStatCard>\n  </grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"1\">\n    <targetStatCard>\n      <title href=\"ding://router?start_time=1755000000000&end_time=1755007200000&type=pre_exam_mock_self_test\">Mock Self-test</title>\n      <preview src=\"file:///sdcard/Pictures/Camera/camera_1786008139046.jpg\"></preview>\n      <text>23</text>\n      <caption>QUESTIONS</caption>\n      <subtitle>Questions</subtitle>\n    </targetStatCard>\n  </grid:item>\n  <grid:item x=\"3\" y=\"1\" width=\"2\" height=\"2\">\n    <textCard>\n      <text_title>Prepare for Math Final Exams</text_title>\n      <text_subtitle>Today's Review Focus: Operations of Higher-order Function</text_subtitle>\n      <cta href=\"https://example.com/schedule/math-final\">✦ View Full Schedule</cta>\n    </textCard>\n  </grid:item>\n  <grid:item x=\"1\" y=\"2\" width=\"2\" height=\"2\">\n    [Topology|title=数列的极限知识图谱]\n    @@@\n    {\n    \"{\\\\\"nodes\\\\\":[{\\\\\"id\\\\\":\\\\\"Chapter:数列的极限\\\\\",\\\\\"labels\\\\\":[\\\\\"Chapter\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的极限\\\\\",\\\\\"ord\\\\\":1,\\\\\"chapter\\\\\":\\\\\"第一章\\\\\"}},{\\\\\"id\\\\\":\\\\\"Topic:数列的概念\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的概念\\\\\",\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"Topic:数列的性质\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的性质\\\\\",\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\
+  ... (truncated)
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 66ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-fcfa0055-86f7-4aa4-97dc-19f83f541f9f",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-fcfa0055-86f7-4aa4-97dc-19f83f541f9f",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "column",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {},
+            "dataAction": "append",
+            "statusKey": "",
+            "headingLevel": 1,
+            "isHeadingLayout": true
+          },
+          "layout": {
+            "style": {
+           
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T04:51:11.440Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "# 测试\n\n<layout:grid columns=\"4\" rows=\"2\" gap=\"16\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">A</grid:item>\n  <grid:item x=\"2\" y=\"1\" width=\"1\" height=\"1\">B</grid:item>\n  <grid:item x=\"3\" y=\"1\" width=\"2\" height=\"1\">C</grid:item>\n  <grid:item x=\"1\" y=\"2\" width=\"2\" height=\"1\">\n    [Topology|title=第4个子项里的图谱]\n    @@@\n    {\"nodes\":[{\"id\":\"A\",\"labels\":[\"Chapter\"],\"props\":{\"name\":\"A\"}}],\"edges\":[]}\n    @@@\n  </grid:item>\n  <grid:item x=\"3\" y=\"2\" width=\"1\" height=\"1\">E</grid:item>\n  <grid:item x=\"4\" y=\"2\" width=\"1\" height=\"1\">F</grid:item>\n</layout:grid>"
+}
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 5ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-14bbba72-38de-49e3-a5d9-62ff480c68d1",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-14bbba72-38de-49e3-a5d9-62ff480c68d1",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "column",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {},
+            "dataAction": "append",
+            "statusKey": "",
+            "headingLevel": 1,
+            "isHeadingLayout": true
+          },
+          "layout": {
+            "style": {
+           
+  ... (truncated)
+================================================================================
+
+================================================================================
+[2026-08-09T04:52:05.703Z] POST /api/markdown-to-eight-element
+================================================================================
+📥 REQUEST:
+  - Origin: none
+  - Referer: none
+  - User-Agent: curl/8.7.1
+  - Body: {
+  "markdown": "# 真实Topology测试\n\n<layout:grid columns=\"1\" rows=\"1\" gap=\"12\">\n  <grid:item x=\"1\" y=\"1\" width=\"1\" height=\"1\">\n[Topology|title=数列的极限知识图谱]\n@@@\n{\n    \"{\\\\\"nodes\\\\\":[{\\\\\"id\\\\\":\\\\\"Chapter:数列的极限\\\\\",\\\\\"labels\\\\\":[\\\\\"Chapter\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的极限\\\\\",\\\\\"ord\\\\\":1,\\\\\"chapter\\\\\":\\\\\"第一章\\\\\"}},{\\\\\"id\\\\\":\\\\\"Topic:数列的概念\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的概念\\\\\",\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"Topic:数列的性质\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的性质\\\\\",\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的极限\\\\\",\\\\\"ord\\\\\":3}},{\\\\\"id\\\\\":\\\\\"Topic:函数与极限\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"函数与极限\\\\\",\\\\\"ord\\\\\":4}},{\\\\\"id\\\\\":\\\\\"KP:数列的定义\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的定义\\\\\",\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"KP:数列的有界性\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的有界性\\\\\",\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"KP:数列的单调性\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的单调性\\\\\",\\\\\"ord\\\\\":3}},{\\\\\"id\\\\\":\\\\\"KP:数列的收敛与发散\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的收敛与发散\\\\\",\\\\\"ord\\\\\":4}},{\\\\\"id\\\\\":\\\\\"KP:极限的唯一性\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"极限的唯一性\\\\\",\\\\\"ord\\\\\":5}},{\\\\\"id\\\\\":\\\\\"KP:极限的保号性\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"极限的保号性\\\\\",\\\\\"ord\\\\\":6}},{\\\\\"id\\\\\":\\\\\"K
+  ... (truncated)
+
+📤 RESPONSE:
+  - Status: 200
+  - Duration: 13ms
+  - Data: {
+  "success": true,
+  "eightElement": {
+    "dataKeys": [],
+    "id": "dd-15d32681-1ec7-4043-876f-8284884d3052",
+    "name": "layout",
+    "name-zh": "布局",
+    "file-type": "template",
+    "theme": "default",
+    "data": {},
+    "EventTargetIds": [],
+    "_metadata": {
+      "actualType": "layout",
+      "variant": "root",
+      "isLayout": true,
+      "isRoot": true,
+      "appliedAttributes": {}
+    },
+    "layout": {
+      "classStyle": {
+        "padding": "{dimension.padding.base}",
+        "margin": "{dimension.margin.base}",
+        "backgroundColor": "{color.basic.opacity.white.100}",
+        "borderRadius": "{dimension.borderradius.large}",
+        "display": "flex",
+        "flexDirection": "column",
+        "flexWrap": "nowrap",
+        "justifyContent": "flex-start",
+        "alignItems": "stretch",
+        "gap": "{dimension.padding.none}",
+        "backgroundImage": "none",
+        "backgroundRepeat": "no-repeat",
+        "backgroundSize": "100vw",
+        "gridTemplateColumns": "none",
+        "gridTemplateAreas": "none",
+        "justifyItems": "stretch"
+      },
+      "className": "layout-root-dd-15d32681-1ec7-4043-876f-8284884d3052",
+      "style": {
+        "layoutWrap": "{layout.wrap.NO_WRAP}",
+        "layoutAlign": "{layout.align.y.self.INHERIT}",
+        "layoutGrow": "{layout.grow.0}",
+        "height": "100%",
+        "position": "relative",
+        "boxSizing": "border-box"
+      },
+      "children": [
+        {
+          "dataKeys": [],
+          "name": "layout",
+          "name-zh": "布局",
+          "file-type": "template",
+          "theme": "default",
+          "_metadata": {
+            "actualType": "layout",
+            "variant": "column",
+            "isLayout": true,
+            "isRoot": false,
+            "appliedAttributes": {},
+            "dataAction": "append",
+            "statusKey": "",
+            "headingLevel": 1,
+            "isHeadingLayout": true
+          },
+          "layout": {
+            "style": {
+           
+  ... (truncated)
+================================================================================

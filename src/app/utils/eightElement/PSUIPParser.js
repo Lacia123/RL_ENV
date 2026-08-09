@@ -10,6 +10,7 @@ import { parseChartTagSpec } from './chartSpecParse.js';
 import { extractMarkdownCodeBlock, createCodeElement, isMarkdownCodeBlock } from './creators/codeCreators.js';
 import { isTopologyTag, extractGraphBlock, processGraphBlock } from './creators/graphCreators.js';
 import { createLayoutElement, extractLayoutBlock, isLayoutTag, createHeadingLayout, createEightElementRoot, createFlexWrapLayout } from './creators/layoutCreators.js';
+import { isGridItemTag, extractGridItemBlock, createGridItemElement } from './creators/gridCreators.js';
 
 import { extractCardBlock, createCardElement, isCardTag, findWildcardMatch, processTemplatePathWithWildcard } from './creators/cardCreators.js';
 import { isComponentTag, extractComponentBlock, createComponentElement } from './creators/componentCreators.js';
@@ -1269,8 +1270,8 @@ function parseMarkdown(markdown, options = {}) {
             // 跳过纯布局/卡片/组件等结构标签行，由专门逻辑处理
             if (
                 !currentLine ||
-                currentLine.match(/^<(layout|card|tab|component)[:\w>]/i) ||
-                currentLine.match(/^<\/(layout|card|tab|component)/i)
+                currentLine.match(/^<(layout|card|tab|component|grid)[:\w>]/i) ||
+                currentLine.match(/^<\/(layout|card|tab|component|grid)/i)
             ) {
                 continue;
             }
@@ -1436,8 +1437,8 @@ function parseMarkdown(markdown, options = {}) {
 
         // 对纯结构标签行不做表格/图表检测，由各自逻辑处理
         const isStructureTagLine =
-            /^<(layout|card|tab|component)[:\w>]/i.test(trimmedLine) ||
-            /^<\/(layout|card|tab|component)/i.test(trimmedLine);
+            /^<(layout|card|tab|component|grid)[:\w>]/i.test(trimmedLine) ||
+            /^<\/(layout|card|tab|component|grid)/i.test(trimmedLine);
 
         if (!isStructureTagLine) {
             // 使用窗口：当前行 + 后面若干行，一起判断是否构成 chart/table 数据块
@@ -1707,6 +1708,44 @@ function parseMarkdown(markdown, options = {}) {
             }
 
             // 跳过已处理的布局标签行
+            i = endIndex;
+            continue;
+        }
+
+        // 🆕 处理 grid:item 标签（网格子项，配合 layout:grid 使用）
+        const gridItemTagInfo = isGridItemTag(trimmedLine);
+        if (gridItemTagInfo.isGridItemTag && !gridItemTagInfo.isClosing) {
+
+            // 处理之前累积的内容
+            flushTextBlock();
+            flushConsecutiveButtons();
+
+            // 如果正在处理列表，先结束列表
+            if (inList && listItems.length > 0) {
+                const listLayout = createLayoutElement(
+                    LAYOUT_CONSTANTS.DIRECTION.VERTICAL,
+                    listItems,
+                    {
+                        alignItems: LAYOUT_CONSTANTS.ALIGN.X.MIN,
+                        counterAxisAlign: LAYOUT_CONSTANTS.ALIGN.Y.ITEMS.MIN
+                    }
+                );
+                stack[stack.length - 1].elements.push(listLayout);
+                inList = false;
+                listItems = [];
+            }
+
+            // 提取 grid:item 块内容
+            const { gridItemContent, attributes, endIndex } = extractGridItemBlock(
+                markedLines.map(item => item.line),
+                i
+            );
+
+            // 创建网格子项元素
+            const gridItemElement = createGridItemElement(gridItemContent, attributes, currentMarkdown);
+            stack[stack.length - 1].elements.push(gridItemElement);
+
+            // 跳过已处理的 grid:item 标签行
             i = endIndex;
             continue;
         }

@@ -246,6 +246,56 @@ function createElementContainer(tagName, content, cardStyleConfig, elementInstan
     return containerElement;
 }
 
+// 🆕 校验 grid 容器子项的定位：越界（超过列/行数）与重叠
+function validateGridPlacements(children, attributes) {
+    if (!children || !Array.isArray(children) || children.length === 0) return;
+
+    const columnCount = parseInt(attributes.columns ?? attributes.cols, 10);
+    const rowCount = parseInt(attributes.rows, 10);
+
+    const placed = [];
+    children.forEach((child, index) => {
+        const placement = child?._metadata?.gridPlacement;
+        if (!placement || !placement.hasXY) return; // 自动占位无需校验
+
+        const { x, y, width, height } = placement;
+        if (columnCount && x + width - 1 > columnCount) {
+            console.warn(`⚠️ grid 子项 #${index + 1} 越界：x=${x} width=${width} 超出列数 ${columnCount}`);
+        }
+        if (rowCount && y + height - 1 > rowCount) {
+            console.warn(`⚠️ grid 子项 #${index + 1} 越界：y=${y} height=${height} 超出行数 ${rowCount}`);
+        }
+
+        const range = { x, y, x2: x + width - 1, y2: y + height - 1 };
+        placed.forEach((prev, j) => {
+            const overlap = !(range.x2 < prev.x || prev.x2 < range.x || range.y2 < prev.y || prev.y2 < range.y);
+            if (overlap) {
+                console.warn(`⚠️ grid 子项 #${index + 1} 与 #${j + 1} 重叠`);
+            }
+        });
+        placed.push(range);
+    });
+}
+
+// 🆕 让 grid:item 内容填满所在格（fill=true，默认）：子内容沿主轴拉伸占满上下空间，左右由 grid 容器 stretch 撑满
+// fill=false（/none/0/no）时保持内容自然尺寸
+function applyGridItemFill(gridItemElement, fill) {
+    if (!gridItemElement || !gridItemElement.layout) return;
+    const isFill = !(fill === 'false' || fill === 'none' || fill === '0' || fill === 'no');
+    if (!isFill) return;
+
+    // 子项容器占满整格高度（父级 grid alignItems:stretch 已保证宽度撑满）
+    gridItemElement.layout.style = gridItemElement.layout.style || {};
+    gridItemElement.layout.style.height = '100%';
+
+    // 直接子内容沿主轴拉伸，填满剩余高度
+    (gridItemElement.layout.children || []).forEach(child => {
+        if (child && child.layout && child.layout.style) {
+            child.layout.style.flexGrow = 1;
+        }
+    });
+}
+
 // 创建布局元素，支持自定义选项
 function createLayoutElement(direction, children = [], options = {}) {
     const { width, height, gap, variant = 'column', isRoot = false,
@@ -270,6 +320,50 @@ function createLayoutElement(direction, children = [], options = {}) {
     // 🆕 获取布局元素的样式配置，传入属性
     const layoutStyleConfig = getElementStyleConfig('layout', isRoot ? 'root' : variant, attributes);
 
+    // 🆕 grid 网格布局：把 columns/cols/rows 展开成 grid-template，并清理原始键（避免泄漏为 CSS 的 columns 简写）
+    if (variant === 'grid') {
+        const gridColumns = attributes.columns ?? attributes.cols;
+        const gridRows = attributes.rows;
+
+        if (gridColumns) {
+            layoutStyleConfig.gridTemplateColumns = `repeat(${gridColumns}, minmax(0, 1fr))`;
+        } else if (attributes.gridTemplateColumns) {
+            layoutStyleConfig.gridTemplateColumns = attributes.gridTemplateColumns;
+        }
+        if (gridRows) {
+            layoutStyleConfig.gridTemplateRows = `repeat(${gridRows}, auto)`;
+        } else if (attributes.gridTemplateRows) {
+            layoutStyleConfig.gridTemplateRows = attributes.gridTemplateRows;
+        }
+
+        delete layoutStyleConfig.columns;
+        delete layoutStyleConfig.cols;
+        delete layoutStyleConfig.rows;
+
+        // 🆕 fill 撑满：容器设置默认值（默认 true），子项可单独覆盖；清理原始键避免泄漏为 CSS
+        const gridFill = attributes.fill !== undefined ? attributes.fill : 'true';
+        delete layoutStyleConfig.fill;
+
+        // 校验子项定位（越界 / 重叠）
+        validateGridPlacements(children, attributes);
+
+        // 🆕 将 fill 应用到每个 grid:item（子项未显式指定时继承容器默认值）
+        children.forEach(child => {
+            if (child && child._metadata && child._metadata.isGridItem) {
+                const itemFill = child._metadata.fill !== undefined ? child._metadata.fill : gridFill;
+                applyGridItemFill(child, itemFill);
+            }
+        });
+    }
+
+    // 🆕 数值型 gap/columnGap/rowGap 补 px（gap 需要合法长度单位，避免输出无效的 gap: 16）
+    ['gap', 'columnGap', 'rowGap'].forEach((key) => {
+        const v = layoutStyleConfig[key];
+        if (typeof v === 'string' && /^\d+(\.\d+)?$/.test(v)) {
+            layoutStyleConfig[key] = `${v}px`;
+        }
+    });
+
     // 创建基础布局
     const baseLayout = createBaseLayout(direction, { width, height, alignItems });
 
@@ -289,6 +383,14 @@ function createLayoutElement(direction, children = [], options = {}) {
     if (gap) {
         baseLayout.style.gap = gap;
     }
+
+    // 🆕 数值型 gap/columnGap/rowGap 补 px（gap 需要合法长度单位，避免输出无效的 gap: 16）
+    ['gap', 'columnGap', 'rowGap'].forEach((key) => {
+        const v = baseLayout.style[key];
+        if (typeof v === 'string' && /^\d+(\.\d+)?$/.test(v)) {
+            baseLayout.style[key] = `${v}px`;
+        }
+    });
 
     // 🔧 重要：确保传入的 justifyContent 和 alignItems 被正确设置
     if (options.justifyContent !== undefined) {

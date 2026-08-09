@@ -2031,8 +2031,12 @@ function computeElementStyle(element) {
     if (!element) return computedStyle;
 
     // 🆕 检查是否为画廊布局，画廊布局需要特殊处理
-    const isGalleryLayout = element._metadata?.variant === 'gallery' || 
+    const isGalleryLayout = element._metadata?.variant === 'gallery' ||
                            (element.layout && element.layout.style && element.layout.style.columnCount);
+
+    // 🆕 检查是否为 grid 网格布局，需要清除 flex 默认属性泄漏
+    const isGridLayout = element._metadata?.variant === 'grid' ||
+                        (element.layout && element.layout.style && element.layout.style.display === 'grid');
 
     // 🆕 处理样式优先级：如果classStyle有和style中相同的属性key，就把style上的去掉，以classStyle为主
     let processedStyle = element.layout?.style ? { ...element.layout.style } : {};
@@ -2075,7 +2079,15 @@ function computeElementStyle(element) {
         delete computedStyle.justifyContent;
         delete computedStyle.alignItems;
         delete computedStyle.gap;  // 画廊使用marginBottom而不是gap
-        
+
+    } else if (isGridLayout) {
+        // 🆕 grid 布局：强制 display:grid，清除 createBaseLayout 默认带入的 flex 属性。
+        // 注意保留 justifyContent / alignItems / gap —— 它们在 grid 中是合法属性。
+        computedStyle.display = 'grid';
+        delete computedStyle.flexDirection;
+        delete computedStyle['flex-direction'];
+        delete computedStyle.flexWrap;
+        delete computedStyle['flex-wrap'];
     } else {
         // 默认值处理：如果设置了display=flex但未设置flex方向，默认为column
         // 🔧 修复：需要检查短横线命名格式（因为 applyStylesToElement 会转换为短横线）

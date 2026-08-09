@@ -228,6 +228,33 @@ const LAYOUT_STYLE = {
             gridTemplateAreas: 'none',
             justifyItems: 'stretch'
         },
+        // 🆕 grid 网格布局（m*n 布局，子项通过 grid:item 提供 x/y/width/height 定位）
+        grid: {
+            style: {
+                display: 'grid',
+                gridAutoFlow: 'row',
+                gridAutoRows: 'auto',
+                justifyItems: 'stretch',
+                alignItems: 'stretch',
+                boxSizing: 'border-box',
+                width: '100%',
+                position: 'relative',
+                // 🆕 超出（宽或高）时滚动：网格内容超过容器边界时在网格内滚动，而不是撑破页面
+                overflow: 'auto',
+                padding: '0',
+                margin: '0',
+            },
+            supportedAttributes: [
+                'columns', 'cols', 'rows',
+                'gridTemplateColumns', 'gridTemplateRows',
+                'gap', 'columnGap', 'rowGap',
+                'justifyItems', 'alignItems', 'justifyContent', 'alignContent',
+                'width', 'height', 'minHeight',
+                'padding', 'background', 'backgroundColor',
+                // 🆕 是否撑满（fill）：子项内容上下左右填满所在格，默认 true
+                'fill'
+            ]
+        },
         bgColumn: {
             style: {
                 padding: `${DIMENSION_CONSTANTS.PADDING.base}`,
