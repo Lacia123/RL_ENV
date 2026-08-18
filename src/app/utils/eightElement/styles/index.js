@@ -21,7 +21,7 @@ import AUDIO_STYLE from './audioStyle.js';
 import IMAGE_STYLE from './imageStyle.js';
 import ICON_STYLE from './iconStyle.js';
 
-import { CSS_VARIABLE_SYSTEM, LAYOUT_CONSTANTS, COLOR_CONSTANTS, DIMENSION_CONSTANTS, FONT_CONSTANTS } from './constant.js';
+import { CSS_VARIABLE_SYSTEM, LAYOUT_CONSTANTS, COLOR_CONSTANTS, DIMENSION_CONSTANTS, FONT_CONSTANTS, GRID_CONSTANTS } from './constant.js';
 
 /**
  * 默认样式配置
@@ -207,5 +207,6 @@ export {
     LAYOUT_CONSTANTS,
     COLOR_CONSTANTS,
     DIMENSION_CONSTANTS,
-    FONT_CONSTANTS
+    FONT_CONSTANTS,
+    GRID_CONSTANTS
 };

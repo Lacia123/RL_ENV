@@ -13,9 +13,9 @@ const METRIC_CARD_STYLE = {
                     display: 'flex',
                     flex: "1",
                     flexDirection: 'column',
-                    gap: '{dimension.gap.base}',
+                    gap: '{dimension.gap.semitight}',
                     borderRadius: '{dimension.borderradius.xl}',
-                    padding: '{dimension.padding.loose}',
+                    padding: '{dimension.padding.base}',
                     background: '{color.surfacecontainer.white100}',
                     boxShadow: '{material.hierarchy.1f}',
                     border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'
@@ -138,9 +138,9 @@ const METRIC_CARD_STYLE = {
                     display: 'flex',
                     flex: "1",
                     flexDirection: 'column',
-                    gap: '{dimension.gap.base}',
+                    gap: '{dimension.gap.semitight}',
                     borderRadius: '{dimension.borderradius.xl}',
-                    padding: '{dimension.padding.loose}',
+                    padding: '{dimension.padding.base}',
                     background: '{color.surfacecontainer.white100}',
                     boxShadow: '{material.hierarchy.1f}',
                     border: '{dimension.borderwidth.narrow} solid {color.surfacecontainer.black12}'

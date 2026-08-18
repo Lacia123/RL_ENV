@@ -9,7 +9,7 @@ const TEXT_CARD_STYLE = {
                     display: 'flex',
                     flex: "1",
                     flexDirection: 'column',
-                    gap: '{dimension.gap.semiloose}',
+                    gap: '{dimension.gap.tight}',
                     borderRadius: '{dimension.borderradius.xl}',
                     padding: '{dimension.padding.loose}',
                     background: '{color.surfacecontainer.white100}',
@@ -38,7 +38,6 @@ const TEXT_CARD_STYLE = {
                             type: 'template',
                             style: {
                                 display: 'flex',
-                                marginTop: '{dimension.margin.tight}'
                             }
                         }
                     ]
@@ -51,7 +50,7 @@ const TEXT_CARD_STYLE = {
                     display: 'flex',
                     flex: "1",
                     flexDirection: 'column',
-                    gap: '{dimension.gap.semiloose}',
+                    gap: '{dimension.gap.tight}',
                     borderRadius: '{dimension.borderradius.xl}',
                     padding: '{dimension.padding.loose}',
                     background: '{color.surfacecontainer.white100}',
@@ -74,7 +73,6 @@ const TEXT_CARD_STYLE = {
                             type: 'template',
                             style: {
                                 display: 'flex',
-                                marginTop: '{dimension.margin.tight}'
                             }
                         }
                     ]
@@ -84,7 +82,7 @@ const TEXT_CARD_STYLE = {
         style: {
             display: 'flex',
             flexDirection: 'column',
-            gap: '{dimension.gap.semiloose}',
+            gap: '{dimension.gap.tight}',
             borderRadius: '{dimension.borderradius.xl}',
             padding: '{dimension.padding.loose}',
             background: '{color.surfacecontainer.white100}',
@@ -137,7 +135,12 @@ const TEXT_CARD_STYLE = {
                     margin: '0',
                     fontSize: '{font.size.small}',
                     color: '{color.basic.opacity.black.64}',
-                    lineHeight: '1.5'
+                    lineHeight: '1.5',
+                    // 🆕 grid 适配：正文最多 2 行，超出省略，避免 1×1 格内溢出
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: '2',
+                    overflow: 'hidden',
                 }
             },
             cta: {
@@ -175,7 +178,7 @@ const TEXT_CARD_STYLE = {
                     textAlign: 'center',
                     gap: '0',
                     borderRadius: '{dimension.borderradius.xl}',
-                    padding: '{dimension.padding.loose}',
+                    padding: '{dimension.padding.extraloose}',
                     background: '{color.surfacecontainer.white100}',
                 },
                 structure: {
@@ -209,9 +212,9 @@ const TEXT_CARD_STYLE = {
                     flexDirection: 'column',
                     alignItems: 'center',
                     textAlign: 'center',
-                    gap: '{dimension.gap.semiloose}',
+                    gap: '{dimension.gap.semitight}',
                     borderRadius: '{dimension.borderradius.xl}',
-                    padding: '{dimension.padding.loose}',
+                    padding: '{dimension.padding.extraloose}',
                     background: '{color.surfacecontainer.white100}',
                 },
                 structure: {
@@ -301,7 +304,7 @@ const TEXT_CARD_STYLE = {
                     containerType: 'inline-size',
                     gap: '0',
                     borderRadius: '{dimension.borderradius.xl}',
-                    padding: '{dimension.padding.loose}',
+                    padding: '{dimension.padding.extraloose}',
                     background: '{color.surfacecontainer.white100}',
                     width: '100%'
                 },

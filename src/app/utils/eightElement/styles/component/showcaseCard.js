@@ -12,7 +12,7 @@ const SHOWCASE_CARD_STYLE = {
                     alignItems: 'stretch',
                     justifyContent: 'space-between',
                     gap: '{dimension.gap.extraloose}',
-                    padding: '32px',
+                    padding: '{dimension.padding.extraloose}',
                     width: '100%',
                     boxSizing: 'border-box',
                     borderRadius: '{dimension.borderradius.xxxl}',
@@ -61,7 +61,7 @@ const SHOWCASE_CARD_STYLE = {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '{dimension.gap.extraloose}',
-                    padding: '60px',
+                    padding: '{dimension.padding.extraloose}',
                     width: '100%',
                     boxSizing: 'border-box',
                     borderRadius: '{dimension.borderradius.xxxl}',
@@ -127,6 +127,9 @@ const SHOWCASE_CARD_STYLE = {
                                 flexDirection: 'column',
                                 gap: '12px',
                                 width: '100%',
+                                // 🆕 grid 适配：列表区占满剩余高度（格子高度随余数浮动），内容由 flex 弹性分配
+                                flex: '1',
+                                minHeight: '0',
                             },
                             slots: ['imageTextItem*', 'commonListItem*', 'doubleImageItem*'],
                         },
@@ -423,8 +426,12 @@ function createImageTextItemSlotConfig() {
                 slots: ['image'],
                 style: {
                     width: '100%',
-                    aspectRatio: '4 / 3',
-                    flexShrink: '0',
+                    // 🆕 grid 适配：图片高度弹性——占列表区剩余空间（随格子高度伸缩），
+                    // 上限 260px 防止格子过高时图片失控；矮格子时自动压缩，不再依赖固定像素匹配
+                    flex: '1',
+                    minHeight: '100px',
+                    maxHeight: '260px',
+                    flexShrink: '1',
                     overflow: 'hidden',
                     position: 'relative',
                     zIndex: '0',

@@ -1,4 +1,4 @@
-import { LAYOUT_CONSTANTS, DIMENSION_CONSTANTS, COLOR_CONSTANTS } from './constant';
+import { LAYOUT_CONSTANTS, DIMENSION_CONSTANTS, COLOR_CONSTANTS, GRID_CONSTANTS } from './constant';
 
 const LAYOUT_STYLE = {
     // 布局元素配置
@@ -233,7 +233,10 @@ const LAYOUT_STYLE = {
             style: {
                 display: 'grid',
                 gridAutoFlow: 'row',
-                gridAutoRows: 'auto',
+                // 🆕 隐式轨道（显式定位超出推导 m/n 时产生）也遵守单位下限，
+                // 避免隐式轨道按内容收缩成 200+px 的窄格子
+                gridAutoColumns: `minmax(${GRID_CONSTANTS.CELL_WIDTH}px, 1fr)`,
+                gridAutoRows: `minmax(${GRID_CONSTANTS.CELL_HEIGHT}px, 1fr)`,
                 justifyItems: 'stretch',
                 alignItems: 'stretch',
                 boxSizing: 'border-box',

@@ -1,5 +1,6 @@
 import {
     LAYOUT_CONSTANTS,
+    GRID_CONSTANTS,
     getElementStyleConfig
 } from '../styles';
 import { generateUUID } from '../util.js';
@@ -289,9 +290,12 @@ function applyGridItemFill(gridItemElement, fill) {
     gridItemElement.layout.style.height = '100%';
 
     // 直接子内容沿主轴拉伸，填满剩余高度
+    // minHeight:0 允许子内容（卡片）在格子内压缩——格子高度随容器余数摊平浮动（i+δ），
+    // 卡片必须能跟随格子伸缩，由卡片内部 flex 弹性分配内容，而不是靠固定像素匹配
     (gridItemElement.layout.children || []).forEach(child => {
         if (child && child.layout && child.layout.style) {
             child.layout.style.flexGrow = 1;
+            child.layout.style.minHeight = '0';
         }
     });
 }
@@ -321,24 +325,50 @@ function createLayoutElement(direction, children = [], options = {}) {
     const layoutStyleConfig = getElementStyleConfig('layout', isRoot ? 'root' : variant, attributes);
 
     // 🆕 grid 网格布局：把 columns/cols/rows 展开成 grid-template，并清理原始键（避免泄漏为 CSS 的 columns 简写）
+    // 通用策略（i/j 为固定单位，永不随容器变化）：
+    // - grid 必须显式指定 width/height：m=⌊(width+GAP)/(i+GAP)⌋、n=⌊(height+GAP)/(j+GAP)⌋ 由 grid 自身尺寸推导，
+    //   容器尺寸不确定也无关，grid 是自带尺寸的块；容器不是整数倍时，余数摊平到格子上（格子 = i+δ）
+    // - 未声明 width/height 时，退回 CSS auto-fill + minmax(i|j, 1fr) 按实际容器推导
+    // - 显式 columns/rows/gridTemplateColumns/gridTemplateRows 始终优先
     if (variant === 'grid') {
         const gridColumns = attributes.columns ?? attributes.cols;
         const gridRows = attributes.rows;
+        const gridGapNum = parseFloat(attributes.gap) || GRID_CONSTANTS.GAP;
+        const gridWidth = attributes.width ? parseInt(attributes.width, 10) : null;
+        const gridHeight = attributes.height ? parseInt(attributes.height, 10) : null;
+        const deriveGridCount = (size, unit) => (size != null && !isNaN(size) && size > 0)
+            ? Math.floor((size + gridGapNum) / (unit + gridGapNum))
+            : null;
 
         if (gridColumns) {
             layoutStyleConfig.gridTemplateColumns = `repeat(${gridColumns}, minmax(0, 1fr))`;
         } else if (attributes.gridTemplateColumns) {
             layoutStyleConfig.gridTemplateColumns = attributes.gridTemplateColumns;
+        } else {
+            const derivedM = deriveGridCount(gridWidth, GRID_CONSTANTS.CELL_WIDTH);
+            layoutStyleConfig.gridTemplateColumns = derivedM && derivedM > 0
+                ? `repeat(${derivedM}, minmax(0, 1fr))`
+                : `repeat(auto-fill, minmax(${GRID_CONSTANTS.CELL_WIDTH}px, 1fr))`;
         }
         if (gridRows) {
             layoutStyleConfig.gridTemplateRows = `repeat(${gridRows}, auto)`;
         } else if (attributes.gridTemplateRows) {
             layoutStyleConfig.gridTemplateRows = attributes.gridTemplateRows;
+        } else {
+            const derivedN = deriveGridCount(gridHeight, GRID_CONSTANTS.CELL_HEIGHT);
+            layoutStyleConfig.gridTemplateRows = derivedN && derivedN > 0
+                ? `repeat(${derivedN}, minmax(0, 1fr))`
+                : `repeat(auto-fill, minmax(${GRID_CONSTANTS.CELL_HEIGHT}px, 1fr))`;
         }
 
         delete layoutStyleConfig.columns;
         delete layoutStyleConfig.cols;
         delete layoutStyleConfig.rows;
+
+        // 🆕 网格间距缺省值：与 i/j 推导配套（auto-fill 计数时自动扣减 gap，不影响推导公式）
+        if (layoutStyleConfig.gap === undefined && options.gap === undefined) {
+            layoutStyleConfig.gap = `${GRID_CONSTANTS.GAP}px`;
+        }
 
         // 🆕 fill 撑满：容器设置默认值（默认 true），子项可单独覆盖；清理原始键避免泄漏为 CSS
         const gridFill = attributes.fill !== undefined ? attributes.fill : 'true';

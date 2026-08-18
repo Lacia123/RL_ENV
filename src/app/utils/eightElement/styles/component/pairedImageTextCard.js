@@ -31,7 +31,7 @@ const PAIRED_IMAGE_TEXT_CARD_STYLE = {
                     width: '100%',
                     flexDirection: 'column',
                     gap: '{dimension.gap.base}',
-                    padding: '{dimension.padding.base}',
+                    padding: '{dimension.padding.extraloose}',
                     borderRadius: '{dimension.borderradius.xxxxl}',
                     background: '{color.basic.opacity.black.4}',
                     boxShadow: '{material.hierarchy.1f}',
@@ -76,7 +76,10 @@ const PAIRED_IMAGE_TEXT_CARD_STYLE = {
                                 gap: '{dimension.gap.base}',
                                 alignItems: 'stretch',
                                 width: '100%',
-                                minWidth: '0'
+                                minWidth: '0',
+                                // 🆕 grid 适配：双子区占满剩余高度，子项跟随格子伸缩
+                                flex: '1',
+                                minHeight: '0',
                             }
                         }
                     ]
@@ -91,7 +94,7 @@ const PAIRED_IMAGE_TEXT_CARD_STYLE = {
                     width: '100%',
                     flexDirection: 'column',
                     gap: '{dimension.gap.base}',
-                    padding: '{dimension.padding.base}',
+                    padding: '{dimension.padding.extraloose}',
                     borderRadius: '{dimension.borderradius.xxxxl}',
                     background: '{color.basic.opacity.black.4}',
                     boxShadow: '{material.hierarchy.1f}',
@@ -132,7 +135,10 @@ const PAIRED_IMAGE_TEXT_CARD_STYLE = {
                                 gap: '{dimension.gap.base}',
                                 alignItems: 'stretch',
                                 width: '100%',
-                                minWidth: '0'
+                                minWidth: '0',
+                                // 🆕 grid 适配：双子区占满剩余高度，子项跟随格子伸缩
+                                flex: '1',
+                                minHeight: '0',
                             }
                         }
                     ]

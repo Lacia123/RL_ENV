@@ -10,7 +10,7 @@ const MISTAKES_CARD_STYLE = {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '{dimension.gap.extraloose}',
-                    padding: '60px',
+                    padding: '{dimension.padding.extraloose}',
                     width: '100%',
                     boxSizing: 'border-box',
                     borderRadius: '{dimension.borderradius.xxxl}',
@@ -54,6 +54,9 @@ const MISTAKES_CARD_STYLE = {
                                 flexDirection: 'column',
                                 gap: '{dimension.gap.extraloose}',
                                 width: '100%',
+                                // 🆕 grid 适配：列表区占满剩余高度，项由 flex 平分空间（随格子高度伸缩）
+                                flex: '1',
+                                minHeight: '0',
                             },
                             slots: ['mistakesCardItem*'],
                         },
@@ -68,6 +71,9 @@ const MISTAKES_CARD_STYLE = {
                     flexDirection: 'column',
                     width: '100%',
                     boxSizing: 'border-box',
+                    // 🆕 grid 适配：无标题模式同样占满格子高度
+                    flex: '1',
+                    minHeight: '0',
                 },
                 structure: {
                     groups: [
@@ -79,6 +85,9 @@ const MISTAKES_CARD_STYLE = {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 width: '100%',
+                                // 🆕 grid 适配：列表区占满剩余高度，项由 flex 平分空间
+                                flex: '1',
+                                minHeight: '0',
                             },
                             slots: ['mistakesCardItem*'],
                         },
@@ -125,13 +134,16 @@ function createMistakesCardItemSlotConfig() {
             display: 'flex',
             flexDirection: 'column',
             width: '100%',
+            // 🆕 grid 适配：列表项平分列表区高度，格子余数摊平后空间自动分布
+            flex: '1',
+            minHeight: '0',
         },
         itemStyles: {
             row: {
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '{dimension.padding.extraloose}',
-                padding: '40px',
+                gap: '{dimension.gap.loose}',
+                padding: '{dimension.padding.base}',
                 width: '100%',
                 boxSizing: 'border-box',
                 borderStyle: 'solid',

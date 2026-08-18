@@ -147,6 +147,16 @@ export const SEMANTIC_COLOR_SYSTEM = {
 };
 
 
+// 网格单位常量（i=列单元基准宽, j=行单元基准高, GAP=格间距）
+// 模型：i/j 固定写死；渲染时网格按容器自动推导 m×n（m=⌊(W+GAP)/(i+GAP)⌋，n 同理），
+// 容器不是 i/j 整数倍时，余数由 CSS auto-fill + minmax 摊平到格子上（格子 = i+δ，δ 很小，展示稳定）。
+// 推导依据：i=456 时 1920/1440 画布几乎整除（δ≤2px）；j=216 时 680px 内容块恰好 3 行。
+export const GRID_CONSTANTS = {
+    CELL_WIDTH: 456,   // i：列单元基准宽（px）
+    CELL_HEIGHT: 216,  // j：行单元基准高（px）
+    GAP: 16,           // 网格间距（px）
+};
+
 // 布局常量定义
 export const LAYOUT_CONSTANTS = {
     DISPLAY: {
