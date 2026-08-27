@@ -325,41 +325,56 @@ function createLayoutElement(direction, children = [], options = {}) {
     const layoutStyleConfig = getElementStyleConfig('layout', isRoot ? 'root' : variant, attributes);
 
     // 🆕 grid 网格布局：把 columns/cols/rows 展开成 grid-template，并清理原始键（避免泄漏为 CSS 的 columns 简写）
-    // 通用策略（i/j 为固定单位，永不随容器变化）：
-    // - grid 必须显式指定 width/height：m=⌊(width+GAP)/(i+GAP)⌋、n=⌊(height+GAP)/(j+GAP)⌋ 由 grid 自身尺寸推导，
-    //   容器尺寸不确定也无关，grid 是自带尺寸的块；容器不是整数倍时，余数摊平到格子上（格子 = i+δ）
-    // - 未声明 width/height 时，退回 CSS auto-fill + minmax(i|j, 1fr) 按实际容器推导
+    // 通用策略（i/j 为固定单位）：
+    // - width/height 写「格数」（纯数字）是推荐写法：网格总尺寸 = m·i + (m-1)·gap、n·j + (n-1)·gap，
+    //   由程序提前换算成像素，格子精确等于单位 i/j（无内部余数）——布局 AI 只需写 width=m height=n，
+    //   不需要关心像素与余数；余数处理（容器非整数倍）只发生在容器层，不进入网格内部
+    // - width/height 写像素（如 "1880px"）向后兼容：由程序推导格数，余数摊平到格子上（格子 = i+δ）
     // - 显式 columns/rows/gridTemplateColumns/gridTemplateRows 始终优先
     if (variant === 'grid') {
         const gridColumns = attributes.columns ?? attributes.cols;
         const gridRows = attributes.rows;
         const gridGapNum = parseFloat(attributes.gap) || GRID_CONSTANTS.GAP;
-        const gridWidth = attributes.width ? parseInt(attributes.width, 10) : null;
-        const gridHeight = attributes.height ? parseInt(attributes.height, 10) : null;
-        const deriveGridCount = (size, unit) => (size != null && !isNaN(size) && size > 0)
-            ? Math.floor((size + gridGapNum) / (unit + gridGapNum))
-            : null;
+
+        // 解析 width/height：纯数字 = 格数（换算精确像素）；"Npx" = 像素（推导格数）；其他（% 等）不处理
+        const resolveGridDimension = (attr, unit) => {
+            if (attr == null) return { count: null, sizePx: null };
+            const text = String(attr).trim();
+            if (/^\d+$/.test(text)) {
+                const count = parseInt(text, 10);
+                return { count, sizePx: count * unit + (count - 1) * gridGapNum };
+            }
+            if (/^\d+px$/i.test(text)) {
+                const num = parseInt(text, 10);
+                return { count: Math.floor((num + gridGapNum) / (unit + gridGapNum)), sizePx: num };
+            }
+            return { count: null, sizePx: null };
+        };
+        const colDim = resolveGridDimension(attributes.width, GRID_CONSTANTS.CELL_WIDTH);
+        const rowDim = resolveGridDimension(attributes.height, GRID_CONSTANTS.CELL_HEIGHT);
 
         if (gridColumns) {
             layoutStyleConfig.gridTemplateColumns = `repeat(${gridColumns}, minmax(0, 1fr))`;
         } else if (attributes.gridTemplateColumns) {
             layoutStyleConfig.gridTemplateColumns = attributes.gridTemplateColumns;
+        } else if (colDim.count && colDim.count > 0) {
+            layoutStyleConfig.gridTemplateColumns = `repeat(${colDim.count}, minmax(0, 1fr))`;
         } else {
-            const derivedM = deriveGridCount(gridWidth, GRID_CONSTANTS.CELL_WIDTH);
-            layoutStyleConfig.gridTemplateColumns = derivedM && derivedM > 0
-                ? `repeat(${derivedM}, minmax(0, 1fr))`
-                : `repeat(auto-fill, minmax(${GRID_CONSTANTS.CELL_WIDTH}px, 1fr))`;
+            layoutStyleConfig.gridTemplateColumns = `repeat(auto-fill, minmax(${GRID_CONSTANTS.CELL_WIDTH}px, 1fr))`;
         }
         if (gridRows) {
             layoutStyleConfig.gridTemplateRows = `repeat(${gridRows}, auto)`;
         } else if (attributes.gridTemplateRows) {
             layoutStyleConfig.gridTemplateRows = attributes.gridTemplateRows;
+        } else if (rowDim.count && rowDim.count > 0) {
+            layoutStyleConfig.gridTemplateRows = `repeat(${rowDim.count}, minmax(0, 1fr))`;
         } else {
-            const derivedN = deriveGridCount(gridHeight, GRID_CONSTANTS.CELL_HEIGHT);
-            layoutStyleConfig.gridTemplateRows = derivedN && derivedN > 0
-                ? `repeat(${derivedN}, minmax(0, 1fr))`
-                : `repeat(auto-fill, minmax(${GRID_CONSTANTS.CELL_HEIGHT}px, 1fr))`;
+            layoutStyleConfig.gridTemplateRows = `repeat(auto-fill, minmax(${GRID_CONSTANTS.CELL_HEIGHT}px, 1fr))`;
         }
+
+        // 🆕 容器尺寸：格数 → 程序换算的精确像素（含 gap）；像素 → 原样；未声明 → 保持 100%/auto
+        if (colDim.sizePx != null) layoutStyleConfig.width = `${colDim.sizePx}px`;
+        if (rowDim.sizePx != null) layoutStyleConfig.height = `${rowDim.sizePx}px`;
 
         delete layoutStyleConfig.columns;
         delete layoutStyleConfig.cols;
@@ -374,8 +389,12 @@ function createLayoutElement(direction, children = [], options = {}) {
         const gridFill = attributes.fill !== undefined ? attributes.fill : 'true';
         delete layoutStyleConfig.fill;
 
-        // 校验子项定位（越界 / 重叠）
-        validateGridPlacements(children, attributes);
+        // 校验子项定位（越界 / 重叠）——列/行数以显式属性或 width/height 换算的格数为准
+        validateGridPlacements(children, {
+            ...attributes,
+            columns: attributes.columns ?? attributes.cols ?? (colDim.count || undefined),
+            rows: attributes.rows ?? (rowDim.count || undefined),
+        });
 
         // 🆕 将 fill 应用到每个 grid:item（子项未显式指定时继承容器默认值）
         children.forEach(child => {

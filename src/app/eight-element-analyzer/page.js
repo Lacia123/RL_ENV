@@ -3709,13 +3709,13 @@ style: {
 
   gridLayoutDemo: {
     name: '📐 网格布局系列',
-    description: '弹性网格布局（i=456 / j=216 固定单位，grid 显式指定 width/height，m×n 由 grid 自身尺寸推导，余数摊平）：6 个 metricCard 块——第一行 4 个统计卡、第二行 2 个大卡各占 2 列 2 行左右分（带图表），网格超出高度时内部滚动',
+    description: '弹性网格布局（i=456 / j=216 固定单位，grid 写 width=m height=n 格数，像素由程序换算，无内部余数）：6 个 metricCard 块——第一行 4 个统计卡、第二行 2 个大卡各占 2 列 2 行左右分（带图表），网格超出高度时内部滚动',
     markdown: `# 网格布局演示：数学期末复习仪表盘
 
-网格单位固定 i=456px / j=216px。grid 显式指定 width/height（width=1880px 对应 1920 画布内容区），m×n 由 grid 自身尺寸推导，不依赖容器；容器不是整数倍时，余数自动摊平到格子上（1880px 下恰好 4 列 × 3 行）。
+预期单位：i=456px（列单元宽）、j=216px（行单元高）、gap=16px。grid 写格数 width=4 / height=3，总尺寸由程序换算（4×456+3×16=1872px、3×216+2×16=680px），格子精确等于单位，网格内部无余数。
 
 ## 6 块仪表盘（第一行 4 个 · 第二行 2 个大卡左右分）
-<layout:grid width="1880px" gap="16" height="680px">
+<layout:grid width="4" gap="16" height="3">
   <grid:item x="1" y="1" width="1" height="1">
     <metricCard>
       <status>ACTIVE</status>
@@ -3793,11 +3793,11 @@ style: {
     description: '弹性网格布局（i=456 / j=216 固定，m×n 自动推导）中集成全部组件类型：heroCard / targetStatCard / metricCard / mistakesCard / showcaseCard / summaryCard / textCard / [table:commonStyle] / pairedImageTextCard / __rawMarkdown__ / Topology',
     markdown: `# 全组件类型网格示例
 
-在弹性网格布局中展示全部组件类型。网格单位固定 i=456px / j=216px，每个 grid 显式指定 width/height，m×n 由 grid 自身尺寸推导（width=1880px 时 m=4），不依赖容器；容器不是整数倍时，余数自动摊平到格子上（格子 = i+δ）。
+在弹性网格布局中展示全部组件类型。预期单位：i=456px（列单元宽）、j=216px（行单元高）、gap=16px。grid 写格数 width=m / height=n（像素与余数由程序换算，格子精确等于单位），布局只需关心"几行几列"。
 
 ## 分区一 · 通栏 hero + 指标行（4×3）
 
-<layout:grid width="1880px" gap="16" height="680px">
+<layout:grid width="4" gap="16" height="3">
 
 <!-- heroCard：cover_image / badge / title / subtitle / metrics / cta_primary / cta_secondary -->
 <grid:item x="1" y="1" width="4" height="2">
@@ -3854,7 +3854,7 @@ style: {
 
 ## 分区二 · 列表卡 + 双子卡 + 表格（4×6）
 
-<layout:grid width="1880px" gap="16" height="1400px">
+<layout:grid width="4" gap="16" height="6">
 
 <!-- mistakesCard：title + mistakesCardItem（type=normal/warning/error） -->
 <grid:item x="1" y="1" width="1" height="3">
@@ -4005,7 +4005,7 @@ style: {
 
 ## 分区三 · 知识图谱（4×3 通栏）
 
-<layout:grid width="1880px" gap="16" height="680px">
+<layout:grid width="4" gap="16" height="3">
 
 <!-- Topology：无组件槽，整块原文透传（[Topology|title=...] + @@@ 围栏） -->
 <grid:item x="1" y="1" width="4" height="3">
@@ -4044,12 +4044,12 @@ style: {
 
   smallGridDemo: {
     name: '📐 小尺寸网格示例',
-    description: '小尺寸容器（width=940 / height=1400）下的弹性网格：2 列布局，组件以 1×1 / 1×2 为主，通栏 hero 占 2×2',
+    description: '小尺寸容器（width=2 / height=6，即 2 列 × 6 行）下的弹性网格：组件以 1×1 / 1×2 为主，通栏 hero 占 2×2',
     markdown: `# 小尺寸网格示例
 
-小尺寸容器（grid 显式指定 width=940px / height=1400px，对应实际业务中常见的半屏内容区），m×n 由 grid 自身尺寸推导：940px → 2 列（格子 ≈462px），1400px → 6 行（格子 ≈220px）。组件以 1×1 / 1×2 为主，通栏组件占 2×2。
+小尺寸容器（grid 写格数 width=2 / height=6，程序换算为 2×456+16=928px 宽、6×216+5×16=1376px 高，对应实际业务中常见的半屏内容区）。预期单位：i=456px（列单元宽）、j=216px（行单元高）、gap=16px。组件以 1×1 / 1×2 为主，通栏组件占 2×2。
 
-<layout:grid width="940px" gap="16" height="1400px">
+<layout:grid width="2" gap="16" height="6">
 
 <!-- heroCard：通栏 2×2 -->
 <grid:item x="1" y="1" width="2" height="2">
@@ -4127,6 +4127,289 @@ style: {
   <title title="任务状态">生成岗位JD完成</title>
   <commit>查看过程</commit>
   <text>基础纵向布局。</text>
+</summaryCard>
+</grid:item>
+</layout:grid>`
+  },
+
+  gridSizeEnum: {
+    name: '📐 卡片尺寸枚举',
+    description: '枚举 grid 中各卡片的尺寸组合（4 列 × 10 行，40 格全满）：heroCard 支持 1×2 / 2×2，pairedImageTextCard 双子卡支持 2×3（更宽一级），其余卡片 1×2 + 小卡 1×1',
+    markdown: `<!-- ============================================================
+     网格布局说明（Grid Layout Notes）
+     ============================================================
+
+     【模型】
+     - 网格由固定单位划分，单位永远写死、不随容器变化：
+       i = 列单元宽 456px，j = 行单元高 216px，gap = 格间距 16px
+     - 容器不是 i/j 整数倍时，余数由程序提前摊平（弹性的意义仅在于摊平余数），
+       网格内部无余数，格子精确等于单位（i / j）
+     - 布局只需关心"几行几列"与"卡片占几乘几"，不需要关心像素与余数
+
+     【写法】
+     - 推荐（格数语义）：
+       layout:grid width="4" height="3" gap="16"
+       width/height 为格数，程序换算成像素：
+       总宽 = m×i + (m-1)×gap（如 4 列 = 4×456+3×16 = 1872px）
+       总高 = n×j + (n-1)×gap（如 3 行 = 3×216+2×16 = 680px）
+     - 兼容（像素语义，向后兼容）：
+       layout:grid width="1880px" height="680px"
+       程序推导格数、余数摊平到格子上（格子 = i+δ）
+     - 显式 columns/rows/gridTemplateColumns 始终优先于以上推导
+
+     【组件尺寸约定】（x = 宽格数，y = 高格数；1 格 = 456×216）
+     - heroCard：1×2 / 2×2（仅支持这两种组合；封面 absolute 铺满、内容自适应）
+     - targetStatCard：1×2 / 2×2（内容高 248px，最小 y=2）
+     - metricCard：1×1（无图表）/ 2×2（带 chart_mini）
+     - summaryCard：1×1（基础）/ 1×2（topImage / preview / backgroundImage 变体）
+     - textCard：1×1（简约，无副标题）/ 1×2（全模式四块内容）
+     - showcaseCard：1×2（按钮/加载变体）/ 1×3（列表变体）/ 2×2
+     - mistakesCard：1×2（≤2 项）/ 1×3（3 项）
+     - pairedImageTextCard：2×3（标准，双子并排各约 428px 宽，图文舒展；1 列宽时子项过挤）
+     - [table:commonStyle]：1×2 / 2×2
+     - Topology：1×2 / 2×2 / 4×3（通栏）
+     - __rawMarkdown__：按内容量 1×1 ~ 2×2
+
+     【弹性机制】（保证任意容器/余数尺寸下内容不滚动）
+     - grid:item 高度 = 格子高度（fill=true），卡片随格子伸缩
+     - 卡片内部可变内容（图片/列表区/双子区）用 flex 占剩余空间，
+       不做固定像素匹配（如 showcaseCard 主图 100~260px 弹性伸缩）
+     - 文本用行数限制兜底（textCard 正文最多 2 行省略）
+     ============================================================ -->
+
+# 卡片尺寸枚举
+
+枚举 grid 中各卡片的尺寸组合。每个格子的卡片内部文字（标题/标签插槽）标注「卡片名 · x×y」，便于对照效果。预期单位：i=456px（列单元宽）、j=216px（行单元高）、gap=16px，grid 写格数 width=4 / height=10。
+
+<layout:grid width="4" gap="16" height="10">
+
+<!-- 小卡 1×1 -->
+<grid:item x="1" y="1" width="1" height="1">
+<metricCard>
+  <status>NORMAL</status>
+  <time_range>本月</time_range>
+  <metric_label>metricCard · 1×1</metric_label>
+  <metric_value>28</metric_value>
+  <trend_value>+2</trend_value>
+</metricCard>
+</grid:item>
+
+<grid:item x="2" y="1" width="1" height="1">
+<summaryCard>
+  <title>summaryCard · 1×1</title>
+  <commit>查看过程</commit>
+  <text>基础纵向布局，适合 1×1 小格。</text>
+</summaryCard>
+</grid:item>
+
+<grid:item x="3" y="1" width="1" height="1">
+<textCard>
+  <text_title>textCard · 1×1</text_title>
+  <text_text>简约模式（无副标题），正文一行以内。</text_text>
+  <cta href="https://example.com/promo">按钮</cta>
+</textCard>
+</grid:item>
+
+<grid:item x="4" y="1" width="1" height="1">
+<__rawMarkdown__>
+rawMarkdown · 1×1 整块原文透传
+</__rawMarkdown__>
+</grid:item>
+
+<!-- heroCard 2×2 / 1×2 -->
+<grid:item x="1" y="2" width="2" height="2">
+<heroCard>
+  <cover_image src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900"></cover_image>
+  <badge>heroCard · 2×2</badge>
+  <title>发现你的下一站旅行</title>
+  <subtitle>个性化行程推荐，AI 智能规划。</subtitle>
+  <metrics>⭐ 4.9 · 128K 用户</metrics>
+  <cta_primary href="https://example.com/plan">开始计划</cta_primary>
+</heroCard>
+</grid:item>
+
+<grid:item x="3" y="2" width="1" height="2">
+<heroCard>
+  <cover_image src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900"></cover_image>
+  <badge>heroCard · 1×2</badge>
+  <title>发现你的下一站旅行</title>
+  <subtitle>个性化行程推荐。</subtitle>
+  <metrics>⭐ 4.9 · 128K 用户</metrics>
+</heroCard>
+</grid:item>
+
+<grid:item x="4" y="2" width="1" height="2">
+<targetStatCard>
+  <subtitle>targetStatCard · 1×2</subtitle>
+  <title>Master Calculus in 14 Days.</title>
+  <text>240</text>
+  <caption>TOTAL PROBLEMS</caption>
+</targetStatCard>
+</grid:item>
+
+<!-- 中卡 1×2 -->
+<grid:item x="1" y="4" width="1" height="2">
+<showcaseCard>
+<title>showcaseCard · 1×2</title>
+<toggle></toggle>
+<text>按钮/加载变体：标题 + 开关 + 文本 + 骨架 + 按钮。</text>
+<loading></loading>
+<button>✦ 查看 AI 摘要</button>
+</showcaseCard>
+</grid:item>
+
+<grid:item x="2" y="4" width="1" height="2">
+<mistakesCard>
+<title>mistakesCard · 1×2</title>
+<mistakesCardItem type="normal">
+<title>Multivariable Calculus</title>
+<text>38% Mastery</text>
+<caption>12 Mistakes</caption>
+</mistakesCardItem>
+
+<mistakesCardItem type="error">
+<title>Vector Spaces</title>
+<text>31% Mastery</text>
+<caption>15 Mistakes</caption>
+</mistakesCardItem>
+</mistakesCard>
+</grid:item>
+
+<grid:item x="3" y="4" width="1" height="2">
+<metricCard>
+  <status>PROGRESS</status>
+  <time_range>本月</time_range>
+  <metric_label>metricCard · 1×2</metric_label>
+  <metric_value>68%</metric_value>
+  <trend_value>+12%</trend_value>
+</metricCard>
+</grid:item>
+
+<grid:item x="4" y="4" width="1" height="2">
+<summaryCard>
+  <topImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></topImage>
+  <title>summaryCard · 1×2</title>
+  <text>topImage 变体，图片弹性占剩余空间。</text>
+  <commitWide>查看过程</commitWide>
+</summaryCard>
+</grid:item>
+
+<grid:item x="1" y="6" width="1" height="2">
+<textCard>
+  <text_title>textCard · 1×2</text_title>
+  <text_subtitle>全模式</text_subtitle>
+  <text_text>完整四块内容：标题、副标题、正文与按钮，适合 1×2。</text_text>
+  <cta href="https://example.com/promo">按钮</cta>
+</textCard>
+</grid:item>
+
+<grid:item x="2" y="6" width="1" height="2">
+## table:commonStyle · 1×2
+
+[table:commonStyle]
+| DingOS版本号 | 设备数量 | 操作 |
+|------|------|------|
+| AWS | 美国、亚洲、亚太 | ⟳  ⋮ |
+| Azure | 全球20+区域 | ⟳  ⋮ |
+| 阿里云 | 中国大陆主要城市 | ⟳  ⋮ |
+</grid:item>
+
+<grid:item x="3" y="6" width="1" height="2">
+[Topology|title=Topology · 1×2]
+@@@
+{
+  "nodes": [
+    {"id":"A","labels":["Topic"],"props":{"name":"导数"}},
+    {"id":"B","labels":["Topic"],"props":{"name":"微分"}},
+    {"id":"C","labels":["KP"],"props":{"name":"链式法则"}},
+    {"id":"D","labels":["KP"],"props":{"name":"求导法则"}},
+    {"id":"E","labels":["Example"],"props":{"name":"幂函数"}},
+    {"id":"F","labels":["Example"],"props":{"name":"复合函数"}}
+  ],
+  "edges": [
+    {"id":"e1","type":"HAS_TOPIC","source":"A","target":"C","props":{}},
+    {"id":"e2","type":"HAS_TOPIC","source":"A","target":"D","props":{}},
+    {"id":"e3","type":"HAS_TOPIC","source":"B","target":"D","props":{}},
+    {"id":"e4","type":"HAS_EXAMPLE","source":"C","target":"E","props":{}},
+    {"id":"e5","type":"HAS_EXAMPLE","source":"D","target":"F","props":{}}
+  ]
+}
+@@@
+</grid:item>
+
+<grid:item x="4" y="6" width="1" height="2">
+<showcaseCard>
+<title>showcaseCard · 1×2</title>
+<subtitle>列表变体</subtitle>
+<imageTextItem>
+<image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论"></image>
+    <title>专利分享合集</title>
+    <text>14MB · 张教授发送</text>
+</imageTextItem>
+<commonListItem>
+  <icon>📄</icon>
+  <layout:column>
+    <title>专利合集</title>
+    <text>1 小时前 · Rebecca 发送</text>
+  </layout:column>
+</commonListItem>
+<caption>4 张图片</caption>
+</showcaseCard>
+</grid:item>
+
+<!-- pairedImageTextCard 双子卡 2×3（更宽一级） -->
+<grid:item x="1" y="8" width="2" height="3">
+<pairedImageTextCard>
+  <label>pairedImageTextCard · 2×3</label>
+  <title>标准双子卡</title>
+  <content>双子并排需要宽度，2 列宽（928px）下每个子项约 428px，图文舒展。</content>
+  <primaryItem>
+    <image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论" />
+    <title>关于企业</title>
+    <body>我们是一家专注于人工智能和大数据领域的创新科技公司。</body>
+  </primaryItem>
+  <secondaryItem>
+    <image src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=800" alt="团队协作会议" />
+    <title>关于团队</title>
+    <body>我们拥有一支充满活力和创新精神的技术团队。</body>
+  </secondaryItem>
+</pairedImageTextCard>
+</grid:item>
+
+<grid:item x="3" y="8" width="1" height="2">
+<summaryCard>
+  <icon></icon>
+  <title>summaryCard · 1×2</title>
+  <commit>查看过程</commit>
+  <text>icon + commit 变体在 1×2 中的展示。</text>
+  <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+</summaryCard>
+</grid:item>
+
+<grid:item x="4" y="8" width="1" height="2">
+<__rawMarkdown__>
+rawMarkdown · 1×2
+更长的整块原文透传内容，
+可以跨多行展示。
+</__rawMarkdown__>
+</grid:item>
+
+<grid:item x="3" y="10" width="1" height="1">
+<metricCard>
+  <status>PROGRESS</status>
+  <time_range>本月</time_range>
+  <metric_label>metricCard · 1×1</metric_label>
+  <metric_value>68%</metric_value>
+  <trend_value>+12%</trend_value>
+</metricCard>
+</grid:item>
+
+<grid:item x="4" y="10" width="1" height="1">
+<summaryCard>
+  <backgroundImage src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=400&h=400"></backgroundImage>
+  <title>summaryCard · 1×1</title>
+  <text>backgroundImage 变体。</text>
+  <commitWide>查看过程</commitWide>
 </summaryCard>
 </grid:item>
 </layout:grid>`
