@@ -60,6 +60,15 @@ function extractGraphBlock(lines, startIndex) {
     if (trimmedJson.startsWith('{') && trimmedJson.endsWith('}')) {
         candidates.push(trimmedJson.slice(1, -1).trim());
     }
+    // 🆕 兼容双重转义格式：实际产物存在多余一层转义（如 \\"id\\" 应为 \"id\"），
+    // 原样解析失败时，去掉一层转义再尝试
+    const unescaped = trimmedJson.replace(/\\\\"/g, '\\"');
+    if (unescaped !== trimmedJson) {
+        candidates.push(unescaped);
+        if (unescaped.startsWith('{') && unescaped.endsWith('}')) {
+            candidates.push(unescaped.slice(1, -1).trim());
+        }
+    }
     for (const candidate of candidates) {
         try {
             const firstParse = JSON.parse(candidate);

@@ -263,6 +263,19 @@ export default function LayoutCheckDebugPage() {
                                     />
                                   </div>
                                 )}
+                                {/* 原始 psuip（对照截图核对内容是否缺失） */}
+                                <div style={{ marginBottom: 8 }}>
+                                  <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4, color: '#595959' }}>
+                                    原始 psuip（对照截图核对缺失）
+                                  </div>
+                                  <pre style={{
+                                    background: '#1f1f1f', color: '#d4d4d4', borderRadius: 6, padding: 10,
+                                    fontSize: 12, overflow: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+                                    maxHeight: 240, margin: 0
+                                  }}>
+{testCases[i].psuip}
+                                  </pre>
+                                </div>
                                 {br.details?.messages?.length > 0 ? (
                                   <ul style={{ margin: '6px 0', padding: 0, listStyle: 'none' }}>
                                     {br.details.messages.map((msg, j) => {

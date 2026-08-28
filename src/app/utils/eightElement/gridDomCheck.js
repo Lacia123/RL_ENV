@@ -25,7 +25,30 @@ import path from 'path';
  */
 function extractTextTokens(psuip) {
   const counts = {};
-  const text = String(psuip || '').replace(/<[^>]*>/g, ' '); // 去掉所有标签
+  // ⚠️ 先剥离 Topology 知识图谱块（[Topology|...] + @@@ fenced JSON）：
+  // 图谱数据渲染为特殊组件（G6 绘制到 canvas/svg），DOM 文本与传入 JSON 无法对齐；
+  // 图谱是否渲染成功由 DOM 侧容器可见性检测兜底，只要渲染出来即认为正确
+  const text = String(psuip || '')
+    .replace(/\[Topology[^\]]*\](?:[\s\S]*?@@@[\s\S]*?@@@)?/g, ' ')
+    // ⚠️ 处理 [table:xxx] 表格：只剥离标签本身与分隔行（|----|、|:---:|），
+    // 数据行的单元格文本保留并与渲染后的 td 文本对齐（| 是 markdown 语法符号，
+    // 渲染后不存在）。表格渲染是否正常由 DOM 检测兜底：内容不可见
+    // （如非法变体被原样输出为 HTML <title>/<table> 标签）会报内容缺失
+    .replace(/\[table:[^\]]*\]/g, ' ')
+    .replace(/^\s*\|[\s|:\-]+\|\s*$/gm, ' ')
+    .replace(/\s*\|\s*/g, ' ')
+    // ⚠️ 再剥离 LaTeX 公式段（$...$ / $$...$$ / \(...\) / \[...\]）：
+    // KaTeX 渲染文本与 LaTeX 源码差异巨大（如 $\dfrac{1}{x-2}$ → 字形 "1 x − 2"），
+    // 无法做文本对比；公式是否渲染由 DOM 侧 .katex 容器可见性检测兜底
+    .replace(/\$\$[\s\S]*?\$\$|\$[^$\n]*?\$|\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]/g, ' ')
+    .replace(/<[^>]*>/g, ' ') // 去掉所有标签
+    // ⚠️ 解码 HTML 实体（单次遍历，与浏览器一致）：
+    // 渲染后 DOM 文本里 &amp; → &、&gt; → > 等，不解码会导致 token 匹配失败误报
+    // （如 "During Q&amp;A" 渲染为 "During Q&A"）。单次解码避免 &amp;gt; 被双重解码
+    .replace(/&(#x?[0-9a-fA-F]+|[a-zA-Z]+);/g, (match, name) => {
+      const ENTITY_MAP = { amp: '&', gt: '>', lt: '<', quot: '"', nbsp: ' ', apos: "'" };
+      return ENTITY_MAP[name.toLowerCase()] || match;
+    });
   text.split(/\n/).forEach((line) => {
     const cleaned = line
       .replace(/```/g, ' ')
@@ -125,6 +148,15 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
         const cs = getComputedStyle(el);
         const rect = el.getBoundingClientRect();
 
+        // ⚠️ 跳过 KaTeX 公式内部元素：annotation（隐藏的 LaTeX 源码，display:none）
+        //    与符号微定位偏移（mn/mo/mi 相对定位矩形偏移）是 KaTeX 正常排版，
+        //    不属于内容缺失；.katex 容器自身仍参与检测（公式未渲染/尺寸 0 时报缺失）。
+        //    .katex-error（KaTeX 解析失败的红色错误提示）也跳过：错误提示可见即说明
+        //    渲染端已暴露问题，且其文本与 LaTeX 源码无法对齐
+        const isKatexInner = el.closest('.katex') && !el.classList.contains('katex');
+        const isKatexError = el.classList.contains('katex-error') || !!el.closest('.katex-error');
+        if (isKatexInner || isKatexError) return;
+
         // ── 判定 3：预期之外的滚动（grid:item 及以内出现滚动条）──
         // ⚠️ 必须在内容元素过滤之前执行：grid:item 等容器没有直接文本、不是 img，
         //    会被 isContentEl 提前 return，导致「grid:item 自身滚动」成为检测盲区
@@ -190,7 +222,13 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
             d.rect.bottom <= cRect.top + EPS || d.rect.top >= cRect.bottom - EPS ||
             d.rect.right <= cRect.left + EPS || d.rect.left >= cRect.right - EPS;
 
-          if (partiallyOutside && !isEllipsisTruncated(d)) {
+          // 裁切祖先自身是省略号容器（line-clamp / ellipsis）时，超出属于允许的截断
+          const ccs = getComputedStyle(clipper);
+          const clipperIsEllipsis =
+            (ccs.textOverflow === 'ellipsis' && ccs.whiteSpace === 'nowrap' && clipper.scrollWidth > clipper.clientWidth + EPS) ||
+            (ccs.display === '-webkit-box' && clipper.scrollHeight > clipper.clientHeight + EPS);
+
+          if (partiallyOutside && !isEllipsisTruncated(d) && !clipperIsEllipsis) {
             violations.push({
               type: 'clipped',
               target: `${d.tag}.${d.cls}`,
@@ -209,7 +247,26 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
       });
 
       // 渲染结果的全部可见文本（供"传入内容是否还在"对比）
-      const renderText = document.body.innerText;
+      // ⚠️ 不能用 innerText 直接取：KaTeX 公式渲染字形与 LaTeX 源码无法对齐，
+      //    且 innerText 受 text-transform 影响。改为遍历文本节点拼接，
+      //    跳过 .katex 公式内部（公式渲染由 .katex 容器 DOM 检测兜底）
+      const renderText = (() => {
+        const parts = [];
+        const walk = (node) => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            parts.push(node.textContent);
+            return;
+          }
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            // 跳过 KaTeX 公式整体（成功渲染 .katex）与解析失败的错误提示（.katex-error）：
+            // 公式字形/错误文本与 LaTeX 源码无法对齐，统一不参与文本对比
+            if (node.classList && (node.classList.contains('katex') || node.classList.contains('katex-error'))) return;
+            node.childNodes.forEach(walk);
+          }
+        };
+        (document.body || document).childNodes.forEach(walk);
+        return parts.join('');
+      })();
 
       return {
         elementCount: elements.length,
