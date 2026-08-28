@@ -125,6 +125,22 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
         const cs = getComputedStyle(el);
         const rect = el.getBoundingClientRect();
 
+        // ── 判定 3：预期之外的滚动（grid:item 及以内出现滚动条）──
+        // ⚠️ 必须在内容元素过滤之前执行：grid:item 等容器没有直接文本、不是 img，
+        //    会被 isContentEl 提前 return，导致「grid:item 自身滚动」成为检测盲区
+        //    （实测：组件 min-height 超过格子高度时 item 出现滚动，却判为 valid）。
+        //    对所有元素检查自身滚动，仅排除文档级（html/body），
+        //    overflow visible 的不算（内容自然溢出/叠出由其他判定覆盖）。
+        if (el.tagName !== 'HTML' && el.tagName !== 'BODY') {
+          if (el.scrollHeight > el.clientHeight + EPS && (cs.overflowY === 'auto' || cs.overflowY === 'scroll')) {
+            violations.push({
+              type: 'scroll',
+              target: `${el.tagName.toLowerCase()}.${(el.className || '').toString().slice(0, 40)}`,
+              detail: `内容超出出现滚动（可见 ${el.clientHeight}px，内容 ${el.scrollHeight}px）`
+            });
+          }
+        }
+
         // 直接文本内容（仅叶子文本节点）
         const text = Array.from(el.childNodes)
           .filter(n => n.nodeType === Node.TEXT_NODE)
@@ -189,16 +205,7 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
           }
         }
 
-        // ── 判定 3：预期之外的滚动（grid:item 及以内出现滚动条）──
-        // 只检测元素自身滚动（scroll > client 且 overflow auto/scroll），
-        // 文档级滚动（body/视口）不参与判定
-        if (d.scrollHeight > d.clientHeight + EPS && (d.overflowY === 'auto' || d.overflowY === 'scroll')) {
-          violations.push({
-            type: 'scroll',
-            target: `${d.tag}.${d.cls}`,
-            detail: `内容超出出现滚动（可见 ${d.clientHeight}px，内容 ${d.scrollHeight}px）`
-          });
-        }
+        // ── 判定 3（滚动）已在元素循环开头对所有元素执行，此处不再重复 ──
       });
 
       // 渲染结果的全部可见文本（供"传入内容是否还在"对比）
@@ -215,12 +222,16 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
     // 不做声明数量对比（变体可能有意不渲染某些插槽），只查"传入了的内容是否还在"：
     // 内容找不到（渲染 0 次）→ 丢失；同一内容传入多次但渲染次数更少 → 丢失
     // ⚠️ 渲染文本为空字符串也必须参与对比（内容全丢时 renderText 为 ""，不能跳过）
+    // ⚠️ 匹配必须大小写不敏感：渲染端存在 text-transform: uppercase 等样式
+    //    （如 targetStatCard 的 subtitle/caption），innerText 返回变换后的文本，
+    //    大小写敏感匹配会误报「内容丢失」。token 提取/计数保持原文大小写
+    //    （避免 "AI" 与 "ai" 两个不同 token 被合并计数产生新的误报）。
     const violations = [...result.violations];
     if (psuip && typeof result.renderText === 'string') {
-      const normalizedRenderText = String(result.renderText).replace(/\s+/g, '');
+      const normalizedRenderText = String(result.renderText).replace(/\s+/g, '').toLowerCase();
       const tokenCounts = extractTextTokens(psuip);
       Object.entries(tokenCounts).forEach(([token, srcCount]) => {
-        const renderCount = countOccurrences(normalizedRenderText, token);
+        const renderCount = countOccurrences(normalizedRenderText, token.toLowerCase());
         if (srcCount > renderCount) {
           violations.push({
             type: 'missing',

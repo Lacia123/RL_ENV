@@ -2894,8 +2894,10 @@ function generateCodeContainerStyleAttribute(styleObject) {
     const styleString = Object.entries(codeContainerStyle)
         .map(([key, value]) => {
             // 如果值是数字，且不是特定属性，添加px单位
+            // ⚠️ 无单位属性（flexGrow/flexShrink/order/opacity 等）不能加 px，
+            //    否则生成无效声明（如 flex-grow: 1px 被浏览器忽略）
             if (typeof value === 'number' &&
-                !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
+                !['fontWeight', 'lineHeight', 'opacity', 'zIndex', 'flexGrow', 'flexShrink', 'order', 'columnCount', 'fillOpacity', 'strokeOpacity', 'stopOpacity'].includes(key)) {
                 value = `${value}px`;
             }
 
@@ -3313,8 +3315,10 @@ function generateStyleAttribute(styleObject) {
     const styleString = Object.entries(styleObject)
         .map(([key, value]) => {
             // 如果值是数字，且不是特定属性，添加px单位
+            // ⚠️ 无单位属性（flexGrow/flexShrink/order/opacity 等）不能加 px，
+            //    否则生成无效声明（如 flex-grow: 1px 被浏览器忽略）
             if (typeof value === 'number' &&
-                !['fontWeight', 'lineHeight', 'opacity', 'zIndex'].includes(key)) {
+                !['fontWeight', 'lineHeight', 'opacity', 'zIndex', 'flexGrow', 'flexShrink', 'order', 'columnCount', 'fillOpacity', 'strokeOpacity', 'stopOpacity'].includes(key)) {
                 value = `${value}px`;
             }
 

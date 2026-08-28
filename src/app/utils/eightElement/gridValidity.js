@@ -10,7 +10,12 @@ import { measureGridDom } from './gridDomCheck.js';
  * 当 type=grid 时，由本函数包裹成完整的可渲染 PSUIP：
  *
  *   grid   → <layout:grid width="{columns}" gap="16" height="{rows}">
- *   item   → <grid:item x="0" y="0" width="{columns}" height="{rows}">
+ *   item   → <grid:item x="1" y="1" width="{columns}" height="{rows}">
+ *
+ * 注：x/y 为起始格，1 起始（与 gridCreators 的语义一致）。
+ * 不能写 0 —— CSS Grid 的网格线从 1 开始，grid-column/row 为 0 是无效声明，
+ * 会被浏览器忽略导致 grid:item 落入自动占位、高度只剩 1 格（span 丢失），
+ * 进而组件空间不足产生内容叠加。
  *
  * 即：外层网格 = 传入的格子数（m 列 × n 行）；内部单个 grid:item 占满整个网格，
  * psuip 的卡片内容全部放入该 item 中渲染。
@@ -23,7 +28,7 @@ export function wrapGridPsuip(psuip, { columns, rows }) {
   const content = String(psuip || '').trim();
   return [
     `<layout:grid width="${columns}" gap="16" height="${rows}">`,
-    `<grid:item x="0" y="0" width="${columns}" height="${rows}">`,
+    `<grid:item x="1" y="1" width="${columns}" height="${rows}">`,
     content,
     `</grid:item>`,
     `</layout:grid>`
