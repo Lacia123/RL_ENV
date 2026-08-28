@@ -1,0 +1,352 @@
+[
+  {
+    "name": "定义域产物 · textCenterCard 函数定义域",
+    "description": "实际产物单卡（函数定义域讲义，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCenterCard>\n  <text_title>函数定义域（Domain）</text_title>\n  <text_text>把函数想象成一台「自动售货机」：你只能投进它认可的硬币（合法输入），投错币机器就不工作。定义域就是这台机器**允许你投进去的所有输入值的集合**。</text_text>\n</textCenterCard>"
+  },
+  {
+    "name": "定义域产物 · textCenterCard 核心定义",
+    "description": "实际产物单卡（函数定义域讲义，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCenterCard>\n  <text_title>核心定义</text_title>\n  <text_text>函数 $f$ 的定义域，是使函数表达式**有意义**的所有自变量 $x$ 的取值集合，记作 $D_f$ 或 $\\text{Dom}(f)$。</text_text>\n  <text_subtitle>label:定义域, href:https://example.com/glossary/domain</text_subtitle>\n</textCenterCard>"
+  },
+  {
+    "name": "定义域产物 · textCard 直观理解",
+    "description": "实际产物单卡（函数定义域讲义，通栏）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCard>\n  <text_title>直观理解</text_title>\n  <text_text>求定义域，本质是「排除让式子无意义的 $x$」，常见三条约束：</text_text>\n  <text_subtitle>\n**分母不为零**：$f(x)=\\dfrac{1}{x-2}$，需 $x-2 \\neq 0$，即 $x \\neq 2$。\n**偶次根号下非负**：$f(x)=\\sqrt{x+1}$，需 $x+1 \\geq 0$，即 $x \\geq -1$。\n**对数真数为正**：$f(x)=\\log_2(x-3)$，需 $x-3 &gt; 0$，即 $x &gt; 3$。\n  </text_subtitle>\n  <text_text>综合示例：$f(x)=\\dfrac{\\sqrt{x+1}}{x-2}$ 的定义域为 $x \\geq -1$ 且 $x \\neq 2$，写作 $[-1,2)\\cup(2,+\\infty)$。</text_text>\n</textCard>"
+  },
+  {
+    "name": "定义域产物 · commonStyleList 易错提醒",
+    "description": "实际产物单卡（函数定义域讲义，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<commonStyleList>\n  <layout:column>\n    <description>易错提醒</description>\n    <content>**关键要点**</content>\n    <title>\n    求定义域时**先看整体结构**，把「分母、偶次根、对数」三类约束**同时**列出，再取交集，不要只盯着一处。\n    对数真数要求**严格大于 0**（不能等于 0），而偶次根号下允许**等于 0**，两者别混淆。\n    结果要用**集合或区间**表示，不能只写一个孤立的不等式就结束。\n    </title>\n  </layout:column>\n</commonStyleList>"
+  },
+  {
+    "name": "定义域产物 · commonStyleList 易混辨析",
+    "description": "实际产物单卡（函数定义域讲义，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<commonStyleList>\n  <layout:column>\n    <description>易混辨析</description>\n    <content>**关键要点**</content>\n    <title>\n    **定义域 vs 值域**：定义域是「允许输入的 $x$」，值域是「可能输出的 $y$」。前者由表达式约束决定，后者由函数映射结果决定。\n    **定义域 vs 自然定义域**：自然定义域指仅由表达式本身决定的定义域；若题目额外规定范围（如「$x&gt;0$」），则取两者交集。\n    **根号 $\\sqrt{x}$ 与 $\\sqrt[3]{x}$**：偶次根号要求被开方数非负，奇次根号（立方根）对任意实数都有意义，无限制。\n    </title>\n  </layout:column>\n</commonStyleList>"
+  },
+  {
+    "name": "定义域产物 · textCard 典型例题",
+    "description": "实际产物单卡（函数定义域讲义，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCard>\n  <text_title>典型例题</text_title>\n  <text_text>**题目**：求函数 $f(x)=\\dfrac{\\sqrt{4-x^2}}{x-1}$ 的定义域。</text_text>\n  <text_subtitle>**解题过程**：</text_subtitle>\n  <text_text>\n偶次根号约束：$4-x^2 \\geq 0$，即 $x^2 \\leq 4$，得 $-2 \\leq x \\leq 2$。\n分母约束：$x-1 \\neq 0$，即 $x \\neq 1$。\n取交集：$[-2,2]$ 中挖去 $x=1$，得 $[-2,1)\\cup(1,2]$。\n  </text_text>\n</textCard>"
+  },
+  {
+    "name": "定义域产物 · textCard 记忆技巧",
+    "description": "实际产物单卡（函数定义域讲义，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCard>\n  <text_title>记忆技巧</text_title>\n  <text_text>**助记口诀**：「分母不为零，偶根要非负，对数真数正，三关全过才算数。」</text_text>\n  <text_subtitle>**记忆方法**：把三类约束想象成三道「安检门」，$x$ 必须**同时**通过所有门才能进入定义域；漏掉任何一道门，答案就会多算或漏算。</text_subtitle>\n</textCard>"
+  },
+  {
+    "name": "定义域产物 · commonStyleList 相关概念",
+    "description": "实际产物单卡（函数定义域讲义，通栏）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<commonStyleList>\n  <layout:column>\n    <description>相关概念</description>\n    <content>**关键要点**</content>\n    <title>\n    **值域（Range）**：函数所有可能输出值的集合，与定义域一一对应。\n    **复合函数定义域**：$f(g(x))$ 的定义域，需同时满足 $g(x)$ 自身有意义，且 $g(x)$ 落在 $f$ 的定义域内。\n    **区间表示法**：开区间 $(a,b)$、闭区间 $[a,b]$、半开区间及并集 $\\cup$ 的书写规范。\n    </title>\n  </layout:column>\n</commonStyleList>"
+  },
+  {
+    "name": "复习产物 · textCard 考试准备",
+    "description": "实际产物单卡（高等数学复习页，通栏）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCard>\n  <text_title>Prepare for Math Final Exams</text_title>\n  <text_subtitle>Today's Review Focus: Operations of Higher-order Function</text_subtitle>\n  <cta href=\"https://example.com/schedule/math-final\">✦ View Full Schedule</cta>\n</textCard>"
+  },
+  {
+    "name": "复习产物 · targetStatCard 错题集",
+    "description": "实际产物单卡（复习页，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<targetStatCard>\n<title>Error Collection</title>\n<preview src=\"file:///sdcard/Pictures/Camera/20260806/20260806201223.jpg\"></preview>\n<text>32</text>\n<caption>PRACTICE</caption>\n<subtitle>Practice Questions</subtitle>\n</targetStatCard>"
+  },
+  {
+    "name": "复习产物 · targetStatCard 模拟自测",
+    "description": "实际产物单卡（复习页，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<targetStatCard>\n<title href=\"ding://router?start_time=1755000000000&end_time=1755007200000&type=pre_exam_mock_self_test\">Mock Self-test</title>\n<preview src=\"file:///sdcard/Pictures/Camera/camera_1786008139046.jpg\"></preview>\n<text>23</text>\n<caption>QUESTIONS</caption>\n<subtitle>Questions</subtitle>\n</targetStatCard>"
+  },
+  {
+    "name": "复习产物 · Topology 数列极限图谱",
+    "description": "实际产物单卡（复习页图谱，节点 28 个，2×2 观察是否拥挤）",
+    "width": 2,
+    "height": 2,
+    "psuip": "[Topology|title=数列的极限知识图谱]\n@@@\n{\n\"{\\\\\"nodes\\\\\":[{\\\\\"id\\\\\":\\\\\"Chapter:数列的极限\\\\\",\\\\\"labels\\\\\":[\\\\\"Chapter\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的极限\\\\\",\\\\\"ord\\\\\":1,\\\\\"chapter\\\\\":\\\\\"第一章\\\\\"}},{\\\\\"id\\\\\":\\\\\"Topic:数列的概念\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的概念\\\\\",\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"Topic:数列的性质\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的性质\\\\\",\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的极限\\\\\",\\\\\"ord\\\\\":3}},{\\\\\"id\\\\\":\\\\\"Topic:函数与极限\\\\\",\\\\\"labels\\\\\":[\\\\\"Topic\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"函数与极限\\\\\",\\\\\"ord\\\\\":4}},{\\\\\"id\\\\\":\\\\\"KP:数列的定义\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的定义\\\\\",\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"KP:数列的有界性\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的有界性\\\\\",\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"KP:数列的单调性\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的单调性\\\\\",\\\\\"ord\\\\\":3}},{\\\\\"id\\\\\":\\\\\"KP:数列的收敛与发散\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"数列的收敛与发散\\\\\",\\\\\"ord\\\\\":4}},{\\\\\"id\\\\\":\\\\\"KP:极限的唯一性\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"极限的唯一性\\\\\",\\\\\"ord\\\\\":5}},{\\\\\"id\\\\\":\\\\\"KP:极限的保号性\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"极限的保号性\\\\\",\\\\\"ord\\\\\":6}},{\\\\\"id\\\\\":\\\\\"KP:极限的四则运算\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"极限的四则运算\\\\\",\\\\\"ord\\\\\":7}},{\\\\\"id\\\\\":\\\\\"KP:夹逼定理\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"夹逼定理\\\\\",\\\\\"ord\\\\\":8}},{\\\\\"id\\\\\":\\\\\"KP:单调有界定理\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"单调有界定理\\\\\",\\\\\"ord\\\\\":9}},{\\\\\"id\\\\\":\\\\\"KP:重要极限\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"重要极限\\\\\",\\\\\"ord\\\\\":10}},{\\\\\"id\\\\\":\\\\\"KP:等价无穷小\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"等价无穷小\\\\\",\\\\\"ord\\\\\":11}},{\\\\\"id\\\\\":\\\\\"KP:洛必达法则\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"洛必达法则\\\\\",\\\\\"ord\\\\\":12}},{\\\\\"id\\\\\":\\\\\"KP:泰勒展开\\\\\",\\\\\"labels\\\\\":[\\\\\"KnowledgePoint\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"泰勒展开\\\\\",\\\\\"ord\\\\\":13}},{\\\\\"id\\\\\":\\\\\"Example:常数列\\\\\",\\\\\"labels\\\\\":[\\\\\"Example\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"常数列\\\\\",\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"Example:调和数列\\\\\",\\\\\"labels\\\\\":[\\\\\"Example\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"调和数列\\\\\",\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"Example:1/n\\\\\",\\\\\"labels\\\\\":[\\\\\"Example\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"1/n\\\\\",\\\\\"ord\\\\\":3}},{\\\\\"id\\\\\":\\\\\"Example:(-1)^n\\\\\",\\\\\"labels\\\\\":[\\\\\"Example\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"(-1)^n\\\\\",\\\\\"ord\\\\\":4}},{\\\\\"id\\\\\":\\\\\"Example:等比数列\\\\\",\\\\\"labels\\\\\":[\\\\\"Example\\\\\"],\\\\\"props\\\\\":{\\\\\"name\\\\\":\\\\\"等比数列\\\\\",\\\\\"ord\\\\\":5}}],\\\\\"edges\\\\\":[{\\\\\"id\\\\\":\\\\\"e1\\\\\",\\\\\"type\\\\\":\\\\\"HAS_TOPIC\\\\\",\\\\\"source\\\\\":\\\\\"Chapter:数列的极限\\\\\",\\\\\"target\\\\\":\\\\\"Topic:数列的概念\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":1,\\\\\"type\\\\\":\\\\\"direct\\\\\"}},{\\\\\"id\\\\\":\\\\\"e2\\\\\",\\\\\"type\\\\\":\\\\\"HAS_TOPIC\\\\\",\\\\\"source\\\\\":\\\\\"Chapter:数列的极限\\\\\",\\\\\"target\\\\\":\\\\\"Topic:数列的性质\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":2,\\\\\"type\\\\\":\\\\\"direct\\\\\"}},{\\\\\"id\\\\\":\\\\\"e3\\\\\",\\\\\"type\\\\\":\\\\\"HAS_TOPIC\\\\\",\\\\\"source\\\\\":\\\\\"Chapter:数列的极限\\\\\",\\\\\"target\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":3,\\\\\"type\\\\\":\\\\\"direct\\\\\"}},{\\\\\"id\\\\\":\\\\\"e4\\\\\",\\\\\"type\\\\\":\\\\\"HAS_TOPIC\\\\\",\\\\\"source\\\\\":\\\\\"Chapter:数列的极限\\\\\",\\\\\"target\\\\\":\\\\\"Topic:函数与极限\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":4,\\\\\"type\\\\\":\\\\\"direct\\\\\"}},{\\\\\"id\\\\\":\\\\\"e5\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:数列的概念\\\\\",\\\\\"target\\\\\":\\\\\"KP:数列的定义\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"e6\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:数列的性质\\\\\",\\\\\"target\\\\\":\\\\\"KP:数列的有界性\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"e7\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:数列的性质\\\\\",\\\\\"target\\\\\":\\\\\"KP:数列的单调性\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"e8\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"target\\\\\":\\\\\"KP:数列的收敛与发散\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"e9\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"target\\\\\":\\\\\"KP:极限的唯一性\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"e10\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"target\\\\\":\\\\\"KP:极限的保号性\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":3}},{\\\\\"id\\\\\":\\\\\"e11\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"target\\\\\":\\\\\"KP:极限的四则运算\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":4}},{\\\\\"id\\\\\":\\\\\"e12\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"target\\\\\":\\\\\"KP:夹逼定理\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":5}},{\\\\\"id\\\\\":\\\\\"e13\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:数列的极限\\\\\",\\\\\"target\\\\\":\\\\\"KP:单调有界定理\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":6}},{\\\\\"id\\\\\":\\\\\"e14\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:函数与极限\\\\\",\\\\\"target\\\\\":\\\\\"KP:重要极限\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"e15\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:函数与极限\\\\\",\\\\\"target\\\\\":\\\\\"KP:等价无穷小\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"e16\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:函数与极限\\\\\",\\\\\"target\\\\\":\\\\\"KP:洛必达法则\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":3}},{\\\\\"id\\\\\":\\\\\"e17\\\\\",\\\\\"type\\\\\":\\\\\"HAS_KP\\\\\",\\\\\"source\\\\\":\\\\\"Topic:函数与极限\\\\\",\\\\\"target\\\\\":\\\\\"KP:泰勒展开\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":4}},{\\\\\"id\\\\\":\\\\\"e18\\\\\",\\\\\"type\\\\\":\\\\\"HAS_EXAMPLE\\\\\",\\\\\"source\\\\\":\\\\\"KP:数列的定义\\\\\",\\\\\"target\\\\\":\\\\\"Example:常数列\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"e19\\\\\",\\\\\"type\\\\\":\\\\\"HAS_EXAMPLE\\\\\",\\\\\"source\\\\\":\\\\\"KP:数列的定义\\\\\",\\\\\"target\\\\\":\\\\\"Example:调和数列\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"e20\\\\\",\\\\\"type\\\\\":\\\\\"HAS_EXAMPLE\\\\\",\\\\\"source\\\\\":\\\\\"KP:数列的收敛与发散\\\\\",\\\\\"target\\\\\":\\\\\"Example:1/n\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"e21\\\\\",\\\\\"type\\\\\":\\\\\"HAS_EXAMPLE\\\\\",\\\\\"source\\\\\":\\\\\"KP:数列的收敛与发散\\\\\",\\\\\"target\\\\\":\\\\\"Example:(-1)^n\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":2}},{\\\\\"id\\\\\":\\\\\"e22\\\\\",\\\\\"type\\\\\":\\\\\"HAS_EXAMPLE\\\\\",\\\\\"source\\\\\":\\\\\"KP:重要极限\\\\\",\\\\\"target\\\\\":\\\\\"Example:等比数列\\\\\",\\\\\"props\\\\\":{\\\\\"ord\\\\\":1}},{\\\\\"id\\\\\":\\\\\"e23\\\\\",\\\\\"type\\\\\":\\\\\"RELATED_TO\\\\\",\\\\\"source\\\\\":\\\\\"KP:数列的有界性\\\\\",\\\\\"target\\\\\":\\\\\"KP:数列的单调性\\\\\",\\\\\"props\\\\\":{}},{\\\\\"id\\\\\":\\\\\"e24\\\\\",\\\\\"type\\\\\":\\\\\"RELATED_TO\\\\\",\\\\\"source\\\\\":\\\\\"KP:单调有界定理\\\\\",\\\\\"target\\\\\":\\\\\"KP:夹逼定理\\\\\",\\\\\"props\\\\\":{}},{\\\\\"id\\\\\":\\\\\"e25\\\\\",\\\\\"type\\\\\":\\\\\"PREREQUISITE\\\\\",\\\\\"source\\\\\":\\\\\"KP:数列的收敛与发散\\\\\",\\\\\"target\\\\\":\\\\\"KP:数列的定义\\\\\",\\\\\"props\\\\\":{}},{\\\\\"id\\\\\":\\\\\"e26\\\\\",\\\\\"type\\\\\":\\\\\"PREREQUISITE\\\\\",\\\\\"source\\\\\":\\\\\"KP:极限的四则运算\\\\\",\\\\\"target\\\\\":\\\\\"KP:数列的收敛与发散\\\\\",\\\\\"props\\\\\":{}},{\\\\\"id\\\\\":\\\\\"e27\\\\\",\\\\\"type\\\\\":\\\\\"PREREQUISITE\\\\\",\\\\\"source\\\\\":\\\\\"KP:夹逼定理\\\\\",\\\\\"target\\\\\":\\\\\"KP:极限的四则运算\\\\\",\\\\\"props\\\\\":{}},{\\\\\"id\\\\\":\\\\\"e28\\\\\",\\\\\"type\\\\\":\\\\\"PREREQUISITE\\\\\",\\\\\"source\\\\\":\\\\\"KP:单调有界定理\\\\\",\\\\\"target\\\\\":\\\\\"KP:数列的收敛与发散\\\\\",\\\\\"props\\\\\":{}}]}\"\n}\n@@@"
+  },
+  {
+    "name": "复习产物 · summaryCard 复习笔记",
+    "description": "实际产物单卡（复习页，原位于图谱右侧 layout:column）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<summaryCard>\n<title>Today's Review Note</title>\n<preview src=\"file:///sdcard/Pictures/Camera/camera_1786010698497.jpg\"></preview>\n<text>Introduction to LCCDEs</text>\n</summaryCard>"
+  },
+  {
+    "name": "复习产物 · textCard LCCDE 引入",
+    "description": "实际产物单卡（复习页，原位于图谱右侧 layout:column）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCard>\n  <text_title>Introduction to LCCDEs</text_title>\n  <text_text>LCCDE form: \\(a_n y^{(n)} + \\cdots + a_0 y = f(x)\\), with constant \\(a_i\\).</text_text>\n</textCard>"
+  },
+  {
+    "name": "复习产物 · showcaseCard 齐次方程",
+    "description": "实际产物单卡（复习页，原位于图谱右侧 layout:column）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<showcaseCard>\n  <title>Homogeneous Equations</title>\n  <text>When \\(f(x)=0\\), solve \\(a_n r^n + \\cdots + a_0 = 0\\).</text>\n</showcaseCard>"
+  },
+  {
+    "name": "复习产物 · showcaseCard 根的类型",
+    "description": "实际产物单卡（复习页，原位于图谱右侧 layout:column）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<showcaseCard>\n  <title>Distinct / Repeated / Complex Roots</title>\n  <text>Distinct: \\(y_h=\\sum C_i e^{r_i x}\\). Repeated \\(r\\) (mult. \\(k\\)): \\(e^{rx},\\ldots,x^{k-1}e^{rx}\\). Complex: \\(e^{\\alpha x}\\cos(\\beta x),\\ e^{\\alpha x}\\sin(\\beta x)\\).</text>\n</showcaseCard>"
+  },
+  {
+    "name": "复习产物 · mistakesCard 薄弱点",
+    "description": "实际产物单卡（复习页，3 项 → 1×3）",
+    "width": 1,
+    "height": 3,
+    "psuip": "<mistakesCard>\n  <title>Weak Spots</title>\n  <preview src=\"file:///sdcard/Pictures/Camera/camera_1786013999770.jpg\"></preview>\n  <mistakesCardItem type=\"error\">\n    <title>Multivariable Calculus</title>\n    <text>38% Mastery</text>\n    <caption>12 Mistakes</caption>\n  </mistakesCardItem>\n  <mistakesCardItem type=\"warning\">\n    <title>Linear Algebra (Matrix)</title>\n    <text>52% Mastery</text>\n    <caption>8 Mistakes</caption>\n  </mistakesCardItem>\n  <mistakesCardItem type=\"normal\">\n    <title>Vector Spaces</title>\n    <text>61% Mastery</text>\n    <caption>5 Mistakes</caption>\n  </mistakesCardItem>\n</mistakesCard>"
+  },
+  {
+    "name": "定积分产物 · textCard 课程信息",
+    "description": "实际产物单卡（定积分课堂，通栏）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCard>\n  <text_title>Advanced Mathematics</text_title>\n  <text_text>666 Room · Professor Zhang</text_text>\n  <text_subtitle>Today's lecture materials: related files, transcript summary, knowledge cards, smart camera, and handwriting space.</text_subtitle>\n  <text_text>10:30 - 12:00</text_text>\n</textCard>"
+  },
+  {
+    "name": "定积分产物 · commonStyleServiceListDesc 相关资料",
+    "description": "实际产物单卡（定积分课堂，通栏）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<commonStyleServiceListDesc>\n  <icon>📄</icon>\n  <icon>1.4 KB · Sent by u0_a204 · 2026-07-28</icon>\n  <layout:column>\n    <title>Related Files</title>\n    <desc>5 related files</desc>\n    <title href=\"ding://navigate-internal?action=open_smart_doc&amp;url=file%3A%2F%2F%2Fstorage%2Femulated%2F0%2FDownload%2F%E5%AE%9A%E7%A7%AF%E5%88%86%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93.txt&amp;title=Definite%20Integral%20Knowledge%20Summary\">Definite Integral Knowledge Summary</title>\n  </layout:column>\n</commonStyleServiceListDesc>"
+  },
+  {
+    "name": "定积分产物 · commonStyleServiceListCompact 例题讲解",
+    "description": "实际产物单卡（定积分课堂，原并排于 layout:row）",
+    "width": 1,
+    "height": 1,
+    "psuip": "<commonStyleServiceListCompact>\n  <layout:column>\n    <desc>📄</desc>\n    <link href=\"ding://navigate-internal?action=open_smart_doc&amp;url=file%3A%2F%2F%2Fstorage%2Femulated%2F0%2FDownload%2F%E5%AE%9A%E7%A7%AF%E5%88%86%E5%85%B8%E5%9E%8B%E4%BE%8B%E9%A2%98%E8%AE%B2%E8%A7%A3.txt&amp;title=Definite%20Integral%20Example%20Problems\">Definite Integral Example Problems</link>\n    <title>Sent by u0_a204 · 2026-07-28</title>\n  </layout:column>\n</commonStyleServiceListCompact>"
+  },
+  {
+    "name": "定积分产物 · commonStyleServiceListCompact 课后作业",
+    "description": "实际产物单卡（定积分课堂，原并排于 layout:row）",
+    "width": 1,
+    "height": 1,
+    "psuip": "<commonStyleServiceListCompact>\n  <layout:column>\n    <desc>📄</desc>\n    <link href=\"ding://navigate-internal?action=open_smart_doc&amp;url=file%3A%2F%2F%2Fstorage%2Femulated%2F0%2FDownload%2F%E5%AE%9A%E7%A7%AF%E5%88%86%E8%AF%BE%E5%90%8E%E4%BD%9C%E4%B8%9A.txt&amp;title=Definite%20Integral%20Homework\">Definite Integral Homework</link>\n    <title>Sent by u0_a204 · 2026-07-28</title>\n  </layout:column>\n</commonStyleServiceListCompact>"
+  },
+  {
+    "name": "定积分产物 · textCard 课堂纪要",
+    "description": "实际产物单卡（定积分课堂，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCard>\n  <text_title>Transcript Summary</text_title>\n  <text_text>Lecture transcript has been organized.</text_text>\n  <text_subtitle>The lecture introduced the definite integral through the problem of finding the area under a curve. The core method — partition, approximation, summation, and taking the limit — was established. The formal definition was given via Riemann sums: if the limit of Σ f(ξᵢ)Δxᵢ exists as the maximum subinterval length λ→0, independent of partition and choice of ξᵢ, then f is integrable on [a,b]. Geometric interpretation: the definite integral represents the signed area of a curvilinear trapezoid. Key properties covered include linearity, interval additivity, and sign preservation.</text_subtitle>\n</textCard>"
+  },
+  {
+    "name": "定积分产物 · textCard 核心概念回顾",
+    "description": "实际产物单卡（定积分课堂，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCard>\n  <text_title>Core Concept Review</text_title>\n  <text_text>**The Definite Integral**</text_text>\n  <text_subtitle>Think of it as a \"signed area calculator\" — it measures the net area between a curve and the x-axis, where regions above count positive and below count negative.</text_subtitle>\n  <text_text>**The definite integral ∫ₐᵇ f(x)dx is the limit of Riemann sums Σ f(ξᵢ)Δxᵢ as max Δxᵢ → 0, provided this limit exists and is independent of partition and sample point choices.**</text_text>\n</textCard>"
+  },
+  {
+    "name": "定积分产物 · textCenterCard 可积条件",
+    "description": "实际产物单卡（定积分课堂，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCenterCard>\n  <text_title>**Integrability Conditions**</text_title>\n  <text_text>Not every function can be integrated — the function must be \"well-behaved\" enough for the Riemann sum limit to exist uniquely.</text_text>\n  <text_subtitle>**Continuous functions, monotonic functions, and bounded functions with finitely many discontinuities on [a,b] are all integrable. The Dirichlet function is a classic counterexample of a non-integrable function.**</text_subtitle>\n</textCenterCard>"
+  },
+  {
+    "name": "定积分产物 · textCenterCard 关键性质",
+    "description": "实际产物单卡（定积分课堂，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCenterCard>\n  <text_title>**Key Properties**</text_title>\n  <text_text>Linearity: ∫(f+g) = ∫f + ∫g. Interval additivity: ∫ₐᵇ f + ∫ᵇᶜ f = ∫ₐᶜ f. Sign preservation: if f ≥ 0 on [a,b], then ∫ₐᵇ f ≥ 0.</text_text>\n</textCenterCard>"
+  },
+  {
+    "name": "定积分产物 · textCenterCard 讲义原文",
+    "description": "实际产物单卡（定积分课堂，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCenterCard>\n  <text_title>Lecture Transcript</text_title>\n  <text_text>The lecture began with the problem of computing the area of a curvilinear trapezoid. Traditional area formulas for rectilinear shapes fail under curved boundaries, motivating the \"approximate curves with straight lines\" approach. The four-step method — partition, approximate, sum, take the limit — forms the logical core of the definite integral definition.</text_text>\n</textCenterCard>"
+  },
+  {
+    "name": "定积分产物 · textCenterCard 课堂要点",
+    "description": "实际产物单卡（定积分课堂，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCenterCard>\n  <text_title>Lecture Key Points</text_title>\n  <text_text>The formal definition requires that the Riemann sum limit exists regardless of how the interval is partitioned or how sample points are chosen within each subinterval. This \"arbitrariness\" condition is critical; without it, functions like the Dirichlet function could yield different limits under different partitions. The integral variable is a dummy variable — replacing x with any other letter does not change the value.</text_text>\n</textCenterCard>"
+  },
+  {
+    "name": "定积分产物 · [table:commonStyle] 课堂要点表",
+    "description": "实际产物单卡（定积分课堂，通栏）",
+    "width": 1,
+    "height": 2,
+    "psuip": "[table:commonStyle]\n  <title>Lecture Key Points</title>\n  <table>Three examples were worked through: computing ∫₀¹ x dx using equal partitions and right endpoints (result: 1/2); evaluating ∫₋₁¹ |x| dx by splitting at x=0 (result: 1); and comparing ∫₀¹ x² dx vs ∫₀¹ x dx using sign preservation. The professor repeatedly emphasized the essential distinction between definite integrals (constants) and indefinite integrals (families of functions).</table>"
+  },
+  {
+    "name": "定积分产物 · textCenterCard Q&A 要点",
+    "description": "实际产物单卡（定积分课堂，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCenterCard>\n  <text_title>Lecture Key Points</text_title>\n  <text_text>During Q&amp;A, students asked why arbitrary partitioning is required. The professor used the Dirichlet function to illustrate: non-arbitrary partitions can produce different limits, rendering the function non-integrable. The lecture concluded by positioning this material as prerequisite for the Fundamental Theorem of Calculus. Homework: derive the integral of x² on [0,1] using equal partitions, and preview the integral upper-limit function.</text_text>\n</textCenterCard>"
+  },
+  {
+    "name": "定积分产物 · textCenterCard 备忘提醒",
+    "description": "实际产物单卡（定积分课堂，原并排于 layout:row）",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCenterCard>\n  <text_title>📌 Reminder: Don't forget to bring Gou Dan his Yu Xiang Rou Si (fish-flavored shredded pork)!</text_title>\n</textCenterCard>"
+  },
+  {
+    "name": "metricCard · 1×1（1×1）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 1,
+    "psuip": "<metricCard>\n  <status>NORMAL</status>\n  <time_range>本月</time_range>\n  <metric_label>metricCard · 1×1</metric_label>\n  <metric_value>28</metric_value>\n  <trend_value>+2</trend_value>\n</metricCard>"
+  },
+  {
+    "name": "summaryCard · 1×1（1×1）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 1,
+    "psuip": "<summaryCard>\n  <title>summaryCard · 1×1</title>\n  <commit>查看过程</commit>\n  <text>基础纵向布局，适合 1×1 小格。</text>\n</summaryCard>"
+  },
+  {
+    "name": "textCard · 1×1（1×1）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 1,
+    "psuip": "<textCard>\n  <text_title>textCard · 1×1</text_title>\n  <text_text>简约模式（无副标题），正文一行以内。</text_text>\n  <cta href=\"https://example.com/promo\">按钮</cta>\n</textCard>"
+  },
+  {
+    "name": "__rawMarkdown__ · 1×1（1×1）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 1,
+    "psuip": "<__rawMarkdown__>\nrawMarkdown · 1×1 整块原文透传\n</__rawMarkdown__>"
+  },
+  {
+    "name": "heroCard · 2×2（2×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 2,
+    "height": 2,
+    "psuip": "<heroCard>\n  <cover_image src=\"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900\"></cover_image>\n  <badge>heroCard · 2×2</badge>\n  <title>发现你的下一站旅行</title>\n  <subtitle>个性化行程推荐，AI 智能规划。</subtitle>\n  <metrics>⭐ 4.9 · 128K 用户</metrics>\n  <cta_primary href=\"https://example.com/plan\">开始计划</cta_primary>\n</heroCard>"
+  },
+  {
+    "name": "heroCard · 1×2（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "<heroCard>\n  <cover_image src=\"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900\"></cover_image>\n  <badge>heroCard · 1×2</badge>\n  <title>发现你的下一站旅行</title>\n  <subtitle>个性化行程推荐。</subtitle>\n  <metrics>⭐ 4.9 · 128K 用户</metrics>\n</heroCard>"
+  },
+  {
+    "name": "targetStatCard · 1×2（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "<targetStatCard>\n  <subtitle>targetStatCard · 1×2</subtitle>\n  <title>Master Calculus in 14 Days.</title>\n  <text>240</text>\n  <caption>TOTAL PROBLEMS</caption>\n</targetStatCard>"
+  },
+  {
+    "name": "showcaseCard · 1×2（按钮变体）（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "<showcaseCard>\n<title>showcaseCard · 1×2</title>\n<toggle></toggle>\n<text>按钮/加载变体：标题 + 开关 + 文本 + 骨架 + 按钮。</text>\n<loading></loading>\n<button>✦ 查看 AI 摘要</button>\n</showcaseCard>"
+  },
+  {
+    "name": "mistakesCard · 1×2（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "<mistakesCard>\n<title>mistakesCard · 1×2</title>\n<mistakesCardItem type=\"normal\">\n<title>Multivariable Calculus</title>\n<text>38% Mastery</text>\n<caption>12 Mistakes</caption>\n</mistakesCardItem>\n\n<mistakesCardItem type=\"error\">\n<title>Vector Spaces</title>\n<text>31% Mastery</text>\n<caption>15 Mistakes</caption>\n</mistakesCardItem>\n</mistakesCard>"
+  },
+  {
+    "name": "metricCard · 1×2（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "<metricCard>\n  <status>PROGRESS</status>\n  <time_range>本月</time_range>\n  <metric_label>metricCard · 1×2</metric_label>\n  <metric_value>68%</metric_value>\n  <trend_value>+12%</trend_value>\n</metricCard>"
+  },
+  {
+    "name": "summaryCard · 1×2（topImage）（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "<summaryCard>\n  <topImage src=\"https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200\"></topImage>\n  <title>summaryCard · 1×2</title>\n  <text>topImage 变体，图片弹性占剩余空间。</text>\n  <commitWide>查看过程</commitWide>\n</summaryCard>"
+  },
+  {
+    "name": "textCard · 1×2（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "<textCard>\n  <text_title>textCard · 1×2</text_title>\n  <text_subtitle>全模式</text_subtitle>\n  <text_text>完整四块内容：标题、副标题、正文与按钮，适合 1×2。</text_text>\n  <cta href=\"https://example.com/promo\">按钮</cta>\n</textCard>"
+  },
+  {
+    "name": "[table:commonStyle] · 1×2（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "[table:commonStyle]\n| DingOS版本号 | 设备数量 | 操作 |\n|------|------|------|\n| AWS | 美国、亚洲、亚太 | ⟳  ⋮ |\n| Azure | 全球20+区域 | ⟳  ⋮ |\n| 阿里云 | 中国大陆主要城市 | ⟳  ⋮ |"
+  },
+  {
+    "name": "Topology · 1×2（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "[Topology|title=Topology · 1×2]\n@@@\n{\n  \"nodes\": [\n    {\"id\":\"A\",\"labels\":[\"Topic\"],\"props\":{\"name\":\"导数\"}},\n    {\"id\":\"B\",\"labels\":[\"Topic\"],\"props\":{\"name\":\"微分\"}},\n    {\"id\":\"C\",\"labels\":[\"KP\"],\"props\":{\"name\":\"链式法则\"}},\n    {\"id\":\"D\",\"labels\":[\"KP\"],\"props\":{\"name\":\"求导法则\"}},\n    {\"id\":\"E\",\"labels\":[\"Example\"],\"props\":{\"name\":\"幂函数\"}},\n    {\"id\":\"F\",\"labels\":[\"Example\"],\"props\":{\"name\":\"复合函数\"}}\n  ],\n  \"edges\": [\n    {\"id\":\"e1\",\"type\":\"HAS_TOPIC\",\"source\":\"A\",\"target\":\"C\",\"props\":{}},\n    {\"id\":\"e2\",\"type\":\"HAS_TOPIC\",\"source\":\"A\",\"target\":\"D\",\"props\":{}},\n    {\"id\":\"e3\",\"type\":\"HAS_TOPIC\",\"source\":\"B\",\"target\":\"D\",\"props\":{}},\n    {\"id\":\"e4\",\"type\":\"HAS_EXAMPLE\",\"source\":\"C\",\"target\":\"E\",\"props\":{}},\n    {\"id\":\"e5\",\"type\":\"HAS_EXAMPLE\",\"source\":\"D\",\"target\":\"F\",\"props\":{}}\n  ]\n}\n@@@"
+  },
+  {
+    "name": "showcaseCard · 1×2（列表变体）（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "<showcaseCard>\n<title>showcaseCard · 1×2</title>\n<subtitle>列表变体</subtitle>\n<imageTextItem>\n<image src=\"https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800\" alt=\"企业会议与数字化方案讨论\"></image>\n    <title>专利分享合集</title>\n    <text>14MB · 张教授发送</text>\n</imageTextItem>\n<commonListItem>\n  <icon>📄</icon>\n  <layout:column>\n    <title>专利合集</title>\n    <text>1 小时前 · Rebecca 发送</text>\n  </layout:column>\n</commonListItem>\n<caption>4 张图片</caption>\n</showcaseCard>"
+  },
+  {
+    "name": "pairedImageTextCard · 2×3（2×3）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 2,
+    "height": 3,
+    "psuip": "<pairedImageTextCard>\n  <label>pairedImageTextCard · 2×3</label>\n  <title>标准双子卡</title>\n  <content>双子并排需要宽度，2 列宽（928px）下每个子项约 428px，图文舒展。</content>\n  <primaryItem>\n    <image src=\"https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800\" alt=\"企业会议与数字化方案讨论\" />\n    <title>关于企业</title>\n    <body>我们是一家专注于人工智能和大数据领域的创新科技公司。</body>\n  </primaryItem>\n  <secondaryItem>\n    <image src=\"https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=800\" alt=\"团队协作会议\" />\n    <title>关于团队</title>\n    <body>我们拥有一支充满活力和创新精神的技术团队。</body>\n  </secondaryItem>\n</pairedImageTextCard>"
+  },
+  {
+    "name": "summaryCard · 1×2（icon+preview）（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "<summaryCard>\n  <icon></icon>\n  <title>summaryCard · 1×2</title>\n  <commit>查看过程</commit>\n  <text>icon + commit 变体在 1×2 中的展示。</text>\n  <preview src=\"https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200\"></preview>\n</summaryCard>"
+  },
+  {
+    "name": "__rawMarkdown__ · 1×2（1×2）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 2,
+    "psuip": "<__rawMarkdown__>\nrawMarkdown · 1×2\n更长的整块原文透传内容，\n可以跨多行展示。\n</__rawMarkdown__>"
+  },
+  {
+    "name": "metricCard · 1×1（末行）（1×1）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 1,
+    "psuip": "<metricCard>\n  <status>PROGRESS</status>\n  <time_range>本月</time_range>\n  <metric_label>metricCard · 1×1</metric_label>\n  <metric_value>68%</metric_value>\n  <trend_value>+12%</trend_value>\n</metricCard>"
+  },
+  {
+    "name": "summaryCard · 1×1（backgroundImage）（1×1）",
+    "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
+    "width": 1,
+    "height": 1,
+    "psuip": "<summaryCard>\n  <backgroundImage src=\"https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=400&h=400\"></backgroundImage>\n  <title>summaryCard · 1×1</title>\n  <text>backgroundImage 变体。</text>\n  <commitWide>查看过程</commitWide>\n</summaryCard>"
+  }
+]

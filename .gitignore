@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# grid 布局校验测试截图（/api/markdown-layout-check test=true 时生成）
+/public/grid-check-*.png
