@@ -24,7 +24,9 @@ import { checkGridLayoutValidity, wrapGridPsuip } from '@/app/utils/eightElement
  *   - type:    string   布局类型，当前仅支持 "grid"（默认 "grid"）
  *   - width:   number   网格列数 m（格子数），默认 4
  *   - height:  number   网格行数 n（格子数），默认 3
- *   - test:    boolean  是否返回渲染截图 URL（供人工核对判定结果），默认 false
+ *   - test:    boolean  是否返回渲染截图 URL（供人工核对判定结果），默认 false；
+ *                       ⚠️ 仅在 dev 环境（运行时 NODE_ENV === 'development'）生效，
+ *                       生产环境强制忽略（避免在服务器上不断生成图片文件）
  *
  * 出参（JSON）：
  *   - success:      boolean  请求是否成功
@@ -38,6 +40,15 @@ export async function POST(request) {
   try {
     const requestData = await request.json();
     const { psuip, type = 'grid', width = 4, height = 3, test = false } = requestData || {};
+
+    // ⚠️ test 参数只在 dev 环境生效，生产环境强制忽略 test，禁止生成截图——
+    // 避免用户在服务器上不断产生图片文件。
+    // dev 判断：Next.js 进入 dev 模式（server.js 以 NODE_ENV 为空启动 next({dev:true})）
+    // 后会把 NODE_ENV 设为 'development'，因此不能沿用启动时的 !NODE_ENV 判断，
+    // 而应判断运行时 NODE_ENV === 'development'（npm run dev 生效；npm run start 为
+    // 'production' 不生效）
+    const isDev = process.env.NODE_ENV === 'development';
+    const effectiveTest = isDev ? test : false;
 
     // 1. 参数校验：psuip 必填
     if (!psuip || typeof psuip !== 'string' || !psuip.trim()) {
@@ -90,8 +101,8 @@ export async function POST(request) {
     }
 
     // 6. 执行 grid 布局合理性校验（内容缺失检测：真实渲染后检测缺失/裁切/滚动）
-    //    test=true 时截图保存到 public 目录，返回可访问的 URL 供人工核对
-    const screenshotOptions = test
+    //    test=true 且为 dev 环境时截图保存到 public 目录，返回可访问的 URL 供人工核对
+    const screenshotOptions = effectiveTest
       ? { takeScreenshot: true, outputDir: 'public', outputPrefix: 'grid-check' }
       : { takeScreenshot: false };
 
