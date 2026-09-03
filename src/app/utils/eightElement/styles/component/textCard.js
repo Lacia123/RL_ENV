@@ -18,8 +18,8 @@ const TEXT_CARD_STYLE = {
                     groups: [
                         {
                             name: 'titleBlock',
-                            slots: ['text_title'],
-                            styleReference: 'text_title_full'
+                            // 标题样式与 mode 解耦：无论哪种 mode，<text_title> 统一使用 text_title 样式，保证同标签渲染一致
+                            slots: ['text_title']
                         },
                         {
                             name: 'subtitleBlock',
@@ -98,20 +98,6 @@ const TEXT_CARD_STYLE = {
                     background: 'linear-gradient(135deg, {color.basic.brand.5} 0%, {color.basic.violet.5} 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
-                    lineHeight: '1.3'
-                }
-            },
-            text_title_full: {
-                metaType: 'text',
-                variant: 'h3',
-                variantStyle: {
-                    margin: '0',
-                    fontSize: '{font.size.xxl}',
-                    fontWeight: '700',
-                    color: '{color.basic.brand.3}',
-                    background: 'none',
-                    WebkitBackgroundClip: 'border-box',
-                    WebkitTextFillColor: '{color.basic.brand.3}',
                     lineHeight: '1.3'
                 }
             },
