@@ -4415,6 +4415,99 @@ rawMarkdown · 1×2
 </layout:grid>`
   },
 
+  courseResourceDashboard: {
+    name: '📚 课堂资源仪表盘（图片还原）',
+    description: '使用现有 PSUIP 组件拼出课程资源页：课程标题、相关资料、课堂转写、智能摄像头、知识卡片与手写区。',
+    markdown: `<card:headerCard background={color.primarycontainer.brand0}>
+## 0714 Advanced Mathematics
+Room 401 · Professor Zhang
+</card:headerCard>
+
+## Course resources
+
+<!-- 三列 1:1:2，左侧 1 列、中间 1 列、右侧 2 列；共 4 行，上 2 行与下 2 行等高（纵向 1:1） -->
+<!-- height 为格子数（4 行 = 4×j + 3×gap），像素由程序换算，行内容由弹性机制适配 -->
+<layout:grid width="4" gap="16" height="4">
+
+<!-- 左侧：Related files，占 1×4（整列满高） -->
+<grid:item x="1" y="1" width="1" height="4">
+<showcaseCard>
+<title>Related files</title>
+<subtitle>4 Related Files</subtitle>
+<imageTextItem>
+<image src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600" alt="Lecture slides"></image>
+    <title>Lecture Slides - Ch7</title>
+    <text>14MB · Sent by Professor Zhang</text>
+</imageTextItem>
+<commonListItem>
+  <icon>📄</icon>
+  <layout:column>
+    <title>Definite Integral Notes.docx</title>
+    <text>1.2MB · Sent by u0_a204</text>
+  </layout:column>
+</commonListItem>
+<commonListItem>
+  <icon>📊</icon>
+  <layout:column>
+    <title>Practice Problems.xlsx</title>
+    <text>856KB · Sent by u0_a204</text>
+  </layout:column>
+</commonListItem>
+<commonListItem>
+  <icon>📕</icon>
+  <layout:column>
+    <title>Midterm Review.pdf</title>
+    <text>2.3MB · Sent by u0_a204</text>
+  </layout:column>
+</commonListItem>
+<caption>4 Files · Courseware & Homework</caption>
+</showcaseCard>
+</grid:item>
+
+<!-- 中上：Transcription，占 1×2 -->
+<grid:item x="2" y="1" width="1" height="2">
+<showcaseCard>
+<title>Transcription</title>
+<toggle></toggle>
+<text>Today's lecture covered Bayes' theorem, conditional probability, and the law of total probability. The professor worked through several whiteboard examples.</text>
+<loading></loading>
+<button>✦ View AI Summary</button>
+</showcaseCard>
+</grid:item>
+
+<!-- 中下：Smart Camera，contentSummaryCard 单图摘要，占 1×2 -->
+<grid:item x="2" y="3" width="1" height="2">
+<contentSummaryCard>
+  <coverImage src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=600" alt="Whiteboard capture"></coverImage>
+  <title>Smart Camera</title>
+  <description>4 Images captured · Whiteboard 1: Bayes' theorem proof</description>
+  <primaryAction>查看全部 4 张</primaryAction>
+</contentSummaryCard>
+</grid:item>
+
+<!-- 右上：Knowledge card，contentSummaryCard 单图摘要，占 2×2 -->
+<grid:item x="3" y="1" width="2" height="2">
+<contentSummaryCard>
+  <coverImage src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=600" alt="Knowledge card cover"></coverImage>
+  <title>Knowledge card</title>
+  <description>12 cards · 课堂公式速查 · Bayes' Theorem: P(A|B) = P(B|A)·P(A)/P(B)</description>
+  <primaryAction>查看全部卡片</primaryAction>
+</contentSummaryCard>
+</grid:item>
+
+<!-- 右下：Handwriting space，contentSummaryCard 封面图文，占 2×2（与上区等高，1:1） -->
+<grid:item x="3" y="3" width="2" height="2">
+<contentSummaryCard>
+  <coverImage src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600" alt="Handwriting notes"></coverImage>
+  <title>Handwriting space</title>
+  <description>板书推导：条件概率与全概率公式。P(A∩B) = P(A) · P(B|A)</description>
+  <primaryAction>查看过程</primaryAction>
+</contentSummaryCard>
+</grid:item>
+
+</layout:grid>`
+  },
+
 };
 
 

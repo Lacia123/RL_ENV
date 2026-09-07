@@ -60,7 +60,10 @@ const SHOWCASE_CARD_STYLE = {
                 style: {
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '{dimension.gap.extraloose}',
+                    // 🆕 弹性布局：块间距从 extraloose(24) 收紧到 semitight(8)，
+                    // 矮格（1×2）内把空间让给正文；富余空间的弹性由
+                    // loadingBlock/buttonBlock 的 margin-top:auto 承担
+                    gap: '{dimension.gap.semitight}',
                     padding: '{dimension.padding.extraloose}',
                     width: '100%',
                     boxSizing: 'border-box',
@@ -130,6 +133,9 @@ const SHOWCASE_CARD_STYLE = {
                                 // 🆕 grid 适配：列表区占满剩余高度（格子高度随余数浮动），内容由 flex 弹性分配
                                 flex: '1',
                                 minHeight: '0',
+                                // 🆕 列表区自身可滚动：内容超出（格子过矮）时只在列表内滚动，
+                                // 不把整卡撑破/挤压其他区块（滚动只发生在 filelist 内部）
+                                overflowY: 'auto',
                             },
                             slots: ['imageTextItem*', 'commonListItem*', 'doubleImageItem*'],
                         },
@@ -141,6 +147,9 @@ const SHOWCASE_CARD_STYLE = {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 width: '100%',
+                                // 🆕 弹性布局：富余空间推给 loading+button（贴底），
+                                // 空间不足时 auto margin 归零、块自然紧凑堆叠
+                                marginTop: 'auto',
                             },
                             slots: ['loading'],
                         },
@@ -293,7 +302,7 @@ const SHOWCASE_CARD_STYLE = {
                     },
                 },
             },
-            // 展示按钮：内边距 20px 40px，白字 32px 居中
+            // 展示按钮：内边距 12px 40px（原 20px 40px，垂直内边距收紧以适配矮格），白字 32px 居中
             button: {
                 metaType: 'button',
                 supportedAttributes: ['href'],
@@ -306,7 +315,7 @@ const SHOWCASE_CARD_STYLE = {
                     justifyContent: 'center',
                     textAlign: 'center',
                     gap: '10px',
-                    padding: '20px 40px',
+                    padding: '12px 40px',
                     fontSize: '32px',
                     fontWeight: '{font.fontweight.semibold}',
                     color: '{color.basic.opacity.white.100}',

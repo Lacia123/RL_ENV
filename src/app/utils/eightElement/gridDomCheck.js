@@ -7,7 +7,9 @@
  * 检测范围（内容缺失）：
  * 1. 某个内容没有显示出来（元素尺寸为 0 / display:none / visibility:hidden / 完全在裁剪容器之外）
  * 2. 某个内容有一部分超出了容器（被裁切）；「...」省略号截断（ellipsis / line-clamp）是允许的，不算缺失
- * 3. grid:item 及以内出现预期之外的滚动（内容超出容器出现滚动条；文档级滚动不参与判定）
+ * 3. grid:item 自身出现滚动（布局级溢出 = 内容整体放不下格子）；
+ *    组件内部的滚动容器（如 showcaseCard 列表区 overflow-y:auto）是设计行为——
+ *    滚动只发生在列表内部，内容可达不裁切，不算问题（文档级滚动不参与判定）
  * 4. 传入的文本内容丢失：psuip 中出现的文本片段在渲染结果中找不到
  *    （不做声明数量对比——卡片变体可能有意不渲染某些插槽，只对比"传入了的内容是否还在"）
  */
@@ -30,13 +32,13 @@ function extractTextTokens(psuip) {
   // 图谱是否渲染成功由 DOM 侧容器可见性检测兜底，只要渲染出来即认为正确
   const text = String(psuip || '')
     .replace(/\[Topology[^\]]*\](?:[\s\S]*?@@@[\s\S]*?@@@)?/g, ' ')
-    // ⚠️ 处理 [table:xxx] 表格：只剥离标签本身与分隔行（|----|、|:---:|），
-    // 数据行的单元格文本保留并与渲染后的 td 文本对齐（| 是 markdown 语法符号，
-    // 渲染后不存在）。表格渲染是否正常由 DOM 检测兜底：内容不可见
-    // （如非法变体被原样输出为 HTML <title>/<table> 标签）会报内容缺失
+    // ⚠️ 处理 [table:xxx] 表格：只剥离标签本身与分隔行（|----|、|:---:|）。
+    // 数据行保留并与渲染后的 td 文本对齐：仅「以 | 开头」的 markdown 表格行
+    // 把 | 语法符号替换为空格（行首/行尾/单元格分隔）；普通文本行里的 |（如
+    // P(A|B)）是内容，不能动。表格渲染是否正常由 DOM 检测兜底
     .replace(/\[table:[^\]]*\]/g, ' ')
     .replace(/^\s*\|[\s|:\-]+\|\s*$/gm, ' ')
-    .replace(/\s*\|\s*/g, ' ')
+    .replace(/^[ \t]*\|.*$/gm, (line) => line.replace(/\|/g, ' '))
     // ⚠️ 再剥离 LaTeX 公式段（$...$ / $$...$$ / \(...\) / \[...\]）：
     // KaTeX 渲染文本与 LaTeX 源码差异巨大（如 $\dfrac{1}{x-2}$ → 字形 "1 x − 2"），
     // 无法做文本对比；公式是否渲染由 DOM 侧 .katex 容器可见性检测兜底
@@ -131,14 +133,18 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
         ['hidden', 'scroll', 'auto', 'clip'].includes(cs.overflowX) ||
         ['hidden', 'scroll', 'auto', 'clip'].includes(cs.overflowY);
 
-      // 找最近的裁切祖先（包含溢出内容的容器）
-      const nearestClipper = (el) => {
+      // 找全部裁切祖先（由近到远，含溢出的容器链）
+      // ⚠️ 不能只看最近的裁切祖先：内容元素相对最近容器完整、但该容器自身
+      //    又超出外层裁切容器时，内容实际已被外层裁掉不可见（如 contentSummaryCard
+      //    塞进过矮的格子里，desc 相对文字区完整、相对卡片容器越界被 hidden 裁掉）
+      const allClippers = (el) => {
+        const clippers = [];
         let p = el.parentElement;
         while (p && p !== document.body) {
-          if (isClipping(getComputedStyle(p))) return p;
+          if (isClipping(getComputedStyle(p))) clippers.push(p);
           p = p.parentElement;
         }
-        return null;
+        return clippers;
       };
 
       const violations = [];
@@ -157,13 +163,15 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
         const isKatexError = el.classList.contains('katex-error') || !!el.closest('.katex-error');
         if (isKatexInner || isKatexError) return;
 
-        // ── 判定 3：预期之外的滚动（grid:item 及以内出现滚动条）──
-        // ⚠️ 必须在内容元素过滤之前执行：grid:item 等容器没有直接文本、不是 img，
-        //    会被 isContentEl 提前 return，导致「grid:item 自身滚动」成为检测盲区
-        //    （实测：组件 min-height 超过格子高度时 item 出现滚动，却判为 valid）。
-        //    对所有元素检查自身滚动，仅排除文档级（html/body），
-        //    overflow visible 的不算（内容自然溢出/叠出由其他判定覆盖）。
-        if (el.tagName !== 'HTML' && el.tagName !== 'BODY') {
+        // ── 判定 3：预期外的布局级滚动 ──
+        // ⚠️ 在内容元素过滤之前执行（grid:item 容器无直接文本，会被 isContentEl 提前
+        //    return，导致「grid:item 自身滚动」成为盲区——实测组件 min-height 超过
+        //    格子高度时 item 出现滚动却判 valid）。
+        // 只报 grid:item 自身滚动（item 级溢出 = 布局放不下，不合理）；
+        // 组件内部的滚动容器（如 showcaseCard 列表区 overflow-y:auto）是设计行为
+        // ——滚动只发生在 filelist 内部，内容可达不裁切，不算问题
+        const isGridItemEl = (el.className || '').toString().includes('grid-item-dd-');
+        if (isGridItemEl) {
           if (el.scrollHeight > el.clientHeight + EPS && (cs.overflowY === 'auto' || cs.overflowY === 'scroll')) {
             violations.push({
               type: 'scroll',
@@ -211,10 +219,23 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
           return;
         }
 
-        // ── 判定 2：内容有一部分超出容器（省略号截断允许）──
-        const clipper = nearestClipper(el);
-        if (clipper) {
+        // ── 判定 2：内容有一部分超出裁切容器（省略号截断允许）──
+        // 遍历整条裁切祖先链（由近到远）：内容相对最近容器完整、但容器自身
+        // 相对外层越界时，内容实际已被外层裁掉（见 allClippers 注释）。
+        // 对链上每个裁切容器检查，任一越界即报（内容最终不可见/被裁）
+        const clippers = allClippers(el);
+        for (const clipper of clippers) {
           const cRect = clipper.getBoundingClientRect();
+          const ccs = getComputedStyle(clipper);
+
+          // 可滚动容器（overflow auto/scroll 且实际有溢出内容）：内容在滚动区内
+          // 可滚可达，视觉受该容器裁切控制，外层容器无法再裁切它（如 showcaseCard
+          // 列表区），直接跳出裁切链检查——内容不缺失
+          const clipperScrollable =
+            (ccs.overflowX === 'auto' || ccs.overflowX === 'scroll' || ccs.overflowY === 'auto' || ccs.overflowY === 'scroll') &&
+            (clipper.scrollHeight > clipper.clientHeight + EPS || clipper.scrollWidth > clipper.clientWidth + EPS);
+          if (clipperScrollable) break;
+
           const partiallyOutside =
             d.rect.right > cRect.right + EPS || d.rect.bottom > cRect.bottom + EPS ||
             d.rect.left < cRect.left - EPS || d.rect.top < cRect.top - EPS;
@@ -223,23 +244,27 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
             d.rect.right <= cRect.left + EPS || d.rect.left >= cRect.right - EPS;
 
           // 裁切祖先自身是省略号容器（line-clamp / ellipsis）时，超出属于允许的截断
-          const ccs = getComputedStyle(clipper);
           const clipperIsEllipsis =
             (ccs.textOverflow === 'ellipsis' && ccs.whiteSpace === 'nowrap' && clipper.scrollWidth > clipper.clientWidth + EPS) ||
             (ccs.display === '-webkit-box' && clipper.scrollHeight > clipper.clientHeight + EPS);
 
-          if (partiallyOutside && !isEllipsisTruncated(d) && !clipperIsEllipsis) {
+          if (partiallyOutside && d.tag !== 'img' && !isEllipsisTruncated(d) && !clipperIsEllipsis) {
+            // ⚠️ img 部分越界豁免：图片是 cover 视觉，允许边缘被容器裁切
+            //（如 heroCard 封面放大防白边的出血设计），裁掉的是图片边缘不算内容缺失
             violations.push({
               type: 'clipped',
               target: `${d.tag}.${d.cls}`,
               detail: `内容超出容器被裁切（元素 ${Math.round(d.rect.width)}×${Math.round(d.rect.height)}，容器 ${Math.round(cRect.width)}×${Math.round(cRect.height)}）文本「${d.text}」`
             });
+            break; // 已确认越界被裁，不再检查外层裁切祖先（避免同一元素重复报）
           } else if (fullyOutside && !isEllipsisTruncated(d)) {
+            // 完全不可见（含 img 完全在容器外）仍报缺失
             violations.push({
               type: 'missing',
               target: `${d.tag}.${d.cls}`,
               detail: `内容完全位于容器之外（被裁切不可见）文本「${d.text}」`
             });
+            break;
           }
         }
 

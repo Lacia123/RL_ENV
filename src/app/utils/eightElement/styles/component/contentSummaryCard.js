@@ -239,8 +239,11 @@ const CONTENT_SUMMARY_CARD_STYLE = {
                       type: 'template',
                       style: {
                           width: '100%',
-                          height: '344px',
-                          flexShrink: "0",
+                          // 🆕 弹性布局：图片吸收全部剩余空间（装饰可伸缩、cover 裁切无损），
+                          // minHeight 保证矮格中图片可见；文字区自然高不掺水，
+                          // 富余空间不留给文字区内部空白——图片撑满缺失的部分
+                          flex: '1',
+                          minHeight: '120px',
                           fontSize: '{font.size.medium}',
                           borderRadius: '{dimension.borderradius.large}',
                           overflow: 'hidden',
@@ -257,6 +260,10 @@ const CONTENT_SUMMARY_CARD_STYLE = {
                           flexDirection: 'column',
                           gap: '{dimension.gap.semiloose}',
                           overflow: 'hidden',
+                          // 🆕 弹性布局：文字区保持内容自然高度、不参与 grow/shrink
+                          // （完整不被裁切，也不把剩余空间吸进内部造成空白），
+                          // 富余空间全部由图片吸收撑满
+                          flex: '0 0 auto',
                       },
                       groups: [{
                           name: 'header',
@@ -320,8 +327,11 @@ const CONTENT_SUMMARY_CARD_STYLE = {
                       type: 'template',
                       style: {
                           width: '100%',
-                          height: '344px',
-                          flexShrink: "0",
+                          // 🆕 弹性布局：图片吸收全部剩余空间（装饰可伸缩、cover 裁切无损），
+                          // minHeight 保证矮格中图片可见；文字区自然高不掺水，
+                          // 富余空间不留给文字区内部空白——图片撑满缺失的部分
+                          flex: '1',
+                          minHeight: '120px',
                           fontSize: '{font.size.medium}',
                           borderRadius: '{dimension.borderradius.large}',
                           overflow: 'hidden',
@@ -338,6 +348,10 @@ const CONTENT_SUMMARY_CARD_STYLE = {
                           flexDirection: 'column',
                           gap: '{dimension.gap.semiloose}',
                           overflow: 'hidden',
+                          // 🆕 弹性布局：文字区保持内容自然高度、不参与 grow/shrink
+                          // （完整不被裁切，也不把剩余空间吸进内部造成空白），
+                          // 富余空间全部由图片吸收撑满
+                          flex: '0 0 auto',
                       },
                       groups: [{
                           name: 'header',
