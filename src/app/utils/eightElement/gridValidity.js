@@ -42,7 +42,7 @@ export function wrapGridPsuip(psuip, { columns, rows }) {
  * 供 /api/markdown-layout-check 接口使用（强化模型训练用）。
  *
  * 语义：模型不能看图、不关心像素，只关心格子级语义——因此入参是格子数（columns/rows），
- * 像素换算（i=456 / j=216 / gap=16，见 GRID_CONSTANTS）由校验内部完成，对模型不可见。
+ * 像素换算（i=228 / j=216 / gap=16，见 GRID_CONSTANTS）由校验内部完成，对模型不可见。
  *
  * 检测范围（内容缺失，详见 gridDomCheck.js）：
  * 1. 某个内容没有显示出来（尺寸为 0 / display:none / visibility:hidden / 完全在容器之外）

@@ -329,7 +329,8 @@ function createLayoutElement(direction, children = [], options = {}) {
     // - width/height 写「格数」（纯数字）是推荐写法：网格总尺寸 = m·i + (m-1)·gap、n·j + (n-1)·gap，
     //   由程序提前换算成像素，格子精确等于单位 i/j（无内部余数）——布局 AI 只需写 width=m height=n，
     //   不需要关心像素与余数；余数处理（容器非整数倍）只发生在容器层，不进入网格内部
-    // - width/height 写像素（如 "1880px"）向后兼容：由程序推导格数，余数摊平到格子上（格子 = i+δ）
+    // - width/height 写像素（如 "1936px"）向后兼容：由程序推导格数，余数摊平到格子上（格子 = i+δ）
+    //   （1936px = 8×228+7×16，恰好 8 格整；非整倍像素则 δ>0，如旧例 1880px 在 i=228 下推导为 7 格）
     // - 显式 columns/rows/gridTemplateColumns/gridTemplateRows 始终优先
     if (variant === 'grid') {
         const gridColumns = attributes.columns ?? attributes.cols;
