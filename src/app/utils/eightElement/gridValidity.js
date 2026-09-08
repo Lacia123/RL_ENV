@@ -2,6 +2,7 @@ import { markdownToEightElement } from './index.js';
 import { renderEightElementToHtml } from './renderEightElementHtml.js';
 import { GRID_CONSTANTS } from './styles';
 import { measureGridDom } from './gridDomCheck.js';
+import { CARD_MIN_SIZE_MAP } from './cardMinSizes.js';
 
 /**
  * 将裸 psuip 包裹为完整的 grid 布局（可渲染）
@@ -36,6 +37,44 @@ export function wrapGridPsuip(psuip, { columns, rows }) {
 }
 
 /**
+ * 卡片最小尺寸预检（最小格数检测，纯静态不渲染）
+ *
+ * 语义：每种卡片类型可在 CARD_MIN_SIZE_MAP（cardMinSizes.js）里配置最小宽/高，
+ * 单位为「格」（列数 × 行数，与接口 width/height 入参一致）。模型分配给卡片的
+ * 网格小于该类型的最小格数时，卡片必然放不下（内容会被挤压/裁切），属于根本性
+ * 错误——无需渲染即可判定非法，报错放最前（短路，省一次 Playwright DOM 检测）。
+ *
+ * 识别范围：仅取 psuip 顶层的卡片标签（契约中 psuip 为裸内容，顶层即卡片）；
+ * 顶层不是卡片（纯文本 / layout 包裹 / 未在表中配置的类型）时不适用，返回 null，
+ * 交由原有 DOM 内容缺失检测继续兜底。
+ *
+ * @param {string} psuip - 裸 PSUIP 内容（不含 grid / grid:item 标签）
+ * @param {{columns: number, rows: number}} grid - 分配网格的列数 m 与行数 n
+ * @returns {string|null} 不满足时返回报错文案（应置于 messages 最前）；满足/不适用返回 null
+ */
+function checkCardMinSize(psuip, { columns, rows }) {
+  // 顶层标签名：<textCard ...> → textCard；<card:headerPrecentCard> → headerPrecentCard
+  const topTagMatch = String(psuip || '').trim().match(/^<([a-zA-Z][\w.:-]*)/);
+  if (!topTagMatch) return null;
+  const rawTag = topTagMatch[1];
+  const tagName = rawTag.includes(':') ? rawTag.split(':').pop() : rawTag;
+
+  const cfg = CARD_MIN_SIZE_MAP[tagName];
+  if (!cfg) return null; // 该类型未配置最小尺寸 → 不限制（向后兼容）
+
+  const minW = Number(cfg.minW);
+  const minH = Number(cfg.minH);
+  const hasMinW = Number.isFinite(minW);
+  const hasMinH = Number.isFinite(minH);
+  if (!hasMinW && !hasMinH) return null; // 配置了条目但没填有效值 → 视同不限制
+
+  if ((hasMinW && columns < minW) || (hasMinH && rows < minH)) {
+    return `${tagName} 卡片不满足最小尺寸：至少需要 ${hasMinW ? minW : '—'}×${hasMinH ? minH : '—'} 格（宽×高），当前网格仅 ${columns}×${rows} 格`;
+  }
+  return null;
+}
+
+/**
  * grid 布局合理性校验（内容缺失检测）
  *
  * 判定一段 PSUIP 字符串中的 grid 布局在指定的「格子数」网格（m 列 × n 行）下是否"合理"。
@@ -57,6 +96,20 @@ export function wrapGridPsuip(psuip, { columns, rows }) {
  * @returns {Promise<{valid: boolean, details: object, screenshotPath?: string}>} - valid=false 时 details 说明原因
  */
 export async function checkGridLayoutValidity(psuip, { columns, rows, html, takeScreenshot = false, outputDir = 'output', outputPrefix = 'grid-check' }) {
+  // ── 0. 卡片最小尺寸预检（短路：不渲染、不做 DOM 检测）──
+  // 网格分配不足卡片类型要求的最小格数时，卡片必然放不下，属根本性错误，
+  // 直接判定非法并将报错作为唯一（最前）消息返回
+  const minSizeError = checkCardMinSize(psuip, { columns, rows });
+  if (minSizeError) {
+    return {
+      valid: false,
+      details: {
+        checked: 0,
+        messages: [minSizeError]
+      }
+    };
+  }
+
   // 视口 = 网格换算尺寸 + 环境余量：
   // 渲染环境中 layout:root 有 padding（dimension.padding.base = 12px，左右各 12），
   // 若视口精确等于网格尺寸，grid 会被 root padding 挤出视口 → 文档滚动误报。

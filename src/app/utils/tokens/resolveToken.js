@@ -162,8 +162,11 @@ let dynamicTokenSystem = null;
  */
 function setDynamicTokenSystem(tokenSystem) {
   if (tokenSystem && typeof tokenSystem === 'object') {
-    dynamicTokenSystem = tokenSystem;
-    console.log('已设置动态token系统');
+    // 以默认主题 token 为底，用注入的主题 JSON 增量覆盖（overlay），
+    // 合并成完整 token 树：注入文件里缺省的部分（如语义别名层）由默认主题补齐，
+    // 注入文件里定义的部分则覆盖默认值，且后续引用都在合并后的树上解析。
+    dynamicTokenSystem = deepMerge(tokenCollections, tokenSystem);
+    console.log('已设置动态token系统（默认主题 + 自定义主题合并）');
     return true;
   }
   return false;
