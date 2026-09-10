@@ -242,8 +242,10 @@ const LAYOUT_STYLE = {
                 boxSizing: 'border-box',
                 width: '100%',
                 position: 'relative',
-                // 🆕 超出（宽或高）时滚动：网格内容超过容器边界时在网格内滚动，而不是撑破页面
-                overflow: 'auto',
+                // 🆕 不裁切投影：容器若为 overflow:auto/scroll，会连同子卡片的柔光阴影
+                //   一起裁掉（尤其最外圈格子），导致「投影没完全显示」。
+                //   网格尺寸由 width/height 精确控制，轨道用 minmax(0,1fr)，不会撑破页面
+                overflow: 'visible',
                 padding: '0',
                 margin: '0',
             },

@@ -120,7 +120,7 @@ const MISTAKES_CARD_STYLE = {
  * type 属性取值 normal/warning/error：
  *   - normal：背景 grey-0
  *   - warning：背景 orange-0 + backdrop-filter blur(7px)
- *   - error：背景 pink-0
+ *   - error：背景 error-red0（语义错误色，避免主题把 pink.0 刷白导致红底色失效）
  * 容器 border 1.2px solid rgba(255,255,255,0.64)、圆角 32px 保持一致。
  * 三个子标签字体颜色随 type 切换（见各 subSlot.colorByType）。
  * 注：feedItem 的 subSlots 作用域仅限 <mistakesCardItem> 内部，与 mistakesCard 顶层 title 插槽不冲突。
@@ -162,7 +162,7 @@ function createMistakesCardItemSlotConfig() {
                 backdropFilter: 'blur(7px)',
             },
             error: {
-                background: '{color.basic.pink.0}',
+                background: '{color.error.red0}',
             },
         },
         subSlots: {
@@ -182,7 +182,7 @@ function createMistakesCardItemSlotConfig() {
                 colorByType: {
                     normal: '{color.basic.grey.7}',
                     warning: '{color.basic.orange.7}',
-                    error: '{color.basic.pink.7}',
+                    error: '{color.error.red7}',
                 },
             },
             text: {
@@ -200,7 +200,7 @@ function createMistakesCardItemSlotConfig() {
                 colorByType: {
                     normal: '{color.basic.grey.5}',
                     warning: '{color.basic.orange.5}',
-                    error: '{color.basic.pink.5}',
+                    error: '{color.error.red5}',
                 },
             },
             caption: {
@@ -229,7 +229,7 @@ function createMistakesCardItemSlotConfig() {
                 colorByType: {
                     normal: '{color.basic.grey.7}',
                     warning: '{color.basic.orange.7}',
-                    error: '{color.basic.pink.7}',
+                    error: '{color.error.red7}',
                 },
             },
         },

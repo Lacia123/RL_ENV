@@ -136,8 +136,24 @@ function createGridItemElement(content, attributes = {}, currentMarkdown = '') {
     const fill = attributes.fill !== undefined ? attributes.fill : undefined;
 
     // 生成 grid 定位样式（gridColumn/gridRow 由渲染端转成 grid-column/grid-row）
-    // overflow:auto —— 单元格内内容超出（宽或高）时滚动，避免溢出撑破网格
-    const classStyle = { minWidth: '0', overflow: 'auto' };
+    //
+    // 目标：只让「卡片的投影」溢出格子，内容一律不许溢出（投影只是投影，不影响别的格子）。
+    //   - 单元格自身 overflow: visible —— 投影外扩 20+px，需要溢出到格子外才能完整显示；
+    //   - 内容裁切下沉到直接子元素（卡片）：'& > *' 上 overflow: hidden。
+    //
+    // 关键原理：元素的 overflow 只裁切「后代」，不会裁切「自己」的 box-shadow。
+    //   所以卡片自己 overflow:hidden 把内容裁在格子内，而卡片自身的投影依然完整渲染。
+    //   min-width/min-height: 0 —— 阻止内容把网格轨道/卡片撑破（轨道本身用 minmax(0,1fr)）
+    const classStyle = {
+        minWidth: '0',
+        minHeight: '0',
+        overflow: 'visible',
+        '& > *': {
+            minWidth: '0',
+            minHeight: '0',
+            overflow: 'hidden',
+        },
+    };
     if (hasXY) {
         classStyle.gridColumn = `${x} / span ${width}`;
         classStyle.gridRow = `${y} / span ${height}`;
