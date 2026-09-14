@@ -252,6 +252,13 @@
     "psuip": "<heroCard>\n  <cover_image src=\"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900\"></cover_image>\n  <badge>heroCard · 2×2</badge>\n  <title>发现你的下一站旅行</title>\n  <subtitle>个性化行程推荐。</subtitle>\n  <metrics>⭐ 4.9 · 128K 用户</metrics>\n</heroCard>"
   },
   {
+    "name": "targetStatCard · 2×1（反例：内容被压扁折叠）",
+    "description": "2×1 放不下 targetStatCard（卡片样式 minHeight 240px > 格子 216px）：卡片被压缩后内部 headerBlock 只剩 55px，标题块溢出 121px 压到底部数字/说明上（实测「240」「TOTAL PROBLEMS」「查看报告」三处都被标题压住）。预期 invalid —— 判定 4 [overflow] 命中。psuip 为实际产出中的 withCommit 变体（带 button）",
+    "width": 2,
+    "height": 1,
+    "psuip": "<targetStatCard>\n  <subtitle>FOR MAGGIE</subtitle>\n  <title>Master Calculus in 14 Days.</title>\n  <text>240</text>\n  <caption>TOTAL PROBLEMS</caption>\n  <button nativeEvent=\"click\" data=\"viewReport\">查看报告</button>\n</targetStatCard>"
+  },
+  {
     "name": "targetStatCard · 2×2（2×2）",
     "description": "gridSizeEnum 枚举分组中的卡片（page.js），按枚举标注的尺寸单独包裹成网格校验",
     "width": 2,

@@ -12,6 +12,9 @@
  *    滚动只发生在列表内部，内容可达不裁切，不算问题（文档级滚动不参与判定）
  * 4. 传入的文本内容丢失：psuip 中出现的文本片段在渲染结果中找不到
  *    （不做声明数量对比——卡片变体可能有意不渲染某些插槽，只对比"传入了的内容是否还在"）
+ * 5. 内容溢出「不裁切的父容器」（被压扁折叠）：容器被 flex 压缩得比内容矮且
+ *    overflow: visible 时，内容既不裁切也不滚动，而是压在兄弟内容上
+ *    （如 targetStatCard 2×1：卡片内分组被压到 76px，标题第二行压到底部数字上）
  */
 import { chromium } from 'playwright-chromium';
 import fs from 'fs';
@@ -109,6 +112,9 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
 
     const result = await page.evaluate(({ viewportWidth, viewportHeight }) => {
       const EPS = 1; // 容差（px）：避免字体渲染小数误差误报
+      // 溢出容差（px）：比 EPS 略大，吸收 flex 压缩与字体度量的亚像素误差
+      // （判定 4「内容溢出父容器」使用，避免 1px 级抖动误报）
+      const OVERFLOW_EPS = 2;
 
       // 归一化环境边距：浏览器默认 body margin(8px) 会让文档 scroll 尺寸虚高，
       // 导致"文档滚动"误报（grid 本身完整可见）
@@ -179,6 +185,63 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
               detail: `内容超出出现滚动（可见 ${el.clientHeight}px，内容 ${el.scrollHeight}px）`
             });
           }
+        }
+
+        // ── 判定 4：内容溢出「不裁切的父容器」（被压扁折叠）──
+        // 场景：容器被 flex 压缩得比内容矮（如卡片内 flex:1 + min-height:0 的分组），
+        //    且容器 overflow: visible —— 内容既不会被裁切（判定 2 只查裁切祖先），
+        //    也不会出现滚动（判定 3 只认 overflow auto/scroll），于是内容直接压到
+        //    兄弟内容上（实测 targetStatCard 2×1：标题第二行压在底部数字上，判定全绿）。
+        // 判定：子元素「内容盒」（边框盒去掉自身 padding/border）超出「不裁切的父容器」边框盒
+        //    超过 OVERFLOW_EPS 即报。⚠️ 必须扣掉子元素自身的 padding/border：
+        //    padding 是设计留白，溢出量被自身留白吸收时内容并未越界（实测 mistakesCard 2×2
+        //    的 12px 就是 feed 容器的 padding-bottom 伸到插槽外，文字既未越界也未重叠）
+        // 排除（这些元素的矩形不代表流内布局占位，越界属正常视觉设计）：
+        //   - 脱离文档流的子元素（absolute / fixed）
+        //   - 被「真实偏移」的相对定位子元素（relative / sticky 且 top/bottom/left/right
+        //     是非 0 的长度）。⚠️ 不能只判 !== 'auto'：实测 position: relative 且未设偏移时
+        //     chrome 计算值是 0px 而非 auto，卡片/分组这类 relative 容器会被整类误排除，
+        //     判定 4 形同虚设（2×1 targetStatCard 的折叠就是这么漏掉的）
+        //   - 带 transform 的子元素（矩形是变换后的矩形）
+        //   - display: inline 的子元素（行内盒子可高于行盒，KaTeX 公式即如此）
+        //   - 零尺寸子元素 / 零尺寸父容器
+        if (!isClipping(cs) && rect.width > 0 && rect.height > 0) {
+          Array.from(el.children).forEach((child) => {
+            const childCs = getComputedStyle(child);
+            if (childCs.display === 'none' || childCs.visibility === 'hidden') return;
+            if (childCs.position === 'absolute' || childCs.position === 'fixed') return;
+            if ((childCs.position === 'relative' || childCs.position === 'sticky') &&
+                ['top', 'bottom', 'left', 'right'].some((k) => {
+                  const v = String(childCs[k] || '').trim();
+                  return v !== '' && v !== 'auto' && !/^[-+]?0(\.0+)?(px|%)?$/.test(v);
+                })) return;
+            if (childCs.transform && childCs.transform !== 'none') return;
+            if (childCs.display === 'inline') return;
+
+            const cRect = child.getBoundingClientRect();
+            if (cRect.width <= 0.5 || cRect.height <= 0.5) return;
+
+            // 子元素内容盒 = 边框盒去掉自身 padding + border（非内容的设计留白/描边）
+            const px = (v) => parseFloat(v) || 0;
+            const insetTop = px(childCs.paddingTop) + px(childCs.borderTopWidth);
+            const insetRight = px(childCs.paddingRight) + px(childCs.borderRightWidth);
+            const insetBottom = px(childCs.paddingBottom) + px(childCs.borderBottomWidth);
+            const insetLeft = px(childCs.paddingLeft) + px(childCs.borderLeftWidth);
+
+            const overflow = Math.max(
+              (cRect.bottom - insetBottom) - rect.bottom,
+              rect.top - (cRect.top + insetTop),
+              (cRect.right - insetRight) - rect.right,
+              rect.left - (cRect.left + insetLeft)
+            );
+            if (overflow > OVERFLOW_EPS) {
+              violations.push({
+                type: 'overflow',
+                target: `${child.tagName.toLowerCase()}.${(child.className || '').toString().slice(0, 40)}`,
+                detail: `内容溢出容器（未被裁切，被压扁）「${el.tagName.toLowerCase()}.${(el.className || '').toString().slice(0, 40)}」${Math.round(overflow)}px（元素 ${Math.round(cRect.width)}×${Math.round(cRect.height)}，容器 ${Math.round(rect.width)}×${Math.round(rect.height)}）文本「${String(child.textContent || '').trim().slice(0, 30)}」`
+              });
+            }
+          });
         }
 
         // 直接文本内容（仅叶子文本节点）
