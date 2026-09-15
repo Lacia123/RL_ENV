@@ -1,7 +1,7 @@
 const SHOWCASE_CARD_STYLE = {
     showcaseCard: {
         type: 'template',
-        description: '展示型卡片容器。支持两种布局：1) 默认上中下三段布局（支持 title/subtitle/toggle/text/loading/button/imageTextItem/commonListItem/doubleImageItem/caption 插槽）；2) preview 布局（含 preview 标签时）—— 左右布局，左侧 title + caption，右侧 preview 图片。其中 text 为 24px 段落正文；loading 渲染为上下两段渐变骨架条（下条 60% 宽、均 32px 高、opacity 0.6）；button 渲染为内边距 20px 40px、白字 32px 居中的展示按钮。',
+        description: '展示型卡片容器。支持两种布局：1) 默认上中下三段布局（支持 title/subtitle/toggle/text/loading/button/imageTextItem/commonListItem/doubleImageItem/caption 插槽，caption 左侧可选 tag 标签）；2) preview 布局（含 preview 标签时）—— 左右布局，左侧 title + caption + 可选 tag 标签，右侧 preview 图片。其中 text 为 24px 段落正文；loading 渲染为上下两段渐变骨架条（下条 60% 宽、均 32px 高、opacity 0.6）；button 渲染为内边距 20px 40px、白字 32px 居中的展示按钮。',
         layoutModes: [
             {
                 name: 'previewMode',
@@ -32,7 +32,21 @@ const SHOWCASE_CARD_STYLE = {
                                 minWidth: '0',
                                 alignSelf: 'stretch',
                             },
-                            slots: ['title', 'caption'],
+                            groups: [
+                                { name: 'titleGroup', slots: ['title'] },
+                                {
+                                    name: 'captionRow',
+                                    type: 'template',
+                                    condition: 'has:caption',
+                                    style: {
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        gap: '{dimension.gap.semitight}',
+                                    },
+                                    slots: ['tag', 'caption'],
+                                },
+                            ],
                         },
                         {
                             name: 'previewBlock',
@@ -174,10 +188,11 @@ const SHOWCASE_CARD_STYLE = {
                                 display: 'flex',
                                 flexDirection: 'row',
                                 justifyContent: 'flex-start',
-                                alignItems: 'flex-start',
+                                alignItems: 'center',
+                                gap: '{dimension.gap.semitight}',
                                 width: '100%',
                             },
-                            slots: ['caption'],
+                            slots: ['tag', 'caption'],
                         },
                     ],
                 },
@@ -253,6 +268,19 @@ const SHOWCASE_CARD_STYLE = {
                     color: '{color.basic.dark-blue.2}',
                     lineHeight: 1.5,
                     textAlign: 'left',
+                },
+            },
+            tag: {
+                metaType: 'text',
+                variant: 'p',
+                variantStyle: {
+                    margin: '0',
+                    fontSize: '{font.size.xxl}',
+                    fontWeight: '400',
+                    color: '{color.basic.brand.6}',
+                    lineHeight: '120%',
+                    textAlign: 'left',
+                    alignSelf: 'center',
                 },
             },
             // 段落正文：黑字 24px
@@ -579,6 +607,9 @@ function createDoubleImageItemSlotConfig() {
             display: 'flex',
             flexDirection: 'column',
             width: '100%',
+            minHeight: '0',
+            overflow: 'hidden',
+            borderRadius: '30px',
         },
         itemStyles: {
             row: {

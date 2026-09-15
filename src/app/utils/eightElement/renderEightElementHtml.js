@@ -2433,17 +2433,20 @@ function renderButtonElement(element) {
 
     // 获取按钮内容和URL
     let buttonText = element.buttonText || 'Button';
-    let buttonUrl = element.url || '#';
+    // 无真实 URL 时不渲染 <a href="#">，避免点击跳转（textButton 等无链接按钮）
+    const buttonUrl = element.url && element.url.trim() ? element.url : '';
 
     // 转义HTML特殊字符
     buttonText = escapeHtml(buttonText);
 
+    const buttonInnerHtml = buttonUrl
+        ? `<a href="${buttonUrl}" style="display:block;width:100%;height:100%;text-align:center;text-decoration:none;color:inherit;">${buttonText}</a>`
+        : `<span style="display:block;width:100%;height:100%;text-align:center;text-decoration:none;color:inherit;">${buttonText}</span>`;
+
     // 构建按钮HTML
     return `
     <div id="${element.id || ''}" ${classAttr} data-element-type="button" ${styleAttr}>
-      <a href="${buttonUrl}" style="display:block;width:100%;height:100%;text-align:center;text-decoration:none;color:inherit;">
-        ${buttonText}
-      </a>
+      ${buttonInnerHtml}
       </div>
     `;
 }

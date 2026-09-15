@@ -1,12 +1,13 @@
 /*!
  * graph-renderer.js
  * 知识图谱浏览器端渲染运行时（与 src/app/utils/eightElement/KcGraphG6.js 逻辑保持一致）
+ * 辐射布局（radial）+ 默认缩放 0.5 + fitCenter 居中 + node-click 事件。
  *
  * 依赖：/vendor/g6.min.js（@antv/g6 v5 的 UMD 构建，暴露 window.G6）
  * 用法：
  *   <script src="/vendor/g6.min.js"></script>
  *   <script src="/graph-renderer.js"></script>
- *   <kc-graph-g6 data-graph='{"nodes":[],"edges":[]}'></kc-graph-g6>
+ *   <kc-graph-g6 data-graph='{"nodes":[],"edges":[]}' zoom="0.5"></kc-graph-g6>
  *   或：window.renderKcGraph(container, dataStr)
  */
 (function (global) {
@@ -21,6 +22,7 @@
   const TOPIC_GRADIENT = 'linear-gradient(135deg, #B1C5FF 0%, #D0BCFF 25%, #FFA9FF 50%, #FFB0C9 75%, #FFB4A3 100%)';
   const KP_GRADIENT = 'linear-gradient(135deg, #94A6FF 0%, #D68EFE 100%)';
   const HALO_OPACITY = 0.24;
+  const DEFAULT_ZOOM = 0.5;
 
   let nodesRegistered = false;
 
@@ -144,11 +146,33 @@
     return map[type] || map.default;
   }
 
-  function renderGraphData(graph, dataStr) {
+  // 画布居中：先 fitCenter 再按画布中心 zoomTo 放大，最后双 rAF 淡入容器
+  function centerRoot(graph, container) {
+    if (!graph) return;
+    try {
+      if (container) container.style.opacity = '0';
+      graph.fitCenter();
+      const zoom = graph.__kcZoom || DEFAULT_ZOOM;
+      if (zoom > 0 && zoom < 1) {
+        const center = graph.getCanvasCenter();
+        graph.zoomTo(zoom, center);
+      }
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (container) container.style.opacity = '';
+        });
+      });
+    } catch (error) {
+      console.error('centerRoot error', error);
+    }
+  }
+
+  function renderGraphData(graph, dataStr, container) {
     if (!graph) return;
 
     const { nodes, edges } = parseGraphData(dataStr);
     if (nodes.length === 0) return;
+    graph.__kcData = dataStr;
 
     const BASE_SIZE = 200;
     const FONT_SIZE = 15;
@@ -193,10 +217,9 @@
           ? (relType === 'HAS_TOPIC' || relType === 'HAS_KP' ? 2.2 : 1.6)
           : (e.data?.lineWidth || (1.8 + (e.data?.weight || 1) * 0.6));
         const label = isRealFormat ? e.type : (e.data?.label || '');
-        const offset = 50;
         const isDirect = relType === 'HAS_TOPIC';
         return {
-          id: isRealFormat ? e.id : `${e.data.source}-${e.data.target}`,
+          id: isRealFormat ? e.id : `${e.data?.source}-${e.data?.target}`,
           source, target, type: 'line',
           data: { label, relationType: relType },
           style: {
@@ -204,17 +227,16 @@
             lineWidth: isDirect ? 2.265 : 1.5,
             lineDash: isDirect ? undefined : [6, 4],
             cursor: 'pointer',
-            sourceOffset: offset, targetOffset: offset,
             endArrow: false,
             labelText: label,
             labelFill: '#ffffff',
-            labelFontSize: 14,
+            labelFontSize: 12,
             labelFontWeight: 600,
             labelPlacement: 'center',
             labelBackground: true,
             labelBackgroundFill: '#bcc0c4',
             labelBackgroundRadius: 85,
-            labelBackgroundPadding: [6, 10, 6, 10],
+            labelPadding: [2, 2],
             labelBackgroundOpacity: 1,
             labelBackgroundLineWidth: 0,
             labelAutoRotate: false,
@@ -225,46 +247,83 @@
 
     graph.setData(g6Data);
 
-    // 根节点水平居中、保持在视口上方：布局完成（afterlayout）后立即平移相机，
-    // 只调整水平方向。translateTo 以画布中心为基准：新视口中心 = 画布中心 - t，
-    // 取 t = 画布中心X - 根节点X 即可让根节点位于水平中线
-    const centerRootX = () => {
-      const rootNode = g6Data.nodes.find((n) => n.data?.semanticType === 'Chapter' || n.data?.type === 'Chapter');
-      if (!rootNode || typeof graph.translateTo !== 'function') return;
-      try {
-        const [rx] = graph.getElementPosition(rootNode.id);
-        const [cw] = graph.getSize();
-        if (typeof rx === 'number' && typeof cw === 'number') {
-          graph.translateTo([cw / 2 - rx, 0], false);
-        }
-      } catch (error) { /* ignore */ }
-    };
-    graph.on('afterlayout', centerRootX);
-
-    // G6 v5 的 render() 是异步的，兜底：渲染完成后再水平居中（公式基于画布中心，幂等无副作用）
+    // G6 v5 的 render() 是异步的，兜底：渲染完成后居中（fitCenter + zoomTo，幂等无副作用）
     const renderResult = graph.render();
     if (renderResult && typeof renderResult.then === 'function') {
-      renderResult.then(centerRootX).catch(() => { /* ignore */ });
+      renderResult.then(() => {
+        requestAnimationFrame(() => centerRoot(graph, container));
+      }).catch(() => { /* ignore */ });
     }
   }
 
-  function createKcGraph(container, G6, dataStr) {
+  // 创建并渲染辐射布局 + 默认缩放 0.5 的知识图谱
+  function createKcGraph(container, G6, dataStr, options) {
+    options = options || {};
     registerKcGraphNodes(G6);
+    const zoom = options.zoom ?? DEFAULT_ZOOM;
     const graph = new G6.Graph({
       container,
       background: 'transparent',
-      autoFit: false,
       autoResize: true,
       padding: 24,
-      layout: { type: 'dagre', rankdir: 'TB', nodesep: 60, ranksep: 100, edgesep: 30 },
+      zoom,
+      animation: false,
+      layout: {
+        type: 'radial',
+        center: [0, 0],
+        radius: 350,
+        unitRadius: 280,
+        linkDistance: 350,
+        preventOverlap: true,
+        nodeSize: 280,
+        maxIterations: 100,
+      },
       behaviors: [
         { type: 'drag-canvas' },
         { type: 'zoom-canvas' },
         { type: 'drag-element' },
       ],
     });
-    renderGraphData(graph, dataStr);
+    graph.__kcZoom = zoom;
+    wireKcNodeClick(graph, container, dataStr);
+    renderGraphData(graph, dataStr, container);
     return graph;
+  }
+
+  // 绑定节点点击事件，向上冒泡 node-click 自定义事件
+  function wireKcNodeClick(graph, container, dataStr) {
+    if (!graph || typeof graph.on !== 'function') return;
+    graph.on('node:click', (evt) => {
+      let target = evt.target;
+      let nodeId = null;
+      while (target) {
+        if (target.id && typeof graph.getNodeData === 'function') {
+          const data = graph.getNodeData(target.id);
+          if (data) { nodeId = target.id; break; }
+        }
+        target = target.parent;
+      }
+      if (!nodeId) return;
+      const nodeData = typeof graph.getNodeData === 'function' ? graph.getNodeData(nodeId) : null;
+      const { nodes, edges } = parseGraphData(graph.__kcData || dataStr);
+      const host = (container && typeof container.closest === 'function' && container.closest('kc-graph-g6')) || container;
+      const targetEl = host || container || global;
+      if (!targetEl) return;
+      targetEl.dispatchEvent(new CustomEvent('node-click', {
+        detail: {
+          node: {
+            id: nodeId,
+            type: nodeData?.data?.semanticType || nodeData?.data?.type,
+            label: nodeData?.style?.labelText || nodeData?.data?.label,
+            data: nodeData?.data,
+            model: nodeData,
+          },
+          allData: { nodes, edges },
+        },
+        bubbles: true,
+        composed: true,
+      }));
+    });
   }
 
   // 监听容器尺寸变化，让画布自适应（autoResize 只监听 window resize，这里覆盖容器级 resize）
@@ -281,7 +340,6 @@
       timer = setTimeout(() => {
         timer = null;
         try {
-          // 只调整画布尺寸，不改相机，保持根节点始终位于上方
           graph.resize(width, height);
         } catch (error) {
           console.error('知识图谱自适应尺寸调整失败:', error);
@@ -292,11 +350,11 @@
     return observer;
   }
 
-  function renderKcGraph(container, dataStr) {
-    return createKcGraph(container, global.G6, dataStr);
+  function renderKcGraph(container, dataStr, options) {
+    return createKcGraph(container, global.G6, dataStr, options);
   }
 
-  // 注册 <kc-graph-g6 data-graph="..."> 自定义元素
+  // 注册 <kc-graph-g6 data-graph="..." zoom="0.5"> 自定义元素
   if (!global.customElements.get('kc-graph-g6')) {
     class KcGraphG6Element extends HTMLElement {
       constructor() {
@@ -319,13 +377,22 @@
         }
       }
       static get observedAttributes() {
-        return ['data-graph'];
+        return ['data-graph', 'zoom'];
       }
-      attributeChangedCallback() {
+      attributeChangedCallback(name) {
+        if (name === 'zoom') {
+          if (!this._graph) return;
+          const z = parseFloat(this.getAttribute('zoom'));
+          if (Number.isFinite(z) && z > 0) {
+            this._graph.__kcZoom = z;
+            this._graph.zoomTo(z, false);
+          }
+          return;
+        }
         if (!this._graph) return;
         const dataStr = this.getAttribute('data-graph') || '';
         if (dataStr === this._lastDataStr) return;
-        renderGraphData(this._graph, dataStr);
+        renderGraphData(this._graph, dataStr, this._container);
         this._lastDataStr = dataStr;
       }
       _init() {
@@ -333,9 +400,12 @@
           const container = document.createElement('div');
           container.style.width = '100%';
           container.style.height = '100%';
+          this._container = container;
           this.appendChild(container);
           const dataStr = this.getAttribute('data-graph') || '';
-          this._graph = createKcGraph(container, global.G6, dataStr);
+          const zoomAttr = parseFloat(this.getAttribute('zoom'));
+          const options = Number.isFinite(zoomAttr) && zoomAttr > 0 ? { zoom: zoomAttr } : {};
+          this._graph = createKcGraph(container, global.G6, dataStr, options);
           this._lastDataStr = dataStr;
           this._resizeObserver = attachGraphResizeObserver(container, this._graph);
         } catch (error) {

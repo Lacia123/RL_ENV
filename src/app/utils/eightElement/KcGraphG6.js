@@ -1,11 +1,12 @@
 // 知识图谱渲染器（KcGraphG6）
-// 基于 @antv/g6 v5 渲染 dagre 层级布局的知识图谱，浏览器端专用（需要 DOM）。
+// 基于 @antv/g6 v5 渲染辐射布局（radial）的知识图谱，浏览器端专用（需要 DOM）。
+// 默认缩放 0.5，根节点 fitCenter 居中后按画布中心 zoomTo 放大。
 //
 // 使用方式：
-//   1. 打包环境：renderGraph(container, dataStr) 会自动动态 import('@antv/g6')；
+//   1. 打包环境：renderGraph(container, dataStr, { zoom }) 会自动动态 import('@antv/g6')；
 //   2. iframe / 无打包器环境：先加载 /vendor/g6.min.js（UMD，暴露 window.G6），
 //      再调用 renderGraph(container, dataStr, { G6: window.G6 }) 或直接使用
-//      <kc-graph-g6 data-graph="..."> 自定义元素。
+//      <kc-graph-g6 data-graph="..." zoom="0.5"> 自定义元素。
 //
 // 注意：若修改本文件的节点样式 / 渲染逻辑，请同步修改 public/graph-renderer.js。
 
@@ -13,6 +14,7 @@ const MAIN_GRADIENT = 'linear-gradient(45deg, #6975DA 0%, #6E38C1 100%)';
 const TOPIC_GRADIENT = 'linear-gradient(135deg, #B1C5FF 0%, #D0BCFF 25%, #FFA9FF 50%, #FFB0C9 75%, #FFB4A3 100%)';
 const KP_GRADIENT = 'linear-gradient(135deg, #94A6FF 0%, #D68EFE 100%)';
 const HALO_OPACITY = 0.24;
+const DEFAULT_ZOOM = 0.5;
 
 let nodesRegistered = false;
 
@@ -156,15 +158,43 @@ function getNodeColors(type) {
 }
 
 /**
+ * 画布居中：先 fitCenter（全部内容适配视口），再按画布中心 zoomTo 放大，
+ * 最后双 rAF 淡入容器（避免居中过程闪烁）
+ * @param {object} graph - G6 Graph 实例
+ * @param {HTMLElement} container - 挂载容器
+ */
+function centerRoot(graph, container) {
+    if (!graph) return;
+    try {
+        if (container) container.style.opacity = '0';
+        graph.fitCenter();
+        const zoom = graph.__kcZoom || DEFAULT_ZOOM;
+        if (zoom > 0 && zoom < 1) {
+            const center = graph.getCanvasCenter();
+            graph.zoomTo(zoom, center);
+        }
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                if (container) container.style.opacity = '';
+            });
+        });
+    } catch (error) {
+        console.error('centerRoot error', error);
+    }
+}
+
+/**
  * 将图谱 JSON 数据渲染到已有的 G6 Graph 实例
  * @param {object} graph - G6 Graph 实例
  * @param {string} dataStr - 图谱 JSON 字符串
+ * @param {HTMLElement} container - 挂载容器（用于居中时的淡入控制）
  */
-export function renderGraphData(graph, dataStr) {
+export function renderGraphData(graph, dataStr, container) {
     if (!graph) return;
 
     const { nodes, edges } = parseGraphData(dataStr);
     if (nodes.length === 0) return;
+    graph.__kcData = dataStr;
 
     const BASE_SIZE = 200;
     const FONT_SIZE = 15;
@@ -209,10 +239,9 @@ export function renderGraphData(graph, dataStr) {
                 ? (relType === 'HAS_TOPIC' || relType === 'HAS_KP' ? 2.2 : 1.6)
                 : (e.data?.lineWidth || (1.8 + (e.data?.weight || 1) * 0.6));
             const label = isRealFormat ? e.type : (e.data?.label || '');
-            const offset = 50;
             const isDirect = relType === 'HAS_TOPIC';
             return {
-                id: isRealFormat ? e.id : `${e.data.source}-${e.data.target}`,
+                id: isRealFormat ? e.id : `${e.data?.source}-${e.data?.target}`,
                 source, target, type: 'line',
                 data: { label, relationType: relType },
                 style: {
@@ -220,17 +249,16 @@ export function renderGraphData(graph, dataStr) {
                     lineWidth: isDirect ? 2.265 : 1.5,
                     lineDash: isDirect ? undefined : [6, 4],
                     cursor: 'pointer',
-                    sourceOffset: offset, targetOffset: offset,
                     endArrow: false,
                     labelText: label,
                     labelFill: '#ffffff',
-                    labelFontSize: 14,
+                    labelFontSize: 12,
                     labelFontWeight: 600,
                     labelPlacement: 'center',
                     labelBackground: true,
                     labelBackgroundFill: '#bcc0c4',
                     labelBackgroundRadius: 85,
-                    labelBackgroundPadding: [6, 10, 6, 10],
+                    labelPadding: [2, 2],
                     labelBackgroundOpacity: 1,
                     labelBackgroundLineWidth: 0,
                     labelAutoRotate: false,
@@ -241,53 +269,94 @@ export function renderGraphData(graph, dataStr) {
 
     graph.setData(g6Data);
 
-    // 根节点水平居中、保持在视口上方：布局完成（afterlayout）后立即平移相机，
-    // 只调整水平方向。translateTo 以画布中心为基准：新视口中心 = 画布中心 - t，
-    // 取 t = 画布中心X - 根节点X 即可让根节点位于水平中线
-    const centerRootX = () => {
-        const rootNode = g6Data.nodes.find((n) => n.data?.semanticType === 'Chapter' || n.data?.type === 'Chapter');
-        if (!rootNode || typeof graph.translateTo !== 'function') return;
-        try {
-            const [rx] = graph.getElementPosition(rootNode.id);
-            const [cw] = graph.getSize();
-            if (typeof rx === 'number' && typeof cw === 'number') {
-                graph.translateTo([cw / 2 - rx, 0], false);
-            }
-        } catch (error) { /* ignore */ }
-    };
-    graph.on('afterlayout', centerRootX);
-
-    // G6 v5 的 render() 是异步的，兜底：渲染完成后再水平居中（公式基于画布中心，幂等无副作用）
+    // G6 v5 的 render() 是异步的，兜底：渲染完成后居中（fitCenter + zoomTo，幂等无副作用）
     const renderResult = graph.render();
     if (renderResult && typeof renderResult.then === 'function') {
-        renderResult.then(centerRootX).catch(() => { /* ignore */ });
+        renderResult.then(() => {
+            requestAnimationFrame(() => centerRoot(graph, container));
+        }).catch(() => { /* ignore */ });
     }
 }
 
 /**
- * 在容器上创建并渲染一个知识图谱
+ * 在容器上创建并渲染一个知识图谱（辐射布局 + 默认缩放 0.5）
  * @param {HTMLElement} container - 挂载容器
  * @param {object} G6 - @antv/g6 的模块导出
  * @param {string} dataStr - 图谱 JSON 字符串
+ * @param {object} options - { zoom?: number }，默认 0.5
  * @returns {object} G6 Graph 实例
  */
-export function createKcGraph(container, G6, dataStr) {
+export function createKcGraph(container, G6, dataStr, options = {}) {
     registerKcGraphNodes(G6);
+    const zoom = options.zoom ?? DEFAULT_ZOOM;
     const graph = new G6.Graph({
         container,
         background: 'transparent',
-        autoFit: false,
         autoResize: true,
         padding: 24,
-        layout: { type: 'dagre', rankdir: 'TB', nodesep: 60, ranksep: 100, edgesep: 30 },
+        zoom,
+        animation: false,
+        layout: {
+            type: 'radial',
+            center: [0, 0],
+            radius: 350,
+            unitRadius: 280,
+            linkDistance: 350,
+            preventOverlap: true,
+            nodeSize: 280,
+            maxIterations: 100,
+        },
         behaviors: [
             { type: 'drag-canvas' },
             { type: 'zoom-canvas' },
             { type: 'drag-element' },
         ],
     });
-    renderGraphData(graph, dataStr);
+    graph.__kcZoom = zoom;
+    wireKcNodeClick(graph, container, dataStr);
+    renderGraphData(graph, dataStr, container);
     return graph;
+}
+
+/**
+ * 绑定节点点击事件，向上冒泡 node-click 自定义事件
+ * @param {object} graph - G6 Graph 实例
+ * @param {HTMLElement} container - 挂载容器
+ * @param {string} dataStr - 初始图谱 JSON 字符串
+ */
+function wireKcNodeClick(graph, container, dataStr) {
+    if (!graph || typeof graph.on !== 'function') return;
+    graph.on('node:click', (evt) => {
+        let target = evt.target;
+        let nodeId = null;
+        while (target) {
+            if (target.id && typeof graph.getNodeData === 'function') {
+                const data = graph.getNodeData(target.id);
+                if (data) { nodeId = target.id; break; }
+            }
+            target = target.parent;
+        }
+        if (!nodeId) return;
+        const nodeData = typeof graph.getNodeData === 'function' ? graph.getNodeData(nodeId) : null;
+        const { nodes, edges } = parseGraphData(graph.__kcData ?? dataStr);
+        const host = (container && typeof container.closest === 'function' && container.closest('kc-graph-g6')) || container;
+        const targetEl = host || container || (typeof window !== 'undefined' ? window : null);
+        if (!targetEl) return;
+        targetEl.dispatchEvent(new CustomEvent('node-click', {
+            detail: {
+                node: {
+                    id: nodeId,
+                    type: nodeData?.data?.semanticType || nodeData?.data?.type,
+                    label: nodeData?.style?.labelText || nodeData?.data?.label,
+                    data: nodeData?.data,
+                    model: nodeData,
+                },
+                allData: { nodes, edges },
+            },
+            bubbles: true,
+            composed: true,
+        }));
+    });
 }
 
 /**
@@ -310,7 +379,6 @@ export function attachGraphResizeObserver(container, graph) {
         timer = setTimeout(() => {
             timer = null;
             try {
-                // 只调整画布尺寸，不改相机，保持根节点始终位于上方
                 graph.resize(width, height);
             } catch (error) {
                 console.error('知识图谱自适应尺寸调整失败:', error);
@@ -325,16 +393,16 @@ export function attachGraphResizeObserver(container, graph) {
  * 渲染知识图谱（会自动加载 @antv/g6）
  * @param {HTMLElement} container - 挂载容器
  * @param {string} dataStr - 图谱 JSON 字符串
- * @param {object} options - { G6?: 手动注入的 @antv/g6 模块导出 }
+ * @param {object} options - { G6?: 手动注入的 @antv/g6 模块导出, zoom?: number }
  * @returns {Promise<object|null>} G6 Graph 实例
  */
 export async function renderGraph(container, dataStr, options = {}) {
     if (typeof window === 'undefined' || !container) return null;
     const G6 = options.G6 || (await import('@antv/g6'));
-    return createKcGraph(container, G6, dataStr);
+    return createKcGraph(container, G6, dataStr, options);
 }
 
-// 在浏览器环境中注册 <kc-graph-g6 data-graph="..."> 自定义元素
+// 在浏览器环境中注册 <kc-graph-g6 data-graph="..." zoom="0.5"> 自定义元素
 if (typeof window !== 'undefined' &&
     typeof window.customElements !== 'undefined' &&
     !window.customElements.get('kc-graph-g6')) {
@@ -360,13 +428,22 @@ if (typeof window !== 'undefined' &&
             }
         }
         static get observedAttributes() {
-            return ['data-graph'];
+            return ['data-graph', 'zoom'];
         }
-        attributeChangedCallback() {
+        attributeChangedCallback(name) {
+            if (name === 'zoom') {
+                if (!this._graph) return;
+                const z = parseFloat(this.getAttribute('zoom'));
+                if (Number.isFinite(z) && z > 0) {
+                    this._graph.__kcZoom = z;
+                    this._graph.zoomTo(z, false);
+                }
+                return;
+            }
             if (!this._graph) return;
             const dataStr = this.getAttribute('data-graph') || '';
             if (dataStr === this._lastDataStr) return;
-            renderGraphData(this._graph, dataStr);
+            renderGraphData(this._graph, dataStr, this._container);
             this._lastDataStr = dataStr;
         }
         async _init() {
@@ -379,7 +456,9 @@ if (typeof window !== 'undefined' &&
                 this._container = container;
                 this.appendChild(container);
                 const dataStr = this.getAttribute('data-graph') || '';
-                this._graph = createKcGraph(container, G6, dataStr);
+                const zoomAttr = parseFloat(this.getAttribute('zoom'));
+                const options = Number.isFinite(zoomAttr) && zoomAttr > 0 ? { zoom: zoomAttr } : {};
+                this._graph = createKcGraph(container, G6, dataStr, options);
                 this._lastDataStr = dataStr;
                 this._resizeObserver = attachGraphResizeObserver(container, this._graph);
             } catch (error) {

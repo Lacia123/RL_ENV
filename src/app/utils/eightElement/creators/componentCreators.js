@@ -741,6 +741,8 @@ export function extractSlotContent(lines, startIndex) {
     
     const slotName = startTagInfo.slotName;
     const attributes = startTagInfo.attributes;
+    // 保留标签前的缩进（用于列表卡片子项层级识别）
+    const indent = startLine.length - startLine.trimStart().length;
     
     // 如果是自闭合标签，没有内容
     if (startTagInfo.isSelfClosing) {
@@ -748,7 +750,8 @@ export function extractSlotContent(lines, startIndex) {
             slotContent: '',
             slotName: slotName,
             attributes: attributes,
-            endIndex: startIndex
+            endIndex: startIndex,
+            indent,
         };
     }
     
@@ -779,7 +782,8 @@ export function extractSlotContent(lines, startIndex) {
         slotContent: contentLines.join('\n').trim(),
         slotName: slotName,
         attributes: attributes,
-        endIndex: i - 1
+        endIndex: i - 1,
+        indent,
     };
 }
 
@@ -789,6 +793,8 @@ export function extractSlotContent(lines, startIndex) {
  * @returns {Object|null} 插槽数据或 null
  */
 function parseSingleLineSlot(line) {
+    // 保留标签前的缩进（用于列表卡片子项层级识别）
+    const indent = line.length - line.trimStart().length;
     const trimmedLine = line.trim();
     
     // 匹配单行标签: <slotName attr="value">content</slotName>
@@ -804,7 +810,8 @@ function parseSingleLineSlot(line) {
             slotName: slotName,
             slotContent: slotContent,
             attributes: attributes,
-            isSingleLine: true
+            isSingleLine: true,
+            indent,
         };
     }
     
@@ -819,7 +826,8 @@ function parseSingleLineSlot(line) {
             slotName: slotName,
             slotContent: '',
             attributes: attributes,
-            isSingleLine: true
+            isSingleLine: true,
+            indent,
         };
     }
     
@@ -1222,6 +1230,17 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             if (tableElement) {
                 innerElements.push(tableElement);
             }
+        } else if (slotConfig.metaType === 'score') {
+            // 🆕 圆点评分器 <score value="3" max="5" color="..."/>
+            const scoreElement = createScoreElement(
+                parseInt(attributes?.value, 10),
+                parseInt(attributes?.max, 10),
+                attributes?.color || '',
+                slotConfig.variantStyle || {}
+            );
+            if (scoreElement) {
+                innerElements.push(scoreElement);
+            }
         }
         
         if (innerElements.length === 0) {
@@ -1310,6 +1329,39 @@ export function createElementFromSlotConfig(slotName, slotConfig, slotData, curr
             if (element && attributes && attributes.href) {
                 element.type = 'text_hyperlink';
                 element.url = attributes.href;
+            }
+            
+            // 🆕 color 属性 — 自定义文字颜色（具体色值 / token 引用），不传则用 variantStyle 默认色
+            if (element && attributes && attributes.color) {
+                const resolvedColor = resolveSlotColor(attributes.color);
+                element.layout.classStyle = {
+                    ...element.layout.classStyle,
+                    color: resolvedColor,
+                };
+            }
+            
+            // 🆕 列表子项 — 通过标签前空格缩进 / level 属性识别，渲染时自动缩进（如有序列表 2.1、2.2）
+            if (element && slotConfig.indentFromWhitespace) {
+                const indentLevel = getSlotIndentLevel(slotData);
+                if (indentLevel > 0) {
+                    element.layout.classStyle = {
+                        ...element.layout.classStyle,
+                        paddingLeft: `${Math.min(indentLevel, 3) * 40}px`,
+                    };
+                }
+            }
+            
+            // 🆕 无序列表项目符号 — 按出现顺序在 4 种圆点颜色间循环。
+            // 注意：必须重建 &::before 对象（浅拷贝合并会让各元素共享同一引用，导致全部采用最后一个值）
+            if (element && slotConfig.bulletCycling) {
+                const idx = getSlotOccurrenceIndex(slotName);
+                const bulletColor = BULLET_CYCLE_COLORS[(idx - 1) % BULLET_CYCLE_COLORS.length];
+                if (element.layout?.classStyle?.['&::before']) {
+                    element.layout.classStyle['&::before'] = {
+                        ...element.layout.classStyle['&::before'],
+                        backgroundColor: bulletColor,
+                    };
+                }
             }
         } else if (slotConfig.metaType === 'button') {
             const buttonUrl = attributes.href || '#';
@@ -2122,6 +2174,18 @@ function createElementForSubSlot(
         return createAudioElement(src, slotAttributes);
     }
 
+    if (metaType === 'score') {
+        // 🆕 圆点评分器 <score value="3" max="5" color="..."/>（feedItem 内嵌）
+        // 标签不存在时（slotData 为 null）跳过，不渲染占位圆点
+        if (!slotData) return null;
+        return createScoreElement(
+            parseInt(slotAttributes.value, 10),
+            parseInt(slotAttributes.max, 10),
+            slotAttributes.color || '',
+            subSlotConfig.variantStyle || {}
+        );
+    }
+
     return null;
 }
 
@@ -2222,6 +2286,133 @@ function parseAttributes(attributesStr) {
     }
     
     return attributes;
+}
+
+/**
+ * 解析插槽 color 属性的值为实际颜色
+ * 支持三种写法：
+ * - 具体色值：color="#FF0000" / color="red"
+ * - token 引用（引号包花括号）：color="{color.primary.brand5}"
+ * - 无引号 token 路径（parseAttributes 会剥掉花括号）：color={color.primary.brand5}
+ */
+function resolveSlotColor(colorValue) {
+    if (typeof colorValue !== 'string' || !colorValue) return null;
+    // 已含 token 引用格式 {x.y.z}
+    if (colorValue.includes('{') && colorValue.includes('}')) {
+        return resolveToken(colorValue, 20) || colorValue;
+    }
+    // 无引号 token 路径，还原为引用后解析
+    if (/^(color|font|dimension|motion|material|asset|layout)\.[a-zA-Z0-9._-]+$/.test(colorValue)) {
+        return resolveToken(`{${colorValue}}`, 20) || colorValue;
+    }
+    // 具体色值（#hex / rgb / 命名色）原样返回
+    return colorValue;
+}
+
+/**
+ * 计算列表插槽的缩进层级（子项层级）
+ * - 标签前的空格数：每 4 个空格为一级（如 4 空格 → level 1）
+ * - level 属性：level="2" 及以上表示层级；level="sub" 视为一级
+ */
+function getSlotIndentLevel(slotData) {
+    const indentChars = Math.max(0, slotData?.indent || 0);
+    let level = Math.round(indentChars / 4);
+    const levelAttr = slotData?.attributes?.level;
+    if (levelAttr !== undefined && levelAttr !== null && levelAttr !== '') {
+        const numeric = parseInt(String(levelAttr).replace(/\D/g, ''), 10);
+        if (!Number.isNaN(numeric) && numeric >= 2) {
+            level = Math.max(level, numeric - 1);
+        } else if (String(levelAttr).toLowerCase() === 'sub') {
+            level = Math.max(level, 1);
+        }
+    }
+    return level;
+}
+
+/**
+ * 无序列表项的圆点颜色 — 按出现顺序依次循环使用
+ * 4 种颜色依次循环：color-basic-blue-3 / violet-4 / amber-5 / teal-4
+ */
+const BULLET_CYCLE_COLORS = [
+    '{color.basic.blue.3}',
+    '{color.basic.violet.4}',
+    '{color.basic.amber.5}',
+    '{color.basic.teal.4}',
+];
+
+/**
+ * 从插槽名（如 unorderedListItem、unorderedListItem#2、#3）提取在文档中的出现序号（从 1 起）
+ */
+function getSlotOccurrenceIndex(slotName) {
+    const match = String(slotName || '').match(/#(\d+)$/);
+    return match ? parseInt(match[1], 10) : 1;
+}
+
+/**
+ * 创建圆点评分器元素（<score value="3" max="5" color="..."/>）
+ * - 渲染为一行 N 个 16×16 圆形（flex row + gap）
+ * - 前 value 个点亮（默认 {color.basic.brand.5}，color 属性可改为任意色如蓝）
+ * - 其余默认灰色 {color.basic.grey.1}
+ * @param {number} value - 点亮的圆点个数
+ * @param {number} max - 圆点总数（默认 5）
+ * @param {string} colorValue - 点亮色（具体色值 / {token} 引用 / 无引号 token 路径）
+ * @param {Object} wrapperStyle - 应用到外层容器的变体样式（如字号、间距）
+ */
+function createScoreElement(value = 0, max = 5, colorValue = '', wrapperStyle = {}) {
+    const maxN = Math.max(1, Math.min(Number.isFinite(max) ? Math.round(max) : 5, 20));
+    const valueN = Math.max(0, Math.min(Number.isFinite(value) ? Math.round(value) : 0, maxN));
+    const litColor = resolveSlotColor(colorValue) || resolveToken('{color.basic.brand.5}', 20);
+    const grayColor = resolveToken('{color.basic.grey.1}', 20);
+
+    const dots = [];
+    for (let i = 0; i < maxN; i++) {
+        dots.push({
+            id: generateUUID(),
+            name: 'layout',
+            'name-zh': `评分圆点-${i + 1}`,
+            'file-type': 'cell-element',
+            type: 'layout',
+            layout: {
+                style: {
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    background: i < valueN ? litColor : grayColor,
+                },
+                classStyle: {},
+                children: [],
+            },
+            _metadata: {
+                actualType: 'scoreDot',
+                lit: i < valueN,
+            },
+            events: [{}],
+        });
+    }
+
+    return {
+        id: generateUUID(),
+        name: 'layout',
+        'name-zh': '圆点评分器',
+        'file-type': 'cell-element',
+        type: 'layout',
+        _metadata: {
+            actualType: 'score',
+        },
+        layout: {
+            style: {
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '8px',
+                ...wrapperStyle,
+            },
+            classStyle: {},
+            children: dots,
+        },
+        description: '圆点评分器',
+        events: [{}],
+    };
 }
 
 /**
@@ -2578,9 +2769,34 @@ function createMetaTypeComponent(content, variant, componentConfig, markdownData
             rawContent: componentConfig.rawContent
         }, null);
     } else if (componentConfig.metaType === 'button') {
-        const buttonUrl = markdownData?.url || '#';
+        // 不提供 url 时留空，避免渲染为可点击的 <a href="#">（点击会导致页面跳转）
+        const buttonUrl = markdownData?.url || '';
         const buttonVariant = componentConfig.variant;
         elementInstance = createButtonElement(content, buttonUrl, buttonVariant, currentMarkdown, null);
+
+        // 🆕 按 type 区分样式（textButton 等）：公共 baseStyle + types[type] 覆盖背景色 / 文字颜色
+        const typeKey = externalParameters?.type || 'primary';
+        const typeStyle = {
+            ...(componentConfig.baseStyle || {}),
+            ...((componentConfig.types && componentConfig.types[typeKey]) || componentConfig.types?.primary || {}),
+        };
+        if (elementInstance && Object.keys(typeStyle).length > 0) {
+            const resolvedTypeStyle = {};
+            Object.entries(typeStyle).forEach(([key, value]) => {
+                if (typeof value === 'string') {
+                    resolvedTypeStyle[key] = resolveToken(value) || value;
+                } else {
+                    resolvedTypeStyle[key] = value;
+                }
+            });
+            elementInstance.layout = elementInstance.layout || {};
+            elementInstance.layout.classStyle = Object.fromEntries(
+                Object.entries({
+                    ...(elementInstance.layout.classStyle || {}),
+                    ...resolvedTypeStyle,
+                }).filter(([key]) => !key.startsWith('&'))
+            );
+        }
     } else if (componentConfig.metaType === 'image') {
         const imageUrl = markdownData?.url || '';
         elementInstance = createBackgroundElement(imageUrl, componentConfig.variant, null);
@@ -2728,6 +2944,23 @@ function createTemplateComponent(content, variant, componentConfig, markdownData
     // 🆕 优先处理插槽标签（slotConfigs）
     // 🔧 兼容 slots 属性
     const availableSlotConfigs = componentConfig.slotConfigs || componentConfig.slots;
+
+    // 🆕 将组件参数（parameters）应用到插槽配置的样式占位符（如 listCard 的 $color）
+    // 无占位符时是 no-op，不影响其他组件
+    if (availableSlotConfigs && Object.keys(paramValues).length > 0) {
+        Object.values(availableSlotConfigs).forEach((slotConfig) => {
+            if (!slotConfig || typeof slotConfig !== 'object') return;
+            if (slotConfig.variantStyle) {
+                slotConfig.variantStyle = applyParametersToStyle(JSON.parse(JSON.stringify(slotConfig.variantStyle)), paramValues);
+            }
+            if (slotConfig.style) {
+                slotConfig.style = applyParametersToStyle(JSON.parse(JSON.stringify(slotConfig.style)), paramValues);
+            }
+            if (slotConfig.classStyle) {
+                slotConfig.classStyle = applyParametersToStyle(JSON.parse(JSON.stringify(slotConfig.classStyle)), paramValues);
+            }
+        });
+    }
     
     if (availableSlotConfigs && content) {
 

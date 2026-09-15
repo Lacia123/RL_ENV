@@ -25,6 +25,9 @@ import COMMON_STYLE_SERVICE_LIST_STYLE from './commonStyleServiceList';
 import COMMON_STYLE_SERVICE_LIST_DESC_STYLE from './commonStyleServiceListDesc';
 import COMMON_STYLE_SERVICE_LIST_COMPACT_STYLE from './commonStyleServiceListCompact';
 import TEXT_CARD_STYLE from './textCard';
+import TEXT_BUTTON_STYLE from './textButton';
+import LIST_CARD_STYLE from './listCard';
+import DETAIL_LIST_CARD_STYLE from './detailListCard';
 import BANNER_IMAGE_PANEL_STYLE from './bannerImagePanel';
 import MESSAGE_REMINDER_STYLE from './messageReminder';
 import SHOWCASE_CARD_STYLE from './showcaseCard';
@@ -61,6 +64,9 @@ const COMPONENT_STYLE = {
         ...COMMON_STYLE_SERVICE_LIST_DESC_STYLE,
         ...COMMON_STYLE_SERVICE_LIST_COMPACT_STYLE,
         ...TEXT_CARD_STYLE,
+        ...TEXT_BUTTON_STYLE,
+        ...LIST_CARD_STYLE,
+        ...DETAIL_LIST_CARD_STYLE,
         ...BANNER_IMAGE_PANEL_STYLE,
         ...MESSAGE_REMINDER_STYLE,
         ...SHOWCASE_CARD_STYLE,

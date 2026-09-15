@@ -3615,7 +3615,8 @@ style: {
 <showcaseCard>
 <title>Related files</title>
 <preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
-<caption>4 Images</caption>
+<tag>4</tag>
+<caption>Images</caption>
 </showcaseCard>
 
 ## 4. 带按钮和加载中
@@ -3705,6 +3706,69 @@ style: {
 ## 倒计时卡片
 距离活动开始还有 <countdown target="2026-12-31T00:00:00" format="{dd}天{hh}时{mm}分{ss}秒"></countdown>
 </card:elegantStandard>`
+    },
+
+    textButton: {
+        name: '🔘 文本按钮',
+        description: 'textButton 按钮组件 — 通过 type 区分三种样式（primary 默认 / dark / light），主要差异为背景色与文字颜色',
+        markdown: `# textButton 文本按钮
+
+<textButton type="primary">✧ View AI Summary</textButton>
+
+<textButton type="dark">Open Main Courseware</textButton>
+
+<textButton type="light">View AI Summary</textButton>`
+    },
+
+    listCard: {
+        name: '📋 列表卡片',
+        description: '',
+        markdown: `# listCard 列表卡片
+
+<listCard>
+<title>CONTENTS</title>
+<orderedListItem color="{color.primary.brand5}">1. Definition of Functions</orderedListItem>
+<orderedListItem>2. Definition of Functions</orderedListItem>
+    <orderedListItem>2.1 Definition of Functions</orderedListItem>
+    <orderedListItem >2.2 Definitions of a function</orderedListItem>
+<orderedListItem>3. Range of a function</orderedListItem>
+</listCard>
+
+<listCard background="{color.basic.brand.8}" color="{color.basic.opacity.white.100}">
+<title color="{color.basic.opacity.white.48}">LECTURE RESOURCES</title>
+<unorderedListItem>Lecture Audio</unorderedListItem>
+<unorderedListItem >Lecture Slides</unorderedListItem>
+<unorderedListItem >Lecture Slides</unorderedListItem>
+<unorderedListItem >Lecture Slides</unorderedListItem>
+</listCard>`
+    },
+
+    detailListCard: {
+        name: '📑 详情列表卡片',
+        description: '',
+        markdown: `# detailListCard 详情列表卡片
+
+<detailListCard>
+<title>CONTENTS</title>
+<subtitle>QUICK REFERENCE CARD</subtitle>
+<image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678" ></image>
+<detailItem>
+<title>Subject</title>
+<text>Mathematics Analysis</text>
+</detailItem>
+<detailItem>
+<title>Core Unit</title>
+<text>Mathematics Analysis</text>
+</detailItem>
+<detailItem>
+<title>Complexity</title>
+<score value="3" max="5" />
+</detailItem>
+<detailItem>
+<title>Sources</title>
+<text>Mathematics Analysis</text>
+</detailItem>
+</detailListCard>`
     },
 
   gridLayoutDemo: {
@@ -4039,6 +4103,133 @@ style: {
 }
 @@@
 </grid:item>
+</layout:grid>`
+  },
+
+  relatedFilesGridDemo: {
+    name: '📁 相关文件网格示例',
+    description: '相关文件场景的弹性网格（i=228 / j=216，8×9）：5 个 showcaseCard 变体（title+toggle / doubleImageItem 双图 / preview 左右布局 / doubleImageItem 单图 / tag+caption）、3 个 textButton（primary/dark/light）、左 3 列×5 行 detailListCard + 右列上下堆叠 2 个 listCard（有序 + 深色无序）',
+    markdown: `# 相关文件网格示例
+
+相关文件场景的弹性网格布局。预期单位：i=228px（列单元宽）、j=216px（行单元高）、gap=16px。grid 写格数 width=m / height=n（像素与余数由程序换算，格子精确等于单位），布局只需关心"几行几列"。
+
+<layout:grid width="8" gap="16" height="9">
+
+<!-- showcaseCard：title + toggle -->
+<grid:item x="1" y="1" width="2" height="1">
+<showcaseCard>
+<title>Related files</title>
+<toggle></toggle>
+</showcaseCard>
+</grid:item>
+
+<!-- showcaseCard：title + doubleImageItem（双图并排）+ caption -->
+<grid:item x="3" y="1" width="2" height="2">
+<showcaseCard>
+<title>Related files</title>
+<doubleImageItem>
+<image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论"></image>
+<image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论"></image>
+</doubleImageItem>
+<caption>4 Images</caption>
+</showcaseCard>
+</grid:item>
+
+<!-- showcaseCard：preview 左右布局（preview + tag + caption） -->
+<grid:item x="5" y="1" width="2" height="1">
+<showcaseCard>
+<title>Related files</title>
+<preview src="https://sop-cdn.dingcloud.com/aigui/file/rzrcm49z88yo6gnja2ehg7r87s9m72tt20260210101743900.png?w=200&h=200"></preview>
+<tag>4</tag>
+<caption>Images</caption>
+</showcaseCard>
+</grid:item>
+
+<!-- showcaseCard：title + doubleImageItem（单图）+ caption -->
+<grid:item x="7" y="1" width="2" height="2">
+<showcaseCard>
+<title>Related files</title>
+<doubleImageItem>
+<image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800" alt="企业会议与数字化方案讨论"></image>
+</doubleImageItem>
+<caption>4 Images</caption>
+</showcaseCard>
+</grid:item>
+
+<!-- showcaseCard：title + tag + caption -->
+<grid:item x="1" y="2" width="2" height="1">
+<showcaseCard>
+<title>Related files</title>
+<tag>4</tag>
+<caption>Images</caption>
+</showcaseCard>
+</grid:item>
+
+<!-- textButton：primary -->
+<grid:item x="1" y="3" width="2" height="1">
+<textButton type="primary">✧ View AI Summary</textButton>
+</grid:item>
+
+<!-- textButton：dark（文本较长，占 3 列，避免 grid 横向溢出） -->
+<grid:item x="3" y="3" width="3" height="1">
+<textButton type="dark">Open Main Courseware</textButton>
+</grid:item>
+
+<!-- textButton：light -->
+<grid:item x="6" y="3" width="2" height="1">
+<textButton type="light">View AI Summary</textButton>
+</grid:item>
+
+<!-- 分区三 · detailListCard 左列 + 两个 listCard 右列上下堆叠 -->
+
+<!-- detailListCard：3 列宽详情列表卡片（左，占 5 行） -->
+<grid:item x="1" y="4" width="3" height="5">
+<detailListCard>
+<title>CONTENTS</title>
+<subtitle>QUICK REFERENCE CARD</subtitle>
+<image src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678" ></image>
+<detailItem>
+<title>Subject</title>
+<text>Mathematics Analysis</text>
+</detailItem>
+<detailItem>
+<title>Core Unit</title>
+<text>Mathematics Analysis</text>
+</detailItem>
+<detailItem>
+<title>Complexity</title>
+<score value="3" max="5" />
+</detailItem>
+<detailItem>
+<title>Sources</title>
+<text>Mathematics Analysis</text>
+</detailItem>
+</detailListCard>
+</grid:item>
+
+<!-- listCard 右列上：有序列表 contents -->
+<grid:item x="5" y="4" width="4" height="3">
+<listCard>
+<title>CONTENTS</title>
+<orderedListItem color="{color.primary.brand5}">1. Definition of Functions</orderedListItem>
+<orderedListItem>2. Definition of Functions</orderedListItem>
+    <orderedListItem>2.1 Definition of Functions</orderedListItem>
+    <orderedListItem>2.2 Definitions of a function</orderedListItem>
+<orderedListItem>3. Range of a function</orderedListItem>
+</listCard>
+</grid:item>
+
+<!-- listCard 右列下：深色无序列表 lecture resources -->
+<grid:item x="5" y="7" width="4" height="2">
+<listCard background="{color.basic.brand.8}" color="{color.basic.opacity.white.100}">
+<title color="{color.basic.opacity.white.48}">LECTURE RESOURCES</title>
+<unorderedListItem>Lecture Audio</unorderedListItem>
+<unorderedListItem>Lecture Slides</unorderedListItem>
+<unorderedListItem>Lecture Slides</unorderedListItem>
+<unorderedListItem>Lecture Slides</unorderedListItem>
+</listCard>
+</grid:item>
+
 </layout:grid>`
   },
 
