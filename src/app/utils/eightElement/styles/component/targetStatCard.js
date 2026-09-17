@@ -14,6 +14,12 @@ const TARGET_STAT_CARD_STYLE = {
   <caption>TOTAL PROBLEMS</caption>
 </targetStatCard>`
         },
+        // ⚠️ 两个模式都不设 minHeight（原为 240px）：grid 里卡片高度由格子决定——grid:item 是
+        //    flex 列容器，applyGridItemFill 已让直接子内容 flex:1 + min-height:0 跟随格子
+        //    （见 creators/layoutCreators.js）。固定像素下限与「格」这套度量会打架：240px > 1 格(216px)
+        //    时 1 行格子永远放不下——卡片被顶出格子（多出的 24px 压到下一行）、内部 flex 被挤扁
+        //    （实测 2×1：标题块溢出 headerBlock 压到底部数字上，被判定 4 报 invalid）；
+        //    而在装得下的格子里这个下限又不起作用（2 列宽时内容本身 ≈260px，已超过 240px）。
         layoutModes: [
             // 模式1：含按钮的横向度量行
             {
@@ -24,7 +30,6 @@ const TARGET_STAT_CARD_STYLE = {
                     flex: "1",
                     width: '100%',
                     minWidth: '440px',
-                    minHeight: '240px',
                     gap: '{dimension.gap.loose}',
                     flexDirection: 'column',
                     padding: '{dimension.padding.extraloose}',
@@ -131,7 +136,6 @@ const TARGET_STAT_CARD_STYLE = {
                     flex: "1",
                     width: '100%',
                     minWidth: '440px',
-                    minHeight: '240px',
                     gap: '{dimension.gap.loose}',
                     flexDirection: 'column',
                     padding: '{dimension.padding.extraloose}',
