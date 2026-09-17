@@ -21,12 +21,6 @@ export default {
         "value": "{dimension.basic.dimension.4}",
         "type": "other"
       }
-    },
-    "boderwidth": {
-      0: {
-        "value": "{dimension.basic.dimension.0}",
-        "type": "other"
-      }
     }
   }
 }

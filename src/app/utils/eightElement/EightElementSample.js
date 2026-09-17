@@ -1105,67 +1105,67 @@ export default {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.0}",
+                          "value": "{dimension.borderwidth.0}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.0}"
+                      "resource": "{dimension.borderwidth.0}"
                     },
                     "hover": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.1}",
+                          "value": "{dimension.borderwidth.1}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.1}"
+                      "resource": "{dimension.borderwidth.1}"
                     },
                     "active": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.2}",
+                          "value": "{dimension.borderwidth.2}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.2}"
+                      "resource": "{dimension.borderwidth.2}"
                     },
                     "pressed": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.1}",
+                          "value": "{dimension.borderwidth.1}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.1}"
+                      "resource": "{dimension.borderwidth.1}"
                     },
                     "loading": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.1}",
+                          "value": "{dimension.borderwidth.1}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.1}"
+                      "resource": "{dimension.borderwidth.1}"
                     },
                     "disable": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.1}",
+                          "value": "{dimension.borderwidth.1}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.1}"
+                      "resource": "{dimension.borderwidth.1}"
                     }
                   }
                 },
@@ -2270,67 +2270,67 @@ export default {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.0}",
+                          "value": "{dimension.borderwidth.0}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.0}"
+                      "resource": "{dimension.borderwidth.0}"
                     },
                     "hover": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.1}",
+                          "value": "{dimension.borderwidth.1}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.1}"
+                      "resource": "{dimension.borderwidth.1}"
                     },
                     "active": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.2}",
+                          "value": "{dimension.borderwidth.2}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.2}"
+                      "resource": "{dimension.borderwidth.2}"
                     },
                     "pressed": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.1}",
+                          "value": "{dimension.borderwidth.1}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.1}"
+                      "resource": "{dimension.borderwidth.1}"
                     },
                     "loading": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.1}",
+                          "value": "{dimension.borderwidth.1}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.1}"
+                      "resource": "{dimension.borderwidth.1}"
                     },
                     "disable": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.1}",
+                          "value": "{dimension.borderwidth.1}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.1}"
+                      "resource": "{dimension.borderwidth.1}"
                     }
                   }
                 },
@@ -2951,23 +2951,23 @@ export default {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.0}",
+                          "value": "{dimension.borderwidth.0}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.0}"
+                      "resource": "{dimension.borderwidth.0}"
                     },
                     "loaded": {
                       "data-key": "",
                       "style": {
                         "borderwidth": {
-                          "value": "{dimension.boderwidth.0}",
+                          "value": "{dimension.borderwidth.0}",
                           "type": "borderWidth",
                           "key": "shape-borderwidth"
                         }
                       },
-                      "resource": "{dimension.boderwidth.0}"
+                      "resource": "{dimension.borderwidth.0}"
                     }
                   }
                 },
