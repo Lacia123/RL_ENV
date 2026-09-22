@@ -1,0 +1,114 @@
+{
+ "heroCard": {
+  "source": "slab-comp.txt",
+  "psuip": "<heroCard>\n  <cover_image src=\"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900\"></cover_image>\n  <badge>热门目的地</badge>\n  <title>发现你的下一站旅行</title>\n  <subtitle>个性化行程推荐，AI 智能规划，帮你找到更合适的旅程节奏。</subtitle>\n  <metrics>⭐ 4.9 · 128K 用户</metrics>\n  <metrics>🗺️ 320+ 城市灵感</metrics>\n  <cta_primary href=\"https://example.com/plan\">开始计划</cta_primary>\n  <cta_secondary href=\"https://example.com/destinations\">查看目的地</cta_secondary>\n</heroCard>"
+ },
+ "pairedImageTextCard": {
+  "source": "slab-comp.txt",
+  "psuip": "<pairedImageTextCard>\n  <label>公司简介</label>\n  <title>致力于提供最先进的数字化解决方案</title>\n  <content>我们围绕技术、团队与服务能力，为客户提供可持续的数字化支持。</content>\n  <primaryItem>\n    <image src=\"https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800\" alt=\"企业会议与数字化方案讨论\" />\n    <title>关于企业</title>\n    <body>我们是一家专注于人工智能和大数据领域的创新科技公司，围绕数据治理、智能分析、业务自动化与系统集成，为客户提供从方案规划到落地交付的完整支持。</body>\n  </primaryItem>\n  <secondaryItem>\n    <image src=\"https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=800\" alt=\"团队协作会议\" />\n    <title>关于团队</title>\n    <body>我们拥有一支充满活力和创新精神的技术团队，汇聚了来自不同领域的优秀人才。</body>\n  </secondaryItem>\n</pairedImageTextCard>"
+ },
+ "summaryCard": {
+  "source": "slab-comp.txt",
+  "psuip": "<summaryCard>\n  <title title=\"鼠标悬停可看完整标题\">生成岗位JD完成（悬停看 tooltip）</title>\n  <commit>查看过程</commit>\n  <text key=\"summary\"></text>\n</summaryCard>"
+ },
+ "textCard": {
+  "source": "slab-comp.txt",
+  "psuip": "<textCard>\n  <text_title>限时</text_title>\n  <text_text> 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。</text_text>\n  <cta href=\"https://example.com/promo\">按钮</cta>\n</textCard>"
+ },
+ "textCenterCard": {
+  "source": "slab-comp.txt",
+  "psuip": "<textCenterCard>\n  <text_subtitle>Section 1</text_subtitle>\n  <text_title>特大标题居中</text_title>\n  <text_text> 联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。</text_text>\n</textCenterCard>"
+ },
+ "commentListCard": {
+  "source": "修复：docs 模板改为 loop+itemContent（loopData 数据）",
+  "psuip": "<commentListCard>\n  <loop data=\"loopData\">\n    <itemContent>\n      <title key=\"title\"></title>\n      <desc key=\"desc\"></desc>\n    </itemContent>\n  </loop>\n</commentListCard>"
+ },
+ "commentStyleListCard": {
+  "source": "恢复 docs 原示例（loop data=comments）",
+  "psuip": "<commentStyleListCard>\n  <title>项目动态</title>\n  <subtitle>最新 3 条更新 · 自动排列列表项</subtitle>\n  <loop data=\"comments\" nativeEvent=\"click\">\n    <itemContent>\n      <avatar src=\"avatarUrl\" key=\"avatarUrl\"></avatar>\n      <name key=\"approveAuditorName\"></name>\n      <text key=\"applyDeptName\"></text>\n      <desc key=\"orderSummary\"></desc>\n      <timestamp key=\"beginTime\"></timestamp>\n    </itemContent>\n  </loop>\n</commentStyleListCard>"
+ },
+ "confirmableCard": {
+  "source": "slab-comp.txt",
+  "psuip": "<confirmableCard>\n  <visual src=\"https://sop-cdn.dingcloud.com/filez/icon/8mm6fa2u7foi4j38r6r67navgpttixwi20240708114129822.png\" alt=\"品牌图形\" />\n  <cornerIcon>↻</cornerIcon>\n  <title>鼎道智联</title>\n  <body>正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字正文文字</body>\n</confirmableCard>"
+ },
+ "card:headerCard": {
+  "source": "修复：markdown 直排（h2 title + h3/h4/p 分组 percentItem）",
+  "psuip": "<card:headerCard>\n## 头部品牌分析\n### 联想\n#### 45%\n市场份额\n### 苹果\n#### 32%\n市场份额\n### 荣耀\n#### 23%\n市场份额\n</card:headerCard>"
+ },
+ "card:headerPrecentCard": {
+  "source": "markdown-renderer-examples.md",
+  "psuip": "<card:headerPrecentCard>\n## 二、市场概述\nAI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注\n### 中国市场\n<percentValue color={color.error.red8}>#### 15%</percentValue>\nAI-PC 出货量\n### 全球市场  \n#### 25%\nAI-PC 渗透率\n### 未来预测\n#### 40%\n预计增长率\n</card:headerPrecentCard>"
+ },
+ "hiringDarkNewAvatarCard": {
+  "source": "手动修复（参考 hiringNewAvatarCard 结构）",
+  "psuip": "<hiringDarkNewAvatarCard>\n  <title>算法策略</title>\n  <name>张逸杰</name>\n  <badge>推荐原因</badge>\n  <desc>他在算法优化与模型调参方面有出色表现，多次在业务指标上实现显著提升，是团队重点推荐的核心候选人。</desc>\n  <avatar src=\"https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200\"></avatar>\n</hiringDarkNewAvatarCard>"
+ },
+ "hiringNewAvatarCard": {
+  "source": "docs.md",
+  "psuip": "<hiringNewAvatarCard>\n  <title>算法策略</title>\n  <name>张逸杰</name>\n  <badge>推荐原因</badge>\n  <desc>他在算法优化与模型调参方面有出色表现，多次在业务指标上实现显著提升...</desc>\n  <avatar src=\"https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200\"></avatar>\n</hiringNewAvatarCard>"
+ },
+ "hiringNewPersonCard": {
+  "source": "docs.md",
+  "psuip": "<hiringNewPersonCard>\n  <title>杭州电子科技大学</title>\n  <name>张忠元</name>\n  <badge>推荐原因</badge>\n  <desc>他具备扎实的数学与计算机基础，对机器学习、深度学习及优化算法有系统掌握...</desc>\n</hiringNewPersonCard>"
+ },
+ "hiringNewTitleCard": {
+  "source": "docs.md",
+  "psuip": "<hiringNewTitleCard>\n  <title>人才筛选详情</title>\n  <desc>负责核心算法模型的设计、优化与落地</desc>\n  <badge>算法工程师</badge>\n</hiringNewTitleCard>"
+ },
+ "layeredActionCard": {
+  "source": "slab-comp.txt",
+  "psuip": "<layeredActionCard>\n  <icon>✦</icon>\n  <title>订阅我们的</title>\n  <titleAccent>新闻通讯</titleAccent>\n  <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>\n  <primaryAction nativeEvent=\"click\" data=\"subscribe\">订阅</primaryAction>\n  <secondaryAction nativeEvent=\"click\" data=\"later\">稍后再说</secondaryAction>\n</layeredActionCard>"
+ },
+ "card:minimalistChartCard": {
+  "source": "已完成的组件",
+  "psuip": "<card:minimalistChartCard>\n    ## 03\n    ### 头部品牌分析\n    联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。\n</card:minimalistChartCard>"
+ },
+ "multiActionCard": {
+  "source": "slab-comp.txt",
+  "psuip": "<multiActionCard>\n  <label>加入我们</label>\n  <description>成为我们团队的一员，你将有机会参与前沿技术研究，与优秀团队一起成长，共同打造行业领先的解决方案。</description>\n  <actionLabel>应聘方式</actionLabel>\n  <primaryAction nativeEvent=\"click\" data=\"officialApply\">官网在线申请</primaryAction>\n  <secondaryAction nativeEvent=\"click\" data=\"wechatApply\">公众号后台申请</secondaryAction>\n  <secondaryAction nativeEvent=\"click\" data=\"emailApply\">发送邮件申请</secondaryAction>\n</multiActionCard>"
+ },
+ "productCard": {
+  "source": "修复：image 槽位需 src 属性",
+  "psuip": "<productCard>\n  <image src=\"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600\"></image>\n  <title>智能降噪耳机</title>\n  <description>主动降噪 · 40 小时续航 · 旗舰音质</description>\n  <price>¥999.00</price>\n  <button>立即购买</button>\n</productCard>"
+ },
+ "simpleCard": {
+  "source": "docs.md",
+  "psuip": "<simpleCard>\n### AI芯片\n#### 搭载最新AI处理器\n</simpleCard>"
+ },
+ "titleCenterCard": {
+  "source": "slab-comp.txt",
+  "psuip": "<titleCenterCard>\n  <text_subtitle>Job Detial</text_subtitle>\n  <text_title>岗位详情</text_title>\n</titleCenterCard>"
+ },
+ "targetStatCard": {
+  "source": "test-cases.json",
+  "psuip": "<targetStatCard>\n<title>Error Collection</title>\n<preview src=\"file:///sdcard/Pictures/Camera/20260806/20260806201223.jpg\"></preview>\n<text>32</text>\n<caption>PRACTICE</caption>\n<subtitle>Practice Questions</subtitle>\n</targetStatCard>"
+ },
+ "showcaseCard": {
+  "source": "优化：替换为内容更丰富的展示型卡片示例",
+  "psuip": "<showcaseCard>\n  <title>机器学习模型选型指南</title>\n  <subtitle>Linear Algebra · Matrix · 特征值</subtitle>\n  <text>从线性代数到矩阵分解，掌握机器学习核心数学基础，为模型选型提供理论支撑。</text>\n  <commonListItem>特征值分解与奇异值分解的对比</commonListItem>\n  <commonListItem>矩阵条件数与数值稳定性分析</commonListItem>\n  <commonListItem>降维算法中的代数直觉</commonListItem>\n  <button>开始学习</button>\n</showcaseCard>"
+ },
+ "mistakesCard": {
+  "source": "test-cases.json",
+  "psuip": "<mistakesCard>\n  <title>Weak Spots</title>\n  <preview src=\"file:///sdcard/Pictures/Camera/camera_1786013999770.jpg\"></preview>\n  <mistakesCardItem type=\"error\">\n    <title>Multivariable Calculus</title>\n    <text>38% Mastery</text>\n    <caption>12 Mistakes</caption>\n  </mistakesCardItem>\n  <mistakesCardItem type=\"warning\">\n    <title>Linear Algebra (Matrix)</title>\n    <text>52% Mastery</text>\n    <caption>8 Mistakes</caption>\n  </mistakesCardItem>\n  <mistakesCardItem type=\"normal\">\n    <title>Vector Spaces</title>\n    <text>61% Mastery</text>\n    <caption>5 Mistakes</caption>\n  </mistakesCardItem>\n</mistakesCard>"
+ },
+ "metricCard": {
+  "source": "test-cases.json",
+  "psuip": "<metricCard>\n  <status>NORMAL</status>\n  <time_range>本月</time_range>\n  <metric_label>metricCard · 2×1</metric_label>\n  <metric_value>28</metric_value>\n  <trend_value>+2</trend_value>\n</metricCard>"
+ },
+ "contentSummaryCard": {
+  "source": "eight-element-analyzer/page.js",
+  "psuip": "<contentSummaryCard>\n  <coverImage src=\"https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=600\" alt=\"Whiteboard capture\"></coverImage>\n  <title>Smart Camera</title>\n  <description>4 Images captured · Whiteboard 1: Bayes' theorem proof</description>\n  <primaryAction>查看全部 4 张</primaryAction>\n</contentSummaryCard>"
+ },
+ "detailListCard": {
+  "source": "eight-element-analyzer/page.js",
+  "psuip": "<detailListCard>\n<title>CONTENTS</title>\n<subtitle>QUICK REFERENCE CARD</subtitle>\n<image src=\"https://images.unsplash.com/photo-1505373877841-8d25f7d46678\" ></image>\n<detailItem>\n<title>Subject</title>\n<text>Mathematics Analysis</text>\n</detailItem>\n<detailItem>\n<title>Core Unit</title>\n<text>Mathematics Analysis</text>\n</detailItem>\n<detailItem>\n<title>Complexity</title>\n<score value=\"3\" max=\"5\" />\n</detailItem>\n<detailItem>\n<title>Sources</title>\n<text>Mathematics Analysis</text>\n</detailItem>\n</detailListCard>"
+ },
+ "listCard": {
+  "source": "eight-element-analyzer/page.js",
+  "psuip": "<listCard>\n<title>CONTENTS</title>\n<orderedListItem color=\"{color.primary.brand5}\">1. Definition of Functions</orderedListItem>\n<orderedListItem>2. Definition of Functions</orderedListItem>\n    <orderedListItem>2.1 Definition of Functions</orderedListItem>\n    <orderedListItem >2.2 Definitions of a function</orderedListItem>\n<orderedListItem>3. Range of a function</orderedListItem>\n</listCard>"
+ },
+ "featureHeroCard": {
+  "source": "eight-element-analyzer/page.js",
+  "psuip": "<featureHeroCard>\n  <coverImage src=\"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900\"></coverImage>\n  <badge>热门目的地</badge>\n  <title>发现你的下一站旅行</title>\n  <description>个性化行程推荐，AI 智能规划，帮你找到更合适的旅程节奏。</description>\n  <highlights>⭐ 4.9 · 128K 用户</highlights>\n  <highlights>🗺️ 320+ 城市灵感</highlights>\n  <primaryAction href=\"https://example.com/plan\">开始计划</primaryAction>\n  <secondaryAction href=\"https://example.com/destinations\">查看目的地</secondaryAction>\n</featureHeroCard>"
+ }
+}

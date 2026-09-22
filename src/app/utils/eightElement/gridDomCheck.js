@@ -110,6 +110,33 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
     await page.setViewportSize({ width, height });
     await page.setContent(htmlContent);
 
+    // ⚠️ 等待资源加载稳定后再检测：
+    // 外部图片（如 images.unsplash.com）加载是异步的，setContent 后立即 evaluate 时
+    // img / CSS 背景图的尺寸可能仍为 0×0 → 被「内容未显示」误报，导致增长检测把本已
+    // 合法的格子误判为不合法并继续增长（结果依赖网络，不稳定）。
+    // 策略：先等 networkidle（覆盖 <img> 与 CSS background 等全部网络资源），
+    // 再等 document.images 全部 complete（load/error 均视为完成），均带超时兜底；
+    // 超时后按当前状态检测——确实未显示的图片仍会报缺失（符合预期）。
+    const RESOURCE_WAIT_TIMEOUT = 8000;
+    try {
+      await page.waitForLoadState('networkidle', { timeout: RESOURCE_WAIT_TIMEOUT });
+    } catch { /* 超时：继续，交由下方图片等待兜底 */ }
+    try {
+      await page.evaluate((timeout) => new Promise((resolve) => {
+        const images = Array.from(document.images);
+        if (images.length === 0) { resolve(); return; }
+        let pending = images.length;
+        let settled = false;
+        const finish = () => { if (!settled) { settled = true; resolve(); } };
+        const timer = setTimeout(finish, timeout);
+        images.forEach((img) => {
+          if (img.complete) { pending--; if (pending === 0) { clearTimeout(timer); finish(); } return; }
+          img.addEventListener('load', () => { pending--; if (pending === 0) { clearTimeout(timer); finish(); } }, { once: true });
+          img.addEventListener('error', () => { pending--; if (pending === 0) { clearTimeout(timer); finish(); } }, { once: true });
+        });
+      }), RESOURCE_WAIT_TIMEOUT);
+    } catch { /* 忽略 evaluate 异常 */ }
+
     const result = await page.evaluate(({ viewportWidth, viewportHeight }) => {
       const EPS = 1; // 容差（px）：避免字体渲染小数误差误报
       // 溢出容差（px）：比 EPS 略大，吸收 flex 压缩与字体度量的亚像素误差
@@ -400,7 +427,6 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
       screenshotPath = path.join(outputDir, `${outputPrefix}-${timestamp}-${rand}.png`);
       const screenshotBuffer = await page.screenshot({ fullPage: true, type: 'png' });
       fs.writeFileSync(screenshotPath, screenshotBuffer);
-      console.log(`grid 检测截图已保存至: ${screenshotPath}`);
     }
 
     return {
@@ -411,13 +437,9 @@ export async function measureGridDom(htmlContent, { width, height, psuip, takeSc
   } finally {
     try {
       if (page) await page.close();
-    } catch (err) {
-      console.error('关闭 Playwright page 失败:', err.message);
-    }
+    } catch (err) { /* 忽略：接口响应已返回错误信息，localhost 可直接调试 */ }
     try {
       if (browser) await browser.close();
-    } catch (err) {
-      console.error('关闭 Playwright browser 失败:', err.message);
-    }
+    } catch (err) { /* 忽略 */ }
   }
 }

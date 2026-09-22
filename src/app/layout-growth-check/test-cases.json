@@ -1,0 +1,494 @@
+[
+ {
+  "name": "textCard 基础短文本",
+  "card": "textCard",
+  "morphology": "vertical",
+  "description": "短标题 + 短正文，起始尺寸（2×1）即应合法",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<textCard>\n  <text_title>什么是定义域</text_title>\n  <text_text>函数 f(x) 的定义域是使表达式有意义的所有输入值集合。</text_text>\n</textCard>"
+ },
+ {
+  "name": "textCard 超长正文（需增长）",
+  "card": "textCard",
+  "morphology": "vertical",
+  "description": "正文极长，2×1 必然裁切/缺失，应增长到更大格子才合法",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<textCard>\n  <text_title>机器学习核心概念详解（超长示例）</text_title>\n  <text_text>机器学习是一类从数据中自动学习规律并用于预测或决策的算法体系。其核心思想是通过大量样本拟合一个函数，使该函数在未见数据上也能给出合理输出。监督学习依赖带标签数据，通过损失函数最小化逐步调整模型参数；无监督学习则从无标签数据中发现隐含结构，如聚类与降维。深度学习进一步利用多层神经网络表达复杂非线性关系，在图像、语音、自然语言等领域取得突破性进展。模型评估通常采用训练集/验证集/测试集划分，配合交叉验证降低过拟合风险。正则化、早停、数据增强等技巧可有效提升泛化能力。以上内容足够长，用于验证卡片在内容溢出时的增长检测逻辑是否按趋势向量正确扩张格子数。</text_text>\n</textCard>"
+ },
+ {
+  "name": "textCenterCard 居中短文本",
+  "card": "textCenterCard",
+  "morphology": "vertical",
+  "description": "居中标题 + 居中正文，起始尺寸合法",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<textCenterCard>\n  <text_title>核心定义</text_title>\n  <text_text>函数 $f$ 的定义域，是使表达式有意义的所有自变量取值集合。</text_text>\n</textCenterCard>"
+ },
+ {
+  "name": "textCenterCard 长内容居中",
+  "card": "textCenterCard",
+  "morphology": "vertical",
+  "description": "长标题 + 长正文居中排版，应增长",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 2
+  },
+  "psuip": "<textCenterCard>\n  <text_title>关于机器学习泛化能力的深入讨论</text_title>\n  <text_text>泛化能力衡量模型在未见数据上的表现。偏差-方差权衡指出：模型过简单则欠拟合（高偏差），过复杂则过拟合（高方差）。实践中通过正则化约束参数规模、用交叉验证选择超参数、以早停机制防止训练过久，从而在偏差与方差之间取得平衡。集成方法如随机森林与梯度提升通过组合多个弱学习器显著降低方差，而迁移学习则利用预训练模型减少对大量标注数据的依赖。评估指标需结合业务场景选择：分类任务常用准确率、精确率、召回率与 F1，回归任务常用均方误差与平均绝对误差。数据不均衡时需谨慎使用准确率，应关注混淆矩阵与 PR 曲线。样本量与特征维度的关系亦影响模型稳定性，特征工程与降维技术（PCA、t-SNE）可缓解维度灾难。</text_text>\n</textCenterCard>"
+ },
+ {
+  "name": "metricCard 基础指标",
+  "card": "metricCard",
+  "morphology": "vertical",
+  "description": "指标名 + 大数字 + 趋势值，起始 2×1 合法",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<metricCard>\n  <metric_label>本月营收</metric_label>\n  <metric_value>¥1,280万</metric_value>\n  <trend_value>+12.4%</trend_value>\n</metricCard>"
+ },
+ {
+  "name": "metricCard 长指标文案",
+  "card": "metricCard",
+  "morphology": "vertical",
+  "description": "指标标签与趋势文案较长，需更大格子",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<metricCard>\n  <metric_label>本季度活跃用户增长率（同比口径，含自然流量与投放流量）</metric_label>\n  <metric_value>38.6%</metric_value>\n  <trend_value>环比上月提升 5.2 个百分点，其中企业客户贡献 2.1 个百分点</trend_value>\n</metricCard>"
+ },
+ {
+  "name": "heroCard 封面图主视觉",
+  "card": "heroCard",
+  "morphology": "vertical",
+  "description": "封面图模式主视觉卡（外部图片），起始 4×2 应合法",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 2
+  },
+  "psuip": "<heroCard>\n  <cover_image src=\"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900\"></cover_image>\n  <badge>热门目的地</badge>\n  <title>发现你的下一站旅行</title>\n  <subtitle>个性化行程推荐，AI 智能规划，帮你找到更合适的旅程节奏。</subtitle>\n  <metrics>⭐ 4.9 · 128K 用户</metrics>\n  <metrics>🗺️ 320+ 城市灵感</metrics>\n  <cta_primary href=\"https://example.com/plan\">开始计划</cta_primary>\n  <cta_secondary href=\"https://example.com/destinations\">查看目的地</cta_secondary>\n</heroCard>"
+ },
+ {
+  "name": "featureHeroCard 特性主视觉",
+  "card": "featureHeroCard",
+  "morphology": "vertical",
+  "description": "特性主视觉卡（首屏重点推荐），含图与双按钮",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 2
+  },
+  "psuip": "<featureHeroCard>\n  <coverImage src=\"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=900\"></coverImage>\n  <badge>热门目的地</badge>\n  <title>发现你的下一站旅行</title>\n  <description>个性化行程推荐，AI 智能规划，帮你找到更合适的旅程节奏。</description>\n  <highlights>⭐ 4.9 · 128K 用户</highlights>\n  <highlights>🗺️ 320+ 城市灵感</highlights>\n  <primaryAction href=\"https://example.com/plan\">开始计划</primaryAction>\n  <secondaryAction href=\"https://example.com/destinations\">查看目的地</secondaryAction>\n</featureHeroCard>"
+ },
+ {
+  "name": "summaryCard 底部宽按钮",
+  "card": "summaryCard",
+  "morphology": "vertical",
+  "description": "总结卡：图片背景 + 底部宽按钮",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<summaryCard>\n  <title>致力于提供最先进的数字化解决方案</title>\n  <commit>了解更多</commit>\n  <text>从数据洞察到智能决策，为各行业客户打造端到端的数字化转型路径。</text>\n</summaryCard>"
+ },
+ {
+  "name": "summaryCard 长内容",
+  "card": "summaryCard",
+  "morphology": "vertical",
+  "description": "长标题 + 长正文 + 双按钮，需增长",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<summaryCard>\n  <title>面向企业级客户的端到端数字化解决方案与服务矩阵</title>\n  <commit>免费咨询</commit>\n  <text>覆盖咨询规划、数据中台建设、AI 应用落地与运维保障四大阶段，帮助客户在数据驱动决策、业务流程自动化、智能客服与预测性维护等场景实现价值闭环。方案基于云原生架构设计，支持私有化与混合云部署，满足金融、制造、零售、能源等行业合规要求。实施过程遵循敏捷方法论，通过共创工作坊、分阶段交付与持续优化机制确保项目风险可控、收益可量化。</text>\n</summaryCard>"
+ },
+ {
+  "name": "showcaseCard 展示型卡片",
+  "card": "showcaseCard",
+  "morphology": "vertical",
+  "description": "标题 + 副标题 + 正文 + 列表 + 按钮的标准展示布局",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<showcaseCard>\n  <title>机器学习模型选型指南</title>\n  <subtitle>Linear Algebra · Matrix · 特征值</subtitle>\n  <text>从线性代数到矩阵分解，掌握机器学习核心数学基础，为模型选型提供理论支撑。</text>\n  <commonListItem>特征值分解与奇异值分解的对比</commonListItem>\n  <commonListItem>矩阵条件数与数值稳定性分析</commonListItem>\n  <commonListItem>降维算法中的代数直觉</commonListItem>\n  <button>开始学习</button>\n</showcaseCard>"
+ },
+ {
+  "name": "showcaseCard 列表超多（需增长）",
+  "card": "showcaseCard",
+  "morphology": "vertical",
+  "description": "6 条列表项 + 长正文，2×1 放不下，应增长",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 2
+  },
+  "psuip": "<showcaseCard>\n  <title>机器学习知识体系速览</title>\n  <subtitle>从基础到进阶的完整路线</subtitle>\n  <text>本文整理机器学习从入门到进阶的核心知识点，涵盖数学基础、经典算法、工程实践与前沿方向，供学习者对照查漏补缺。</text>\n  <commonListItem>线性代数：向量、矩阵、特征值与奇异值分解</commonListItem>\n  <commonListItem>概率统计：条件概率、贝叶斯公式、极大似然估计</commonListItem>\n  <commonListItem>监督学习：线性回归、逻辑回归、SVM、决策树与随机森林</commonListItem>\n  <commonListItem>无监督学习：K-Means、DBSCAN、PCA 与自编码器</commonListItem>\n  <commonListItem>深度学习：CNN、RNN、Transformer 与注意力机制</commonListItem>\n  <commonListItem>工程实践：特征工程、超参数调优、模型部署与监控</commonListItem>\n  <commonListItem>前沿方向：大语言模型、多模态学习、强化学习与可解释性</commonListItem>\n  <button>开始学习</button>\n</showcaseCard>"
+ },
+ {
+  "name": "targetStatCard 目标统计",
+  "card": "targetStatCard",
+  "morphology": "vertical",
+  "description": "紫色标签 + 超大标题 + 大数字目标统计卡",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<targetStatCard>\n  <title>Error Collection</title>\n  <preview src=\"https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=600\"></preview>\n  <text>32</text>\n  <caption>PRACTICE</caption>\n  <subtitle>Practice Questions</subtitle>\n</targetStatCard>"
+ },
+ {
+  "name": "mistakesCard 易错点提示",
+  "card": "mistakesCard",
+  "morphology": "vertical",
+  "description": "易错点卡片（warning 模式）",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<mistakesCard>\n  <title>Weak Spots</title>\n  <mistakesCardItem type=\"error\">\n    <title>Multivariable Calculus</title>\n    <text>38% Mastery</text>\n    <caption>12 Mistakes</caption>\n  </mistakesCardItem>\n  <mistakesCardItem type=\"warning\">\n    <title>Linear Algebra (Matrix)</title>\n    <text>52% Mastery</text>\n    <caption>8 Mistakes</caption>\n  </mistakesCardItem>\n</mistakesCard>"
+ },
+ {
+  "name": "mistakesCard 多条易错点（需增长）",
+  "card": "mistakesCard",
+  "morphology": "vertical",
+  "description": "error 模式 + 多条内容，需增长",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<mistakesCard>\n  <title>高频易错点汇总（error 模式）</title>\n  <mistakesCardItem type=\"error\">\n    <title>极限与连续</title>\n    <text>18% Mastery</text>\n    <caption>5 Mistakes</caption>\n  </mistakesCardItem>\n  <mistakesCardItem type=\"warning\">\n    <title>导数与微分</title>\n    <text>45% Mastery</text>\n    <caption>11 Mistakes</caption>\n  </mistakesCardItem>\n  <mistakesCardItem type=\"normal\">\n    <title>积分应用</title>\n    <text>70% Mastery</text>\n    <caption>3 Mistakes</caption>\n  </mistakesCardItem>\n</mistakesCard>"
+ },
+ {
+  "name": "contentSummaryCard 内容摘要",
+  "card": "contentSummaryCard",
+  "morphology": "vertical",
+  "description": "标题 + 摘要 + 可选按钮的内容摘要卡",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<contentSummaryCard>\n  <coverImage src=\"https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=600\"></coverImage>\n  <title>旅行灵感周刊</title>\n  <description>本周精选全球 12 个宝藏目的地，含小众海岛与人文古城。</description>\n  <primaryAction>查看全文</primaryAction>\n</contentSummaryCard>"
+ },
+ {
+  "name": "contentSummaryCard 长摘要（需增长）",
+  "card": "contentSummaryCard",
+  "morphology": "vertical",
+  "description": "长标题 + 长摘要，2×1 放不下应增长",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<contentSummaryCard>\n  <coverImage src=\"https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=600\"></coverImage>\n  <title>2026 年度数字营销趋势白皮书精华摘要</title>\n  <description>基于对 2000+ 家企业营销负责人的调研，提炼出五大核心趋势：① 生成式 AI 重塑内容生产流程，72% 的企业已将其纳入日常运营；② 第一方数据战略成为增长基石，Cookie 退场后 CDP 与数据中台投入持续加码；③ 短视频与直播电商深度融合，内容场与货架场双向联动；④ 私域运营从粗放走向精细化，SCRM 与企微生态价值凸显；⑤ 全域营销测量与归因成为预算分配的核心依据，MMM 与 MTA 融合实践加速落地。</description>\n  <primaryAction>下载完整白皮书</primaryAction>\n</contentSummaryCard>"
+ },
+ {
+  "name": "detailListCard 详情列表",
+  "card": "detailListCard",
+  "morphology": "vertical",
+  "description": "详情列表卡（章节标题 + 正文条目）",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<detailListCard>\n  <title>CONTENTS</title>\n  <subtitle>QUICK REFERENCE CARD</subtitle>\n  <image src=\"https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=600\"></image>\n  <detailItem>\n    <title>Subject</title>\n    <text>Mathematics Analysis</text>\n  </detailItem>\n  <detailItem>\n    <title>Core Unit</title>\n    <text>Mathematics Analysis</text>\n  </detailItem>\n  <detailItem>\n    <title>Complexity</title>\n    <score value=\"3\" max=\"5\" />\n  </detailItem>\n</detailListCard>"
+ },
+ {
+  "name": "detailListCard 多章节（需增长）",
+  "card": "detailListCard",
+  "morphology": "vertical",
+  "description": "8 个章节条目，2×1 放不下需增长",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 2
+  },
+  "psuip": "<detailListCard>\n  <title>高等数学目录（完整版）</title>\n  <subtitle>八章全览</subtitle>\n  <image src=\"https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=600\"></image>\n  <detailItem><title>第一章</title><text>函数与极限：映射、复合函数、极限的定义与性质</text></detailItem>\n  <detailItem><title>第二章</title><text>导数与微分：求导法则、隐函数与参数方程求导</text></detailItem>\n  <detailItem><title>第三章</title><text>微分中值定理与导数的应用：罗尔、拉格朗日、柯西定理</text></detailItem>\n  <detailItem><title>第四章</title><text>不定积分：换元积分法、分部积分法</text></detailItem>\n  <detailItem><title>第五章</title><text>定积分及其应用：牛顿-莱布尼茨公式、反常积分</text></detailItem>\n  <detailItem><title>第六章</title><text>多元函数微积分：偏导数、全微分、重积分</text></detailItem>\n  <detailItem><title>第七章</title><text>无穷级数：数项级数、幂级数、傅里叶级数</text></detailItem>\n  <detailItem><title>第八章</title><text>常微分方程：一阶方程、二阶线性方程</text></detailItem>\n</detailListCard>"
+ },
+ {
+  "name": "listCard 列表卡",
+  "card": "listCard",
+  "morphology": "vertical",
+  "description": "基础列表卡（多条列表项）",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<listCard>\n  <title>CONTENTS</title>\n  <orderedListItem color=\"{color.primary.brand5}\">1. Definition of Functions</orderedListItem>\n  <orderedListItem>2. Definition of Functions</orderedListItem>\n  <orderedListItem>3. Range of a function</orderedListItem>\n</listCard>"
+ },
+ {
+  "name": "listCard 超多列表（需增长）",
+  "card": "listCard",
+  "morphology": "vertical",
+  "description": "10 条列表项，需增长到更多行",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 2
+  },
+  "psuip": "<listCard>\n  <title>2026 科技趋势 Top 10</title>\n  <orderedListItem>1. 端侧大模型普及，手机与 PC 离线推理成为标配</orderedListItem>\n  <orderedListItem>2. 具身智能进入商用元年，人形机器人落地工厂与仓储</orderedListItem>\n  <orderedListItem>3. 自动驾驶 L4 级规模化运营，Robotaxi 扩展至百城</orderedListItem>\n  <orderedListItem>4. 量子计算取得里程碑突破，纠错能力大幅提升</orderedListItem>\n  <orderedListItem>5. 脑机接口临床试验加速，医疗康复场景率先落地</orderedListItem>\n  <orderedListItem>6. 合成数据成为 AI 训练新燃料，缓解数据合规压力</orderedListItem>\n  <orderedListItem>7. 低空经济爆发，eVTOL 载人飞行器开启城市通勤</orderedListItem>\n  <orderedListItem>8. AI Agent 自主完成复杂工作流，重塑企业运营</orderedListItem>\n  <orderedListItem>9. 生物制造与合成生物学走向产业化</orderedListItem>\n  <orderedListItem>10. 能源互联网与虚拟电厂加速新型电力系统构建</orderedListItem>\n</listCard>"
+ },
+ {
+  "name": "pairedImageTextCard 双子图文",
+  "card": "pairedImageTextCard",
+  "morphology": "vertical",
+  "description": "双子图文卡片（两个图文子模块）",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<pairedImageTextCard>\n  <label>公司简介</label>\n  <title>致力于提供最先进的数字化解决方案</title>\n  <content>我们围绕技术、团队与服务能力，为客户提供可持续的数字化支持。</content>\n  <primaryItem>\n    <image src=\"https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=1200&h=800\" alt=\"企业会议与数字化方案讨论\" />\n    <title>关于企业</title>\n    <body>我们是一家专注于人工智能和大数据领域的创新科技公司，围绕数据治理、智能分析、业务自动化与系统集成，为客户提供从方案规划到落地交付的完整支持。</body>\n  </primaryItem>\n  <secondaryItem>\n    <image src=\"https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=800\" alt=\"团队协作与项目管理\" />\n    <title>团队实力</title>\n    <body>拥有一支跨学科的复合型团队，覆盖算法、工程、产品与设计，具备从 0 到 1 打造复杂系统的完整能力。</body>\n  </secondaryItem>\n</pairedImageTextCard>"
+ },
+ {
+  "name": "commentListCard 评论列表",
+  "card": "commentListCard",
+  "morphology": "vertical",
+  "description": "评论列表卡（loop 渲染 3 条用户评论）",
+  "expect": {
+   "valid": true,
+   "minColumns": 1,
+   "minRows": 1
+  },
+  "psuip": "<commentListCard>\n  <loop data=\"loopData\">\n    <itemContent>\n      <title key=\"title\"></title>\n      <desc key=\"desc\"></desc>\n    </itemContent>\n  </loop>\n</commentListCard>"
+ },
+ {
+  "name": "commentStyleListCard 项目动态",
+  "card": "commentStyleListCard",
+  "morphology": "vertical",
+  "description": "评论样式列表卡（loop 渲染 3 条申报记录）",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<commentStyleListCard>\n  <title>项目动态</title>\n  <subtitle>最新 3 条更新 · 自动排列列表项</subtitle>\n  <loop data=\"comments\" nativeEvent=\"click\">\n    <itemContent>\n      <avatar src=\"avatarUrl\" key=\"avatarUrl\"></avatar>\n      <name key=\"approveAuditorName\"></name>\n      <text key=\"applyDeptName\"></text>\n      <desc key=\"orderSummary\"></desc>\n      <timestamp key=\"beginTime\"></timestamp>\n    </itemContent>\n  </loop>\n</commentStyleListCard>"
+ },
+ {
+  "name": "confirmableCard 可确认内容",
+  "card": "confirmableCard",
+  "morphology": "vertical",
+  "description": "图标/标签 + 标题/正文 + 底部操作的可确认卡",
+  "expect": {
+   "valid": true,
+   "minColumns": 1,
+   "minRows": 1
+  },
+  "psuip": "<confirmableCard>\n  <visual src=\"https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=400\"></visual>\n  <cornerIcon>↻</cornerIcon>\n  <title>生成岗位 JD 完成</title>\n  <body>悬停可查看 tooltip 提示，点击按钮查看详情，确认无误后即可发布。</body>\n</confirmableCard>"
+ },
+ {
+  "name": "layeredActionCard 层叠行动卡",
+  "card": "layeredActionCard",
+  "morphology": "vertical",
+  "description": "紫色主视觉 + 浅色面板 + 操作入口",
+  "expect": {
+   "valid": true,
+   "minColumns": 1,
+   "minRows": 1
+  },
+  "psuip": "<layeredActionCard>\n  <icon>✦</icon>\n  <title>订阅我们的</title>\n  <titleAccent>新闻通讯</titleAccent>\n  <description>获取最新的产品更新、行业资讯和独家优惠信息。</description>\n  <primaryAction>订阅</primaryAction>\n  <secondaryAction>稍后再说</secondaryAction>\n</layeredActionCard>"
+ },
+ {
+  "name": "multiActionCard 多按钮操作",
+  "card": "multiActionCard",
+  "morphology": "vertical",
+  "description": "主操作 + 多个次操作的行动卡",
+  "expect": {
+   "valid": true,
+   "minColumns": 1,
+   "minRows": 1
+  },
+  "psuip": "<multiActionCard>\n  <label>加入我们</label>\n  <description>成为我们团队的一员，参与前沿技术研究，与优秀团队一起成长。</description>\n  <actionLabel>应聘方式</actionLabel>\n  <primaryAction>官网在线申请</primaryAction>\n  <secondaryAction>公众号后台申请</secondaryAction>\n</multiActionCard>"
+ },
+ {
+  "name": "productCard 产品卡",
+  "card": "productCard",
+  "morphology": "vertical",
+  "description": "产品图 + 标题 + 卖点 + 价格 + 购买按钮",
+  "expect": {
+   "valid": true,
+   "minColumns": 1,
+   "minRows": 1
+  },
+  "psuip": "<productCard>\n  <image src=\"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600\"></image>\n  <title>智能降噪耳机</title>\n  <description>主动降噪 · 40 小时续航 · 旗舰音质</description>\n  <price>¥999.00</price>\n  <button>立即购买</button>\n</productCard>"
+ },
+ {
+  "name": "productCard 长卖点（需增长）",
+  "card": "productCard",
+  "morphology": "vertical",
+  "description": "长标题 + 长描述的产品卡，需更大格子",
+  "expect": {
+   "valid": true,
+   "minColumns": 1,
+   "minRows": 2
+  },
+  "psuip": "<productCard>\n  <image src=\"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=600\"></image>\n  <title>旗舰级智能降噪无线耳机 Pro Max 2026 款</title>\n  <description>自适应主动降噪，智能识别环境噪音；40 小时综合续航支持快充；支持空间音频、多设备无缝切换与专属 APP 个性化调音；IPX5 防水防汗，适配运动与通勤全场景。</description>\n  <price>¥1,299.00</price>\n  <button>立即购买</button>\n</productCard>"
+ },
+ {
+  "name": "simpleCard 简洁卡",
+  "card": "simpleCard",
+  "morphology": "vertical",
+  "description": "简洁卡（markdown 标题映射）",
+  "expect": {
+   "valid": true,
+   "minColumns": 1,
+   "minRows": 1
+  },
+  "psuip": "<simpleCard>\n### AI芯片\n#### 搭载最新AI处理器\n</simpleCard>"
+ },
+ {
+  "name": "titleCenterCard 居中标题卡",
+  "card": "titleCenterCard",
+  "morphology": "vertical",
+  "description": "特大标题居中展示",
+  "expect": {
+   "valid": true,
+   "minColumns": 1,
+   "minRows": 1
+  },
+  "psuip": "<titleCenterCard>\n  <text_subtitle>Job Detail</text_subtitle>\n  <text_title>岗位详情</text_title>\n</titleCenterCard>"
+ },
+ {
+  "name": "card:headerCard 头部卡",
+  "card": "card:headerCard",
+  "morphology": "vertical",
+  "description": "头部品牌分析 + 三个品牌占比（markdown 直排）",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<card:headerCard>\n## 头部品牌分析\n### 联想\n#### 45%\n市场份额\n### 苹果\n#### 32%\n市场份额\n### 荣耀\n#### 23%\n市场份额\n</card:headerCard>"
+ },
+ {
+  "name": "card:headerPrecentCard 头部百分比卡",
+  "card": "card:headerPrecentCard",
+  "morphology": "vertical",
+  "description": "市场概述 + 三块百分比数据（15%/25%/40%）",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<card:headerPrecentCard>\n## 二、市场概述\nAI-PC 概念自 2023 年由英特尔提出后，迅速引发行业关注\n### 中国市场\n#### 15%\nAI-PC 出货量\n### 全球市场\n#### 25%\nAI-PC 渗透率\n### 未来预测\n#### 40%\n预计增长率\n</card:headerPrecentCard>"
+ },
+ {
+  "name": "card:minimalistChartCard 极简图表卡",
+  "card": "card:minimalistChartCard",
+  "morphology": "vertical",
+  "description": "极简图表卡（03 章节标识 + 分析正文）",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<card:minimalistChartCard>\n## 头部品牌分析\n联想、苹果和荣耀作为 AI-PC 市场的头部品牌，各自凭借独特的产品功能和市场策略在竞争中占据一席之地。以下是联想、苹果和荣耀的销售份额占比。\n</card:minimalistChartCard>"
+ },
+ {
+  "name": "hiringNewTitleCard 招聘标题卡（左右形态）",
+  "card": "hiringNewTitleCard",
+  "morphology": "horizontal",
+  "description": "左右形态：左标题右操作，验证 [[1,0],[0,1]] 倾向",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<hiringNewTitleCard>\n  <title>人才筛选详情</title>\n  <desc>负责核心算法模型的设计、优化与落地</desc>\n  <badge>算法工程师</badge>\n</hiringNewTitleCard>"
+ },
+ {
+  "name": "hiringNewAvatarCard 招聘头像卡（左右形态）",
+  "card": "hiringNewAvatarCard",
+  "morphology": "horizontal",
+  "description": "左右形态：左侧信息 + 右侧头像，验证 [[1,0],[0,1]]",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<hiringNewAvatarCard>\n  <title>算法策略</title>\n  <name>张逸杰</name>\n  <badge>推荐原因</badge>\n  <desc>他在算法优化与模型调参方面有出色表现，多次在业务指标上实现显著提升，是团队重点推荐的核心候选人。</desc>\n  <avatar src=\"https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200\"></avatar>\n</hiringNewAvatarCard>"
+ },
+ {
+  "name": "hiringDarkNewAvatarCard 招聘深色头像卡（左右形态）",
+  "card": "hiringDarkNewAvatarCard",
+  "morphology": "horizontal",
+  "description": "左右形态：深色渐变底 + 左侧信息 + 右侧头像",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<hiringDarkNewAvatarCard>\n  <title>算法策略</title>\n  <name>张逸杰</name>\n  <badge>推荐原因</badge>\n  <desc>他在算法优化与模型调参方面有出色表现，多次在业务指标上实现显著提升。</desc>\n  <avatar src=\"https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=200&h=200\"></avatar>\n</hiringDarkNewAvatarCard>"
+ },
+ {
+  "name": "hiringNewPersonCard 招聘人物卡",
+  "card": "hiringNewPersonCard",
+  "morphology": "vertical",
+  "description": "上下形态：学校 + 姓名 + 推荐原因",
+  "expect": {
+   "valid": true,
+   "minColumns": 2,
+   "minRows": 1
+  },
+  "psuip": "<hiringNewPersonCard>\n  <title>杭州电子科技大学</title>\n  <name>张忠元</name>\n  <badge>推荐原因</badge>\n  <desc>他具备扎实的数学与计算机基础，对机器学习、深度学习及优化算法有系统掌握。</desc>\n</hiringNewPersonCard>"
+ },
+ {
+  "name": "纯文本（无卡片 → 默认上下）",
+  "card": "__rawMarkdown__",
+  "morphology": "default",
+  "description": "边界：顶层非卡片纯文本，倾向性回退默认 [[0,1],[1,0]]",
+  "expect": {
+   "valid": true,
+   "minColumns": 1,
+   "minRows": 1
+  },
+  "psuip": "这是一段纯文本，没有包裹任何卡片标签，用于验证无卡片时的默认回退行为。"
+ },
+ {
+  "name": "markdown 列表（无卡片 → 兜底渲染）",
+  "card": "__rawMarkdown__",
+  "morphology": "default",
+  "description": "边界：markdown 无序列表（非卡片内容），兜底按纯文本渲染，1×1 合法",
+  "expect": {
+   "valid": true,
+   "minColumns": 1,
+   "minRows": 1
+  },
+  "psuip": "- 第一项：增长检测按卡片形态自动推导倾向性\n- 第二项：上下形态先加行再加列\n- 第三项：左右形态先加列再加行"
+ },
+ {
+  "name": "未知卡片（回退默认形态）",
+  "card": "__unknown__",
+  "morphology": "default",
+  "description": "边界：未在形态配置中的卡片，回退默认上下 [[0,1],[1,0]]",
+  "expect": {
+   "valid": false,
+   "minColumns": 8,
+   "minRows": 10
+  },
+  "psuip": "<unknownCard>\n  <title>未知卡片</title>\n  <desc>未注册组件，按纯文本兜底处理。</desc>\n</unknownCard>"
+ }
+]

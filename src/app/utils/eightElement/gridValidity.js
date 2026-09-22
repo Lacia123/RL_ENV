@@ -155,7 +155,7 @@ export async function checkGridLayoutValidity(psuip, { columns, rows, html, take
       }
     };
   } catch (error) {
-    console.error('grid DOM 检测失败:', error);
+    // 错误信息通过接口响应 details.messages 返回，localhost 直接调接口可查，不打日志
     return {
       valid: false,
       details: {
