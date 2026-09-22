@@ -22,10 +22,10 @@ import { growCheckGridLayout } from '@/app/utils/eightElement/gridGrowthCheck';
  *                                 [1,0] = 列 +1（横向加宽），[0,1] = 行 +1（纵向加高）；
  *                                 列表用尽循环；一侧到上限后该方向视为 0；
  *                                 [0,0] 步跳过（不渲染不检测）
- *   - n:        number            列数上限（横向最多 n 格），默认 8
- *   - m:        number            行数上限（纵向最多 m 格），默认 10
- *   - test:     boolean           是否返回最终渲染截图 URL；⚠️ 仅本地 dev 生效，
- *                                 生产环境强制忽略（线上不产生任何图片）
+ *   - columns:  number            列数上限（横向最多多少列），默认 8
+ *   - rows:     number            行数上限（纵向最多多少行），默认 10
+ *   - test:      boolean           是否返回最终渲染截图 URL；⚠️ 仅本地 dev 生效，
+ *                                   生产环境强制忽略（线上不产生任何图片）
  *
  * 出参（JSON）：
  *   - success:        boolean  请求是否成功
@@ -34,7 +34,8 @@ import { growCheckGridLayout } from '@/app/utils/eightElement/gridGrowthCheck';
  *   - startRows:      number   起始行数（顶层卡片 minH，未配置则 1）
  *   - columns:        number   最终列数（格子数）
  *   - rows:           number   最终行数（格子数）
- *   - n / m:          number   回显入参上限
+ *   - maxColumns:     number   回显列数上限（入参 columns）
+ *   - maxRows:        number   回显行数上限（入参 rows）
  *   - tendency:       Array<[number,number]>  实际使用的增长趋势（自动推导或入参回显）
  *   - cardName:       string|null  命中的顶层卡片名（去掉 card: 前缀；未识别为 null）
  *   - tendencySource: 'config' | 'default' | 'input'  趋势来源：
@@ -46,7 +47,18 @@ import { growCheckGridLayout } from '@/app/utils/eightElement/gridGrowthCheck';
 export async function POST(request) {
   try {
     const requestData = await request.json();
-    const { psuip, tendency, n = 8, m = 10, test = false } = requestData || {};
+    const { psuip, tendency, columns = 8, rows = 10, test = false, n, m } = requestData || {};
+
+    // ⚠️ 旧参数名 n/m 已弃用：明确拒绝，提示使用 columns/rows（不静默兼容）
+    if (n !== undefined || m !== undefined) {
+      return NextResponse.json({
+        success: false,
+        error: '参数 n/m 已弃用，请使用 columns/rows（columns = 列数上限，rows = 行数上限）'
+      }, { status: 400 });
+    }
+
+    const maxColumns = Number(columns);
+    const maxRows = Number(rows);
 
     // ⚠️ test 只在本地 dev 生效（与 markdown-layout-check 一致）：
     // 生产环境强制忽略，禁止生成截图文件
@@ -73,13 +85,11 @@ export async function POST(request) {
       }
     }
 
-    // 3. 参数校验：n/m 必须为正整数（列/行上限）
-    const maxColumns = Number(n);
-    const maxRows = Number(m);
+    // 3. 参数校验：columns/rows 必须为正整数（列/行上限）
     if (!Number.isInteger(maxColumns) || !Number.isInteger(maxRows) || maxColumns <= 0 || maxRows <= 0) {
       return NextResponse.json({
         success: false,
-        error: 'n/m 必须为正整数（n = 列数上限，m = 行数上限）'
+        error: 'columns/rows 必须为正整数（columns = 列数上限，rows = 行数上限）'
       }, { status: 400 });
     }
 
@@ -106,8 +116,8 @@ export async function POST(request) {
       startRows: result.startRows,
       columns: result.columns,
       rows: result.rows,
-      n: maxColumns,
-      m: maxRows,
+      maxColumns,
+      maxRows,
       tendency: result.tendency,
       cardName: result.cardName,
       tendencySource: result.tendencySource,

@@ -72,7 +72,7 @@ export default function LayoutGrowthCheckPage() {
       const res = await fetch('/api/markdown-grid-growth-check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ psuip, n: Number(n), m: Number(m), test })
+        body: JSON.stringify({ psuip, columns: Number(n), rows: Number(m), test })
       });
       const data = await res.json();
       if (!res.ok) {
@@ -96,7 +96,7 @@ export default function LayoutGrowthCheckPage() {
       const res = await fetch('/api/markdown-grid-growth-check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ psuip: tc.psuip, n: Number(maxC), m: Number(maxR), test: true })
+        body: JSON.stringify({ psuip: tc.psuip, columns: Number(maxC), rows: Number(maxR), test: true })
       });
       const data = await res.json();
       if (!res.ok) return { error: data.error || `请求失败（${res.status}）` };
@@ -206,12 +206,12 @@ export default function LayoutGrowthCheckPage() {
 
           <div style={{ display: 'flex', gap: 16, marginTop: 12, alignItems: 'center' }}>
             <label style={{ fontSize: 13 }}>
-              列上限 n：
+              列上限：
               <input type="number" min="1" value={n} onChange={(e) => setN(e.target.value)}
                 style={{ width: 70, marginLeft: 6, padding: '4px 6px' }} />
             </label>
             <label style={{ fontSize: 13 }}>
-              行上限 m：
+              行上限：
               <input type="number" min="1" value={m} onChange={(e) => setM(e.target.value)}
                 style={{ width: 70, marginLeft: 6, padding: '4px 6px' }} />
             </label>
@@ -249,7 +249,7 @@ export default function LayoutGrowthCheckPage() {
                 ? `✓ 合法：${result.columns}×${result.rows} 格`
                 : `✗ 增长到上限仍不合法（${result.columns}×${result.rows} 格）`}
               <span style={{ fontSize: 12, fontWeight: 400, marginLeft: 12, color: '#888' }}>
-                起始 {result.startColumns}×{result.startRows} · 上限 n×m = {result.n}×{result.m} ·
+                起始 {result.startColumns}×{result.startRows} · 上限 = {result.maxColumns}×{result.maxRows} ·
                 checked {result.details?.checked ?? 0} 个元素
               </span>
             </div>
@@ -321,12 +321,12 @@ export default function LayoutGrowthCheckPage() {
 
         <div style={{ display: 'flex', gap: 16, marginBottom: 12, alignItems: 'center' }}>
           <label style={{ fontSize: 13 }}>
-            套用上限 n：
+            列上限：
             <input type="number" min="1" value={suiteN} onChange={(e) => setSuiteN(e.target.value)}
               style={{ width: 60, marginLeft: 6, padding: '4px 6px' }} />
           </label>
           <label style={{ fontSize: 13 }}>
-            m：
+            行上限：
             <input type="number" min="1" value={suiteM} onChange={(e) => setSuiteM(e.target.value)}
               style={{ width: 60, marginLeft: 6, padding: '4px 6px' }} />
           </label>

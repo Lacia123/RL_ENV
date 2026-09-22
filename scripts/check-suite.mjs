@@ -6,7 +6,7 @@ for (let i = 0; i < cases.length; i++) {
   try {
     const res = await fetch('http://localhost:3001/api/markdown-grid-growth-check', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ psuip: tc.psuip, n: 8, m: 10, test: false })
+      body: JSON.stringify({ psuip: tc.psuip, columns: 8, rows: 10, test: false })
     });
     const d = await res.json();
     const pass = !d.error && d.valid === tc.expect.valid && d.columns >= (tc.expect.minColumns ?? 1) && d.rows >= (tc.expect.minRows ?? 1);
