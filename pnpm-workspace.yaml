@@ -1,0 +1,5 @@
+allowBuilds:
+  canvas: true
+  playwright-chromium: true
+  sharp: true
+  unrs-resolver: true
